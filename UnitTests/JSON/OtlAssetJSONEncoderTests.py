@@ -4,7 +4,7 @@ from datetime import datetime
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
-from otlmow_converter.OTLFacility import OTLFacility
+from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
 
@@ -12,7 +12,7 @@ class OtlAssetJSONEncoderTests(unittest.TestCase):
     def set_up_encoder(self):
         base_dir = os.path.dirname(os.path.realpath(__file__))
         settings_file_location = f'{base_dir}/../settings_OTLMOW.json'
-        otl_facility = OTLFacility(logfile='', settings_path=settings_file_location)
+        otl_facility = OtlmowConverter(logfile='', settings_path=settings_file_location)
         encoder = OtlAssetJSONEncoder(settings=otl_facility.settings)
         return encoder
 

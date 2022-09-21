@@ -8,7 +8,7 @@ from otlmow_converter.FileExporter import FileExporter
 from otlmow_converter.FileImporter import FileImporter
 
 
-class OTLFacility:
+class OtlmowConverter:
     def __init__(self,
                  settings_path: Path = None,
                  logging_level: int = logging.WARNING,
