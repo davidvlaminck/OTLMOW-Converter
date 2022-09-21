@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from OTLMOW.Facility.Exceptions.InvalidExtensionError import InvalidExtensionError
-from OTLMOW.Facility.FileFormats.CsvExporter import CsvExporter
-from OTLMOW.Facility.FileFormats.JsonExporter import JsonExporter
-from OTLMOW.Facility.FileImporter import FileImporter
+from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
+from otlmow_converter.FileFormats.CsvExporter import CsvExporter
+from otlmow_converter.FileFormats.JsonExporter import JsonExporter
+from otlmow_converter.FileImporter import FileImporter
 
 
 class FileExporter:

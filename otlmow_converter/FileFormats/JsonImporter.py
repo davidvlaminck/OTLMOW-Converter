@@ -1,4 +1,4 @@
-﻿from OTLMOW.Facility.FileFormats.JsonDecoder import JsonDecoder
+﻿from otlmow_converter.FileFormats.JsonDecoder import JsonDecoder
 
 
 class JsonImporter:

@@ -1,13 +1,12 @@
+import datetime
 import os
 import unittest
-import datetime
-from pathlib import Path
 
-from OTLMOW.Facility.FileFormats.CsvExporter import CsvExporter
-from OTLMOW.Facility.FileFormats.CsvImporter import CsvImporter
-from OTLMOW.Facility.OTLFacility import OTLFacility
-from SettingManagerForUnitTests import get_settings_path_for_unittests
-from TestClasses.OTLModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
+from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from otlmow_converter.FileFormats.CsvExporter import CsvExporter
+from otlmow_converter.FileFormats.CsvImporter import CsvImporter
+from otlmow_converter.OTLFacility import OTLFacility
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -101,13 +100,13 @@ class CsvExporterTests(unittest.TestCase):
         with self.subTest('object in list without valid assetId'):
             with self.assertRaises(ValueError):
                 list_of_objects = [AllCasesTestClass()]
-                csv_data = exporter.create_data_from_objects(list_of_objects)
+                exporter.create_data_from_objects(list_of_objects)
 
         with self.subTest('object in list without valid assetId -> empty string'):
             with self.assertRaises(ValueError):
                 list_of_objects = [AllCasesTestClass()]
                 list_of_objects[0].assetId.identificator = ''
-                csv_data = exporter.create_data_from_objects(list_of_objects)
+                exporter.create_data_from_objects(list_of_objects)
 
         with self.subTest('object in list with valid assetId -> string'):
             list_of_objects = [AllCasesTestClass()]

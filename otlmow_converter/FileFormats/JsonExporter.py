@@ -1,4 +1,4 @@
-﻿from OTLMOW.ModelGenerator.OtlAssetJSONEncoder import OtlAssetJSONEncoder
+﻿from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
 
 
 class JsonExporter:

@@ -1,9 +1,9 @@
 import copy
 from pathlib import Path
 
-from OTLMOW.Facility.DotnotationHelper import DotnotationHelper
-from OTLMOW.Facility.GenericHelper import GenericHelper
-from OTLMOW.OTLModel.Classes.ImplementatieElement.AIMObject import AIMObject
+from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
+from otlmow_model.Helpers.DotnotationHelper import DotnotationHelper
+from otlmow_model.Helpers.GenericHelper import GenericHelper
 
 
 class CsvExporter:

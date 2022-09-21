@@ -2,15 +2,16 @@ import os
 import unittest
 from datetime import datetime
 
-from OTLMOW.Facility.OTLFacility import OTLFacility
-from OTLMOW.ModelGenerator.OtlAssetJSONEncoder import OtlAssetJSONEncoder
-from TestClasses.OTLModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
+from otlmow_converter.OTLFacility import OTLFacility
+
 
 
 class OtlAssetJSONEncoderTests(unittest.TestCase):
     def set_up_encoder(self):
         base_dir = os.path.dirname(os.path.realpath(__file__))
-        settings_file_location = f'{base_dir}/../../settings_OTLMOW.json'
+        settings_file_location = f'{base_dir}/../settings_OTLMOW.json'
         otl_facility = OTLFacility(logfile='', settings_path=settings_file_location)
         encoder = OtlAssetJSONEncoder(settings=otl_facility.settings)
         return encoder

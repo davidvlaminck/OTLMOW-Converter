@@ -1,7 +1,7 @@
 import json
 
-from OTLMOW.Facility.AssetFactory import AssetFactory
-from OTLMOW.Facility.FileFormats.DictDecoder import DictDecoder
+from otlmow_converter.AssetFactory import AssetFactory
+from otlmow_converter.FileFormats.DictDecoder import DictDecoder
 
 
 class JsonDecoder:
