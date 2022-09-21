@@ -1,15 +1,17 @@
 from datetime import date, datetime, time
 from unittest import TestCase
 
-from OTLMOW.Facility.FileFormats.JsonDecoder import JsonDecoder
-from OTLMOW.OTLModel.Classes.Onderdeel.ExterneDetectie import ExterneDetectie
-from OTLMOW.OTLModel.Classes.Onderdeel.HeeftBetrokkene import HeeftBetrokkene
-from OTLMOW.OTLModel.Classes.Onderdeel.Netwerkpoort import Netwerkpoort
-from OTLMOW.OTLModel.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
-from OTLMOW.OTLModel.Classes.Installatie.Wegberm import Wegberm
-from UnitTests.TestClasses.OTLModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from otlmow_model.Classes.Installatie.Wegberm import Wegberm
+from otlmow_model.Classes.Onderdeel.ExterneDetectie import ExterneDetectie
+from otlmow_model.Classes.Onderdeel.HeeftBetrokkene import HeeftBetrokkene
+from otlmow_model.Classes.Onderdeel.Netwerkpoort import Netwerkpoort
+from otlmow_model.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
 
-# TODO compare to GeneralTests/DavieDecoderTests
+from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from otlmow_converter.FileFormats.JsonDecoder import JsonDecoder
+
+
+#TODO: refactor to only use AllCasesTestClass
 class DavieDecoderTests(TestCase):
     jsonDataCase1 = """[{
     "assetId": {

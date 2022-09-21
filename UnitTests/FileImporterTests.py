@@ -2,10 +2,10 @@ import os
 from os.path import abspath
 from unittest import TestCase
 
-from OTLMOW.Facility.Exceptions.InvalidExtensionError import InvalidExtensionError
-from OTLMOW.Facility.FileFormats.CsvImporter import CsvImporter
-from OTLMOW.Facility.FileFormats.JsonImporter import JsonImporter
-from OTLMOW.Facility.FileImporter import FileImporter
+from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
+from otlmow_converter.FileFormats.CsvImporter import CsvImporter
+from otlmow_converter.FileFormats.JsonImporter import JsonImporter
+from otlmow_converter.FileImporter import FileImporter
 
 
 class FileImporterTests(TestCase):

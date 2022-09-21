@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
 
-from OTLMOW.Facility.AssetFactory import AssetFactory
-from OTLMOW.Facility.DotnotationHelper import DotnotationHelper
+from otlmow_model.Helpers.DotnotationHelper import DotnotationHelper
+
+from otlmow_converter.AssetFactory import AssetFactory
 
 
 class CsvImporter:
