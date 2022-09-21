@@ -90,7 +90,7 @@ class CsvExporterTests(unittest.TestCase):
 
     def test_create_data_from_objects_empty_objects(self):
         otl_facility = self.set_up_facility()
-        exporter = CsvExporter(settings=otl_facility.settings)
+        exporter = CsvExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
 
         with self.subTest('empty list of objects'):
             with self.assertRaises(ValueError):
@@ -121,7 +121,7 @@ class CsvExporterTests(unittest.TestCase):
 
     def test_create_data_from_objects_nonempty_objects_same_type(self):
         otl_facility = self.set_up_facility()
-        exporter = CsvExporter(settings=otl_facility.settings)
+        exporter = CsvExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
 
         list_of_objects = [AllCasesTestClass(), AllCasesTestClass()]
         list_of_objects[0].assetId.identificator = '0'
@@ -180,7 +180,7 @@ class CsvExporterTests(unittest.TestCase):
 
     def test_create_data_from_objects_cardinality(self):
         otl_facility = self.set_up_facility()
-        exporter = CsvExporter(settings=otl_facility.settings)
+        exporter = CsvExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
 
         list_of_objects = [AllCasesTestClass()]
         list_of_objects[0].assetId.identificator = '0'
@@ -205,7 +205,7 @@ class CsvExporterTests(unittest.TestCase):
 
     def test_create_data_from_objects_different_settings(self):
         otl_facility = self.set_up_facility()
-        exporter = CsvExporter(settings=otl_facility.settings)
+        exporter = CsvExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
         exporter.settings = {
             "name": "csv",
             "dotnotation": {
@@ -249,7 +249,7 @@ class CsvExporterTests(unittest.TestCase):
 
     def test_create_with_different_cardinality_among_subattributes(self):
         otl_facility = self.set_up_facility()
-        exporter = CsvExporter(settings=otl_facility.settings)
+        exporter = CsvExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
 
         list_of_objects = [AllCasesTestClass()]
         list_of_objects[0].assetId.identificator = '0'

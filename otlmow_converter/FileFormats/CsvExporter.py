@@ -7,7 +7,9 @@ from otlmow_model.Helpers.GenericHelper import GenericHelper
 
 
 class CsvExporter:
-    def __init__(self, settings=None):
+    def __init__(self, settings=None, class_directory: str = 'otlmow_model.Classes'):
+        self.aimobject_ref = self.import_aimobject(class_directory)
+
         if settings is None:
             settings = {}
         self.settings = settings
@@ -76,7 +78,7 @@ class CsvExporter:
         self.csv_headers = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
 
         for asset_object in list_of_objects:
-            if isinstance(asset_object, AIMObject):
+            if isinstance(asset_object, self.aimobject_ref):
                 if asset_object.assetId.identificator is None or asset_object.assetId.identificator == '':
                     raise ValueError(
                         f'Not possible to export AIM Objects without a valid assetId.identificator. '
@@ -224,3 +226,12 @@ class CsvExporter:
         else:
             values_list = list(map(lambda x: x.waarde, actual_attributes))
         return values_list
+
+    def import_aimobject(self, class_directory):
+        try:
+            # TODO: check https://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
+            py_mod = __import__(name=f'{class_directory}.ImplementatieElement.AIMObject', fromlist=f'AIMObject')
+        except ModuleNotFoundError:
+            return None
+        class_ = getattr(py_mod, 'AIMObject')
+        return class_
