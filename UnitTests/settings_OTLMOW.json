@@ -55,7 +55,7 @@
             "delimiter": ";"
         },
         {
-            "name": "xslx",
+            "name": "xls",
             "dotnotation": {
                 "separator": ".",
                 "cardinality separator": "|",
