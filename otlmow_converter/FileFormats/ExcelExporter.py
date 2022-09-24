@@ -101,7 +101,7 @@ class ExcelExporter:
                 self.data[short_uri] = DataFrame()
             d = {}
 
-            # TODO check if assetId.identificator is empty
+            # TODO check if assetId.identificator is empty is a problem for Davie or not
 
             for k, v in otl_object.list_attributes_and_values_by_dotnotation():
                 if self.settings['dotnotation']['cardinality indicator'] in k:
@@ -113,11 +113,9 @@ class ExcelExporter:
                 d['typeURI'] = otl_object.typeURI
             if 'assetId.identificator' not in d:
                 d['assetId.identificator'] = None
-            if 'assetId.toegekendDoor' not in d:
-                d['assetId.toegekendDoor'] = None
+            # if 'assetId.toegekendDoor' not in d:
+            #     d['assetId.toegekendDoor'] = None
 
-            print(self.data[short_uri].shape[0])
-            print(d)
             df = DataFrame(d, index=[self.data[short_uri].shape[0]])
 
             self.data[short_uri] = pandas.concat([self.data[short_uri], df])
@@ -129,6 +127,9 @@ class ExcelExporter:
         for k, df in self.data.items():
             headers = []
             headers.extend(fixed_first_headers)
+            for fixed_header in fixed_first_headers:
+                if fixed_header not in df.columns:
+                    headers.remove(fixed_header)
 
             for col in df.columns:
                 if col in fixed_first_headers:

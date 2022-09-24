@@ -1,8 +1,11 @@
 import datetime
+import logging
 import os
 import unittest
 from pathlib import Path
 
+import numpy
+import pandas
 from pandas import DataFrame
 
 from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
@@ -53,8 +56,8 @@ class ExcelExporterTests(unittest.TestCase):
         exporter = ExcelExporter(settings=otl_facility.settings)
         list_of_objects = [Voedt()]
         exporter.create_dataframe_dict_from_objects(list_of_objects)
-        data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, None]]
-        df = DataFrame(data, columns=['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'])
+        data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None]]
+        df = DataFrame(data, columns=['typeURI', 'assetId.identificator'])
         self.assertTrue('Voedt' in exporter.data)
         self.assertEqual(df.iloc[0].tolist(), exporter.data['Voedt'].iloc[0].tolist())
 
@@ -64,9 +67,9 @@ class ExcelExporterTests(unittest.TestCase):
         list_of_objects = [Voedt(), Voedt()]
         list_of_objects[0].isActief = True
         exporter.create_dataframe_dict_from_objects(list_of_objects)
-        data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, None, True],
-                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, None, None]]
-        df = DataFrame(data, columns=['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'isActief'])
+        data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, True],
+                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, None]]
+        df = DataFrame(data, columns=['typeURI', 'assetId.identificator', 'isActief'])
         self.assertTrue('Voedt' in exporter.data)
         self.assertEqual(df.iloc[0].tolist(), exporter.data['Voedt'].iloc[0].tolist())
         self.assertEqual(df.iloc[1].tolist(), exporter.data['Voedt'].iloc[1].tolist())
@@ -78,13 +81,13 @@ class ExcelExporterTests(unittest.TestCase):
         list_of_objects[0].isActief = True
         list_of_objects[1].isActief = True
         exporter.create_dataframe_dict_from_objects(list_of_objects)
-        data_voeding = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, None, True]]
+        data_voeding = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, True]]
         df_voeding = DataFrame(data_voeding,
-                               columns=['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'isActief'])
-        data_bevestiging = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', None, None, True],
-                            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', None, None, None]]
+                               columns=['typeURI', 'assetId.identificator', 'isActief'])
+        data_bevestiging = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', None, True],
+                            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', None, None]]
         df_bevestiging = DataFrame(data_bevestiging,
-                                   columns=['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'isActief'])
+                                   columns=['typeURI', 'assetId.identificator', 'isActief'])
         self.assertTrue('Voedt' in exporter.data)
         self.assertTrue('Bevestiging' in exporter.data)
         self.assertEqual(df_voeding.iloc[0].tolist(), exporter.data['Voedt'].iloc[0].tolist())
@@ -103,148 +106,17 @@ class ExcelExporterTests(unittest.TestCase):
         exporter.export_to_file(list_of_objects=objects, filepath=new_file_location)
         self.assertTrue(os.path.isfile(new_file_location))
 
+        self.assertTrue(self.verify_excel_files(file_location, new_file_location))
+
         # https://kanoki.org/2019/02/26/compare-two-excel-files-for-difference-using-python/
 
     @unittest.skip
     def test_sort_headers(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings)
-        with self.subTest('no headers'):
-            result = exporter.sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'])
-            expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
-            self.assertListEqual(expected, result)
-
-        with self.subTest('2 headers'):
-            result = exporter.sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'b', 'a'])
-            expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a', 'b']
-            self.assertListEqual(expected, result)
-
-        with self.subTest('complex headers'):
-            result = exporter.sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.2', 'a.1'])
-            expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.1', 'a.2']
-            self.assertListEqual(expected, result)
-
-    @unittest.skip
-    def test_create_data_from_objects_empty_objects(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
-
-        with self.subTest('empty list of objects'):
-            with self.assertRaises(ValueError):
-                list_of_objects = []
-                exporter.create_data_from_objects(list_of_objects)
-
-        with self.subTest('object in list without valid assetId'):
-            with self.assertRaises(ValueError):
-                list_of_objects = [AllCasesTestClass()]
-                exporter.create_data_from_objects(list_of_objects)
-
-        with self.subTest('object in list without valid assetId -> empty string'):
-            with self.assertRaises(ValueError):
-                list_of_objects = [AllCasesTestClass()]
-                list_of_objects[0].assetId.identificator = ''
-                exporter.create_data_from_objects(list_of_objects)
-
-        with self.subTest('object in list with valid assetId -> string'):
-            list_of_objects = [AllCasesTestClass()]
-            list_of_objects[0].assetId.identificator = '0'
-            Excel_data = exporter.create_data_from_objects(list_of_objects)
-            self.assertEqual('typeURI', Excel_data[0][0])
-            self.assertEqual('assetId.identificator', Excel_data[0][1])
-            self.assertEqual('assetId.toegekendDoor', Excel_data[0][2])
-            self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-                             Excel_data[1][0])
-            self.assertEqual('0', Excel_data[1][1])
-            self.assertEqual(None, Excel_data[1][2])
-
-    @unittest.skip
-    def test_create_data_from_objects_nonempty_objects_same_type(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
-
-        list_of_objects = [AllCasesTestClass(), AllCasesTestClass()]
-        list_of_objects[0].assetId.identificator = '0'
-        list_of_objects[0].testDecimalField = 1.0
-        list_of_objects[0].testBooleanField = True
-        list_of_objects[0].testKeuzelijst = 'waarde-1'
-        list_of_objects[0].testComplexType.testStringField = 'string in complex veld'
-        list_of_objects[0].testComplexType.testKwantWrd.waarde = 2.0
-
-        list_of_objects[1].assetId.identificator = '1'
-        list_of_objects[1].testBooleanField = False
-        list_of_objects[1].testKeuzelijstMetKard = ['waarde-2']
-        list_of_objects[1].testDateField = datetime.date(2022, 2, 2)
-        list_of_objects[1].testDecimalField = 2.5
-        list_of_objects[
-            1].testComplexType.testComplexType2.testStringField = 'string in complex veld binnenin complex veld'
-
-        Excel_data = exporter.create_data_from_objects(list_of_objects)
-
-        with self.subTest('verify headers'):
-            self.assertEqual('typeURI', Excel_data[0][0])
-            self.assertEqual('assetId.identificator', Excel_data[0][1])
-            self.assertEqual('assetId.toegekendDoor', Excel_data[0][2])
-            self.assertEqual('testBooleanField', Excel_data[0][3])
-            self.assertEqual('testComplexType.testComplexType2.testStringField', Excel_data[0][4])
-            self.assertEqual('testComplexType.testKwantWrd', Excel_data[0][5])
-            self.assertEqual('testComplexType.testStringField', Excel_data[0][6])
-            self.assertEqual('testDateField', Excel_data[0][7])
-            self.assertEqual('testDecimalField', Excel_data[0][8])
-            self.assertEqual('testKeuzelijst', Excel_data[0][9])
-            self.assertEqual('testKeuzelijstMetKard[]', Excel_data[0][10])
-
-        with self.subTest('verify asset 1'):
-            self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-                             Excel_data[1][0])
-            self.assertEqual('0', Excel_data[1][1])
-            self.assertEqual(None, Excel_data[1][2])
-            self.assertEqual(True, Excel_data[1][3])
-            self.assertEqual(None, Excel_data[1][4])
-            self.assertEqual(2.0, Excel_data[1][5])
-            self.assertEqual('string in complex veld', Excel_data[1][6])
-            self.assertEqual(1.0, Excel_data[1][8])
-            self.assertEqual('waarde-1', Excel_data[1][9])
-            self.assertEqual(None, Excel_data[1][10])
-
-        with self.subTest('verify asset 2'):
-            self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-                             Excel_data[2][0])
-            self.assertEqual('1', Excel_data[2][1])
-            self.assertEqual(None, Excel_data[2][2])
-            self.assertEqual(False, Excel_data[2][3])
-            self.assertEqual('string in complex veld binnenin complex veld', Excel_data[2][4])
-            self.assertEqual(None, Excel_data[2][5])
-            self.assertEqual(None, Excel_data[2][6])
-            self.assertEqual('2022-02-02', Excel_data[2][7])
-            self.assertEqual(2.5, Excel_data[2][8])
-            self.assertEqual(None, Excel_data[2][9])
-            self.assertEqual(['waarde-2'], Excel_data[2][10])
+        pass
 
     @unittest.skip
     def test_create_data_from_objects_cardinality(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
-
-        list_of_objects = [AllCasesTestClass()]
-        list_of_objects[0].assetId.identificator = '0'
-        list_of_objects[0]._testComplexTypeMetKard.add_empty_value()
-        list_of_objects[0].testComplexTypeMetKard[0].testStringField = '1.1'
-        list_of_objects[0].testComplexTypeMetKard[0].testBooleanField = False
-        list_of_objects[0]._testComplexTypeMetKard.add_empty_value()
-        list_of_objects[0].testComplexTypeMetKard[1].testStringField = '1.2'
-        list_of_objects[0].testComplexTypeMetKard[1].testBooleanField = True
-
-        Excel_data = exporter.create_data_from_objects(list_of_objects)
-
-        self.assertEqual('typeURI', Excel_data[0][0])
-        self.assertEqual('assetId.identificator', Excel_data[0][1])
-        self.assertEqual('assetId.toegekendDoor', Excel_data[0][2])
-        self.assertEqual('testComplexTypeMetKard[].testBooleanField', Excel_data[0][3])
-        self.assertEqual('testComplexTypeMetKard[].testStringField', Excel_data[0][4])
-        self.assertEqual('0', Excel_data[1][1])
-        self.assertEqual(None, Excel_data[1][2])
-        self.assertListEqual([False, True], Excel_data[1][3])
-        self.assertListEqual(['1.1', '1.2'], Excel_data[1][4])
+        pass
 
     @unittest.skip
     def test_create_data_from_objects_different_settings(self):
@@ -261,36 +133,7 @@ class ExcelExporterTests(unittest.TestCase):
             "delimiter": ','
         }
 
-        list_of_objects = [AllCasesTestClass(), AllCasesTestClass()]
-        list_of_objects[0].assetId.identificator = '0'
-        list_of_objects[0].testDecimalField = 1.0
-        list_of_objects[0].testBooleanField = True
-        list_of_objects[0].testKeuzelijst = 'waarde-1'
-        list_of_objects[0].testComplexType.testStringField = 'string in complex veld'
-        list_of_objects[0].testComplexType.testKwantWrd.waarde = 2.0
-
-        list_of_objects[1].assetId.identificator = '1'
-        list_of_objects[1].testBooleanField = False
-        list_of_objects[1].testKeuzelijstMetKard = ['waarde-2', 'waarde-3']
-        list_of_objects[1].testDecimalField = 2.5
-        list_of_objects[
-            1].testComplexType.testComplexType2.testStringField = 'string in complex veld binnenin complex veld'
-
-        Excel_data = exporter.create_data_from_objects(list_of_objects)
-
-        with self.subTest('verify headers with different dotnotation settings'):
-            self.assertEqual('assetId+identificator', Excel_data[0][1])
-            self.assertEqual('assetId+toegekendDoor', Excel_data[0][2])
-            self.assertEqual('testComplexType+testComplexType2+testStringField', Excel_data[0][4])
-            self.assertEqual('testComplexType+testKwantWrd', Excel_data[0][5])
-            self.assertEqual('testComplexType+testStringField', Excel_data[0][6])
-            self.assertEqual('testKeuzelijstMetKard()', Excel_data[0][9])
-
-        Excel_data_lines = exporter.create_data_lines_from_data(Excel_data, delimiter=exporter.settings['delimiter'])
-        expected_line_asset_2 = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass,1,,False,string in complex veld binnenin complex veld,,,2.5,,waarde-2$waarde-3'
-
-        with self.subTest('verify data with different settings'):
-            self.assertEqual(expected_line_asset_2, Excel_data_lines[2])
+        pass
 
     @unittest.skip
     def test_create_with_different_cardinality_among_subattributes(self):
@@ -323,3 +166,31 @@ class ExcelExporterTests(unittest.TestCase):
 
         expected = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass;0;;False|True|;|2.0|;1.1|1.2|1.3'
         self.assertEqual(expected, Excel_data_lines[1])
+
+    def verify_excel_files(self, file1_location, file2_location):
+        df_dict1 = pandas.read_excel(file1_location, sheet_name=None)
+        df_dict2 = pandas.read_excel(file2_location, sheet_name=None)
+        keys = set(df_dict1.keys())
+        keys.union(set(df_dict2.keys()))
+        for k in keys:
+            df1 = df_dict1[k]
+            df2 = df_dict2[k]
+            if not df1.equals(df2):
+                print(f'found difference in sheet: {k}')
+                return False
+            comparison_values = df1.values == df2.values
+            if isinstance(comparison_values, bool):
+                if not comparison_values:
+                    print(f'found difference in sheet: {k}')
+                    return False
+            elif len(comparison_values) == 1:
+                cols = list(filter(lambda x: not x, comparison_values[0]))
+                if len(cols) != 0:
+                    print(f'found difference in sheet: {k}')
+                    return False
+            else:
+                rows, cols = numpy.where(comparison_values == False)
+                if len(rows) != 0 or len(cols) != 0:
+                    print(f'found difference in sheet: {k}')
+                    return False
+        return True

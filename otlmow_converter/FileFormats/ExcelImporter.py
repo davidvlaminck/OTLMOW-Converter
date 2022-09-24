@@ -26,11 +26,6 @@ class ExcelImporter:
         self.objects = []
 
     def import_file(self, filepath: Path = None, **kwargs):
-        delimiter = ';'
-        if kwargs is not None:
-            if 'delimiter' in kwargs:
-                delimiter = kwargs['delimiter']
-
         if filepath == '' or not os.path.isfile(filepath):
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
