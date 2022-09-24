@@ -98,17 +98,17 @@ class ExcelExporterTests(unittest.TestCase):
         otl_converter = self.set_up_converter()
         
         importer = ExcelImporter(settings=otl_converter.settings)
-        file_location = Path(ROOT_DIR) / 'test_file_VR.xlsx'
-        objects = importer.import_file(file_location)
+        import_file_location = Path(ROOT_DIR) / 'test_file_VR.xlsx'
+        objects = importer.import_file(import_file_location)
         
         exporter = ExcelExporter(settings=otl_converter.settings)
-        new_file_location = Path(ROOT_DIR) / 'test_file_VR_output.xlsx'
-        if os.path.isfile(new_file_location):
-            os.remove(new_file_location)
-        exporter.export_to_file(list_of_objects=objects, filepath=new_file_location)
+        export_file_location = Path(ROOT_DIR) / 'test_file_VR_output.xlsx'
+        if os.path.isfile(export_file_location):
+            os.remove(export_file_location)
+        exporter.export_to_file(list_of_objects=objects, filepath=export_file_location)
         
-        self.assertTrue(os.path.isfile(new_file_location))
-        self.assertTrue(self.verify_excel_files(file_location, new_file_location))
+        self.assertTrue(os.path.isfile(export_file_location))
+        self.assertTrue(self.verify_excel_files_are_equal(import_file_location, export_file_location))
 
     @unittest.skip
     def test_sort_headers(self):
@@ -167,7 +167,7 @@ class ExcelExporterTests(unittest.TestCase):
         expected = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass;0;;False|True|;|2.0|;1.1|1.2|1.3'
         self.assertEqual(expected, Excel_data_lines[1])
 
-    def verify_excel_files(self, file1_location, file2_location):
+    def verify_excel_files_are_equal(self, file1_location, file2_location):
         df_dict1 = pandas.read_excel(file1_location, sheet_name=None)
         df_dict2 = pandas.read_excel(file2_location, sheet_name=None)
         keys = set(df_dict1.keys())
