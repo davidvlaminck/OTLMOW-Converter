@@ -3,6 +3,7 @@ from pathlib import Path
 
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
+from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 from otlmow_converter.FileFormats.JsonImporter import JsonImporter
 
 
@@ -35,7 +36,9 @@ class FileImporter:
     def get_importer_from_extension(extension: str, settings: dict):
         if extension == 'csv':
             return CsvImporter(settings=settings)
-        if extension == 'json':
+        elif extension == 'json':
             return JsonImporter(settings=settings)
+        elif extension in ['xls', 'xlsx']:
+            return ExcelImporter(settings=settings)
         else:
-            raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json')
+            raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx')
