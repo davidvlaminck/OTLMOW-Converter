@@ -21,16 +21,16 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class ExcelExporterTests(unittest.TestCase):
     @staticmethod
-    def set_up_facility():
+    def set_up_converter():
         settings_file_location = get_settings_path_for_unittests()
-        otl_facility = OtlmowConverter(settings_path=settings_file_location)
-        return otl_facility
+        otl_converter = OtlmowConverter(settings_path=settings_file_location)
+        return otl_converter
 
     def test_init_importer_only_load_with_settings(self):
-        otl_facility = self.set_up_facility()
+        otl_converter = self.set_up_converter()
 
         with self.subTest('load with correct settings'):
-            exporter = ExcelExporter(settings=otl_facility.settings)
+            exporter = ExcelExporter(settings=otl_converter.settings)
             self.assertIsNotNone(exporter)
 
         with self.subTest('load without settings'):
@@ -46,14 +46,14 @@ class ExcelExporterTests(unittest.TestCase):
                 ExcelExporter(settings={"file_formats": [{}]})
 
     def test_objects_to_dataframedict_empty_list(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings)
+        otl_converter = self.set_up_converter()
+        exporter = ExcelExporter(settings=otl_converter.settings)
         exporter.create_dataframe_dict_from_objects([])
         self.assertDictEqual({}, exporter.data)
 
     def test_objects_to_dataframe_dict_relation_object(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings)
+        otl_converter = self.set_up_converter()
+        exporter = ExcelExporter(settings=otl_converter.settings)
         list_of_objects = [Voedt()]
         exporter.create_dataframe_dict_from_objects(list_of_objects)
         data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None]]
@@ -62,8 +62,8 @@ class ExcelExporterTests(unittest.TestCase):
         self.assertEqual(df.iloc[0].tolist(), exporter.data['Voedt'].iloc[0].tolist())
 
     def test_objects_to_dataframe_dict_2_relation_objects(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings)
+        otl_converter = self.set_up_converter()
+        exporter = ExcelExporter(settings=otl_converter.settings)
         list_of_objects = [Voedt(), Voedt()]
         list_of_objects[0].isActief = True
         exporter.create_dataframe_dict_from_objects(list_of_objects)
@@ -75,8 +75,8 @@ class ExcelExporterTests(unittest.TestCase):
         self.assertEqual(df.iloc[1].tolist(), exporter.data['Voedt'].iloc[1].tolist())
 
     def test_objects_to_dataframe_dict_2_relation_objects_diff_types(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings)
+        otl_converter = self.set_up_converter()
+        exporter = ExcelExporter(settings=otl_converter.settings)
         list_of_objects = [Voedt(), Bevestiging(), Bevestiging()]
         list_of_objects[0].isActief = True
         list_of_objects[1].isActief = True
@@ -94,21 +94,21 @@ class ExcelExporterTests(unittest.TestCase):
         self.assertEqual(df_bevestiging.iloc[0].tolist(), exporter.data['Bevestiging'].iloc[0].tolist())
         self.assertEqual(df_bevestiging.iloc[1].tolist(), exporter.data['Bevestiging'].iloc[1].tolist())
 
-    def test_load_and_writefile(self):
-        otl_facility = self.set_up_facility()
-        importer = ExcelImporter(settings=otl_facility.settings)
+    def test_import_and_export_file(self):
+        otl_converter = self.set_up_converter()
+        
+        importer = ExcelImporter(settings=otl_converter.settings)
         file_location = Path(ROOT_DIR) / 'test_file_VR.xlsx'
         objects = importer.import_file(file_location)
-        exporter = ExcelExporter(settings=otl_facility.settings)
+        
+        exporter = ExcelExporter(settings=otl_converter.settings)
         new_file_location = Path(ROOT_DIR) / 'test_file_VR_output.xlsx'
         if os.path.isfile(new_file_location):
             os.remove(new_file_location)
         exporter.export_to_file(list_of_objects=objects, filepath=new_file_location)
+        
         self.assertTrue(os.path.isfile(new_file_location))
-
         self.assertTrue(self.verify_excel_files(file_location, new_file_location))
-
-        # https://kanoki.org/2019/02/26/compare-two-excel-files-for-difference-using-python/
 
     @unittest.skip
     def test_sort_headers(self):
@@ -120,8 +120,8 @@ class ExcelExporterTests(unittest.TestCase):
 
     @unittest.skip
     def test_create_data_from_objects_different_settings(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
+        otl_converter = self.set_up_converter()
+        exporter = ExcelExporter(settings=otl_converter.settings, class_directory='UnitTests.TestClasses.Classes')
         exporter.settings = {
             "name": "Excel",
             "dotnotation": {
@@ -137,8 +137,8 @@ class ExcelExporterTests(unittest.TestCase):
 
     @unittest.skip
     def test_create_with_different_cardinality_among_subattributes(self):
-        otl_facility = self.set_up_facility()
-        exporter = ExcelExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
+        otl_converter = self.set_up_converter()
+        exporter = ExcelExporter(settings=otl_converter.settings, class_directory='UnitTests.TestClasses.Classes')
 
         list_of_objects = [AllCasesTestClass()]
         list_of_objects[0].assetId.identificator = '0'
