@@ -1,10 +1,4 @@
-﻿import importlib
-import os.path
-import site
-import sys
-from pathlib import Path
-
-from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
+﻿from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
 
 from otlmow_converter.FileFormats.DictDecoder import DictDecoder
 from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri, get_titlecase_from_ns
