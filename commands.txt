@@ -1,0 +1,5 @@
+# build the package
+python3 -m build
+
+# upload the build using .pypirc config file
+python3 -m twine upload --repository pypi dist/* --config-file .pypirc
