@@ -22,7 +22,7 @@ class FileExporter:
             return CsvExporter(settings=settings)
         elif extension == 'json':
             return JsonExporter(settings=settings)
-        elif extension == ['xls', 'xlsx']:
+        elif extension in ['xls', 'xlsx']:
             return ExcelExporter(settings=settings)
         else:
             raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx')
