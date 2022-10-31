@@ -5,9 +5,9 @@ from typing import Dict
 import pandas
 from numpy import nan
 from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
-from otlmow_model.Helpers.DotnotationHelper import DotnotationHelper
-from otlmow_model.Helpers.GenericHelper import GenericHelper
 from pandas import DataFrame
+
+from otlmow_converter.DotnotationHelper import DotnotationHelper
 
 
 class ExcelExporter:
