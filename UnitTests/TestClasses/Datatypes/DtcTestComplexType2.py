@@ -1,15 +1,15 @@
 # coding=utf-8
-from otlmow_model.BaseClasses.AttributeInfo import AttributeInfo
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
+from otlmow_model.BaseClasses.WaardenObject import WaardenObject
 from otlmow_model.BaseClasses.ComplexField import ComplexField
 from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest
 from otlmow_model.BaseClasses.StringField import StringField
 
 
 # Generated with OTLComplexDatatypeCreator. To modify: extend, do not edit
-class DtcTestComplexType2Waarden(AttributeInfo):
-    def __init__(self, parent=None):
-        AttributeInfo.__init__(self, parent)
+class DtcTestComplexType2Waarden(WaardenObject):
+    def __init__(self):
+        WaardenObject.__init__(self)
         self._testKwantWrd = OTLAttribuut(field=KwantWrdTest,
                                           naam='testKwantWrd',
                                           label='Test kwantitatieve waarde',
@@ -78,7 +78,7 @@ class DtcTestComplexType2Waarden(AttributeInfo):
 
 
 # Generated with OTLComplexDatatypeCreator. To modify: extend, do not edit
-class DtcTestComplexType2(ComplexField, AttributeInfo):
+class DtcTestComplexType2(ComplexField):
     """Test datatype voor een complexe waarde in een complexe waarde"""
     naam = 'DtcTestComplexType2'
     label = 'Test ComplexType2'

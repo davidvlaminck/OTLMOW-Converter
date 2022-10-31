@@ -1,13 +1,12 @@
 # coding=utf-8
 from abc import abstractmethod
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMDBStatus import AIMDBStatus
-from otlmow_model.BaseClasses.AttributeInfo import AttributeInfo
 from otlmow_model.BaseClasses.DavieRelatieAttributes import DavieRelatieAttributes
 from otlmow_model.BaseClasses.OTLObject import OTLObject
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
-class RelatieObject(AIMDBStatus, AttributeInfo, DavieRelatieAttributes, OTLObject):
+class RelatieObject(AIMDBStatus, DavieRelatieAttributes, OTLObject):
     """Abstracte die de relaties voorziet van gemeenschappelijk eigenschappen."""
 
     typeURI = 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#RelatieObject'
@@ -16,6 +15,5 @@ class RelatieObject(AIMDBStatus, AttributeInfo, DavieRelatieAttributes, OTLObjec
     @abstractmethod
     def __init__(self):
         AIMDBStatus.__init__(self)
-        AttributeInfo.__init__(self)
         DavieRelatieAttributes.__init__(self)
         OTLObject.__init__(self)

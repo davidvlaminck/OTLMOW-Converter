@@ -1,5 +1,4 @@
 # coding=utf-8
-from otlmow_model.BaseClasses.AttributeInfo import AttributeInfo
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest
 from otlmow_model.BaseClasses.StringField import StringField
@@ -8,9 +7,8 @@ from otlmow_model.BaseClasses.UnionWaarden import UnionWaarden
 
 
 # Generated with OTLUnionDatatypeCreator. To modify: extend, do not edit
-class DtuTestUnionTypeWaarden(AttributeInfo, UnionWaarden):
-    def __init__(self, parent=None):
-        AttributeInfo.__init__(self, parent)
+class DtuTestUnionTypeWaarden(UnionWaarden):
+    def __init__(self):
         UnionWaarden.__init__(self)
         self._unionKwantWrd = OTLAttribuut(field=KwantWrdTest,
                                            naam='unionKwantWrd',
@@ -52,7 +50,7 @@ class DtuTestUnionTypeWaarden(AttributeInfo, UnionWaarden):
 
 
 # Generated with OTLUnionDatatypeCreator. To modify: extend, do not edit
-class DtuTestUnionType(UnionTypeField, AttributeInfo):
+class DtuTestUnionType(UnionTypeField):
     """Union datatype voor test doeleinden."""
     naam = 'DtuTestUnionType'
     label = 'Test UnionType'
