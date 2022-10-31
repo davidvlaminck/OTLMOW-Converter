@@ -1,5 +1,8 @@
 ﻿from typing import Union
 
+from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
+from otlmow_model.BaseClasses.WaardenObject import WaardenObject
+
 
 class DotnotationHelper:
     separator = '.'
@@ -24,7 +27,7 @@ class DotnotationHelper:
         return cardinality_indicator, separator, waarde_shortcut_applicable
 
     @staticmethod
-    def get_dotnotation(attribute,
+    def get_dotnotation(attribute: OTLAttribuut,
                         separator: str = '',
                         cardinality_indicator: str = '',
                         waarde_shortcut_applicable: Union[bool, None] = None):
@@ -34,14 +37,17 @@ class DotnotationHelper:
 
         if waarde_shortcut_applicable:
             if attribute.naam == 'waarde' and attribute.owner._parent is not None and attribute.owner._parent.field.waarde_shortcut_applicable:
-                return attribute.owner._parent.dotnotation
+                return DotnotationHelper.get_dotnotation(attribute.owner._parent)
 
         dotnotation = attribute.naam
         if attribute.kardinaliteit_max != '1':
             dotnotation += cardinality_indicator
 
-        if attribute.owner._parent is not None:
-            return attribute.owner._parent.dotnotation + separator + dotnotation
+        if isinstance(attribute.owner, OTLAttribuut):
+            return dotnotation
+
+        if isinstance(attribute.owner, WaardenObject):
+            return DotnotationHelper.get_dotnotation(attribute.owner._parent) + separator + dotnotation
 
         return dotnotation
 
