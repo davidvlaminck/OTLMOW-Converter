@@ -84,7 +84,8 @@ class ExcelExporter:
             values_list = list(map(lambda x: x.waarde, actual_attributes))
         return values_list
 
-    def import_aimobject(self, class_directory):
+    @staticmethod
+    def import_aimobject(class_directory):
         try:
             # TODO: check https://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
             py_mod = __import__(name=f'{class_directory}.ImplementatieElement.AIMObject', fromlist=f'AIMObject')
