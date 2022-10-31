@@ -3,10 +3,10 @@ from pathlib import Path
 from typing import Dict
 
 import pandas as pandas
-from otlmow_model.Helpers.DotnotationHelper import DotnotationHelper
 from pandas import DataFrame
 
 from otlmow_converter.AssetFactory import AssetFactory
+from otlmow_converter.DotnotationHelper import DotnotationHelper
 
 
 class ExcelImporter:
