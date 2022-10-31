@@ -1,4 +1,4 @@
-﻿from typing import Union
+﻿from typing import Union, Iterable, Tuple
 
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from otlmow_model.BaseClasses.WaardenObject import WaardenObject
@@ -181,6 +181,51 @@ class DotnotationHelper:
                                                                value=value_item, convert=convert, separator=separator,
                                                                cardinality_indicator=cardinality_indicator,
                                                                waarde_shortcut_applicable=waarde_shortcut_applicable)
+
+    @classmethod
+    def list_attributes_and_values_by_dotnotation(cls, asset=None, waarde_shortcut: bool = False, separator: str = '.',
+                                                  cardinality_indicator: str = '[]') -> Iterable[Tuple[str, object]]:
+        sorted_attributes = sorted(list(vars(asset).items()), key=lambda i: i[0])
+
+        for k, v in sorted_attributes:
+            if k in ['_parent', '_geometry_types', '_valid_relations']:
+                continue
+            if v.waarde is None:
+                continue
+
+            if v.field.waardeObject is not None:
+                if v.kardinaliteit_max != 1 and v.kardinaliteit_max != '1':
+                    lijsten = []
+                    for list_item in v.waarde:
+                        lijsten.append(
+                            list(cls.list_attributes_and_values_by_dotnotation(asset=list_item,
+                                                                               waarde_shortcut=waarde_shortcut,
+                                                                               separator=separator,
+                                                                               cardinality_indicator=cardinality_indicator)))
+
+                    combined_dict = {}
+                    for lijst in lijsten:
+
+                        for dotnotation, v in lijst:
+                            if dotnotation not in combined_dict:
+                                combined_dict[dotnotation] = [v]
+                            else:
+                                combined_dict[dotnotation].append(v)
+
+                    for dict_k in sorted(combined_dict.keys()):
+                        yield dict_k, combined_dict[dict_k]
+                else:
+                    for k1, v1 in cls.list_attributes_and_values_by_dotnotation(asset=v.waarde,
+                                                                                waarde_shortcut=waarde_shortcut,
+                                                                                separator=separator,
+                                                                                cardinality_indicator=cardinality_indicator):
+                        yield k1, v1
+
+            else:
+                dotnotation = DotnotationHelper.get_dotnotation(v, waarde_shortcut_applicable=waarde_shortcut,
+                                                                separator=separator,
+                                                                cardinality_indicator=cardinality_indicator)
+                yield dotnotation, v.field.value_default(v.waarde)
 
     @staticmethod
     def convert_waarde_to_correct_type(waarde, attribuut, log_warnings):

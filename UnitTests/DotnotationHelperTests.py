@@ -45,7 +45,7 @@ class DotnotationHelperTests(TestCase):
         instance = AllCasesTestClass()
         instance.testKeuzelijst = 'waarde-2'
         instance.testBooleanField = True
-        attribute_list = list(instance.list_attributes_and_values_by_dotnotation())
+        attribute_list = list(DotnotationHelper.list_attributes_and_values_by_dotnotation(instance))
         expected_list = [('testBooleanField', True),
                          ('testKeuzelijst', 'waarde-2')]
         self.assertListEqual(expected_list, attribute_list)
@@ -55,7 +55,7 @@ class DotnotationHelperTests(TestCase):
         instance.testComplexType.testStringField = 'string 1'
         instance.testComplexType.testComplexType2.testStringField = 'string 2'
         instance.testUnionType.unionKwantWrd.waarde = 2.0
-        attribute_list = list(instance.list_attributes_and_values_by_dotnotation())
+        attribute_list = list(DotnotationHelper.list_attributes_and_values_by_dotnotation(instance))
         expected_list = [('testComplexType.testComplexType2.testStringField', 'string 2'),
                          ('testComplexType.testStringField', 'string 1'),
                          ('testUnionType.unionKwantWrd.waarde', 2.0)]
@@ -69,7 +69,7 @@ class DotnotationHelperTests(TestCase):
         instance.testComplexTypeMetKard[0].testStringField = 'e'
         instance._testComplexTypeMetKard.add_empty_value()
         instance.testComplexTypeMetKard[1].testStringField = 'f'
-        attribute_list = list(instance.list_attributes_and_values_by_dotnotation())
+        attribute_list = list(DotnotationHelper.list_attributes_and_values_by_dotnotation(instance))
         expected_list = [('testComplexType.testStringFieldMetKard[]', ['c', 'd']),
                          ('testComplexTypeMetKard[].testStringField', ['e', 'f']),
                          ('testStringFieldMetKard[]', ['a', 'b'])]
@@ -83,7 +83,8 @@ class DotnotationHelperTests(TestCase):
         instance.testComplexType.testKwantWrdMetKard[1].waarde = 4.0
         instance.testComplexType.testComplexType2.testKwantWrd.waarde = 5.0
         instance.testUnionType.unionKwantWrd.waarde = 2.0
-        attribute_list = list(instance.list_attributes_and_values_by_dotnotation(waarde_shortcut=True))
+        attribute_list = list(DotnotationHelper.list_attributes_and_values_by_dotnotation(instance,
+                                                                                          waarde_shortcut=True))
         expected_list = [('testComplexType.testComplexType2.testKwantWrd', 5.0),
                          ('testComplexType.testKwantWrdMetKard[]', [3.0, 4.0]),
                          ('testUnionType.unionKwantWrd', 2.0)]

@@ -103,7 +103,7 @@ class ExcelExporter:
 
             # TODO check if assetId.identificator is empty is a problem for Davie or not
 
-            for k, v in otl_object.list_attributes_and_values_by_dotnotation():
+            for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(otl_object):
                 if self.settings['dotnotation']['cardinality indicator'] in k:
                     d[k] = self.settings['dotnotation']['cardinality separator'].join(v)
                 else:
