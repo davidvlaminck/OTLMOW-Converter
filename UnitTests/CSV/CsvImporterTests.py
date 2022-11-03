@@ -1,19 +1,17 @@
 import os
 import unittest
+from pathlib import Path
 
 from otlmow_model.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
 
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 
 class CsvImporterTests(unittest.TestCase):
     def test_init_importer_only_load_with_settings(self):
-        base_dir = os.path.dirname(os.path.realpath(__file__))
-        settings_file_location = f'{base_dir}/../settings_OTLMOW.json'
-        otl_facility = OtlmowConverter(logfile='', settings_path=settings_file_location)
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        otl_facility = OtlmowConverter(settings_path=settings_file_location)
 
         with self.subTest('load with correct settings'):
             importer = CsvImporter(settings=otl_facility.settings)
@@ -32,28 +30,25 @@ class CsvImporterTests(unittest.TestCase):
                 CsvImporter(settings={"file_formats": [{}]})
 
     def test_load_test_file_multiple_types(self):
-        base_dir = os.path.dirname(os.path.realpath(__file__))
-        settings_file_location = f'{base_dir}/../settings_OTLMOW.json'
-        file_location = os.path.abspath(os.path.join(os.sep, ROOT_DIR, 'export_multiple_types.csv'))
-        otl_facility = OtlmowConverter(logfile='', settings_path=settings_file_location)
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        file_location = Path(__file__).parent / 'export_multiple_types.csv'
+        otl_facility = OtlmowConverter(settings_path=settings_file_location)
         objects = otl_facility.create_assets_from_file(file_location)
 
         self.assertEqual(15, len(objects))
 
     def test_load_test_file(self):
-        base_dir = os.path.dirname(os.path.realpath(__file__))
-        settings_file_location = f'{base_dir}/../settings_OTLMOW.json'
-        otl_facility = OtlmowConverter(logfile='', settings_path=settings_file_location)
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        otl_facility = OtlmowConverter(settings_path=settings_file_location)
         importer = CsvImporter(settings=otl_facility.settings)
-        file_location = os.path.abspath(os.path.join(os.sep, ROOT_DIR, 'test_file_VR.csv'))
+        file_location = Path(__file__).parent / 'test_file_VR.csv'
         importer.import_file(file_location)
         self.assertEqual(187, len(importer.data))
         self.assertEqual(27, len(importer.headers))
 
     def test_create_objects_from_data(self):
-        base_dir = os.path.dirname(os.path.realpath(__file__))
-        settings_file_location = f'{base_dir}/../settings_OTLMOW.json'
-        otl_facility = OtlmowConverter(logfile='', settings_path=settings_file_location)
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        otl_facility = OtlmowConverter(settings_path=settings_file_location)
         importer = CsvImporter(settings=otl_facility.settings)
         datastring = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Verkeersregelaar;1433df2f-5dc8-467b-94f4-efceb4581c68-b25kZXJkZWVsI1ZlcmtlZXJzcmVnZWxhYXI;AWV;;;;centraal|klok;2021-06-09;;;;802C5;MACQ;true;aansluit_802C5.pdf;application-pdf;/eminfra/core/api/otl/assets/1433df2f-5dc8-467b-94f4-efceb4581c68-b25kZXJkZWVsI1ZlcmtlZXJzcmVnZWxhYXI/documenten/ed288304-0f02-479f-af74-28d2fc55e5fe;;;civa-2020;;ccol;;;;;;;240.0;in-gebruik;42;2020-10-09;V016027v06;POINT Z (146955.19 181631.1 59.17)'
         datastring2 = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Verkeersregelaar;176c849f-f386-4a07-9493-cb5100ba9830-b25kZXJkZWVsI1ZlcmtlZXJzcmVnZWxhYXI;AWV;;;;klok;2022-02-19;;;;605C7|605C7;MACQ | TRAFIROAD;true;V15.816_v11_605C7.pdf;application-pdf;https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Verkeersregelaar.kabelaansluitschema;yunex;sx;;;StrideTT;type-1;;;V15.816_v11_605C7.pdf;application-pdf;https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Verkeersregelaar.technischeDocumentatie;240.0;in-gebruik;42;2021-09-16;V015816v11;POINT Z (145670.97 164665.43 21)'
