@@ -99,7 +99,8 @@ class CsvExporter:
         while len(values_list) < len(self.csv_headers):
             values_list.append(None)
 
-        for attribute, value in DotnotationHelper.list_attributes_and_values_by_dotnotation(aim_object,
+        for attribute, value in DotnotationHelper.list_attributes_and_values_by_dotnotation(
+                asset=aim_object,
                 waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable']):
             if attribute in self.csv_headers[1:3]:
                 continue
