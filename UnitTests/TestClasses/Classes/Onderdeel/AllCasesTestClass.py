@@ -44,7 +44,7 @@ class AllCasesTestClass(AIMObject):
 
         self._testComplexTypeMetKard = OTLAttribuut(field=DtcTestComplexType,
                                                     naam='testComplexTypeMetKard',
-                                                    label='Test ComplexType Met Kard',
+                                                    label='Test ComplexTypeMetKard',
                                                     objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexTypeMetKard',
                                                     kardinaliteit_max='*',
                                                     definition='Test attribuut voor een complexe waarde met kardinaliteit > 1',

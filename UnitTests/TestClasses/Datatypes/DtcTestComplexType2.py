@@ -17,28 +17,12 @@ class DtcTestComplexType2Waarden(WaardenObject):
                                           definition='Test attribuut voor Kwantitatieve waarde in een complex datatype.',
                                           owner=self)
 
-        self._testKwantWrdMetKard = OTLAttribuut(field=KwantWrdTest,
-                                                 naam='testKwantWrdMetKard',
-                                                 label='Test kwantitatieve waarde met kardinaliteit',
-                                                 objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrdMetKard',
-                                                 kardinaliteit_max='*',
-                                                 definition='Test attribuut voor Kwantitatieve waarde met kardinaliteit > 0 in een complex datatype.',
-                                                 owner=self)
-
         self._testStringField = OTLAttribuut(field=StringField,
                                              naam='testStringField',
                                              label='Test tekstveld',
                                              objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringField',
                                              definition='Test attribuut voor tekst in een complex datatype.',
                                              owner=self)
-
-        self._testStringFieldMetKard = OTLAttribuut(field=StringField,
-                                                    naam='testStringFieldMetKard',
-                                                    label='Test tekstveld met kardinaliteit',
-                                                    objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringFieldMetKard',
-                                                    kardinaliteit_max='*',
-                                                    definition='Test attribuut voor tekst met kardinaliteit > 0 in een complex datatype.',
-                                                    owner=self)
 
     @property
     def testKwantWrd(self):
@@ -50,15 +34,6 @@ class DtcTestComplexType2Waarden(WaardenObject):
         self._testKwantWrd.set_waarde(value, owner=self._parent)
 
     @property
-    def testKwantWrdMetKard(self):
-        """Test attribuut voor Kwantitatieve waarde met kardinaliteit > 0 in een complex datatype."""
-        return self._testKwantWrdMetKard.get_waarde()
-
-    @testKwantWrdMetKard.setter
-    def testKwantWrdMetKard(self, value):
-        self._testKwantWrdMetKard.set_waarde(value, owner=self._parent)
-
-    @property
     def testStringField(self):
         """Test attribuut voor tekst in een complex datatype."""
         return self._testStringField.get_waarde()
@@ -66,15 +41,6 @@ class DtcTestComplexType2Waarden(WaardenObject):
     @testStringField.setter
     def testStringField(self, value):
         self._testStringField.set_waarde(value, owner=self._parent)
-
-    @property
-    def testStringFieldMetKard(self):
-        """Test attribuut voor tekst met kardinaliteit > 0 in een complex datatype."""
-        return self._testStringFieldMetKard.get_waarde()
-
-    @testStringFieldMetKard.setter
-    def testStringFieldMetKard(self, value):
-        self._testStringFieldMetKard.set_waarde(value, owner=self._parent)
 
 
 # Generated with OTLComplexDatatypeCreator. To modify: extend, do not edit
