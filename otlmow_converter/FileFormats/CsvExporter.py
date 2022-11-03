@@ -116,7 +116,9 @@ class CsvExporter:
 
             index = self.csv_headers.index(attribute)
 
-            if isinstance(value, list):
+            if attribute.count('[]') > 1:
+                values_list[index] = '<unable to write a nested list in a csv>'
+            elif isinstance(value, list):
                 value = self.fix_cardinality_value(aim_object, attribute)
                 values_list[index] = value
             else:
