@@ -1,8 +1,8 @@
 import copy
 from pathlib import Path
 
-from otlmow_model.Helpers.GenericHelper import GenericHelper
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri
 
 
 class CsvExporter:
@@ -58,7 +58,7 @@ class CsvExporter:
         types = set(map(lambda x: x.typeURI, list_of_objects))
         for object_type in types:
             filtered_objects = list(filter(lambda x: x.typeURI == object_type, list_of_objects))
-            ns, name = GenericHelper.get_ns_and_name_from_uri(object_type)
+            ns, name = get_ns_and_name_from_uri(object_type)
             shortened_uri = ns + '_' + name
             specific_file_location = str(file_location)
             index = specific_file_location.rfind('\\')
