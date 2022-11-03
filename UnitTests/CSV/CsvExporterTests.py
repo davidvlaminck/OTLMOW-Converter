@@ -1,14 +1,13 @@
 import datetime
 import os
 import unittest
+from pathlib import Path
 
 from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
-
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class CsvExporterTests(unittest.TestCase):
@@ -40,10 +39,10 @@ class CsvExporterTests(unittest.TestCase):
     def test_load_and_writefile(self):
         otl_facility = self.set_up_facility()
         importer = CsvImporter(settings=otl_facility.settings)
-        file_location = os.path.abspath(os.path.join(os.sep, ROOT_DIR, 'test_file_VR.csv'))
+        file_location = Path(__file__).parent / 'test_file_VR.csv'
         objects = importer.import_file(file_location)
         exporter = CsvExporter(settings=otl_facility.settings)
-        new_file_location = os.path.abspath(os.path.join(os.sep, ROOT_DIR, 'test_export_file_VR.csv'))
+        new_file_location = Path(__file__).parent / 'test_export_file_VR.csv'
         if os.path.isfile(new_file_location):
             os.remove(new_file_location)
         exporter.export_to_file(list_of_objects=objects, filepath=new_file_location)
