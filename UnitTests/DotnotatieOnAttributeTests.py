@@ -5,6 +5,16 @@ from otlmow_converter.DotnotationHelper import DotnotationHelper
 
 
 class DotnotationOnAttributeTests(TestCase):
+    def test_fill_with_dummy_data_complex_attr(self):
+        instance = AllCasesTestClass()
+        attr = instance._testComplexType
+        attr.fill_with_dummy_data()
+        self.assertIsNotNone(instance.testComplexType.testBooleanField)
+        self.assertIsNotNone(instance.testComplexType.testComplexType2MetKard[0].testStringField)
+        self.assertIsNotNone(instance.testComplexType.testKwantWrd.waarde)
+        self.assertEquals('testComplexType.testComplexType2MetKard[].testStringField',
+                          DotnotationHelper.get_dotnotation(instance.testComplexType.testComplexType2MetKard[0]._testStringField))
+
     def test_dotnotation_on_attribute(self):
         instance = AllCasesTestClass()
 
@@ -28,8 +38,8 @@ class DotnotationOnAttributeTests(TestCase):
                              DotnotationHelper.get_dotnotation(instance.testComplexTypeMetKard[0]._testBooleanField))
             self.assertEqual('testComplexTypeMetKard[].testComplexType2MetKard[]',
                              DotnotationHelper.get_dotnotation(instance.testComplexTypeMetKard[0]._testComplexType2MetKard))
-            self.assertEqual('testComplexTypeMetKard[].testComplexType2MetKard[].testStringFieldMetKard[]',
-                             DotnotationHelper.get_dotnotation(instance.testComplexTypeMetKard[0].testComplexType2MetKard[0]._testStringFieldMetKard))
+            self.assertEqual('testComplexTypeMetKard[].testComplexType2MetKard[].testStringField',
+                             DotnotationHelper.get_dotnotation(instance.testComplexTypeMetKard[0].testComplexType2MetKard[0]._testStringField))
 
         with self.subTest('non-complex attributes'):
             self.assertEqual('testKeuzelijst', DotnotationHelper.get_dotnotation(instance._testKeuzelijst))
