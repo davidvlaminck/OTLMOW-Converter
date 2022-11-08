@@ -51,6 +51,7 @@ class DotnotationHelper:
 
         return dotnotation
 
+    # TODO add allow_nested_lists parameter
     @staticmethod
     def get_attributes_by_dotnotation(instance_or_attribute,
                                       dotnotation: str,
@@ -91,7 +92,9 @@ class DotnotationHelper:
                 return collected_attributes
             else:
                 attribute = getattr(instance_or_attribute, first)
-                return DotnotationHelper.get_attributes_by_dotnotation(attribute, rest)
+                return DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=attribute, dotnotation=rest,
+                                                                       cardinality_indicator=cardinality_indicator, separator=separator,
+                                                                       waarde_shortcut_applicable=waarde_shortcut_applicable)
         else:
             if cardinality_indicator in dotnotation:
                 return getattr(instance_or_attribute, '_' + dotnotation.replace(cardinality_indicator, ''))
