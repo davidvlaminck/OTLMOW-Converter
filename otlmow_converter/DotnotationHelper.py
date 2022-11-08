@@ -92,8 +92,10 @@ class DotnotationHelper:
                 return collected_attributes
             else:
                 attribute = getattr(instance_or_attribute, first)
-                return DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=attribute, dotnotation=rest,
-                                                                       cardinality_indicator=cardinality_indicator, separator=separator,
+                return DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=attribute,
+                                                                       dotnotation=rest,
+                                                                       cardinality_indicator=cardinality_indicator,
+                                                                       separator=separator,
                                                                        waarde_shortcut_applicable=waarde_shortcut_applicable)
         else:
             if cardinality_indicator in dotnotation:
@@ -102,7 +104,8 @@ class DotnotationHelper:
                 return getattr(instance_or_attribute, '_' + dotnotation)
 
     @staticmethod
-    def set_attribute_by_dotnotation(instanceOrAttribute, dotnotation, value, convert=True, convert_warnings: bool = True,
+    def set_attribute_by_dotnotation(instanceOrAttribute, dotnotation, value, convert=True,
+                                     convert_warnings: bool = True,
                                      separator: str = '', cardinality_indicator: str = '',
                                      waarde_shortcut_applicable: Union[bool, None] = None) -> None:
 
@@ -133,14 +136,23 @@ class DotnotationHelper:
 
             if not isinstance(attribute, list) and not attribute.field.waarde_shortcut_applicable:
                 if convert:
-                    converted_value = DotnotationHelper.convert_waarde_to_correct_type(value, attribute, convert_warnings)
+                    converted_value = DotnotationHelper.convert_waarde_to_correct_type(value, attribute,
+                                                                                       convert_warnings)
                     attribute.set_waarde(converted_value)
                 else:
                     attribute.set_waarde(value)
                 return
 
             # waarde shortcut
-            parent_waarde_attr = attribute[0].owner._parent
+            if isinstance(attribute, list):
+                attribute = attribute[0]
+
+            if attribute.field.waarde_shortcut_applicable:
+                parent_waarde_attr = attribute
+            else:
+                parent_waarde_attr = attribute.owner._parent
+            if parent_waarde_attr.waarde is None:
+                parent_waarde_attr.add_empty_value()
             while len(parent_waarde_attr.waarde) < len(value):
                 parent_waarde_attr.add_empty_value()
 
@@ -149,6 +161,7 @@ class DotnotationHelper:
                                                                dotnotation='waarde',
                                                                value=list_item,
                                                                convert=convert,
+                                                               convert_warnings=convert_warnings,
                                                                separator=separator,
                                                                cardinality_indicator=cardinality_indicator,
                                                                waarde_shortcut_applicable=waarde_shortcut_applicable)
@@ -167,7 +180,11 @@ class DotnotationHelper:
                                                                         waarde_shortcut_applicable=waarde_shortcut_applicable)
             if attribute.waarde is None:
                 attribute.add_empty_value()
-            DotnotationHelper.set_attribute_by_dotnotation(attribute.waarde, rest, value)
+            DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde, dotnotation=rest,
+                                                           value=value, convert=convert,
+                                                           convert_warnings=convert_warnings, separator=separator,
+                                                           cardinality_indicator=cardinality_indicator,
+                                                           waarde_shortcut_applicable=waarde_shortcut_applicable)
             return
 
         if cardinality_indicator in first:
@@ -177,13 +194,14 @@ class DotnotationHelper:
                                                                         dotnotation=first.replace(cardinality_indicator, ''),
                                                                         separator=separator,
                                                                         cardinality_indicator=cardinality_indicator,
-                                                                        waarde_shortcut_applicable=False)
+                                                                        waarde_shortcut_applicable=waarde_shortcut_applicable)
 
             for index, value_item in enumerate(value):
                 if attribute.waarde is None or len(attribute.waarde) <= index:
                     attribute.add_empty_value()
-                DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde[index], dotnotation=rest,
-                                                               value=value_item, convert=convert, separator=separator,
+                DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde[index],
+                                                               dotnotation=rest, value=value_item, convert=convert,
+                                                               convert_warnings=convert_warnings, separator=separator,
                                                                cardinality_indicator=cardinality_indicator,
                                                                waarde_shortcut_applicable=waarde_shortcut_applicable)
 
@@ -270,7 +288,6 @@ class DotnotationHelper:
                     new_dict[k] = v
 
         return new_dict
-
 
 # from collections.abc import MutableMapping
 #
