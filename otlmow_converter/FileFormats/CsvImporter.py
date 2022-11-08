@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 
@@ -42,10 +43,15 @@ class CsvImporter:
         except Exception as ex:
             raise ex
 
-        return self.create_objects_from_data()
+        return self.create_objects_from_data(**kwargs)
 
-    def create_objects_from_data(self):
+    def create_objects_from_data(self, **kwargs):
         list_of_objects = []
+        class_directory = None
+
+        if kwargs is not None:
+            if 'class_directory' in kwargs:
+                class_directory = kwargs['class_directory']
 
         try:
             type_index = self.headers.index('typeURI')
@@ -53,8 +59,8 @@ class CsvImporter:
             raise ValueError('The data is missing essential typeURI data')
 
         for record in self.data:
-            object = AssetFactory().dynamic_create_instance_from_uri(record[type_index])
-            list_of_objects.append(object)
+            instance = AssetFactory().dynamic_create_instance_from_uri(record[type_index], directory=class_directory)
+            list_of_objects.append(instance)
             for index, row in enumerate(record):
                 if index == type_index:
                     continue
@@ -67,6 +73,9 @@ class CsvImporter:
                 cardinality_indicator = self.settings['dotnotation']['cardinality indicator']
 
                 if cardinality_indicator in self.headers[index]:
+                    if self.headers[index].count(cardinality_indicator) > 1:
+                        logging.warning(f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
+                        continue
                     value = row.split(self.settings['dotnotation']['cardinality separator'])
                 else:
                     value = row
@@ -77,13 +86,16 @@ class CsvImporter:
                         value = None
                     self.headers[index] = 'geometry'
 
-                DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=object,
-                                                               dotnotation=self.headers[index],
-                                                               value=value,
-                                                               convert_warnings=False,
-                                                               separator=self.settings['dotnotation']['separator'],
-                                                               cardinality_indicator=cardinality_indicator,
-                                                               waarde_shortcut_applicable=self.settings['dotnotation'][
-                                                                   'waarde_shortcut_applicable'])
+                try:
+                    DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=instance,
+                                                                   dotnotation=self.headers[index],
+                                                                   value=value,
+                                                                   convert_warnings=False,
+                                                                   separator=self.settings['dotnotation']['separator'],
+                                                                   cardinality_indicator=cardinality_indicator,
+                                                                   waarde_shortcut_applicable=self.settings['dotnotation'][
+                                                                       'waarde_shortcut_applicable'])
+                except AttributeError as exc:
+                    raise AttributeError(self.headers[index]) from exc
 
         return list_of_objects
