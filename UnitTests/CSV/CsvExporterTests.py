@@ -1,6 +1,6 @@
-import datetime
 import os
 import unittest
+from datetime import date, datetime, time
 from pathlib import Path
 
 from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
@@ -133,7 +133,7 @@ class CsvExporterTests(unittest.TestCase):
         list_of_objects[1].assetId.identificator = '1'
         list_of_objects[1].testBooleanField = False
         list_of_objects[1].testKeuzelijstMetKard = ['waarde-2']
-        list_of_objects[1].testDateField = datetime.date(2022, 2, 2)
+        list_of_objects[1].testDateField = date(2022, 2, 2)
         list_of_objects[1].testDecimalField = 2.5
         list_of_objects[1].testComplexType.testComplexType2.testStringField = 'string in complex veld binnenin complex veld'
 
@@ -246,6 +246,7 @@ class CsvExporterTests(unittest.TestCase):
         with self.subTest('verify data with different settings'):
             self.assertEqual(expected_line_asset_2, csv_data_lines[2])
 
+    # TODO refactor
     def test_create_with_different_cardinality_among_subattributes(self):
         otl_facility = self.set_up_facility()
         exporter = CsvExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
@@ -276,6 +277,207 @@ class CsvExporterTests(unittest.TestCase):
 
         expected = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass;0;;False|True|;|2.0|;1.1|1.2|1.3'
         self.assertEqual(expected, csv_data_lines[1])
+
+    def test_export_and_then_import_unnested_attributes(self):
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        converter = OtlmowConverter(settings_path=settings_file_location)
+        importer = CsvImporter(settings=converter.settings)
+        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+        file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+        instance = AllCasesTestClass()
+        instance.assetId.identificator = '0000'
+        instance.testBooleanField = False
+        instance.testDateField = date(2019, 9, 20)
+        instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
+        instance.testDecimalField = 79.07
+        instance.testDecimalFieldMetKard = [10.0, 20.0]
+        instance.testEenvoudigType.waarde = 'string1'
+        instance._testEenvoudigTypeMetKard.add_empty_value()
+        instance._testEenvoudigTypeMetKard.add_empty_value()
+        instance.testEenvoudigTypeMetKard[0].waarde = 'string1'
+        instance.testEenvoudigTypeMetKard[1].waarde = 'string2'
+        instance.testIntegerField = -55
+        instance.testIntegerFieldMetKard = [76, 2]
+        instance.testKeuzelijst = 'waarde-4'
+        instance.testKeuzelijstMetKard = ['waarde-4', 'waarde-3']
+        instance.testKwantWrd.waarde = 98.21
+        instance._testKwantWrdMetKard.add_empty_value()
+        instance._testKwantWrdMetKard.add_empty_value()
+        instance.testKwantWrdMetKard[0].waarde = 10.0
+        instance.testKwantWrdMetKard[1].waarde = 20.0
+        instance.testStringField = 'oFfeDLp'
+        instance.testStringFieldMetKard = ['string1', 'string2']
+        instance.testTimeField = time(11, 5, 26)
+
+        exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
+                                split_per_type=False)
+
+        objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+        self.assertEqual(1, len(objects))
+        self.assertEqual(19, len(importer.headers))
+
+        instance = objects[0]
+        self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
+        self.assertEqual('0000', instance.assetId.identificator)
+
+        self.assertEqual(False, instance.testBooleanField)
+        self.assertEqual(date(2019, 9, 20), instance.testDateField)
+        self.assertEqual(datetime(2001, 12, 15, 22, 22, 15), instance.testDateTimeField)
+        self.assertEqual(79.07, instance.testDecimalField)
+        self.assertListEqual([10.0, 20.0], instance.testDecimalFieldMetKard)
+        self.assertEqual('string1', instance.testEenvoudigType.waarde)
+        self.assertEqual('string1', instance.testEenvoudigTypeMetKard[0].waarde)
+        self.assertEqual('string2', instance.testEenvoudigTypeMetKard[1].waarde)
+        self.assertEqual(-55, instance.testIntegerField)
+        self.assertListEqual([76, 2], instance.testIntegerFieldMetKard)
+        self.assertEqual('waarde-4', instance.testKeuzelijst)
+        self.assertListEqual(['waarde-4', 'waarde-3'], instance.testKeuzelijstMetKard)
+        self.assertEqual(98.21, instance.testKwantWrd.waarde)
+        self.assertEqual(10.0, instance.testKwantWrdMetKard[0].waarde)
+        self.assertEqual(20.0, instance.testKwantWrdMetKard[1].waarde)
+        self.assertEqual('oFfeDLp', instance.testStringField)
+        self.assertEqual('string1', instance.testStringFieldMetKard[0])
+        self.assertEqual('string2', instance.testStringFieldMetKard[1])
+        self.assertEqual(time(11, 5, 26), instance.testTimeField)
+
+        os.unlink(file_location)
+        
+    def test_export_and_then_import_nested_attributes_level_1(self):
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        converter = OtlmowConverter(settings_path=settings_file_location)
+        importer = CsvImporter(settings=converter.settings)
+        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+        file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+        instance = AllCasesTestClass()
+        instance.assetId.identificator = '0000'
+
+        instance.testComplexType.testBooleanField = True
+        instance.testComplexType.testKwantWrd.waarde = 65.14
+        instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+        instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+        instance.testComplexType.testKwantWrdMetKard[0].waarde = 10.0
+        instance.testComplexType.testKwantWrdMetKard[1].waarde = 20.0
+        instance.testComplexType.testStringField = 'KmCtMXM'
+        instance.testComplexType.testStringFieldMetKard = ['string1', 'string2']
+
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[0].testBooleanField = True
+        instance.testComplexTypeMetKard[1].testBooleanField = False
+        instance.testComplexTypeMetKard[0].testKwantWrd.waarde = 10.0
+        instance.testComplexTypeMetKard[1].testKwantWrd.waarde = 20.0
+        instance.testComplexTypeMetKard[0].testStringField = 'string1'
+        instance.testComplexTypeMetKard[1].testStringField = 'string2'
+        instance.testUnionType.unionString = 'RWKofW'
+
+        instance._testUnionTypeMetKard.add_empty_value()
+        instance._testUnionTypeMetKard.add_empty_value()
+        instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
+        instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
+
+        exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
+                                split_per_type=False)
+
+        objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+        self.assertEqual(1, len(objects))
+        self.assertEqual(13, len(importer.headers))
+
+        instance = objects[0]
+        self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
+        self.assertEqual('0000', instance.assetId.identificator)
+
+        self.assertEqual('0000', instance.assetId.identificator)
+        self.assertEqual(True, instance.testComplexType.testBooleanField)
+        self.assertEqual(65.14, instance.testComplexType.testKwantWrd.waarde)
+        self.assertEqual(10.0, instance.testComplexType.testKwantWrdMetKard[0].waarde)
+        self.assertEqual(20.0, instance.testComplexType.testKwantWrdMetKard[1].waarde)
+        self.assertEqual('KmCtMXM', instance.testComplexType.testStringField)
+        self.assertEqual('string1', instance.testComplexType.testStringFieldMetKard[0])
+        self.assertEqual('string2', instance.testComplexType.testStringFieldMetKard[1])
+        self.assertEqual(True, instance.testComplexTypeMetKard[0].testBooleanField)
+        self.assertEqual(False, instance.testComplexTypeMetKard[1].testBooleanField)
+        self.assertEqual(10.0, instance.testComplexTypeMetKard[0].testKwantWrd.waarde)
+        self.assertEqual(20.0, instance.testComplexTypeMetKard[1].testKwantWrd.waarde)
+        self.assertEqual('string1', instance.testComplexTypeMetKard[0].testStringField)
+        self.assertEqual('string2', instance.testComplexTypeMetKard[1].testStringField)
+        self.assertEqual('RWKofW', instance.testUnionType.unionString)
+        self.assertEqual(None, instance.testUnionType.unionKwantWrd.waarde)
+        self.assertEqual(10.0, instance.testUnionTypeMetKard[0].unionKwantWrd.waarde)
+        self.assertEqual(20.0, instance.testUnionTypeMetKard[1].unionKwantWrd.waarde)
+
+        os.unlink(file_location)
+
+    def test_export_and_then_import_nested_attributes_level_2(self):
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        converter = OtlmowConverter(settings_path=settings_file_location)
+        importer = CsvImporter(settings=converter.settings)
+        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+        file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+        instance = AllCasesTestClass()
+        instance.assetId.identificator = '0000'
+        
+        instance.testComplexType.testComplexType2.testKwantWrd.waarde = 76.8
+        instance.testComplexType.testComplexType2.testStringField = 'GZBzgRhOrQvfZaN'
+        instance.testComplexType._testComplexType2MetKard.add_empty_value()
+        instance.testComplexType._testComplexType2MetKard.add_empty_value()
+        instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde = 10.0
+        instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde = 20.0
+        instance.testComplexType.testComplexType2MetKard[0].testStringField = 'string1'
+        instance.testComplexType.testComplexType2MetKard[1].testStringField = 'string2'
+
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde = 10.0
+        instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde = 20.0
+        instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
+        instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
+
+        exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
+                                split_per_type=False)
+
+        objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+        self.assertEqual(1, len(objects))
+        self.assertEqual(9, len(importer.headers))
+
+        instance = objects[0]
+        self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
+        self.assertEqual('0000', instance.assetId.identificator)
+
+        self.assertEqual(76.8, instance.testComplexType.testComplexType2.testKwantWrd.waarde)
+        self.assertEqual('GZBzgRhOrQvfZaN', instance.testComplexType.testComplexType2.testStringField)
+        self.assertEqual(10.0, instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde)
+        self.assertEqual(20.0, instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde)
+        self.assertEqual('string1', instance.testComplexType.testComplexType2MetKard[0].testStringField)
+        self.assertEqual('string2', instance.testComplexType.testComplexType2MetKard[1].testStringField)
+        self.assertEqual(10.0, instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde)
+        self.assertEqual(20.0, instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde)
+        self.assertEqual('string1', instance.testComplexTypeMetKard[0].testComplexType2.testStringField)
+        self.assertEqual('string2', instance.testComplexTypeMetKard[1].testComplexType2.testStringField)
+
+        os.unlink(file_location)
+
+    def test_export_and_then_import_list_of_lists(self):
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        converter = OtlmowConverter(settings_path=settings_file_location)
+        importer = CsvImporter(settings=converter.settings)
+        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+        file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+        instance = AllCasesTestClass()
+        instance.assetId.identificator = '0000'
+
+        instance.testComplexTypeMetKard[0].testKwantWrdMetKard[0].waarde = 10.0
+        exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
+                                split_per_type=False)
+
+        with self.assertLogs(level='WARNING') as log:
+            objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+            self.assertEqual(len(log.output), 1)
+
+        self.assertEqual(None, objects[0].testComplexTypeMetKard[0].testKwantWrdMetKard[0].waarde)
+
+        os.unlink(file_location)
+        
+
 
 
 

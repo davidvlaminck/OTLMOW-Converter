@@ -36,7 +36,7 @@ class CsvExporter:
             if 'split_per_type' in kwargs:
                 split_per_type = kwargs['split_per_type']
 
-        if filepath == None:
+        if filepath is None:
             raise ValueError(f'Can not write a file to: {filepath}')
 
         if delimiter == '':
@@ -208,7 +208,7 @@ class CsvExporter:
                                                                             dotnotation=attribute,
                                                                             separator='.',
                                                                             cardinality_indicator='[]',
-                                                                            waarde_shortcut_applicable=False)
+                                                                            waarde_shortcut_applicable=True)
 
         if actual_attributes is None:
             return []
@@ -221,7 +221,13 @@ class CsvExporter:
                 values_list = []
                 for actual_attribute in actual_attributes:
                     if actual_attribute.waarde is not None:
-                        values_list.append(actual_attribute.waarde.waarde)
+                        if isinstance(actual_attribute.waarde, list):
+                            new_list = []
+                            for item in actual_attribute.waarde:
+                                new_list.append(item.waarde)
+                            values_list.append(new_list)
+                        else:
+                            values_list.append(actual_attribute.waarde.waarde)
                     else:
                         values_list.append(None)
             else:
@@ -230,7 +236,8 @@ class CsvExporter:
             values_list = list(map(lambda x: x.waarde, actual_attributes))
         return values_list
 
-    def import_aimobject(self, class_directory):
+    @staticmethod
+    def import_aimobject(class_directory):
         try:
             # TODO: check https://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
             py_mod = __import__(name=f'{class_directory}.ImplementatieElement.AIMObject', fromlist=f'AIMObject')
