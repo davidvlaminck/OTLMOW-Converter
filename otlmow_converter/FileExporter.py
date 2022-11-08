@@ -13,13 +13,16 @@ class FileExporter:
 
     def create_file_from_assets(self, filepath: Path, list_of_objects: list, **kwargs):
         extension = FileImporter.get_file_extension(filepath, file_must_exist=False)
-        exporter = self.get_exporter_from_extension(extension=extension, settings=self.settings)
+        exporter = self.get_exporter_from_extension(extension=extension, settings=self.settings, **kwargs)
         return exporter.export_to_file(filepath=filepath, list_of_objects=list_of_objects, **kwargs)
 
     @staticmethod
-    def get_exporter_from_extension(extension: str, settings: dict):
+    def get_exporter_from_extension(extension: str, settings: dict, **kwargs):
         if extension == 'csv':
-            return CsvExporter(settings=settings)
+            class_directory = None
+            if kwargs is not None and 'class_directory' in kwargs:
+                class_directory = kwargs['class_directory']
+            return CsvExporter(settings=settings, class_directory=class_directory)
         elif extension == 'json':
             return JsonExporter(settings=settings)
         elif extension in ['xls', 'xlsx']:
