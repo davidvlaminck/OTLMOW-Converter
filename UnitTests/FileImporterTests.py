@@ -1,5 +1,5 @@
 import os
-from os.path import abspath
+from pathlib import Path
 from unittest import TestCase
 
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
@@ -18,15 +18,15 @@ class FileImporterTests(TestCase):
 
     def test_get_file_extension_nonexistant_filepath(self):
         with self.assertRaises(FileNotFoundError):
-            FileImporter.get_file_extension('this_file_does_not_exist.csv')
+            FileImporter.get_file_extension(Path('this_file_does_not_exist.csv'))
 
     def test_get_file_extension_filepath_without_extension(self):
         with self.assertRaises(ValueError):
-            FileImporter.get_file_extension('this_file_has_no_extension')
+            FileImporter.get_file_extension(Path('this_file_has_no_extension'))
 
     def test_get_file_extension_valid_filepath(self):
         base_dir = os.path.dirname(os.path.realpath(__file__))
-        filepath = abspath(f'{base_dir}/CSV/test_file_VR.csv')
+        filepath = Path(base_dir) / 'CSV' / 'test_file_VR.csv'
         extension = FileImporter.get_file_extension(filepath)
         self.assertEqual('csv', extension)
 

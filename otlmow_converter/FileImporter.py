@@ -29,8 +29,7 @@ class FileImporter:
         if file_must_exist and not os.path.isfile(filepath):
             raise FileNotFoundError(filepath_str + " is not a valid path. File does not exist.")
 
-        index = filepath_str.rfind('.')
-        return filepath_str[index + 1:]
+        return filepath.suffix[1:]
 
     @staticmethod
     def get_importer_from_extension(extension: str, settings: dict):
