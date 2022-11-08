@@ -71,7 +71,7 @@ class DotnotationHelper:
             attribute = getattr(instance_or_attribute, '_' + dotnotation.replace(cardinality_indicator, ''))
             if attribute.field.waarde_shortcut_applicable:
                 waardenObject = getattr(instance_or_attribute, dotnotation.replace(cardinality_indicator, ''))
-                if cardinality_indicator in dotnotation:
+                if attribute.kardinaliteit_max != '1':
                     collected_attributes = []
                     for waardenObject_in_list in waardenObject:
                         collected_attributes.append(getattr(waardenObject_in_list, '_waarde'))
@@ -123,10 +123,10 @@ class DotnotationHelper:
         if separator not in dotnotation:
             # set list directly
             attribute = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instanceOrAttribute,
-                                                                        dotnotation=dotnotation.replace(cardinality_indicator, ''),
+                                                                        dotnotation=dotnotation,
                                                                         separator=separator,
                                                                         cardinality_indicator=cardinality_indicator,
-                                                                        waarde_shortcut_applicable=False)
+                                                                        waarde_shortcut_applicable=waarde_shortcut_applicable)
 
             if not isinstance(attribute, list) and not attribute.field.waarde_shortcut_applicable:
                 if convert:
@@ -137,10 +137,12 @@ class DotnotationHelper:
                 return
 
             # waarde shortcut
+            parent_waarde_attr = attribute[0].owner._parent
+            while len(parent_waarde_attr.waarde) < len(value):
+                parent_waarde_attr.add_empty_value()
+
             for index, list_item in enumerate(value):
-                if attribute.waarde is None or len(attribute.waarde) <= index:
-                    attribute.add_empty_value()
-                DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde[index],
+                DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=parent_waarde_attr.waarde[index],
                                                                dotnotation='waarde',
                                                                value=list_item,
                                                                convert=convert,
@@ -237,6 +239,8 @@ class DotnotationHelper:
             return new_list
 
         if attribuut.field.waardeObject is not None and attribuut.field.waarde_shortcut_applicable:
+            if attribuut.waarde is None:
+                attribuut.add_empty_value()
             field = attribuut.waarde._waarde.field
 
         return field.convert_to_correct_type(waarde, log_warnings=log_warnings)

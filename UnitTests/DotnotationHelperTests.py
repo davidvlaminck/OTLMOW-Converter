@@ -209,7 +209,7 @@ class DotnotationHelperTests(TestCase):
             expected_attribute = instance.testKwantWrdMetKard[0]._waarde
             self.assertEqual(expected_attribute.objectUri, result_attribute[0].objectUri)
 
-        with self.subTest("attribute 4 levels deep with waarde shortcut disabled"):
+        with self.subTest("attribute 4 levels deep with waarde shortcut enabled"):
             result_attribute = DotnotationHelper.get_attributes_by_dotnotation(instance,
                                                                                'testComplexType.testComplexType2.testKwantWrd')
             expected_attribute = instance.testComplexType.testComplexType2.testKwantWrd._waarde
@@ -352,16 +352,19 @@ class DotnotationHelperTests(TestCase):
 
         with self.subTest("attribute 1 level deep with cardinality > 1 and waarde shortcut enabled"):
             DotnotationHelper.set_attribute_by_dotnotation(instance, 'testKwantWrdMetKard[]', [0.0, 1.0])
+            self.assertEqual(0.0, instance.testKwantWrdMetKard[0].waarde)
             self.assertEqual(1.0, instance.testKwantWrdMetKard[1].waarde)
 
         with self.subTest("attribute 2 levels deep with cardinality > 1 (first part) and with waarde shortcut enabled"):
             DotnotationHelper.set_attribute_by_dotnotation(instance, 'testComplexTypeMetKard[].testKwantWrd',
                                                            [8.0, 9.0])
+            self.assertEqual(8.0, instance.testComplexTypeMetKard[0].testKwantWrd.waarde)
             self.assertEqual(9.0, instance.testComplexTypeMetKard[1].testKwantWrd.waarde)
 
         with self.subTest("attribute 2 levels deep with cardinality > 1 (last part) and with waarde shortcut enabled"):
             DotnotationHelper.set_attribute_by_dotnotation(instance, 'testComplexType.testKwantWrdMetKard[]',
                                                            [2.0, 3.0])
+            self.assertEqual(2.0, instance.testComplexType.testKwantWrdMetKard[0].waarde)
             self.assertEqual(3.0, instance.testComplexType.testKwantWrdMetKard[1].waarde)
 
         with self.subTest("attribute 3 levels deep with waarde shortcut enabled"):
