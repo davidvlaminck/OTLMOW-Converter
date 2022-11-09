@@ -8,6 +8,7 @@ from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri
 class CsvExporter:
     def __init__(self, settings=None, class_directory: str = 'otlmow_model.Classes'):
         self.aimobject_ref = self.import_aimobject(class_directory)
+        self.relatieobject_ref = self.import_relatieobject(class_directory)
 
         if settings is None:
             settings = {}
@@ -78,7 +79,7 @@ class CsvExporter:
         self.csv_headers = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
 
         for asset_object in list_of_objects:
-            if isinstance(asset_object, self.aimobject_ref):
+            if isinstance(asset_object, self.aimobject_ref) or isinstance(asset_object, self.relatieobject_ref):
                 if asset_object.assetId.identificator is None or asset_object.assetId.identificator == '':
                     raise ValueError(
                         f'Not possible to export AIM Objects without a valid assetId.identificator. '
@@ -244,4 +245,14 @@ class CsvExporter:
         except ModuleNotFoundError:
             return None
         class_ = getattr(py_mod, 'AIMObject')
+        return class_
+
+    @staticmethod
+    def import_relatieobject(class_directory):
+        try:
+            # TODO: check https://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
+            py_mod = __import__(name=f'{class_directory}.ImplementatieElement.RelatieObject', fromlist=f'RelatieObject')
+        except ModuleNotFoundError:
+            return None
+        class_ = getattr(py_mod, 'RelatieObject')
         return class_
