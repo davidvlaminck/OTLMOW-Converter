@@ -106,7 +106,12 @@ class ExcelExporter:
 
             for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(otl_object):
                 if self.settings['dotnotation']['cardinality indicator'] in k:
-                    d[k] = self.settings['dotnotation']['cardinality separator'].join(v)
+                    string_list = []
+                    for item in v:
+                        if not isinstance(item, str):
+                            item = str(item)
+                        string_list.append(item)
+                    d[k] = self.settings['dotnotation']['cardinality separator'].join(string_list)
                 else:
                     d[k] = v
 
@@ -121,11 +126,12 @@ class ExcelExporter:
 
             self.data[short_uri] = pandas.concat([self.data[short_uri], df])
 
-        self.fix_headers_order_and_replace_nan_with_none()
+        self.fix_headers_order_and_replace_nan_with_none(self.data)
 
-    def fix_headers_order_and_replace_nan_with_none(self):
+    @staticmethod
+    def fix_headers_order_and_replace_nan_with_none(data):
         fixed_first_headers = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
-        for k, df in self.data.items():
+        for k, df in data.items():
             headers = []
             headers.extend(fixed_first_headers)
             for fixed_header in fixed_first_headers:
@@ -141,6 +147,6 @@ class ExcelExporter:
                 headers.remove('geometry')
                 headers.append('geometry')
 
-            self.data[k] = df[headers].replace({nan: None})
+            data[k] = df[headers].replace({nan: None})
 
 
