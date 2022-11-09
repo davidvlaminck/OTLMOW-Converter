@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "otlmow_converter"
-version = "0.1"
+version = "0.2"
 authors = [{name = "David Vlaminck", email = "david.vlaminck@mow.vlaanderen.be"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -15,6 +15,7 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
   'pandas >= 1.5.0',
+  'otlmow_model >= 2.5.2',
 ]
 
 [tool.setuptools.packages.find]
