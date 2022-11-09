@@ -177,6 +177,50 @@ class CsvExporterTests(unittest.TestCase):
             self.assertEqual(None, csv_data[2][9])
             self.assertEqual(['waarde-2'], csv_data[2][10])
 
+    def test_create_with_different_cardinality_among_subattributes(self):
+        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+        converter = OtlmowConverter(settings_path=settings_file_location)
+        importer = CsvImporter(settings=converter.settings)
+        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+        file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+        instance = AllCasesTestClass()
+        instance.assetId.identificator = '0000-0000'
+
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[0].testBooleanField = False
+        instance.testComplexTypeMetKard[0].testStringField = '1.1'
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[1].testBooleanField = True
+        instance.testComplexTypeMetKard[1].testKwantWrd.waarde = 2.0
+        instance.testComplexTypeMetKard[1].testStringField = '1.2'
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[2].testStringField = '1.3'
+
+        exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
+                                split_per_type=False)
+
+        objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+        self.assertEqual(1, len(objects))
+        self.assertEqual(5, len(importer.data['AllCasesTestClass'].columns))
+
+        instance = objects[0]
+        self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
+        self.assertEqual('0000-0000', instance.assetId.identificator)
+
+        self.assertEqual(False, instance.testComplexTypeMetKard[0].testBooleanField)
+        self.assertEqual(True, instance.testComplexTypeMetKard[1].testBooleanField)
+        self.assertEqual(None, instance.testComplexTypeMetKard[2].testBooleanField)
+
+        self.assertEqual(None, instance.testComplexTypeMetKard[0].testKwantWrd.waarde)
+        self.assertEqual(2.0, instance.testComplexTypeMetKard[1].testKwantWrd.waarde)
+        self.assertEqual(None, instance.testComplexTypeMetKard[2].testKwantWrd.waarde)
+
+        self.assertEqual('1.1', instance.testComplexTypeMetKard[0].testStringField)
+        self.assertEqual('1.2', instance.testComplexTypeMetKard[1].testStringField)
+        self.assertEqual('1.3', instance.testComplexTypeMetKard[2].testStringField)
+
+        os.unlink(file_location)
+
     def test_create_data_from_objects_cardinality(self):
         otl_facility = self.set_up_facility()
         exporter = CsvExporter(settings=otl_facility.settings, class_directory='UnitTests.TestClasses.Classes')
