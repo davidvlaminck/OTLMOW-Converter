@@ -30,8 +30,6 @@ def create_relation(source: RelationInteractor, target: RelationInteractor, rela
     relation.doelAssetId.identificator = target.assetId.identificator
     relation.doelAssetId.toegekendDoor = target.assetId.toegekendDoor
 
-
-
     relation.assetId.identificator = source.assetId.identificator + '_-_' + target.assetId.identificator
     relation.assetId.toegekendDoor = 'OTLMOW'
 
