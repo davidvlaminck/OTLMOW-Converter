@@ -7,6 +7,8 @@ from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri
 
 class CsvExporter:
     def __init__(self, settings=None, class_directory: str = 'otlmow_model.Classes'):
+        if class_directory is None:
+            class_directory = 'otlmow_model.Classes'
         self.aimobject_ref = self.import_aimobject(class_directory)
         self.relatieobject_ref = self.import_relatieobject(class_directory)
 
