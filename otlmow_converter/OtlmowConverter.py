@@ -15,7 +15,7 @@ class OtlmowConverter:
                  logfile: Path = None):
         """Main utility class for creating a model, importing and exporting assets from files and enabling validation features
 
-        :param settings_path: specifies the location of the settings file this library loads. Defaults to the example that is supplied with the library ('OTLMOW/Facility/settings_sample.json')
+        :param settings_path: specifies the location of the settings file this library loads. Defaults to the example that is supplied with the library ('./settings_otlmow_converter.json')
         :type settings_path: Path
         :param logging_level: specifies the level of logging that is used for actions with this class
         :type logging_level: int
@@ -83,17 +83,16 @@ class OtlmowConverter:
             return environment
         raise ValueError("Valid options for the environment parameter are: '', 'prd', 'tei', 'dev' and 'aim'")
 
-    def _load_settings(self, settings_path):
-        if settings_path == '':
+    def _load_settings(self, settings_path: Path):
+        if settings_path is None:
             current_file_path = Path(__file__)
-            directory = current_file_path.parents[0]
-            settings_path = abspath(f'{directory}\\settings_sample.json')
+            settings_path = Path(current_file_path.parent / 'settings_otlmow_converter.json')
 
         if not os.path.isfile(settings_path):
-            raise FileNotFoundError(settings_path + " is not a valid path. File does not exist.")
+            raise FileNotFoundError(f'{settings_path} is not a valid path. File does not exist.')
 
         try:
             with open(settings_path) as settings_file:
                 self.settings = json.load(settings_file)
         except OSError:
-            raise ImportError(f'Could not open the settings file at {settings_file}')
+            raise ImportError(f'Could not open the settings file at {settings_path}')
