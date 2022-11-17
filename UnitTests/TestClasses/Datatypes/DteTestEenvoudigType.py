@@ -17,7 +17,7 @@ class DteTestEenvoudigTypeWaarden(WaardenObject):
                                     owner=self)
 
     @property
-    def waarde(self):
+    def waarde(self) -> str:
         """De string die het eenvoudige test datatype voorstelt."""
         return self._waarde.get_waarde()
 

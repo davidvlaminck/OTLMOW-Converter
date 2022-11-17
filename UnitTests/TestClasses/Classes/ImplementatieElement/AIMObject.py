@@ -1,4 +1,5 @@
 # coding=utf-8
+from datetime import date
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from abc import abstractmethod
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMDBStatus import AIMDBStatus
@@ -6,8 +7,8 @@ from UnitTests.TestClasses.Classes.ImplementatieElement.AIMToestand import AIMTo
 from otlmow_model.BaseClasses.OTLAsset import OTLAsset
 from otlmow_model.BaseClasses.RelationInteractor import RelationInteractor
 from otlmow_model.BaseClasses.DateField import DateField
-from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator
-from UnitTests.TestClasses.Datatypes.KwantWrdInMaand import KwantWrdInMaand
+from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator, DtcIdentificatorWaarden
+from UnitTests.TestClasses.Datatypes.KwantWrdInMaand import KwantWrdInMaand, KwantWrdInMaandWaarden
 from otlmow_model.BaseClasses.StringField import StringField
 
 
@@ -70,7 +71,7 @@ class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
                                                     owner=self)
 
     @property
-    def assetId(self):
+    def assetId(self) -> DtcIdentificatorWaarden:
         """Unieke identificatie van de asset zoals toegekend door de assetbeheerder of n.a.v. eerste aanlevering door de leverancier."""
         return self._assetId.get_waarde()
 
@@ -79,7 +80,7 @@ class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
         self._assetId.set_waarde(value, owner=self)
 
     @property
-    def bestekPostNummer(self):
+    def bestekPostNummer(self) -> str:
         """Een verwijzing naar een postnummer uit het specifieke bestek waar het object mee verband houdt."""
         return self._bestekPostNummer.get_waarde()
 
@@ -88,7 +89,7 @@ class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
         self._bestekPostNummer.set_waarde(value, owner=self)
 
     @property
-    def datumOprichtingObject(self):
+    def datumOprichtingObject(self) -> date:
         """Datum van de oprichting van het object."""
         return self._datumOprichtingObject.get_waarde()
 
@@ -97,7 +98,7 @@ class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
         self._datumOprichtingObject.set_waarde(value, owner=self)
 
     @property
-    def notitie(self):
+    def notitie(self) -> str:
         """Extra notitie voor het object."""
         return self._notitie.get_waarde()
 
@@ -106,7 +107,7 @@ class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
         self._notitie.set_waarde(value, owner=self)
 
     @property
-    def standaardBestekPostNummer(self):
+    def standaardBestekPostNummer(self) -> str:
         """Een verwijzing naar een postnummer uit het standaardbestek waar het object mee verband houdt. De notatie van het postnummer moet overeenkomen met de notatie die gebruikt is in de catalogi van standaardbestekken, bijvoorbeeld postnummer 0701.20404G."""
         return self._standaardBestekPostNummer.get_waarde()
 
@@ -115,7 +116,7 @@ class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
         self._standaardBestekPostNummer.set_waarde(value, owner=self)
 
     @property
-    def theoretischeLevensduur(self):
+    def theoretischeLevensduur(self) -> KwantWrdInMaandWaarden:
         """ De levensduur in aantal maanden die theoretisch mag verwacht worden voor een object."""
         return self._theoretischeLevensduur.get_waarde()
 

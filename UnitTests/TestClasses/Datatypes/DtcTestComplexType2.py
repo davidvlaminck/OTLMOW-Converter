@@ -2,7 +2,7 @@
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from otlmow_model.BaseClasses.WaardenObject import WaardenObject
 from otlmow_model.BaseClasses.ComplexField import ComplexField
-from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest
+from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest, KwantWrdTestWaarden
 from otlmow_model.BaseClasses.StringField import StringField
 
 
@@ -25,7 +25,7 @@ class DtcTestComplexType2Waarden(WaardenObject):
                                              owner=self)
 
     @property
-    def testKwantWrd(self):
+    def testKwantWrd(self) -> KwantWrdTestWaarden:
         """Test attribuut voor Kwantitatieve waarde in een complex datatype."""
         return self._testKwantWrd.get_waarde()
 
@@ -34,7 +34,7 @@ class DtcTestComplexType2Waarden(WaardenObject):
         self._testKwantWrd.set_waarde(value, owner=self._parent)
 
     @property
-    def testStringField(self):
+    def testStringField(self) -> str:
         """Test attribuut voor tekst in een complex datatype."""
         return self._testStringField.get_waarde()
 

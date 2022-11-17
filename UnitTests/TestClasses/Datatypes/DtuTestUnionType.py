@@ -1,6 +1,6 @@
 # coding=utf-8
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
-from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest
+from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest, KwantWrdTestWaarden
 from otlmow_model.BaseClasses.StringField import StringField
 from otlmow_model.BaseClasses.UnionTypeField import UnionTypeField
 from otlmow_model.BaseClasses.UnionWaarden import UnionWaarden
@@ -27,7 +27,7 @@ class DtuTestUnionTypeWaarden(UnionWaarden):
                                          owner=self)
 
     @property
-    def unionKwantWrd(self):
+    def unionKwantWrd(self) -> KwantWrdTestWaarden:
         """Kwantitatieve waarde van het test Union datatype"""
         return self._unionKwantWrd.get_waarde()
 
@@ -38,7 +38,7 @@ class DtuTestUnionTypeWaarden(UnionWaarden):
             self.clear_other_props('_unionKwantWrd')
 
     @property
-    def unionString(self):
+    def unionString(self) -> str:
         """Vrij tekstveld van het test Union datatype"""
         return self._unionString.get_waarde()
 

@@ -21,7 +21,7 @@ class AIMToestand(ABC):
                                       owner=self)
 
     @property
-    def toestand(self):
+    def toestand(self) -> str:
         """Geeft de actuele stand in de levenscyclus van het object."""
         return self._toestand.get_waarde()
 

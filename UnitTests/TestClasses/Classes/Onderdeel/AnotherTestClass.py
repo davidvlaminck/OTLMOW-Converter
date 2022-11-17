@@ -1,7 +1,7 @@
 # coding=utf-8
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMObject import AIMObject
-from UnitTests.TestClasses.Datatypes.DtcTestComplexType import DtcTestComplexType
+from UnitTests.TestClasses.Datatypes.DtcTestComplexType import DtcTestComplexType, DtcTestComplexTypeWaarden
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
@@ -26,7 +26,7 @@ class AnotherTestClass(AIMObject):
                                               owner=self)
 
     @property
-    def deprecatedString(self):
+    def deprecatedString(self) -> DtcTestComplexTypeWaarden:
         """Tekstveld dat niet meer gebruikt wordt"""
         return self._deprecatedString.get_waarde()
 

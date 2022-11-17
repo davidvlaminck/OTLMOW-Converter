@@ -28,12 +28,12 @@ class KwantWrdTestWaarden(WaardenObject):
                                     owner=self)
 
     @property
-    def standaardEenheid(self):
+    def standaardEenheid(self) -> str:
         """De standaard eenheid bij dit datatype is uitgedrukt in percent."""
         return self._standaardEenheid.usagenote.split('"')[1]
 
     @property
-    def waarde(self):
+    def waarde(self) -> float:
         """Bevat een getal die bij het datatype hoort."""
         return self._waarde.get_waarde()
 

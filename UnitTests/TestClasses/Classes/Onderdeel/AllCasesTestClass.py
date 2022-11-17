@@ -1,16 +1,17 @@
 # coding=utf-8
+from datetime import date, datetime, time
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMObject import AIMObject
 from otlmow_model.BaseClasses.BooleanField import BooleanField
 from otlmow_model.BaseClasses.DateField import DateField
 from otlmow_model.BaseClasses.DateTimeField import DateTimeField
-from UnitTests.TestClasses.Datatypes.DtcTestComplexType import DtcTestComplexType
-from UnitTests.TestClasses.Datatypes.DteTestEenvoudigType import DteTestEenvoudigType
-from UnitTests.TestClasses.Datatypes.DtuTestUnionType import DtuTestUnionType
+from UnitTests.TestClasses.Datatypes.DtcTestComplexType import DtcTestComplexType, DtcTestComplexTypeWaarden
+from UnitTests.TestClasses.Datatypes.DteTestEenvoudigType import DteTestEenvoudigType, DteTestEenvoudigTypeWaarden
+from UnitTests.TestClasses.Datatypes.DtuTestUnionType import DtuTestUnionType, DtuTestUnionTypeWaarden
 from otlmow_model.BaseClasses.FloatOrDecimalField import FloatOrDecimalField
 from otlmow_model.BaseClasses.IntegerField import IntegerField
 from UnitTests.TestClasses.Datatypes.KlTestKeuzelijst import KlTestKeuzelijst
-from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest
+from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest, KwantWrdTestWaarden
 from otlmow_model.BaseClasses.StringField import StringField
 from otlmow_model.BaseClasses.TimeField import TimeField
 
@@ -177,7 +178,7 @@ class AllCasesTestClass(AIMObject):
                                                   owner=self)
 
     @property
-    def testBooleanField(self):
+    def testBooleanField(self) -> bool:
         """Test attribuut voor BooleanField"""
         return self._testBooleanField.get_waarde()
 
@@ -186,7 +187,7 @@ class AllCasesTestClass(AIMObject):
         self._testBooleanField.set_waarde(value, owner=self)
 
     @property
-    def testComplexType(self):
+    def testComplexType(self) -> DtcTestComplexTypeWaarden:
         """Test attribuut voor een complexe waarde"""
         return self._testComplexType.get_waarde()
 
@@ -195,7 +196,7 @@ class AllCasesTestClass(AIMObject):
         self._testComplexType.set_waarde(value, owner=self)
 
     @property
-    def testComplexTypeMetKard(self):
+    def testComplexTypeMetKard(self) -> DtcTestComplexTypeWaarden:
         """Test attribuut voor een complexe waarde met kardinaliteit > 1"""
         return self._testComplexTypeMetKard.get_waarde()
 
@@ -204,7 +205,7 @@ class AllCasesTestClass(AIMObject):
         self._testComplexTypeMetKard.set_waarde(value, owner=self)
 
     @property
-    def testDateField(self):
+    def testDateField(self) -> date:
         """Test attribuut voor DateField"""
         return self._testDateField.get_waarde()
 
@@ -213,7 +214,7 @@ class AllCasesTestClass(AIMObject):
         self._testDateField.set_waarde(value, owner=self)
 
     @property
-    def testDateTimeField(self):
+    def testDateTimeField(self) -> datetime:
         """Test attribuut voor DateTimeField"""
         return self._testDateTimeField.get_waarde()
 
@@ -222,7 +223,7 @@ class AllCasesTestClass(AIMObject):
         self._testDateTimeField.set_waarde(value, owner=self)
 
     @property
-    def testDecimalField(self):
+    def testDecimalField(self) -> float:
         """Test attribuut voor DecimalField"""
         return self._testDecimalField.get_waarde()
 
@@ -231,7 +232,7 @@ class AllCasesTestClass(AIMObject):
         self._testDecimalField.set_waarde(value, owner=self)
 
     @property
-    def testDecimalFieldMetKard(self):
+    def testDecimalFieldMetKard(self) -> float:
         """Test attribuut voor DecimalField met kardinaliteit > 1"""
         return self._testDecimalFieldMetKard.get_waarde()
 
@@ -240,7 +241,7 @@ class AllCasesTestClass(AIMObject):
         self._testDecimalFieldMetKard.set_waarde(value, owner=self)
 
     @property
-    def testEenvoudigType(self):
+    def testEenvoudigType(self) -> DteTestEenvoudigTypeWaarden:
         """Test attribuut voor een eenvoudige waarde"""
         return self._testEenvoudigType.get_waarde()
 
@@ -249,7 +250,7 @@ class AllCasesTestClass(AIMObject):
         self._testEenvoudigType.set_waarde(value, owner=self)
 
     @property
-    def testEenvoudigTypeMetKard(self):
+    def testEenvoudigTypeMetKard(self) -> DteTestEenvoudigTypeWaarden:
         """Test attribuut voor een eenvoudige waarde met kardinaliteit > 1"""
         return self._testEenvoudigTypeMetKard.get_waarde()
 
@@ -258,7 +259,7 @@ class AllCasesTestClass(AIMObject):
         self._testEenvoudigTypeMetKard.set_waarde(value, owner=self)
 
     @property
-    def testIntegerField(self):
+    def testIntegerField(self) -> int:
         """Test attribuut voor IntegerField"""
         return self._testIntegerField.get_waarde()
 
@@ -267,7 +268,7 @@ class AllCasesTestClass(AIMObject):
         self._testIntegerField.set_waarde(value, owner=self)
 
     @property
-    def testIntegerFieldMetKard(self):
+    def testIntegerFieldMetKard(self) -> int:
         """Test attribuut voor IntegerField met kardinaliteit > 1"""
         return self._testIntegerFieldMetKard.get_waarde()
 
@@ -276,7 +277,7 @@ class AllCasesTestClass(AIMObject):
         self._testIntegerFieldMetKard.set_waarde(value, owner=self)
 
     @property
-    def testKeuzelijst(self):
+    def testKeuzelijst(self) -> str:
         """Test attribuut voor een keuzelijst"""
         return self._testKeuzelijst.get_waarde()
 
@@ -285,7 +286,7 @@ class AllCasesTestClass(AIMObject):
         self._testKeuzelijst.set_waarde(value, owner=self)
 
     @property
-    def testKeuzelijstMetKard(self):
+    def testKeuzelijstMetKard(self) -> str:
         """Test attribuut voor een keuzelijst met kardinaliteit > 1"""
         return self._testKeuzelijstMetKard.get_waarde()
 
@@ -294,7 +295,7 @@ class AllCasesTestClass(AIMObject):
         self._testKeuzelijstMetKard.set_waarde(value, owner=self)
 
     @property
-    def testKwantWrd(self):
+    def testKwantWrd(self) -> KwantWrdTestWaarden:
         """Test attribuut voor een kwantitatieve waarde"""
         return self._testKwantWrd.get_waarde()
 
@@ -303,7 +304,7 @@ class AllCasesTestClass(AIMObject):
         self._testKwantWrd.set_waarde(value, owner=self)
 
     @property
-    def testKwantWrdMetKard(self):
+    def testKwantWrdMetKard(self) -> KwantWrdTestWaarden:
         """Test attribuut voor een kwantitatieve waarde met kardinaliteit > 1"""
         return self._testKwantWrdMetKard.get_waarde()
 
@@ -312,7 +313,7 @@ class AllCasesTestClass(AIMObject):
         self._testKwantWrdMetKard.set_waarde(value, owner=self)
 
     @property
-    def testStringField(self):
+    def testStringField(self) -> str:
         """Test attribuut voor StringField"""
         return self._testStringField.get_waarde()
 
@@ -321,7 +322,7 @@ class AllCasesTestClass(AIMObject):
         self._testStringField.set_waarde(value, owner=self)
 
     @property
-    def testStringFieldMetKard(self):
+    def testStringFieldMetKard(self) -> str:
         """Test attribuut voor StringField met kardinaliteit > 1"""
         return self._testStringFieldMetKard.get_waarde()
 
@@ -330,7 +331,7 @@ class AllCasesTestClass(AIMObject):
         self._testStringFieldMetKard.set_waarde(value, owner=self)
 
     @property
-    def testTimeField(self):
+    def testTimeField(self) -> time:
         """Test attribuut voor TimeField"""
         return self._testTimeField.get_waarde()
 
@@ -339,7 +340,7 @@ class AllCasesTestClass(AIMObject):
         self._testTimeField.set_waarde(value, owner=self)
 
     @property
-    def testUnionType(self):
+    def testUnionType(self) -> DtuTestUnionTypeWaarden:
         """Test attribuut voor een union type"""
         return self._testUnionType.get_waarde()
 
@@ -348,7 +349,7 @@ class AllCasesTestClass(AIMObject):
         self._testUnionType.set_waarde(value, owner=self)
 
     @property
-    def testUnionTypeMetKard(self):
+    def testUnionTypeMetKard(self) -> DtuTestUnionTypeWaarden:
         """Test attribuut voor een union type met kardinaliteit > 1"""
         return self._testUnionTypeMetKard.get_waarde()
 

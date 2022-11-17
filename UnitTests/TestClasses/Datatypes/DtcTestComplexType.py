@@ -3,8 +3,8 @@ from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from otlmow_model.BaseClasses.WaardenObject import WaardenObject
 from otlmow_model.BaseClasses.BooleanField import BooleanField
 from otlmow_model.BaseClasses.ComplexField import ComplexField
-from UnitTests.TestClasses.Datatypes.DtcTestComplexType2 import DtcTestComplexType2
-from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest
+from UnitTests.TestClasses.Datatypes.DtcTestComplexType2 import DtcTestComplexType2, DtcTestComplexType2Waarden
+from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest, KwantWrdTestWaarden
 from otlmow_model.BaseClasses.StringField import StringField
 
 
@@ -65,7 +65,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
                                                     owner=self)
 
     @property
-    def testBooleanField(self):
+    def testBooleanField(self) -> bool:
         """Test attribuut voor boolean in een complex datatype."""
         return self._testBooleanField.get_waarde()
 
@@ -74,7 +74,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testBooleanField.set_waarde(value, owner=self._parent)
 
     @property
-    def testComplexType2(self):
+    def testComplexType2(self) -> DtcTestComplexType2Waarden:
         """Test attribuut voor complexe waarde in een complex datatype."""
         return self._testComplexType2.get_waarde()
 
@@ -83,7 +83,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testComplexType2.set_waarde(value, owner=self._parent)
 
     @property
-    def testComplexType2MetKard(self):
+    def testComplexType2MetKard(self) -> DtcTestComplexType2Waarden:
         """Test attribuut voor complexe waarde met kardinaliteit > 1 in een complex datatype."""
         return self._testComplexType2MetKard.get_waarde()
 
@@ -92,7 +92,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testComplexType2MetKard.set_waarde(value, owner=self._parent)
 
     @property
-    def testKwantWrd(self):
+    def testKwantWrd(self) -> KwantWrdTestWaarden:
         """Test attribuut voor Kwantitatieve waarde in een complex datatype."""
         return self._testKwantWrd.get_waarde()
 
@@ -101,7 +101,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testKwantWrd.set_waarde(value, owner=self._parent)
 
     @property
-    def testKwantWrdMetKard(self):
+    def testKwantWrdMetKard(self) -> KwantWrdTestWaarden:
         """Test attribuut voor Kwantitatieve waarde met kardinaliteit > 0 in een complex datatype."""
         return self._testKwantWrdMetKard.get_waarde()
 
@@ -110,7 +110,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testKwantWrdMetKard.set_waarde(value, owner=self._parent)
 
     @property
-    def testStringField(self):
+    def testStringField(self) -> str:
         """Test attribuut voor tekst in een complex datatype."""
         return self._testStringField.get_waarde()
 
@@ -119,7 +119,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testStringField.set_waarde(value, owner=self._parent)
 
     @property
-    def testStringFieldMetKard(self):
+    def testStringFieldMetKard(self) -> str:
         """Test attribuut voor tekst met kardinaliteit > 0 in een complex datatype."""
         return self._testStringFieldMetKard.get_waarde()
 

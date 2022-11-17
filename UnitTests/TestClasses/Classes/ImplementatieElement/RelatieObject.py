@@ -4,7 +4,7 @@ from abc import abstractmethod
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMDBStatus import AIMDBStatus
 from otlmow_model.BaseClasses.DavieRelatieAttributes import DavieRelatieAttributes
 from otlmow_model.BaseClasses.OTLObject import OTLObject
-from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator
+from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator, DtcIdentificatorWaarden
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
@@ -42,7 +42,7 @@ class RelatieObject(AIMDBStatus, DavieRelatieAttributes, OTLObject):
                                          owner=self)
 
     @property
-    def assetId(self):
+    def assetId(self) -> DtcIdentificatorWaarden:
         """Unieke identificatie van de asset zoals toegekend door de assetbeheerder of n.a.v. eerste aanlevering door de leverancier."""
         return self._assetId.get_waarde()
 
@@ -51,7 +51,7 @@ class RelatieObject(AIMDBStatus, DavieRelatieAttributes, OTLObject):
         self._assetId.set_waarde(value, owner=self)
 
     @property
-    def bronAssetId(self):
+    def bronAssetId(self) -> DtcIdentificatorWaarden:
         """De identificator van het object waaruit de relatie vertrekt."""
         return self._bronAssetId.get_waarde()
 
@@ -60,7 +60,7 @@ class RelatieObject(AIMDBStatus, DavieRelatieAttributes, OTLObject):
         self._bronAssetId.set_waarde(value, owner=self)
 
     @property
-    def doelAssetId(self):
+    def doelAssetId(self) -> DtcIdentificatorWaarden:
         """De identificator van het object waarin de relatie toekomt."""
         return self._doelAssetId.get_waarde()
 
