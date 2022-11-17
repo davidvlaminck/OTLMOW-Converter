@@ -1,7 +1,7 @@
 # coding=utf-8
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from UnitTests.TestClasses.Classes.ImplementatieElement.DirectioneleRelatie import DirectioneleRelatie
-from UnitTests.TestClasses.Datatypes.KwantWrdInVolt import KwantWrdInVolt
+from UnitTests.TestClasses.Datatypes.KwantWrdInVolt import KwantWrdInVolt, KwantWrdInVoltWaarden
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
@@ -31,7 +31,7 @@ class Voedt(DirectioneleRelatie):
                                               owner=self)
 
     @property
-    def aansluitspanning(self):
+    def aansluitspanning(self) -> KwantWrdInVoltWaarden:
         """Spanning van de aansluiting, dit wordt enkel ingevuld op voedingsrelaties voorbij de hoofdschakelaar."""
         return self._aansluitspanning.get_waarde()
 
@@ -40,7 +40,7 @@ class Voedt(DirectioneleRelatie):
         self._aansluitspanning.set_waarde(value, owner=self)
 
     @property
-    def aansluitvermogen(self):
+    def aansluitvermogen(self) -> KwantWrdInVoltWaarden:
         """Vermogen van de aansluiting, dit wordt enkel ingevuld op voedingsrelaties voorbij de hoofdschakelaar."""
         return self._aansluitvermogen.get_waarde()
 
