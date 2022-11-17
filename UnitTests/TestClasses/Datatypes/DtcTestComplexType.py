@@ -1,4 +1,5 @@
 # coding=utf-8
+from typing import List
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from otlmow_model.BaseClasses.WaardenObject import WaardenObject
 from otlmow_model.BaseClasses.BooleanField import BooleanField
@@ -83,7 +84,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testComplexType2.set_waarde(value, owner=self._parent)
 
     @property
-    def testComplexType2MetKard(self) -> DtcTestComplexType2Waarden:
+    def testComplexType2MetKard(self) -> List[DtcTestComplexType2Waarden]:
         """Test attribuut voor complexe waarde met kardinaliteit > 1 in een complex datatype."""
         return self._testComplexType2MetKard.get_waarde()
 
@@ -101,7 +102,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testKwantWrd.set_waarde(value, owner=self._parent)
 
     @property
-    def testKwantWrdMetKard(self) -> KwantWrdTestWaarden:
+    def testKwantWrdMetKard(self) -> List[KwantWrdTestWaarden]:
         """Test attribuut voor Kwantitatieve waarde met kardinaliteit > 0 in een complex datatype."""
         return self._testKwantWrdMetKard.get_waarde()
 
@@ -119,7 +120,7 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testStringField.set_waarde(value, owner=self._parent)
 
     @property
-    def testStringFieldMetKard(self) -> str:
+    def testStringFieldMetKard(self) -> List[str]:
         """Test attribuut voor tekst met kardinaliteit > 0 in een complex datatype."""
         return self._testStringFieldMetKard.get_waarde()
 
