@@ -1,11 +1,9 @@
-import json
 import logging
-import os
-from os.path import abspath
 from pathlib import Path
 
 from otlmow_converter.FileExporter import FileExporter
 from otlmow_converter.FileImporter import FileImporter
+from otlmow_converter.SettingsManager import load_settings
 
 
 class OtlmowConverter:
@@ -22,8 +20,7 @@ class OtlmowConverter:
         :param logfile: specifies the path to the logfile.
         :type logfile: Path
         """
-        self.settings: dict = {}
-        self._load_settings(settings_path)
+        self.settings: dict = load_settings(settings_path)
 
         if logging_level != 0 and logfile is not None and str(logfile) != '':
             logging.basicConfig(filename=str(logfile),
@@ -82,17 +79,3 @@ class OtlmowConverter:
         elif environment in ['tei', 'dev', 'aim']:
             return environment
         raise ValueError("Valid options for the environment parameter are: '', 'prd', 'tei', 'dev' and 'aim'")
-
-    def _load_settings(self, settings_path: Path):
-        if settings_path is None:
-            current_file_path = Path(__file__)
-            settings_path = Path(current_file_path.parent / 'settings_otlmow_converter.json')
-
-        if not os.path.isfile(settings_path):
-            raise FileNotFoundError(f'{settings_path} is not a valid path. File does not exist.')
-
-        try:
-            with open(settings_path) as settings_file:
-                self.settings = json.load(settings_file)
-        except OSError:
-            raise ImportError(f'Could not open the settings file at {settings_path}')
