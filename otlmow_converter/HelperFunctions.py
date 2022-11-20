@@ -1,9 +1,12 @@
 # from otlmow-modelbuilder
-def get_ns_and_name_from_uri(objectUri):
-    if 'https://wegenenverkeer.data.vlaanderen.be/ns/' not in objectUri:
-        raise ValueError(f'{objectUri} is not a valid uri to extract a namespace from')
+def get_shortened_uri(object_uri: str):
+    if 'https://wegenenverkeer.data.vlaanderen.be/ns/' not in object_uri:
+        raise ValueError(f'{object_uri} is not a valid uri to extract a namespace from')
+    return object_uri.split('/ns/')[1]
 
-    short_uri = objectUri.split('/ns/')[1]
+
+def get_ns_and_name_from_uri(object_uri):
+    short_uri = get_shortened_uri(object_uri)
     short_uri_array = short_uri.split('#')
     return short_uri_array[0], short_uri_array[1]
 
