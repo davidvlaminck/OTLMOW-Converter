@@ -217,7 +217,7 @@ class TableExporterTests(unittest.TestCase):
             table_data = exporter.get_data_as_table('onderdeel#AllCasesTestClass')
             self.assertListEqual([['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
                                   ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0',
-                                   None]], table_data)
+                                   '']], table_data)
 
         with self.subTest('one object, primitive attributes in reverse order'):
             exporter = self.set_up_exporter()
@@ -229,7 +229,7 @@ class TableExporterTests(unittest.TestCase):
             table_data = exporter.get_data_as_table('onderdeel#AllCasesTestClass')
             expected_data = [
                 ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testIntegerField', 'testStringField'],
-                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, '1', 'test']]
+                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', '', '1', 'test']]
             self.assertListEqual(expected_data, table_data)
 
     def test_get_data_as_table_two_different_types_split_false(self):
@@ -245,8 +245,8 @@ class TableExporterTests(unittest.TestCase):
         table_data = exporter.get_data_as_table()
         expected_data = [
             ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie', 'testStringField'],
-            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, None, 'string1'],
-            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', None, 'notitie2', None]]
+            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', '', '', 'string1'],
+            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', '', 'notitie2', '']]
         self.assertListEqual(expected_data, table_data)
 
     def test_get_data_as_table_basic_nonempty_objects_same_type(self):
@@ -271,10 +271,10 @@ class TableExporterTests(unittest.TestCase):
             ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testBooleanField',
              'testComplexType.testKwantWrd', 'testComplexType.testStringField', 'testDateField', 'testDecimalField',
              'testKeuzelijst', 'testKeuzelijstMetKard[]'],
-            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, 'True', '2.0',
-             'string in complex veld', None, '1.0', 'waarde-1', None],
-            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '1', None, 'False', None, None,
-             '2022-02-02', '2.5', None, 'waarde-2']]
+            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', '', 'True', '2.0',
+             'string in complex veld', '', '1.0', 'waarde-1', ''],
+            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '1', '', 'False', '', '',
+             '2022-02-02', '2.5', '', 'waarde-2']]
         self.assertListEqual(expected_data, table_data)
 
     def test_fill_master_dict_cardinality(self):
@@ -308,9 +308,9 @@ class TableExporterTests(unittest.TestCase):
     def test_stringify_value(self):
         exporter = self.set_up_exporter()
         with self.subTest('None, values_as_strings = True'):
-            self.assertIsNone(exporter._stringify_value(None))
+            self.assertEquals('', exporter._stringify_value(None))
         with self.subTest('None, values_as_strings = False'):
-            self.assertIsNone(exporter._stringify_value(None, values_as_strings=False))
+            self.assertEquals(None, exporter._stringify_value(None, values_as_strings=False))
         with self.subTest('str, values_as_strings = True'):
             self.assertEquals('test1', exporter._stringify_value('test1'))
         with self.subTest('str, values_as_strings = False'):
@@ -324,7 +324,7 @@ class TableExporterTests(unittest.TestCase):
         with self.subTest('float, values_as_strings = False'):
             self.assertEquals(2.0, exporter._stringify_value(2.00, values_as_strings=False))
         with self.subTest('empty list'):
-            self.assertEquals(None, exporter._stringify_value([]))
+            self.assertEquals('', exporter._stringify_value([]))
         with self.subTest('list of 1 strings, values_as_strings = True'):
             self.assertEquals('1', exporter._stringify_value(['1']))
         with self.subTest('list of 2 strings, values_as_strings = True'):
@@ -372,7 +372,7 @@ class TableExporterTests(unittest.TestCase):
                 ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor',
                  'testComplexTypeMetKard[].testBooleanField', 'testComplexTypeMetKard[].testKwantWrd',
                  'testComplexTypeMetKard[].testStringField'],
-                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000-0000', None,
+                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000-0000', '',
                  'False|True|', '|2.0|', '1.1|1.2|1.3']]
             self.assertListEqual(expected_data, table_data)
 
@@ -406,8 +406,6 @@ class TableExporterTests(unittest.TestCase):
                 ['typeURI', 'assetId+identificator', 'assetId+toegekendDoor',
                  'testComplexTypeMetKard()+testBooleanField', 'testComplexTypeMetKard()+testKwantWrd+waarde',
                  'testComplexTypeMetKard()+testStringField'],
-                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000-0000', None,
+                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000-0000', '',
                  'False*True*', '*2.0*', '1.1*1.2*1.3']]
             self.assertListEqual(expected_data, table_data)
-
-    # unit test for different dotnotation setting

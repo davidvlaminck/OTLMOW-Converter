@@ -69,10 +69,13 @@ class TableExporter:
             row = []
             for header in headers:
                 if header in object_dict:
-                    row.append(self._stringify_value(object_dict[header], header=header,
+                    row.append(self._stringify_value(value=object_dict[header], header=header,
                                                      values_as_strings=values_as_strings))
                 else:
-                    row.append(None)
+                    if values_as_strings:
+                        row.append('')
+                    else:
+                        row.append(None)
             table_data.append(row)
         return table_data
 
