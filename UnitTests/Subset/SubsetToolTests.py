@@ -10,6 +10,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class SubsetToolTests(TestCase):
+    @unittest.skip('moved to other library')
     def test_func1(self):
         subset_tool = SubsetTool(settings_path=get_settings_path_for_unittests())
         subset_location = Path(ROOT_DIR) / 'OTL_AllCasesTestClass.db'
@@ -34,6 +35,7 @@ class SubsetToolTests(TestCase):
         self.assertTrue(True)
 
     @unittest.skip
+    @unittest.skip('moved to other library')
     def test_func2(self):
         list_of_otl_objects = []
         SubsetTool.filters_assets_by_subset(Path('OTL_AllCasesTestClass.db'), list_of_otl_objects)
