@@ -55,6 +55,8 @@ class CsvExporter:
         if split_per_type:
             for type_name in self.table_exporter.master:
                 data = self.table_exporter.get_data_as_table(type_name=type_name)
+                # use Path + ..
+                # specific_filename = filename.split('.')[0] + '_' + shortened_uri + '.' + filename.split('.')[1]
                 self.write_file(file_location=str(filepath) + '_' + type_name.replace('#', '_'), data=data,
                                 delimiter=delimiter)
         else:
