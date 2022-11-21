@@ -91,8 +91,8 @@ class DotnotationHelperTests(TestCase):
 
         attribute_list = list(DotnotationHelper.list_attributes_and_values_by_dotnotation(instance))
         expected_list = [('testComplexTypeMetKard[].testBooleanField', [False, True, None]),
-                         ('testComplexTypeMetKard[].testKwantWrd.waarde', [None, 2.0, None]),
-                         ('testComplexTypeMetKard[].testStringField', ['1.1', '1.2', '1.3'])]
+                         ('testComplexTypeMetKard[].testStringField', ['1.1', '1.2', '1.3']),
+                         ('testComplexTypeMetKard[].testKwantWrd.waarde', [None, 2.0, None])]
         self.assertListEqual(expected_list, attribute_list)
 
     def test_list_attributes_and_values_by_dotnotation_waarde_shortcut(self):
