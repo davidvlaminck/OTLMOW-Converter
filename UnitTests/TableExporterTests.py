@@ -315,6 +315,10 @@ class TableExporterTests(unittest.TestCase):
             self.assertEquals('test1', exporter._stringify_value('test1'))
         with self.subTest('str, values_as_strings = False'):
             self.assertEquals('test2', exporter._stringify_value('test2', values_as_strings=False))
+        with self.subTest('date, values_as_strings = True'):
+            self.assertEquals('2022-02-01', exporter._stringify_value(date(2022, 2, 1)))
+        with self.subTest('date, values_as_strings = False'):
+            self.assertEquals(date(2022, 2, 2), exporter._stringify_value(date(2022, 2, 2), values_as_strings=False))
         with self.subTest('float, values_as_strings = True'):
             self.assertEquals('1.0', exporter._stringify_value(1.00))
         with self.subTest('float, values_as_strings = False'):
@@ -370,6 +374,40 @@ class TableExporterTests(unittest.TestCase):
                  'testComplexTypeMetKard[].testStringField'],
                 ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000-0000', None,
                  'False|True|', '|2.0|', '1.1|1.2|1.3']]
+            self.assertListEqual(expected_data, table_data)
+
+    def test_get_data_as_table_different_dotnotation_settings(self):
+        with self.subTest('empty list'):
+            settings = {
+                "separator": "+",
+                "cardinality separator": "*",
+                "cardinality indicator": "()",
+                "waarde_shortcut_applicable": False
+            }
+            exporter = TableExporter(dotnotation_settings=settings, class_directory='UnitTests.TestClasses.Classes')
+
+            instance = AllCasesTestClass()
+            instance.assetId.identificator = '0000-0000'
+
+            instance._testComplexTypeMetKard.add_empty_value()
+            instance.testComplexTypeMetKard[0].testBooleanField = False
+            instance.testComplexTypeMetKard[0].testStringField = '1.1'
+            instance._testComplexTypeMetKard.add_empty_value()
+            instance.testComplexTypeMetKard[1].testBooleanField = True
+            instance.testComplexTypeMetKard[1].testKwantWrd.waarde = 2.0
+            instance.testComplexTypeMetKard[1].testStringField = '1.2'
+            instance._testComplexTypeMetKard.add_empty_value()
+            instance.testComplexTypeMetKard[2].testStringField = '1.3'
+
+            exporter.fill_master_dict([instance])
+            table_data = exporter.get_data_as_table('onderdeel#AllCasesTestClass')
+
+            expected_data = [
+                ['typeURI', 'assetId+identificator', 'assetId+toegekendDoor',
+                 'testComplexTypeMetKard()+testBooleanField', 'testComplexTypeMetKard()+testKwantWrd+waarde',
+                 'testComplexTypeMetKard()+testStringField'],
+                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000-0000', None,
+                 'False*True*', '*2.0*', '1.1*1.2*1.3']]
             self.assertListEqual(expected_data, table_data)
 
     # unit test for different dotnotation setting
