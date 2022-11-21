@@ -41,10 +41,10 @@ class CsvImporterTests(unittest.TestCase):
         settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
         otl_facility = OtlmowConverter(settings_path=settings_file_location)
         importer = CsvImporter(settings=otl_facility.settings)
-        file_location = Path(__file__).parent / 'test_file_VR.csv'
-        importer.import_file(file_location)
-        self.assertEqual(187, len(importer.data))
-        self.assertEqual(27, len(importer.headers))
+        file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
+        importer.import_file(file_location, class_directory='UnitTests.TestClasses.Classes')
+        self.assertEqual(1, len(importer.data))
+        self.assertEqual(35, len(importer.headers))
 
     def test_create_objects_from_data(self):
         settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'

@@ -26,7 +26,7 @@ class FileImporterTests(TestCase):
 
     def test_get_file_extension_valid_filepath(self):
         base_dir = os.path.dirname(os.path.realpath(__file__))
-        filepath = Path(base_dir) / 'CSV' / 'test_file_VR.csv'
+        filepath = Path(base_dir) / 'CSV' / 'Testfiles' / 'import_then_export_input.csv'
         extension = FileImporter.get_file_extension(filepath)
         self.assertEqual('csv', extension)
 
