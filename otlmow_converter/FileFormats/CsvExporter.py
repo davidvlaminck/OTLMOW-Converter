@@ -1,20 +1,20 @@
 import copy
 from pathlib import Path
+from typing import List
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.FileFormats.TableExporter import TableExporter
 from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri
 
 
 class CsvExporter:
-    def __init__(self, settings=None, class_directory: str = 'otlmow_model.Classes'):
-        if class_directory is None:
-            class_directory = 'otlmow_model.Classes'
-        self.aimobject_ref = self.import_aimobject(class_directory)
-        self.relatieobject_ref = self.import_relatieobject(class_directory)
-
+    def __init__(self, settings=None, class_directory: str = None, ignore_empty_asset_id: bool = False):
         if settings is None:
             settings = {}
         self.settings = settings
+
+        self.aimobject_ref = self.import_aimobject(class_directory)
+        self.relatieobject_ref = self.import_relatieobject(class_directory)
 
         if 'file_formats' not in self.settings:
             raise ValueError("The settings are not loaded or don't contain settings for file formats")
@@ -23,6 +23,10 @@ class CsvExporter:
             raise ValueError("Unable to find csv in file formats settings")
 
         self.settings = csv_settings
+        self.table_exporter = TableExporter(dotnotation_settings=csv_settings['dotnotation'],
+                                            class_directory=class_directory,
+                                            ignore_empty_asset_id=ignore_empty_asset_id)
+
         self.headers = []
         self.data = [[]]
         self.objects = []
@@ -31,7 +35,7 @@ class CsvExporter:
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs):
         delimiter = ';'
-        split_per_type = False
+        split_per_type = True
 
         if kwargs is not None:
             if 'delimiter' in kwargs:
@@ -47,12 +51,25 @@ class CsvExporter:
             if delimiter == '':
                 delimiter = ';'
 
+        self.table_exporter.fill_master_dict(list_of_objects=list_of_objects, split_per_type=split_per_type)
         if split_per_type:
-            self.export_multiple_csv_files(list_of_objects, filepath, delimiter)
+            for type_name in self.table_exporter.master:
+                data = self.table_exporter.get_data_as_table(type_name=type_name)
+                self.write_file(file_location=str(filepath) + '_' + type_name.replace('#', '_'), data=data,
+                                delimiter=delimiter)
         else:
-            csv_data = self.create_data_from_objects(list_of_objects)
-            csv_data_lines = self.create_data_lines_from_data(csv_data, delimiter)
-            self.write_file(file_location=filepath, data=csv_data_lines)
+            data = self.table_exporter.get_data_as_table()
+            self.write_file(file_location=filepath, data=data, delimiter=delimiter)
+
+    @staticmethod
+    def write_file(file_location, data: List[List], delimiter: str):
+        try:
+            with open(file_location, "w") as file:
+                for line in data:
+                    linestring = delimiter.join(line)
+                    file.writelines(linestring + '\n')
+        except Exception as ex:
+            raise ex
 
     def export_multiple_csv_files(self, list_of_objects: list, file_location: Path = None, delimiter: str = ''):
         if list_of_objects is None:
@@ -180,14 +197,7 @@ class CsvExporter:
                         row[index] = ''
         return row
 
-    @staticmethod
-    def write_file(file_location, data):
-        try:
-            with open(file_location, "w") as file:
-                for line in data:
-                    file.writelines(line + '\n')
-        except Exception as ex:
-            raise ex
+
 
     @staticmethod
     def sort_headers(headers):

@@ -118,10 +118,16 @@ class TableExporter:
 
     def _stringify_value(self, value, header: str = '', values_as_strings: bool = True):
         if value is None:
-            return None
+            if values_as_strings:
+                return ''
+            else:
+                return None
         if isinstance(value, list):
             if not value:
-                return None
+                if values_as_strings:
+                    return ''
+                else:
+                    return 'None'
             if isinstance(value[0], list):
                 raise ValueError(f'Not possible to make table exports with a list in a list value {header}')
             list_string = ''
