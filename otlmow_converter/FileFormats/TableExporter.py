@@ -12,11 +12,14 @@ from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri, get_short
 
 
 class TableExporter:
-    def __init__(self, dotnotation_settings=None, class_directory: str = 'otlmow_model.Classes'):
+    def __init__(self, dotnotation_settings=None, class_directory: str = 'otlmow_model.Classes',
+                 ignore_empty_asset_id: bool = False):
         if class_directory is None:
             class_directory = 'otlmow_model.Classes'
         self.aim_object_ref = self._import_aim_object(class_directory)
         self.relatie_object_ref = self._import_relatie_object(class_directory)
+
+        self.ignore_empty_asset_id = ignore_empty_asset_id
 
         if dotnotation_settings is None:
             dotnotation_settings = {}
@@ -164,22 +167,6 @@ class TableExporter:
     #     except Exception as ex:
     #         raise ex
     #
-    # @staticmethod
-    # def sort_headers(headers):
-    #     if headers is None or headers == []:
-    #         return headers
-    #     first_three = headers[0:3]
-    #     rest = headers[3:]
-    #     sorted_rest = sorted(rest)
-    #     first_three.extend(sorted_rest)
-    #
-    #     return first_three
-    #
-    # def find_sorted_header_index(self, attribute):
-    #     headers = copy.copy(self.csv_headers)
-    #     headers.append(attribute)
-    #     headers = self.sort_headers(headers)
-    #     return headers.index(attribute)
     #
     # def fix_cardinality_value(self, aim_object, attribute):
     #     actual_attributes = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=aim_object,
@@ -234,14 +221,82 @@ class TableExporter:
         class_ = getattr(py_mod, 'RelatieObject')
         return class_
 
+    @staticmethod
+    def sort_headers(headers):
+        if headers is None or headers == []:
+            return headers
+        first_three = headers[0:3]
+        rest = headers[3:]
+        sorted_rest = sorted(rest)
+        first_three.extend(sorted_rest)
+
+        return first_three
+
+    def get_data_as_table(self, type_name='single', values_as_strings=True):
+        if type_name not in self.master:
+            raise ValueError(f'There is no available for type name: {type_name}')
+        table_data = []
+        headers = self.sort_headers(self.master[type_name]['headers'])
+        table_data.append(headers)
+        for object_dict in self.master[type_name]['data']:
+            row = []
+            for header in headers:
+                if header in object_dict:
+                    row.append(self._stringify_value(object_dict[header], header=header,
+                                                     values_as_strings=values_as_strings))
+                else:
+                    row.append(None)
+            table_data.append(row)
+        return table_data
+
     def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]]):
         for otl_object in list_of_objects:
             if not isinstance(otl_object, self.aim_object_ref) and not isinstance(otl_object, self.relatie_object_ref):
-                warnings.warn(BadTypeWarning(f'{otl_object} is not of type AIMObject or RelatieObject. Ignoring this object'))
+                warnings.warn(
+                    BadTypeWarning(f'{otl_object} is not of type AIMObject or RelatieObject. Ignoring this object'))
                 continue
+
+            if not self.ignore_empty_asset_id:
+                if otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
+                    raise ValueError(f'{otl_object} does not have an asset-id.')
 
             short_uri = get_shortened_uri(otl_object.typeURI)
             if short_uri not in self.master:
-                self.master[short_uri] = [['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']]
-            self.master[short_uri].append([otl_object.typeURI, otl_object.assetId.identificator,
-                                           otl_object.assetId.toegekendDoor])
+                self.master[short_uri] = {'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
+                                          'data': []}
+            data_dict = {
+                'typeURI': otl_object.typeURI,
+                'assetId.identificator': otl_object.assetId.identificator,
+                'assetId.toegekendDoor': otl_object.assetId.toegekendDoor
+            }
+
+            for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(otl_object,
+                                                                                    waarde_shortcut=self.settings[
+                                                                                        'waarde_shortcut_applicable']):
+                if k in ['assetId.identificator', 'assetId.toegekendDoor']:
+                    continue
+                if k not in self.master[short_uri]['headers']:
+                    self.master[short_uri]['headers'].append(k)
+                data_dict[k] = v
+
+            self.master[short_uri]['data'].append(data_dict)
+
+    def _stringify_value(self, value, header: str = '', values_as_strings: bool = True):
+        if value is None:
+            return None
+        if isinstance(value, list):
+            if value == []:
+                return None
+            if isinstance(value[0], list):
+                raise ValueError(f'Not possible to make table exports with a list in a list value {header}')
+            list_string = ''
+            for list_item in value:
+                if not isinstance(list_item, str):
+                    list_string += str(list_item)
+                else:
+                    list_string += list_item
+                list_string += self.settings['cardinality separator']
+            return list_string[:-1]
+        if values_as_strings and not isinstance(value, str):
+            return str(value)
+        return value
