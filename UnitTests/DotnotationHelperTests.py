@@ -76,6 +76,25 @@ class DotnotationHelperTests(TestCase):
                          ('testStringFieldMetKard[]', ['a', 'b'])]
         self.assertListEqual(expected_list, attribute_list)
 
+    def test_list_attributes_and_values_by_dotnotation_attributes_with_different_cardinality(self):
+        instance = AllCasesTestClass()
+
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[0].testBooleanField = False
+        instance.testComplexTypeMetKard[0].testStringField = '1.1'
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[1].testBooleanField = True
+        instance.testComplexTypeMetKard[1].testKwantWrd.waarde = 2.0
+        instance.testComplexTypeMetKard[1].testStringField = '1.2'
+        instance._testComplexTypeMetKard.add_empty_value()
+        instance.testComplexTypeMetKard[2].testStringField = '1.3'
+
+        attribute_list = list(DotnotationHelper.list_attributes_and_values_by_dotnotation(instance))
+        expected_list = [('testComplexTypeMetKard[].testBooleanField', [False, True, None]),
+                         ('testComplexTypeMetKard[].testKwantWrd.waarde', [None, 2.0, None]),
+                         ('testComplexTypeMetKard[].testStringField', ['1.1', '1.2', '1.3'])]
+        self.assertListEqual(expected_list, attribute_list)
+
     def test_list_attributes_and_values_by_dotnotation_waarde_shortcut(self):
         instance = AllCasesTestClass()
         instance.testComplexType._testKwantWrdMetKard.add_empty_value()
