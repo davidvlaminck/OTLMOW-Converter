@@ -8,10 +8,11 @@ from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
 from pandas import DataFrame
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.FileFormats.TableExporter import TableExporter
 
 
 class ExcelExporter:
-    def __init__(self, settings=None, class_directory: str = 'otlmow_model.Classes'):
+    def __init__(self, settings=None, class_directory: str = None, ignore_empty_asset_id: bool = False):
         self.aimobject_ref = self.import_aimobject(class_directory)
 
         if settings is None:
@@ -30,6 +31,10 @@ class ExcelExporter:
         self.objects = []
         self.csv_headers = []
         self.csv_data = []
+
+        self.table_exporter = TableExporter(dotnotation_settings=xls_settings['dotnotation'],
+                                            class_directory=class_directory,
+                                            ignore_empty_asset_id=ignore_empty_asset_id)
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs):
         self.create_dataframe_dict_from_objects(list_of_objects=list_of_objects)
