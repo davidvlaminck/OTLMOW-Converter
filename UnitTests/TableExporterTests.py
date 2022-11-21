@@ -1,16 +1,11 @@
-import os
 import unittest
-from datetime import date, datetime, time
-from pathlib import Path
+from datetime import date
 
 from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestClasses.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
-from otlmow_converter.FileFormats.CsvExporter import CsvExporter
-from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.FileFormats.TableExporter import TableExporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 from otlmow_converter.SettingsManager import load_settings
 
 
@@ -61,7 +56,7 @@ class TableExporterTests(unittest.TestCase):
             self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#RelatieObject',
                              exporter.relatie_object_ref.typeURI)
 
-    def test_master_dict(self):
+    def test_master_dict_basic_functionality(self):
         with self.subTest('empty list'):
             exporter = self.set_up_exporter()
             exporter.fill_master_dict([])
@@ -120,6 +115,28 @@ class TableExporterTests(unittest.TestCase):
                 'data': [{
                     'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
                     'assetId.identificator': None, 'assetId.toegekendDoor': None
+                }]
+            }}
+            self.assertDictEqual(expected_master_dict, exporter.master)
+
+        with self.subTest('two different classes, split_per_type=False'):
+            exporter = self.set_up_exporter()
+            exporter.ignore_empty_asset_id = True
+            list_of_objects = [AllCasesTestClass(), AnotherTestClass()]
+            list_of_objects[0].assetId.identificator = '0'
+            list_of_objects[1].assetId.identificator = '1'
+            list_of_objects[0].testStringField = 'string1'
+            list_of_objects[1].notitie = 'notitie2'
+
+            exporter.fill_master_dict(list_of_objects, split_per_type=False)
+            expected_master_dict = {'single': {
+                'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testStringField', 'notitie'],
+                'data': [{
+                    'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+                    'assetId.identificator': '0', 'assetId.toegekendDoor': None, 'testStringField': 'string1'
+                }, {
+                    'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
+                    'assetId.identificator': '1', 'assetId.toegekendDoor': None, 'notitie': 'notitie2'
                 }]
             }}
             self.assertDictEqual(expected_master_dict, exporter.master)
@@ -214,6 +231,23 @@ class TableExporterTests(unittest.TestCase):
                 ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testIntegerField', 'testStringField'],
                 ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, '1', 'test']]
             self.assertListEqual(expected_data, table_data)
+
+    def test_get_data_as_table_two_different_types_split_false(self):
+        exporter = self.set_up_exporter()
+        exporter.ignore_empty_asset_id = True
+        list_of_objects = [AllCasesTestClass(), AnotherTestClass()]
+        list_of_objects[0].assetId.identificator = '0'
+        list_of_objects[1].assetId.identificator = '1'
+        list_of_objects[0].testStringField = 'string1'
+        list_of_objects[1].notitie = 'notitie2'
+
+        exporter.fill_master_dict(list_of_objects, split_per_type=False)
+        table_data = exporter.get_data_as_table()
+        expected_data = [
+            ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie', 'testStringField'],
+            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, None, 'string1'],
+            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', None, 'notitie2', None]]
+        self.assertListEqual(expected_data, table_data)
 
     def test_get_data_as_table_basic_nonempty_objects_same_type(self):
         exporter = self.set_up_exporter()
@@ -337,3 +371,5 @@ class TableExporterTests(unittest.TestCase):
                 ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000-0000', None,
                  'False|True|', '|2.0|', '1.1|1.2|1.3']]
             self.assertListEqual(expected_data, table_data)
+
+    # unit test for different dotnotation setting

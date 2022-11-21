@@ -25,9 +25,9 @@ class TableExporter:
             dotnotation_settings = {}
         self.settings = dotnotation_settings
 
-        for required_attribute in ['cardinality separator', 'cardinality indicator', 'waarde_shortcut_applicable']:
+        for required_attribute in ['separator', 'cardinality separator', 'cardinality indicator', 'waarde_shortcut_applicable']:
             if required_attribute not in self.settings:
-                raise ValueError("The settings are not loaded or don't contain the dotnotation settings")
+                raise ValueError("The settings are not loaded or don't contain the full dotnotation settings")
 
         self.master = {}  # holds different "tabs", 1 for each typeURI
 
@@ -249,7 +249,7 @@ class TableExporter:
             table_data.append(row)
         return table_data
 
-    def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]]):
+    def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]], split_per_type: bool = True):
         for otl_object in list_of_objects:
             if not isinstance(otl_object, self.aim_object_ref) and not isinstance(otl_object, self.relatie_object_ref):
                 warnings.warn(
@@ -261,6 +261,8 @@ class TableExporter:
                     raise ValueError(f'{otl_object} does not have an asset-id.')
 
             short_uri = get_shortened_uri(otl_object.typeURI)
+            if not split_per_type:
+                short_uri = 'single'
             if short_uri not in self.master:
                 self.master[short_uri] = {'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
                                           'data': []}
