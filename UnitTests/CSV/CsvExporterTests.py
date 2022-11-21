@@ -35,7 +35,7 @@ class CsvExporterTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 CsvExporter(settings={"file_formats": [{}]})
 
-    def test_load_and_writefile(self):
+    def test_import_then_export_file(self):
         converter = self.set_up_converter()
         importer = CsvImporter(settings=converter.settings)
         file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
