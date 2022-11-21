@@ -33,7 +33,6 @@ class TableExporter:
     @staticmethod
     def _import_aim_object(class_directory):
         try:
-            # TODO: check https://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
             py_mod = __import__(name=f'{class_directory}.ImplementatieElement.AIMObject', fromlist=f'AIMObject')
         except ModuleNotFoundError:
             return None
@@ -43,7 +42,6 @@ class TableExporter:
     @staticmethod
     def _import_relatie_object(class_directory):
         try:
-            # TODO: check https://stackoverflow.com/questions/2724260/why-does-pythons-import-require-fromlist
             py_mod = __import__(name=f'{class_directory}.ImplementatieElement.RelatieObject', fromlist=f'RelatieObject')
         except ModuleNotFoundError:
             return None
@@ -78,7 +76,8 @@ class TableExporter:
             table_data.append(row)
         return table_data
 
-    def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]], split_per_type: bool = True) -> None:
+    def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]],
+                         split_per_type: bool = True) -> None:
         identificator_key = 'assetId.identificator'.replace('.', self.settings['separator'])
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.settings['separator'])
         for otl_object in list_of_objects:
