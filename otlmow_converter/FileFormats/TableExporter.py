@@ -292,7 +292,8 @@ class TableExporter:
             list_string = ''
             for list_item in value:
                 if not isinstance(list_item, str):
-                    list_string += str(list_item)
+                    if list_item is not None:
+                        list_string += str(list_item)
                 else:
                     list_string += list_item
                 list_string += self.settings['cardinality separator']

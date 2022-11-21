@@ -303,6 +303,10 @@ class TableExporterTests(unittest.TestCase):
             self.assertEquals('1.0', exporter._stringify_value([1.00], values_as_strings=False))
         with self.subTest('list of 2 floats, values_as_strings = False'):
             self.assertEquals('1.0|2.0', exporter._stringify_value([1.00, 2.00], values_as_strings=False))
+        with self.subTest('list of 1 float and None, values_as_strings = False'):
+            self.assertEquals('1.0|', exporter._stringify_value([1.00, None], values_as_strings=False))
+        with self.subTest('list of None and 1 float, values_as_strings = False'):
+            self.assertEquals('|2.0', exporter._stringify_value([None, 2.00], values_as_strings=False))
         with self.subTest('list of list'):
             with self.assertRaises(ValueError):
                 exporter._stringify_value([[]])
