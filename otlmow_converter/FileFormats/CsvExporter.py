@@ -21,12 +21,6 @@ class CsvExporter:
                                             class_directory=class_directory,
                                             ignore_empty_asset_id=ignore_empty_asset_id)
 
-        self.headers = []
-        self.data = [[]]
-        self.objects = []
-        self.csv_headers = []
-        self.csv_data = []
-
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs) -> None:
         delimiter = ';'
         split_per_type = True
