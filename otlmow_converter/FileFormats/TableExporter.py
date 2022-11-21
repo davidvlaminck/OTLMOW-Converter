@@ -1,5 +1,5 @@
 import warnings
-from typing import Union, List
+from typing import Union, List, Type, Any, Dict
 
 from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
 from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
@@ -10,7 +10,7 @@ from otlmow_converter.HelperFunctions import get_shortened_uri
 
 
 class TableExporter:
-    def __init__(self, dotnotation_settings=None, class_directory: str = 'otlmow_model.Classes',
+    def __init__(self, dotnotation_settings: Dict = None, class_directory: str = 'otlmow_model.Classes',
                  ignore_empty_asset_id: bool = False):
         if class_directory is None:
             class_directory = 'otlmow_model.Classes'
@@ -31,7 +31,7 @@ class TableExporter:
         self.master = {}  # holds different "tabs", 1 for each typeURI, or one tab 'single'
 
     @staticmethod
-    def _import_aim_object(class_directory):
+    def _import_aim_object(class_directory: str) -> Union[Type[AIMObject], None]:
         try:
             py_mod = __import__(name=f'{class_directory}.ImplementatieElement.AIMObject', fromlist=f'AIMObject')
         except ModuleNotFoundError:
@@ -40,7 +40,7 @@ class TableExporter:
         return class_
 
     @staticmethod
-    def _import_relatie_object(class_directory):
+    def _import_relatie_object(class_directory: str) -> Union[Type[RelatieObject], None]:
         try:
             py_mod = __import__(name=f'{class_directory}.ImplementatieElement.RelatieObject', fromlist=f'RelatieObject')
         except ModuleNotFoundError:
@@ -49,9 +49,9 @@ class TableExporter:
         return class_
 
     @staticmethod
-    def _sort_headers(headers):
+    def _sort_headers(headers: List[str]) -> List[str]:
         if headers is None or headers == []:
-            return headers
+            return []
         first_three = headers[0:3]
         rest = headers[3:]
         sorted_rest = sorted(rest)
@@ -59,7 +59,7 @@ class TableExporter:
 
         return first_three
 
-    def get_data_as_table(self, type_name='single', values_as_strings=True) -> List[List]:
+    def get_data_as_table(self, type_name: str = 'single', values_as_strings: bool = True) -> List[List]:
         if type_name not in self.master:
             raise ValueError(f'There is no available for type name: {type_name}')
         table_data = []
@@ -114,7 +114,7 @@ class TableExporter:
 
             self.master[short_uri]['data'].append(data_dict)
 
-    def _stringify_value(self, value, header: str = '', values_as_strings: bool = True):
+    def _stringify_value(self, value, header: str = '', values_as_strings: bool = True) -> Any:
         if value is None:
             if values_as_strings:
                 return ''
