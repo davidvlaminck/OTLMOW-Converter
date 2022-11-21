@@ -143,17 +143,17 @@ class TableExporterTests(unittest.TestCase):
 
     def test_sort_headers(self):
         with self.subTest('no headers'):
-            result = TableExporter.sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'])
+            result = TableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'])
             expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
             self.assertListEqual(expected, result)
 
         with self.subTest('2 headers'):
-            result = TableExporter.sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'b', 'a'])
+            result = TableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'b', 'a'])
             expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a', 'b']
             self.assertListEqual(expected, result)
 
         with self.subTest('complex headers'):
-            result = TableExporter.sort_headers(
+            result = TableExporter._sort_headers(
                 ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.2', 'a.1'])
             expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.1', 'a.2']
             self.assertListEqual(expected, result)

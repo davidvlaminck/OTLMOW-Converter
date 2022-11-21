@@ -28,7 +28,7 @@ class TableExporter:
             if required_attribute not in self.settings:
                 raise ValueError("The settings are not loaded or don't contain the full dotnotation settings")
 
-        self.master = {}  # holds different "tabs", 1 for each typeURI
+        self.master = {}  # holds different "tabs", 1 for each typeURI, or one tab 'single'
 
     @staticmethod
     def _import_aim_object(class_directory):
@@ -51,7 +51,7 @@ class TableExporter:
         return class_
 
     @staticmethod
-    def sort_headers(headers):
+    def _sort_headers(headers):
         if headers is None or headers == []:
             return headers
         first_three = headers[0:3]
@@ -61,11 +61,11 @@ class TableExporter:
 
         return first_three
 
-    def get_data_as_table(self, type_name='single', values_as_strings=True):
+    def get_data_as_table(self, type_name='single', values_as_strings=True) -> List[List]:
         if type_name not in self.master:
             raise ValueError(f'There is no available for type name: {type_name}')
         table_data = []
-        headers = self.sort_headers(self.master[type_name]['headers'])
+        headers = self._sort_headers(self.master[type_name]['headers'])
         table_data.append(headers)
         for object_dict in self.master[type_name]['data']:
             row = []
@@ -78,7 +78,7 @@ class TableExporter:
             table_data.append(row)
         return table_data
 
-    def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]], split_per_type: bool = True):
+    def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]], split_per_type: bool = True) -> None:
         identificator_key = 'assetId.identificator'.replace('.', self.settings['separator'])
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.settings['separator'])
         for otl_object in list_of_objects:
@@ -103,9 +103,8 @@ class TableExporter:
                 toegekend_door_key: otl_object.assetId.toegekendDoor
             }
 
-            for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(otl_object,
-                                                                                    waarde_shortcut=self.settings[
-                                                                                        'waarde_shortcut_applicable']):
+            for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(
+                    asset=otl_object, waarde_shortcut=self.settings['waarde_shortcut_applicable']):
                 if k in [identificator_key, toegekend_door_key]:
                     continue
                 if self.settings['separator'] != '.' or self.settings['cardinality indicator'] != '[]':
