@@ -35,31 +35,25 @@ class CsvExporterTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 CsvExporter(settings={"file_formats": [{}]})
 
-    @unittest.skip('use different files')
     def test_load_and_writefile(self):
         converter = self.set_up_converter()
         importer = CsvImporter(settings=converter.settings)
-        file_location = Path(__file__).parent / 'test_file_VR.csv'
-        objects = importer.import_file(file_location)
-        exporter = CsvExporter(settings=converter.settings)
-        new_file_location = Path(__file__).parent / 'test_export_file_VR.csv'
+        file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
+        objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+        new_file_location = Path(__file__).parent / 'import_then_export_output.csv'
         if os.path.isfile(new_file_location):
             os.remove(new_file_location)
         exporter.export_to_file(list_of_objects=objects, filepath=new_file_location, split_per_type=False)
         self.assertTrue(os.path.isfile(new_file_location))
 
-    @unittest.skip('fails when split per type = True')
-    def test_load_and_writefile_2(self):
-        converter = self.set_up_converter()
-        importer = CsvImporter(settings=converter.settings)
-        file_location = Path(__file__).parent / 'test_file_VR.csv'
-        objects = importer.import_file(file_location)
-        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
-        new_file_location = Path(__file__).parent / 'test_export_file_VR.csv'
-        if os.path.isfile(new_file_location):
-            os.remove(new_file_location)
-        exporter.export_to_file(list_of_objects=objects, filepath=new_file_location, split_per_type=True)
-        self.assertTrue(os.path.isfile(new_file_location))
+        with open(file_location, 'r') as input_file:
+            input_file_lines = list(input_file)
+        with open(new_file_location, 'r') as output_file:
+            output_file_lines = list(output_file)
+        self.assertListEqual(output_file_lines, input_file_lines)
+
+        os.unlink(new_file_location)
 
     def test_export_and_then_import_unnested_attributes(self):
         settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
