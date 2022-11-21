@@ -111,20 +111,21 @@ class DotnotationHelperTests(TestCase):
         self.assertListEqual(expected_list, attribute_list)
 
     def test_get_dotnotation_default_values_waarde_shortcut(self):
-        DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
-                                                       waarde_shortcut_applicable=True)
-
         instance = AllCasesTestClass()
         with self.subTest("attribute 2 levels deep with waarde shortcut enabled"):
-            dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrd._waarde)
+            dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrd._waarde,
+                                                              waarde_shortcut_applicable=True)
             self.assertEqual('testKwantWrd', dotnotation)
 
         with self.subTest("attribute 2 levels deep with waarde shortcut enabled and cardinality > 1"):
-            dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrdMetKard[0]._waarde)
+            dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrdMetKard[0]._waarde,
+                                                              waarde_shortcut_applicable=True)
             self.assertEqual('testKwantWrdMetKard[]', dotnotation)
 
         with self.subTest("attribute 4 levels deep with waarde shortcut disabled"):
-            dotnotation = DotnotationHelper().get_dotnotation(instance.testComplexType.testComplexType2.testKwantWrd._waarde)
+            dotnotation = DotnotationHelper().get_dotnotation(
+                instance.testComplexType.testComplexType2.testKwantWrd._waarde,
+                waarde_shortcut_applicable=True)
             self.assertEqual('testComplexType.testComplexType2.testKwantWrd', dotnotation)
 
         DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',

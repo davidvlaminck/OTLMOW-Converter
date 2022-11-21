@@ -106,11 +106,10 @@ class TableExporter:
             }
 
             for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(
-                    asset=otl_object, waarde_shortcut=self.settings['waarde_shortcut_applicable']):
+                    asset=otl_object, waarde_shortcut=self.settings['waarde_shortcut_applicable'],
+                    cardinality_indicator=self.settings['cardinality indicator'], separator=self.settings['separator']):
                 if k in [identificator_key, toegekend_door_key]:
                     continue
-                if self.settings['separator'] != '.' or self.settings['cardinality indicator'] != '[]':
-                    k = k.replace('.', self.settings['separator']).replace('[]', self.settings['cardinality indicator'])
                 if k not in self.master[short_uri]['headers']:
                     self.master[short_uri]['headers'].append(k)
                 data_dict[k] = v

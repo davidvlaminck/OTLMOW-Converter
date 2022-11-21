@@ -28,16 +28,18 @@ class DotnotationHelper:
 
     @staticmethod
     def get_dotnotation(attribute: OTLAttribuut,
-                        separator: str = '',
-                        cardinality_indicator: str = '',
-                        waarde_shortcut_applicable: Union[bool, None] = None):
+                        separator: str = '.',
+                        cardinality_indicator: str = '[]',
+                        waarde_shortcut_applicable: bool = False):
 
-        cardinality_indicator, separator, waarde_shortcut_applicable = DotnotationHelper.set_parameters_to_class_vars(
-            cardinality_indicator, separator, waarde_shortcut_applicable)
+        # cardinality_indicator, separator, waarde_shortcut_applicable = DotnotationHelper.set_parameters_to_class_vars(
+        #     cardinality_indicator, separator, waarde_shortcut_applicable)
 
         if waarde_shortcut_applicable:
             if attribute.naam == 'waarde' and attribute.owner._parent is not None and attribute.owner._parent.field.waarde_shortcut_applicable:
-                return DotnotationHelper.get_dotnotation(attribute.owner._parent)
+                return DotnotationHelper.get_dotnotation(
+                    attribute=attribute.owner._parent, separator=separator, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut_applicable=waarde_shortcut_applicable)
 
         dotnotation = attribute.naam
         if attribute.kardinaliteit_max != '1':
@@ -47,7 +49,9 @@ class DotnotationHelper:
             return dotnotation
 
         if isinstance(attribute.owner, WaardenObject):
-            return DotnotationHelper.get_dotnotation(attribute.owner._parent) + separator + dotnotation
+            return DotnotationHelper.get_dotnotation(
+                attribute=attribute.owner._parent, separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut_applicable=waarde_shortcut_applicable) + separator + dotnotation
 
         return dotnotation
 
@@ -191,7 +195,8 @@ class DotnotationHelper:
             # shortcut waarde can't be applicable to this attribute because there is still a 2nd part in dotnotation
             # this must be a union / complex type
             attribute = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instanceOrAttribute,
-                                                                        dotnotation=first.replace(cardinality_indicator, ''),
+                                                                        dotnotation=first.replace(cardinality_indicator,
+                                                                                                  ''),
                                                                         separator=separator,
                                                                         cardinality_indicator=cardinality_indicator,
                                                                         waarde_shortcut_applicable=waarde_shortcut_applicable)
@@ -218,19 +223,18 @@ class DotnotationHelper:
                 continue
 
             if v.field.waardeObject is None:
-                dotnotation = DotnotationHelper.get_dotnotation(v, waarde_shortcut_applicable=waarde_shortcut,
-                                                                separator=separator,
-                                                                cardinality_indicator=cardinality_indicator)
+                dotnotation = DotnotationHelper.get_dotnotation(
+                    v, waarde_shortcut_applicable=waarde_shortcut, separator=separator,
+                    cardinality_indicator=cardinality_indicator)
                 yield dotnotation, v.waarde
                 continue
             else:
                 if v.kardinaliteit_max != '1':
                     combined_dict = {}
                     for index, lijst_item in enumerate(v.waarde):
-                        for k1, v1 in cls.list_attributes_and_values_by_dotnotation(asset=lijst_item,
-                                                                                    waarde_shortcut=waarde_shortcut,
-                                                                                    separator=separator,
-                                                                                    cardinality_indicator=cardinality_indicator):
+                        for k1, v1 in cls.list_attributes_and_values_by_dotnotation(
+                                asset=lijst_item, waarde_shortcut=waarde_shortcut, separator=separator,
+                                cardinality_indicator=cardinality_indicator):
                             if k1 not in combined_dict:
                                 combined_dict[k1] = []
                                 for i in range(index):
@@ -244,10 +248,9 @@ class DotnotationHelper:
                     for k2, v2 in combined_dict.items():
                         yield k2, v2
                 else:
-                    for k1, v1 in cls.list_attributes_and_values_by_dotnotation(asset=v.waarde,
-                                                                                waarde_shortcut=waarde_shortcut,
-                                                                                separator=separator,
-                                                                                cardinality_indicator=cardinality_indicator):
+                    for k1, v1 in cls.list_attributes_and_values_by_dotnotation(
+                            asset=v.waarde, waarde_shortcut=waarde_shortcut, separator=separator,
+                            cardinality_indicator=cardinality_indicator):
                         yield k1, v1
 
     @staticmethod
