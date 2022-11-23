@@ -1,11 +1,8 @@
-from datetime import date, datetime, time
-import logging
 import os
 import unittest
+from datetime import date, datetime, time
 from pathlib import Path
 
-import numpy
-import pandas
 from pandas import DataFrame
 
 from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
@@ -92,34 +89,6 @@ class ExcelExporterTests(unittest.TestCase):
         self.assertEqual(df_bevestiging.iloc[0].tolist(), exporter.data['Bevestiging'].iloc[0].tolist())
         self.assertEqual(df_bevestiging.iloc[1].tolist(), exporter.data['Bevestiging'].iloc[1].tolist())
 
-    def verify_excel_files_are_equal(self, file1_location, file2_location):
-        df_dict1 = pandas.read_excel(file1_location, sheet_name=None)
-        df_dict2 = pandas.read_excel(file2_location, sheet_name=None)
-        keys = set(df_dict1.keys())
-        keys.union(set(df_dict2.keys()))
-        for k in keys:
-            df1 = df_dict1[k]
-            df2 = df_dict2[k]
-            if not df1.equals(df2):
-                print(f'found difference in sheet: {k}')
-                return False
-            comparison_values = df1.values == df2.values
-            if isinstance(comparison_values, bool):
-                if not comparison_values:
-                    print(f'found difference in sheet: {k}')
-                    return False
-            elif len(comparison_values) == 1:
-                cols = list(filter(lambda x: not x, comparison_values[0]))
-                if len(cols) != 0:
-                    print(f'found difference in sheet: {k}')
-                    return False
-            else:
-                rows, cols = numpy.where(comparison_values == False)
-                if len(rows) != 0 or len(cols) != 0:
-                    print(f'found difference in sheet: {k}')
-                    return False
-        return True
-
     def test_export_and_then_import_unnested_attributes(self):
         settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
         converter = OtlmowConverter(settings_path=settings_file_location)
@@ -147,7 +116,6 @@ class ExcelExporterTests(unittest.TestCase):
 
         objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
         self.assertEqual(1, len(objects))
-        self.assertEqual(17, len(importer.data['onderdeel#AllCasesTestClass'].columns))
 
         instance = objects[0]
         self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
@@ -218,7 +186,6 @@ class ExcelExporterTests(unittest.TestCase):
 
         objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
         self.assertEqual(1, len(objects))
-        self.assertEqual(15, len(importer.data['onderdeel#AllCasesTestClass'].columns))
 
         instance = objects[0]
         self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
@@ -278,7 +245,6 @@ class ExcelExporterTests(unittest.TestCase):
 
         objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
         self.assertEqual(1, len(objects))
-        self.assertEqual(9, len(importer.data['onderdeel#AllCasesTestClass'].columns))
 
         instance = objects[0]
         self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)

@@ -1,10 +1,9 @@
 import logging
 import os
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
-import pandas as pandas
-from pandas import DataFrame
+import openpyxl
 
 from otlmow_converter.AssetFactory import AssetFactory
 from otlmow_converter.DotnotationHelper import DotnotationHelper
@@ -23,7 +22,7 @@ class ExcelImporter:
             raise ValueError("Unable to find xls in file formats settings")
 
         self.settings = xls_settings
-        self.data: Dict[str, DataFrame] = {}
+        self.data: Dict[str, List] = {}
         self.objects = []
 
     def import_file(self, filepath: Path = None, **kwargs):
@@ -31,8 +30,17 @@ class ExcelImporter:
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
         try:
-            df_dict = pandas.read_excel(filepath, sheet_name=None)
-            self.data = df_dict
+
+            book = openpyxl.load_workbook(filepath, data_only=True)
+            for sheet in book.worksheets:
+                self.data[sheet] = []
+                for i in range(1, sheet.max_row + 1):
+                    row = []
+                    for j in range(1, sheet.max_column + 1):
+                        cell_obj = sheet.cell(row=i, column=j)
+                        row.append(cell_obj.value)
+                    self.data[sheet].append(row)
+
         except Exception as ex:
             raise ex
 
@@ -47,38 +55,47 @@ class ExcelImporter:
 
         cardinality_indicator = self.settings['dotnotation']['cardinality indicator']
 
-        for sheet, dataframe in self.data.items():
-            for index, record in dataframe.iterrows():
-                instance = AssetFactory().dynamic_create_instance_from_uri(record['typeURI'], directory=class_directory)
+        for sheet, data in self.data.items():
+            headers = data[0]
+            type_index = headers.index('typeURI')
+            for row in data[1:]:
+                instance = AssetFactory().dynamic_create_instance_from_uri(row[type_index], directory=class_directory)
                 list_of_objects.append(instance)
-                for header, value in record.items():
-                    if header in ['typeURI']:
+                for index, row_value in enumerate(row):
+                    if index == type_index:
                         continue
 
+                    header = headers[index]
+
+                    # make lists
                     if cardinality_indicator in header:
                         if header.count(cardinality_indicator) > 1:
-                            logging.warning(f'{header} is a list of lists. This is not allowed in the CSV format')
+                            logging.warning(f'{header} is a list of lists. This is not allowed in the Excel format')
                             continue
 
-                        if isinstance(value, str) and self.settings['dotnotation']['cardinality separator'] in value:
-                            value = value.split(self.settings['dotnotation']['cardinality separator'])
-                        elif not isinstance(value, list):
-                            value = [value]
+                        card_separator = self.settings['dotnotation']['cardinality separator']
+                        if isinstance(row_value, str) and card_separator in row_value:
+                            row_value = row_value.split(card_separator)
+                        elif not isinstance(row_value, list):
+                            row_value = [row_value]
 
+                    # clear geom
                     if header == 'geometry':
-                        if value == '':
-                            value = None
+                        if row_value == '':
+                            row_value = None
 
                     try:
                         DotnotationHelper.set_attribute_by_dotnotation(
-                            instanceOrAttribute=instance, dotnotation=header, value=value, convert_warnings=False,
+                            instanceOrAttribute=instance, dotnotation=header, value=row_value,
+                            convert_warnings=False,
                             separator=self.settings['dotnotation']['separator'],
                             cardinality_indicator=cardinality_indicator,
                             waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
                     except TypeError as type_error:
                         if 'Expecting a string' in type_error.args[0]:
                             DotnotationHelper.set_attribute_by_dotnotation(
-                                instanceOrAttribute=instance, dotnotation=header, value=str(value), convert_warnings=False,
+                                instanceOrAttribute=instance, dotnotation=header, value=str(row_value),
+                                convert_warnings=False,
                                 separator=self.settings['dotnotation']['separator'],
                                 cardinality_indicator=cardinality_indicator,
                                 waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
