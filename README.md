@@ -23,7 +23,8 @@ pip install otlmow_converter --upgrade
 ## Usage
 The core functionality of this library is creating objects of otlmow_model by, either using helper functions or reading a DAVIE file. Then the user can manipulate the objects and finally export them to a valid DAVIE file that can be imported in the application.
 
-<!--- assetfactory
+<!--- 
+assetfactory
 relationcreator
 otlmowconverter
 -->
