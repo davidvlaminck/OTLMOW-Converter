@@ -4,6 +4,7 @@ from typing import Dict
 
 import pandas
 from numpy import nan
+from openpyxl import Workbook
 from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
 from pandas import DataFrame
 
@@ -37,6 +38,10 @@ class ExcelExporter:
                                             ignore_empty_asset_id=ignore_empty_asset_id)
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs):
+        self.table_exporter.fill_master_dict(list_of_objects=list_of_objects, split_per_type=True)
+        self._write_file(file_location=filepath)
+
+        return
         self.create_dataframe_dict_from_objects(list_of_objects=list_of_objects)
 
         if filepath is None:
@@ -154,4 +159,22 @@ class ExcelExporter:
 
             data[k] = df[headers].replace({nan: None})
 
+    def _write_file(self, file_location: Path):
+        wb = Workbook()
+        if len(self.table_exporter.master.keys()) == 0:
+            raise ValueError('There are no asset data to export to Excel')
+        for class_name in self.table_exporter.master:
+            self._create_sheet_by_name(wb, class_name)
+        wb.remove(wb['Sheet'])
+        wb.save(file_location)
 
+    def _create_sheet_by_name(self, wb: Workbook, class_name: str):
+        if len(self.table_exporter.master[class_name]['data']) == 0:
+            return
+
+        asset_data_table = self.table_exporter.get_data_as_table(class_name, values_as_strings=False)
+        sheet = wb.create_sheet(class_name)
+        for row_nr, row in enumerate(asset_data_table):
+            for col_nr, col in enumerate(row):
+                sheet.cell(row=row_nr + 1, column=col_nr + 1).value = col
+            pass

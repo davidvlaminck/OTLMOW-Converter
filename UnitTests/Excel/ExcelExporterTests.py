@@ -92,71 +92,6 @@ class ExcelExporterTests(unittest.TestCase):
         self.assertEqual(df_bevestiging.iloc[0].tolist(), exporter.data['Bevestiging'].iloc[0].tolist())
         self.assertEqual(df_bevestiging.iloc[1].tolist(), exporter.data['Bevestiging'].iloc[1].tolist())
 
-    @unittest.skip
-    def test_sort_headers(self):
-        pass
-
-    @unittest.skip
-    def test_create_data_from_objects_different_settings(self):
-        otl_converter = self.set_up_converter()
-        exporter = ExcelExporter(settings=otl_converter.settings, class_directory='UnitTests.TestClasses.Classes')
-        exporter.settings = {
-            "name": "Excel",
-            "dotnotation": {
-                "separator": "+",
-                "cardinality separator": "$",
-                "cardinality indicator": "()",
-                "waarde_shortcut_applicable": True
-            },
-            "delimiter": ','
-        }
-
-        pass
-
-    def test_create_with_different_cardinality_among_subattributes(self):
-        settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-        converter = OtlmowConverter(settings_path=settings_file_location)
-        importer = ExcelImporter(settings=converter.settings)
-        exporter = ExcelExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
-        file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
-        instance = AllCasesTestClass()
-        instance.assetId.identificator = '0000-0000'
-
-        instance._testComplexTypeMetKard.add_empty_value()
-        instance.testComplexTypeMetKard[0].testBooleanField = False
-        instance.testComplexTypeMetKard[0].testStringField = '1.1'
-        instance._testComplexTypeMetKard.add_empty_value()
-        instance.testComplexTypeMetKard[1].testBooleanField = True
-        instance.testComplexTypeMetKard[1].testKwantWrd.waarde = 2.0
-        instance.testComplexTypeMetKard[1].testStringField = '1.2'
-        instance._testComplexTypeMetKard.add_empty_value()
-        instance.testComplexTypeMetKard[2].testStringField = '1.3'
-
-        exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                                split_per_type=False)
-
-        objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
-        self.assertEqual(1, len(objects))
-        self.assertEqual(5, len(importer.data['AllCasesTestClass'].columns))
-
-        instance = objects[0]
-        self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
-        self.assertEqual('0000-0000', instance.assetId.identificator)
-
-        self.assertEqual(False, instance.testComplexTypeMetKard[0].testBooleanField)
-        self.assertEqual(True, instance.testComplexTypeMetKard[1].testBooleanField)
-        self.assertEqual(None, instance.testComplexTypeMetKard[2].testBooleanField)
-
-        self.assertEqual(None, instance.testComplexTypeMetKard[0].testKwantWrd.waarde)
-        self.assertEqual(2.0, instance.testComplexTypeMetKard[1].testKwantWrd.waarde)
-        self.assertEqual(None, instance.testComplexTypeMetKard[2].testKwantWrd.waarde)
-
-        self.assertEqual('1.1', instance.testComplexTypeMetKard[0].testStringField)
-        self.assertEqual('1.2', instance.testComplexTypeMetKard[1].testStringField)
-        self.assertEqual('1.3', instance.testComplexTypeMetKard[2].testStringField)
-
-        os.unlink(file_location)
-
     def verify_excel_files_are_equal(self, file1_location, file2_location):
         df_dict1 = pandas.read_excel(file1_location, sheet_name=None)
         df_dict2 = pandas.read_excel(file2_location, sheet_name=None)
@@ -212,7 +147,7 @@ class ExcelExporterTests(unittest.TestCase):
 
         objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
         self.assertEqual(1, len(objects))
-        self.assertEqual(16, len(importer.data['AllCasesTestClass'].columns))
+        self.assertEqual(17, len(importer.data['onderdeel#AllCasesTestClass'].columns))
 
         instance = objects[0]
         self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
@@ -283,12 +218,11 @@ class ExcelExporterTests(unittest.TestCase):
 
         objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
         self.assertEqual(1, len(objects))
-        self.assertEqual(15, len(importer.data['AllCasesTestClass'].columns))
+        self.assertEqual(15, len(importer.data['onderdeel#AllCasesTestClass'].columns))
 
         instance = objects[0]
         self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
 
-        self.assertEqual('0000', instance.assetId.identificator)
         self.assertEqual('string1', instance.testEenvoudigTypeMetKard[0].waarde)
         self.assertEqual('string2', instance.testEenvoudigTypeMetKard[1].waarde)
         self.assertEqual(10.0, instance.testKwantWrdMetKard[0].waarde)
@@ -310,9 +244,9 @@ class ExcelExporterTests(unittest.TestCase):
         self.assertEqual(None, instance.testUnionType.unionKwantWrd.waarde)
         self.assertEqual(10.0, instance.testUnionTypeMetKard[0].unionKwantWrd.waarde)
         self.assertEqual(20.0, instance.testUnionTypeMetKard[1].unionKwantWrd.waarde)
+        self.assertEqual('0000', instance.assetId.identificator)
 
         os.unlink(file_location)
-
 
     def test_export_and_then_import_nested_attributes_level_2(self):
         settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
@@ -344,11 +278,10 @@ class ExcelExporterTests(unittest.TestCase):
 
         objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
         self.assertEqual(1, len(objects))
-        self.assertEqual(8, len(importer.data['AllCasesTestClass'].columns))
+        self.assertEqual(9, len(importer.data['onderdeel#AllCasesTestClass'].columns))
 
         instance = objects[0]
         self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', instance.typeURI)
-        self.assertEqual('0000', instance.assetId.identificator)
 
         self.assertEqual(76.8, instance.testComplexType.testComplexType2.testKwantWrd.waarde)
         self.assertEqual('GZBzgRhOrQvfZaN', instance.testComplexType.testComplexType2.testStringField)
@@ -360,5 +293,6 @@ class ExcelExporterTests(unittest.TestCase):
         self.assertEqual(20.0, instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde)
         self.assertEqual('string1', instance.testComplexTypeMetKard[0].testComplexType2.testStringField)
         self.assertEqual('string2', instance.testComplexTypeMetKard[1].testComplexType2.testStringField)
+        self.assertEqual('0000', instance.assetId.identificator)
 
         os.unlink(file_location)
