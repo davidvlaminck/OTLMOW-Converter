@@ -1,4 +1,4 @@
-﻿from typing import Union, Iterable, Tuple
+﻿from typing import Union, Iterable, Tuple, List
 
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from otlmow_model.BaseClasses.WaardenObject import WaardenObject
@@ -57,11 +57,9 @@ class DotnotationHelper:
 
     # TODO add allow_nested_lists parameter
     @staticmethod
-    def get_attributes_by_dotnotation(instance_or_attribute,
-                                      dotnotation: str,
-                                      separator: str = '',
-                                      cardinality_indicator: str = '',
-                                      waarde_shortcut_applicable: Union[bool, None] = None):
+    def get_attributes_by_dotnotation(
+            instance_or_attribute, dotnotation: str, separator: str = '', cardinality_indicator: str = '',
+            waarde_shortcut_applicable: Union[bool, None] = None) -> Union[OTLAttribuut, List[OTLAttribuut]]:
         """Returns the attribute matching the dotnotation starting from a given class instance name or attribute
         :param instance_or_attribute: class or attribute to start the dotnotation from
         :param dotnotation: a string representing a hierarchical structure of attributes
