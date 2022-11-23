@@ -3,12 +3,8 @@ import unittest
 from datetime import date, datetime, time
 from pathlib import Path
 
-from pandas import DataFrame
-
 from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from UnitTests.TestClasses.Classes.Onderdeel.Bevestiging import Bevestiging
-from UnitTests.TestClasses.Classes.Onderdeel.Voedt import Voedt
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
@@ -39,55 +35,6 @@ class ExcelExporterTests(unittest.TestCase):
         with self.subTest('load with incorrect settings (file_formats but no xls)'):
             with self.assertRaises(ValueError):
                 ExcelExporter(settings={"file_formats": [{}]})
-
-    def test_objects_to_dataframedict_empty_list(self):
-        otl_converter = self.set_up_converter()
-        exporter = ExcelExporter(settings=otl_converter.settings)
-        exporter.create_dataframe_dict_from_objects([])
-        self.assertDictEqual({}, exporter.data)
-
-    def test_objects_to_dataframe_dict_relation_object(self):
-        otl_converter = self.set_up_converter()
-        exporter = ExcelExporter(settings=otl_converter.settings)
-        list_of_objects = [Voedt()]
-        exporter.create_dataframe_dict_from_objects(list_of_objects)
-        data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None]]
-        df = DataFrame(data, columns=['typeURI', 'assetId.identificator'])
-        self.assertTrue('Voedt' in exporter.data)
-        self.assertEqual(df.iloc[0].tolist(), exporter.data['Voedt'].iloc[0].tolist())
-
-    def test_objects_to_dataframe_dict_2_relation_objects(self):
-        otl_converter = self.set_up_converter()
-        exporter = ExcelExporter(settings=otl_converter.settings)
-        list_of_objects = [Voedt(), Voedt()]
-        list_of_objects[0].isActief = True
-        exporter.create_dataframe_dict_from_objects(list_of_objects)
-        data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, True],
-                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, None]]
-        df = DataFrame(data, columns=['typeURI', 'assetId.identificator', 'isActief'])
-        self.assertTrue('Voedt' in exporter.data)
-        self.assertEqual(df.iloc[0].tolist(), exporter.data['Voedt'].iloc[0].tolist())
-        self.assertEqual(df.iloc[1].tolist(), exporter.data['Voedt'].iloc[1].tolist())
-
-    def test_objects_to_dataframe_dict_2_relation_objects_diff_types(self):
-        otl_converter = self.set_up_converter()
-        exporter = ExcelExporter(settings=otl_converter.settings)
-        list_of_objects = [Voedt(), Bevestiging(), Bevestiging()]
-        list_of_objects[0].isActief = True
-        list_of_objects[1].isActief = True
-        exporter.create_dataframe_dict_from_objects(list_of_objects)
-        data_voeding = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', None, True]]
-        df_voeding = DataFrame(data_voeding,
-                               columns=['typeURI', 'assetId.identificator', 'isActief'])
-        data_bevestiging = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', None, True],
-                            ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', None, None]]
-        df_bevestiging = DataFrame(data_bevestiging,
-                                   columns=['typeURI', 'assetId.identificator', 'isActief'])
-        self.assertTrue('Voedt' in exporter.data)
-        self.assertTrue('Bevestiging' in exporter.data)
-        self.assertEqual(df_voeding.iloc[0].tolist(), exporter.data['Voedt'].iloc[0].tolist())
-        self.assertEqual(df_bevestiging.iloc[0].tolist(), exporter.data['Bevestiging'].iloc[0].tolist())
-        self.assertEqual(df_bevestiging.iloc[1].tolist(), exporter.data['Bevestiging'].iloc[1].tolist())
 
     def test_export_and_then_import_unnested_attributes(self):
         settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
