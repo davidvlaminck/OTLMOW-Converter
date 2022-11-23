@@ -308,43 +308,43 @@ class TableExporterTests(unittest.TestCase):
     def test_stringify_value(self):
         exporter = self.set_up_exporter()
         with self.subTest('None, values_as_strings = True'):
-            self.assertEquals('', exporter._stringify_value(None))
+            self.assertEqual('', exporter._stringify_value(None))
         with self.subTest('None, values_as_strings = False'):
-            self.assertEquals(None, exporter._stringify_value(None, values_as_strings=False))
+            self.assertEqual(None, exporter._stringify_value(None, values_as_strings=False))
         with self.subTest('str, values_as_strings = True'):
-            self.assertEquals('test1', exporter._stringify_value('test1'))
+            self.assertEqual('test1', exporter._stringify_value('test1'))
         with self.subTest('str, values_as_strings = False'):
-            self.assertEquals('test2', exporter._stringify_value('test2', values_as_strings=False))
+            self.assertEqual('test2', exporter._stringify_value('test2', values_as_strings=False))
         with self.subTest('date, values_as_strings = True'):
-            self.assertEquals('2022-02-01', exporter._stringify_value(date(2022, 2, 1)))
+            self.assertEqual('2022-02-01', exporter._stringify_value(date(2022, 2, 1)))
         with self.subTest('date, values_as_strings = False'):
-            self.assertEquals(date(2022, 2, 2), exporter._stringify_value(date(2022, 2, 2), values_as_strings=False))
+            self.assertEqual(date(2022, 2, 2), exporter._stringify_value(date(2022, 2, 2), values_as_strings=False))
         with self.subTest('float, values_as_strings = True'):
-            self.assertEquals('1.0', exporter._stringify_value(1.00))
+            self.assertEqual('1.0', exporter._stringify_value(1.00))
         with self.subTest('float, values_as_strings = False'):
-            self.assertEquals(2.0, exporter._stringify_value(2.00, values_as_strings=False))
+            self.assertEqual(2.0, exporter._stringify_value(2.00, values_as_strings=False))
         with self.subTest('empty list'):
-            self.assertEquals('', exporter._stringify_value([]))
+            self.assertEqual('', exporter._stringify_value([]))
         with self.subTest('list of 1 strings, values_as_strings = True'):
-            self.assertEquals('1', exporter._stringify_value(['1']))
+            self.assertEqual('1', exporter._stringify_value(['1']))
         with self.subTest('list of 2 strings, values_as_strings = True'):
-            self.assertEquals('1|2', exporter._stringify_value(['1', '2']))
+            self.assertEqual('1|2', exporter._stringify_value(['1', '2']))
         with self.subTest('list of 1 strings, values_as_strings = False'):
-            self.assertEquals('1', exporter._stringify_value(['1'], values_as_strings=False))
+            self.assertEqual('1', exporter._stringify_value(['1'], values_as_strings=False))
         with self.subTest('list of 2 strings, values_as_strings = False'):
-            self.assertEquals('1|2', exporter._stringify_value(['1', '2'], values_as_strings=False))
+            self.assertEqual('1|2', exporter._stringify_value(['1', '2'], values_as_strings=False))
         with self.subTest('list of 1 floats, values_as_strings = True'):
-            self.assertEquals('1.0', exporter._stringify_value([1.00]))
+            self.assertEqual('1.0', exporter._stringify_value([1.00]))
         with self.subTest('list of 2 floats, values_as_strings = True'):
-            self.assertEquals('1.0|2.0', exporter._stringify_value([1.00, 2.00]))
+            self.assertEqual('1.0|2.0', exporter._stringify_value([1.00, 2.00]))
         with self.subTest('list of 1 floats, values_as_strings = False'):
-            self.assertEquals('1.0', exporter._stringify_value([1.00], values_as_strings=False))
+            self.assertEqual('1.0', exporter._stringify_value([1.00], values_as_strings=False))
         with self.subTest('list of 2 floats, values_as_strings = False'):
-            self.assertEquals('1.0|2.0', exporter._stringify_value([1.00, 2.00], values_as_strings=False))
+            self.assertEqual('1.0|2.0', exporter._stringify_value([1.00, 2.00], values_as_strings=False))
         with self.subTest('list of 1 float and None, values_as_strings = False'):
-            self.assertEquals('1.0|', exporter._stringify_value([1.00, None], values_as_strings=False))
+            self.assertEqual('1.0|', exporter._stringify_value([1.00, None], values_as_strings=False))
         with self.subTest('list of None and 1 float, values_as_strings = False'):
-            self.assertEquals('|2.0', exporter._stringify_value([None, 2.00], values_as_strings=False))
+            self.assertEqual('|2.0', exporter._stringify_value([None, 2.00], values_as_strings=False))
         with self.subTest('list of list'):
             with self.assertRaises(ValueError):
                 exporter._stringify_value([[]])
