@@ -53,6 +53,18 @@
             }
         },
         {
+            "name": "json-ld",
+            "dotnotation": {
+                "waarde_shortcut_applicable": false
+            }
+        },
+        {
+            "name": "ttl",
+            "dotnotation": {
+                "waarde_shortcut_applicable": false
+            }
+        },
+        {
             "name": "geojson",
             "dotnotation": {
                 "separator": ".",
