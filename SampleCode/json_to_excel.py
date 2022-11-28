@@ -6,6 +6,7 @@ from pathlib import Path
 
 from otlmow_converter.FileExporter import FileExporter
 from otlmow_converter.FileImporter import FileImporter
+from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
 def load_settings(settings_path):
@@ -25,12 +26,10 @@ def load_settings(settings_path):
 
 
 if __name__ == '__main__':
-    settings = load_settings(Path('/home/davidlinux/Documents/AWV/resources/settings_OTLMOW.json'))
-    importer = FileImporter(settings=settings)
-    exporter = FileExporter(settings=settings)
+    otlmow_converter = OtlmowConverter()
 
-    assets = importer.create_assets_from_file(Path('/home/davidlinux/PycharmProjects/AwvGedeeldeFuncties/UploadAfschermendeConstructies/DAVIE_export_file_20221019_2.json'))
+    assets = otlmow_converter.create_assets_from_file(Path('/home/davidlinux/Documents/AWV/cameras_open_data.json'))
 
     # export
-    file_path = Path(f'Output/{datetime.now().strftime("%Y%m%d%H%M%S")}_exporter.csv')
-    exporter.create_file_from_assets(filepath=file_path, list_of_objects=assets)
+    file_path = Path(f'Output/{datetime.now().strftime("%Y%m%d%H%M%S")}_export.ttl')
+    otlmow_converter.create_file_from_assets(filepath=file_path, list_of_objects=assets)

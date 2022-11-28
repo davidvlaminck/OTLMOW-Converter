@@ -4,6 +4,7 @@ from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionEr
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.JsonExporter import JsonExporter
+from otlmow_converter.FileFormats.TtlExporter import TtlExporter
 from otlmow_converter.FileImporter import FileImporter
 
 
@@ -27,6 +28,8 @@ class FileExporter:
             return JsonExporter(settings=settings)
         elif extension in ['xls', 'xlsx']:
             return ExcelExporter(settings=settings)
+        elif extension == 'ttl':
+            return TtlExporter(settings=settings)
         else:
-            raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx')
+            raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx, xls, ttl')
 

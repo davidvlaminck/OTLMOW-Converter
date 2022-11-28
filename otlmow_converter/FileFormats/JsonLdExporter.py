@@ -5,7 +5,7 @@ from rdflib.paths import Path
 from otlmow_converter.FileFormats.RDFExporter import RDFExporter
 
 
-class TtlExporter:
+class JsonLdExporter:
     def __init__(self, settings=None):
         if settings is None:
             settings = {}
@@ -27,4 +27,4 @@ class TtlExporter:
 
         graph = self.rdf_exporter.create_graph(list_of_objects)
 
-        graph.serialize(destination=str(filepath))
+        graph.serialize(destination=str(filepath), format='json-ld', indent=4)
