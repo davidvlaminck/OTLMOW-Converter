@@ -1,121 +1,13 @@
-import os
 import unittest
 from datetime import date, datetime, time
-from pathlib import Path
 
 from rdflib import RDF, URIRef, Literal
 
-from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from otlmow_converter.FileFormats.CsvExporter import CsvExporter
-from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.FileFormats.RDFExporter import RDFExporter
-from otlmow_converter.FileFormats.TtlExporter import TtlExporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
 class RDFExporterTests(unittest.TestCase):
-    @staticmethod
-    def set_up_converter():
-        settings_file_location = get_settings_path_for_unittests()
-        return OtlmowConverter(settings_path=settings_file_location)
-
-    def test_import_then_export_file(self):
-        converter = self.set_up_converter()
-        importer = CsvImporter(settings=converter.settings)
-        file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
-        objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
-        exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
-        new_file_location = Path(__file__).parent / 'import_then_export_output.csv'
-        if os.path.isfile(new_file_location):
-            os.remove(new_file_location)
-        exporter.export_to_file(list_of_objects=objects, filepath=new_file_location, split_per_type=False)
-        self.assertTrue(os.path.isfile(new_file_location))
-
-        with open(file_location, 'r') as input_file:
-            input_file_lines = list(input_file)
-        with open(new_file_location, 'r') as output_file:
-            output_file_lines = list(output_file)
-        self.assertListEqual(output_file_lines, input_file_lines)
-
-        os.unlink(new_file_location)
-
-    def test_export(self):
-        exporter = RDFExporter(dotnotation_settings={'waarde_shortcut_applicable': False})
-
-        instance = AllCasesTestClass()
-        instance.assetId.identificator = '0000'
-        instance.testBooleanField = False
-        instance.testDateField = date(2019, 9, 20)
-        instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
-        instance.testDecimalField = 79.07
-        instance.testDecimalFieldMetKard = [10.0, 20.0]
-        instance.testEenvoudigType.waarde = 'string1'
-        instance._testEenvoudigTypeMetKard.add_empty_value()
-        instance._testEenvoudigTypeMetKard.add_empty_value()
-        instance.testEenvoudigTypeMetKard[0].waarde = 'string1'
-        instance.testEenvoudigTypeMetKard[1].waarde = 'string2'
-        instance.testIntegerField = -55
-        instance.testIntegerFieldMetKard = [76, 2]
-        instance.testKeuzelijst = 'waarde-4'
-        instance.testKeuzelijstMetKard = ['waarde-4', 'waarde-3']
-        instance.testKwantWrd.waarde = 98.21
-        instance._testKwantWrdMetKard.add_empty_value()
-        instance._testKwantWrdMetKard.add_empty_value()
-        instance.testKwantWrdMetKard[0].waarde = 10.0
-        instance.testKwantWrdMetKard[1].waarde = 20.0
-        instance.testStringField = 'oFfeDLp'
-        instance.testStringFieldMetKard = ['string1', 'string2']
-        instance.testTimeField = time(11, 5, 26)
-
-        instance.testComplexType.testBooleanField = True
-        instance.testComplexType.testKwantWrd.waarde = 65.14
-        instance.testComplexType._testKwantWrdMetKard.add_empty_value()
-        instance.testComplexType._testKwantWrdMetKard.add_empty_value()
-        instance.testComplexType.testKwantWrdMetKard[0].waarde = 10.0
-        instance.testComplexType.testKwantWrdMetKard[1].waarde = 20.0
-        instance.testComplexType.testStringField = 'KmCtMXM'
-        instance.testComplexType.testStringFieldMetKard = ['string1', 'string2']
-
-        instance._testComplexTypeMetKard.add_empty_value()
-        instance._testComplexTypeMetKard.add_empty_value()
-        instance.testComplexTypeMetKard[0].testBooleanField = True
-        instance.testComplexTypeMetKard[1].testBooleanField = False
-        instance.testComplexTypeMetKard[0].testKwantWrd.waarde = 10.0
-        instance.testComplexTypeMetKard[1].testKwantWrd.waarde = 20.0
-        instance.testComplexTypeMetKard[0].testStringField = 'string1'
-        instance.testComplexTypeMetKard[1].testStringField = 'string2'
-        instance.testUnionType.unionString = 'RWKofW'
-
-        instance._testUnionTypeMetKard.add_empty_value()
-        instance._testUnionTypeMetKard.add_empty_value()
-        instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
-        instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
-
-        instance.testComplexType.testComplexType2.testKwantWrd.waarde = 76.8
-        instance.testComplexType.testComplexType2.testStringField = 'GZBzgRhOrQvfZaN'
-        instance.testComplexType._testComplexType2MetKard.add_empty_value()
-        instance.testComplexType._testComplexType2MetKard.add_empty_value()
-        instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde = 10.0
-        instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde = 20.0
-        instance.testComplexType.testComplexType2MetKard[0].testStringField = 'string1'
-        instance.testComplexType.testComplexType2MetKard[1].testStringField = 'string2'
-
-        instance._testComplexTypeMetKard.add_empty_value()
-        instance._testComplexTypeMetKard.add_empty_value()
-        instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde = 10.0
-        instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde = 20.0
-        instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
-        instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
-
-        instance.testComplexTypeMetKard[0]._testComplexType2MetKard.add_empty_value()
-        instance.testComplexTypeMetKard[0]._testComplexType2MetKard.add_empty_value()
-        instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField = 'string1'
-        instance.testComplexTypeMetKard[0].testComplexType2MetKard[1].testStringField = 'string2'
-
-        exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                                split_per_type=False)
-
     def test_export_unnested_attributes(self):
         exporter = RDFExporter(dotnotation_settings={'waarde_shortcut_applicable': False})
 
@@ -272,7 +164,7 @@ class RDFExporterTests(unittest.TestCase):
                 for index, row in enumerate(q_res):
                     self.assertEqual(expected_values[index], row.o)
 
-    def test_export_nested_attributes_level_2(self):
+    def test_export_nested_attributes_level_higher(self):
         exporter = RDFExporter(dotnotation_settings={'waarde_shortcut_applicable': False})
 
         instance = AllCasesTestClass()
@@ -284,12 +176,12 @@ class RDFExporterTests(unittest.TestCase):
         instance.testComplexType.testKwantWrdMetKard[0].waarde = 10.0
         instance.testComplexType.testKwantWrdMetKard[1].waarde = 20.0
 
-        instance.testComplexType.testComplexType2.testKwantWrd.waarde = 76.8 # TODO
+        instance.testComplexType.testComplexType2.testKwantWrd.waarde = 76.8
         instance.testComplexType.testComplexType2.testStringField = 'GZBzgRhOrQvfZaN'
         instance.testComplexType._testComplexType2MetKard.add_empty_value()
         instance.testComplexType._testComplexType2MetKard.add_empty_value()
-        instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde = 10.0 # TODO
-        instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde = 20.0 # TODO
+        instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde = 10.0
+        instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde = 20.0
         instance.testComplexType.testComplexType2MetKard[0].testStringField = 'string1'
         instance.testComplexType.testComplexType2MetKard[1].testStringField = 'string2'
 
@@ -361,12 +253,44 @@ class RDFExporterTests(unittest.TestCase):
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtuUnionType.testKwantWrd',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
         ]:
-            with self.subTest(f'testing complex value level 1: {uri1}'):
+            with self.subTest(f'testing complex values level 2: {uri1}'):
                 query = """SELECT ?o WHERE { ?s ?p1 ?c1 .
                                      ?c1 ?p2 ?c2 .
                                      ?c2 ?p3 ?o .}"""
                 query = query.replace('?s', '<' + str(subj) + '>').replace('?p1', '<' + uri1 + '>').\
                     replace('?p2', '<' + uri2 + '>').replace('?p3', '<' + uri3 + '>')
+
+                q_res = graph.query(query)
+
+                for index, row in enumerate(q_res):
+                    self.assertEqual(expected_values[index], row.o)
+
+        for expected_values, uri1, uri2, uri3, uri4 in [
+            ([Literal('76.8', datatype='http://www.w3.org/2001/XMLSchema#double')],
+             'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexType',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+             'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexType',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2MetKard',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+             'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexTypeMetKard',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd',
+             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
+        ]:
+            with self.subTest(f'testing complex values level 3: {uri1}'):
+                query = """SELECT ?o WHERE { ?s ?p1 ?c1 .
+                                     ?c1 ?p2 ?c2 .
+                                     ?c2 ?p3 ?c3 .
+                                     ?c3 ?p4 ?o .}"""
+                query = query.replace('?s', '<' + str(subj) + '>').replace('?p1', '<' + uri1 + '>'). \
+                    replace('?p2', '<' + uri2 + '>').replace('?p3', '<' + uri3 + '>').replace('?p4', '<' + uri4 + '>')
 
                 q_res = graph.query(query)
 
