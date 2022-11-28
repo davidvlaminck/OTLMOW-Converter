@@ -17,7 +17,15 @@ class RDFExporter:
 
     def create_graph(self, list_of_objects: Iterable = None) -> Graph:
         g = Graph()
-        g.bind("foaf", FOAF)
+        for ns, namespace in {'foaf': FOAF,
+                              'IE': 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#',
+                              'asset': 'https://data.awvvlaanderen.be/id/asset/',
+                              'assetrelatie': 'https://data.awvvlaanderen.be/id/assetrelatie/',
+                              'onderdeel': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#',
+                              'installatie': 'https://wegenenverkeer.data.vlaanderen.be/ns/installatie#',
+                              'keuzelijst': 'https://wegenenverkeer.data.vlaanderen.be/id/concept/',
+                              'loc': 'https://loc.data.wegenenverkeer.be/ns/implementatieelement#'}.items():
+            g.bind(ns, namespace)
 
         for instance in list_of_objects:
             if instance.assetId is None or instance.assetId.identificator is None or \
@@ -39,7 +47,7 @@ class RDFExporter:
         keys = list(filter(lambda k: k[0] == '_', vars(asset_or_attribute).keys()))
 
         for key in keys:
-            if key in ['_valid_relations', '_parent', '_geometry_types']: # TODO fix geometry
+            if key in ['_valid_relations', '_parent', '_geometry_types']:  # TODO fix geometry
                 continue
 
             attribute = getattr(asset_or_attribute, key)

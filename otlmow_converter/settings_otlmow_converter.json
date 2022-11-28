@@ -53,7 +53,7 @@
             }
         },
         {
-            "name": "json-ld",
+            "name": "jsonld",
             "dotnotation": {
                 "waarde_shortcut_applicable": false
             }
