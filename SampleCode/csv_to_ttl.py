@@ -6,8 +6,8 @@ from otlmow_converter.OtlmowConverter import OtlmowConverter
 if __name__ == '__main__':
     otlmow_converter = OtlmowConverter()
 
-    assets = otlmow_converter.create_assets_from_file(Path('/home/davidlinux/Documents/AWV/cameras_open_data.csv'))
+    assets = otlmow_converter.create_assets_from_file(Path('/home/davidlinux/Documents/AWV/cameras_open_data_2.json'))
 
     # export
-    file_path = Path(f'Output/{datetime.now().strftime("%Y%m%d%H%M%S")}_export.ttl')
+    file_path = Path(f'Output/{datetime.now().strftime("%Y%m%d%H%M%S")}_export.jsonld')
     otlmow_converter.create_file_from_assets(filepath=file_path, list_of_objects=assets)

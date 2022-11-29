@@ -1,0 +1,67 @@
+[    
+    {
+        "assetId": {
+            "identificator": "14cc3c81-0e13-49c4-805f-7a89ecf70038-b25kZXJkZWVsI0NhbWVyYQ",
+            "toegekendDoor": "AWV"
+        },
+        "datumOprichtingObject": "2010-01-01",
+        "geometry": "POINT Z (122548.78 179658.28 0)",
+        "isActief": true,
+        "isPtz": true,
+        "opstelhoogte": 19.0,
+        "toestand": "in-gebruik",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera"
+    },
+    {
+        "assetId": {
+            "identificator": "15956fad-95f0-4635-8d52-53270fc54a0e-b25kZXJkZWVsI0NhbWVyYQ",
+            "toegekendDoor": "AWV"
+        },
+        "datumOprichtingObject": "2010-01-01",
+        "geometry": "POINT Z (169097.2 171897 0)",
+        "isActief": true,
+        "isPtz": true,
+        "naam": "CAMV6127",
+        "toestand": "in-gebruik",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera"
+    },
+    {
+        "assetId": {
+            "identificator": "15b552aa-5f7e-47ae-a982-12c608695eb9-b25kZXJkZWVsI0NhbWVyYQ",
+            "toegekendDoor": "AWV"
+        },
+        "geometry": "POINT Z (161227.3 173223.1 0)",
+        "isActief": true,
+        "isPtz": true,
+        "naam": "CAMV6163",
+        "toestand": "in-gebruik",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera"
+    },
+    {
+        "assetId": {
+            "identificator": "164d5e7f-da2c-4c80-b739-a9ed1beae032-b25kZXJkZWVsI0NhbWVyYQ",
+            "toegekendDoor": "AWV"
+        },
+        "datumOprichtingObject": "1970-01-01",
+        "geometry": "POINT Z (151544.4 209812.7 0)",
+        "isActief": true,
+        "isPtz": true,
+        "merk": "bosch",
+        "naam": "CAMA0354",
+        "toestand": "in-gebruik",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera"
+    },
+    {
+        "assetId": {
+            "identificator": "16625e34-6558-43bc-8928-46839f0d3db1-b25kZXJkZWVsI0NhbWVyYQ",
+            "toegekendDoor": "AWV"
+        },
+        "datumOprichtingObject": "2014-12-02",
+        "geometry": "POINT Z (154342.8 177373.1 0)",
+        "isActief": true,
+        "isPtz": true,
+        "naam": "CAMV6185",
+        "toestand": "in-gebruik",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera"
+    }
+]
