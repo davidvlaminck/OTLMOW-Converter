@@ -32,14 +32,20 @@ class JsonLdExporter:
         for ns_prefix, namespace in graph.namespaces():
             namespace_dict[ns_prefix] = namespace
 
+        # create a typelist to frame the json-ld
+        q_res = graph.query("SELECT ?o WHERE { ?s a ?o }")
+        type_lijst = []
+        for row in q_res:
+            type_lijst.append(str(row.o))
+
         json_ld = graph.serialize(format='json-ld', indent=4)
         json_ld = json.loads(json_ld)
         compacted = pyld.jsonld.compact(json_ld, {}, options={'graph': False})
         compacted = pyld.jsonld.frame(compacted, {
-          "@context": namespace_dict,
-          "@type": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera"})
+            '@context': namespace_dict,
+            '@type': type_lijst})
 
         with open(str(filepath), "w") as out_file:
             json.dump(obj=compacted, fp=out_file, indent=4)
 
-        #graph.serialize(destination=str(filepath), format='json-ld', indent=4)
+        # graph.serialize(destination=str(filepath), format='json-ld', indent=4)
