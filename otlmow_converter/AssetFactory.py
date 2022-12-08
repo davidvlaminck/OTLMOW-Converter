@@ -1,4 +1,7 @@
-﻿from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
+﻿from typing import Union, List
+
+from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
+from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
 
 from otlmow_converter.FileFormats.DictDecoder import DictDecoder
 from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri, get_titlecase_from_ns
@@ -6,7 +9,8 @@ from otlmow_converter.HelperFunctions import get_ns_and_name_from_uri, get_title
 
 class AssetFactory:
     @staticmethod
-    def dynamic_create_instance_from_ns_and_name(namespace: str, class_name: str, directory: str = 'otlmow_model.Classes'):
+    def dynamic_create_instance_from_ns_and_name(namespace: str, class_name: str,
+                                                 directory: str = 'otlmow_model.Classes') -> Union[AIMObject, RelatieObject]:
         """Loads the OTL class module and attempts to instantiate the class using the name and namespace of the class
 
         :param namespace: namespace of the class
@@ -15,8 +19,8 @@ class AssetFactory:
         :type: str
         :param directory: directory where the class modules are located, defaults to OTLMOW.OTLModel.Classes
         :type: str
-        :return: returns an instance of class_name in the given namespace, located from directory, that inherits from OTLObject
-        :rtype: OTLObject or None
+        :return: returns an instance of class_name in the given namespace, located from directory, that inherits from AIMObject or RelatieObject
+        :rtype: AIMObject, RelatieObject or None
         """
 
         if directory is None:
@@ -38,7 +42,7 @@ class AssetFactory:
         return instance
 
     @staticmethod
-    def dynamic_create_instance_from_uri(class_uri: str, directory: str = None):
+    def dynamic_create_instance_from_uri(class_uri: str, directory: str = None) -> Union[AIMObject, RelatieObject]:
         if directory is None:
             directory = 'otlmow_model.Classes'
 
@@ -52,9 +56,9 @@ class AssetFactory:
         return created
 
     @staticmethod
-    def create_aimObject_using_other_aimObject_as_template(orig_aim_object: AIMObject, typeURI: str = '',
-                                                           fields_to_copy: [str] = None,
-                                                           directory: str = None):
+    def create_aimObject_using_other_aimObject_as_template(orig_aim_object: Union[AIMObject, RelatieObject], 
+                                                           typeURI: str = '', fields_to_copy: [str] = None,
+                                                           directory: str = None) -> Union[AIMObject, RelatieObject]:
         """Creates an AIMObject, using another AIMObject as template.
         The parameter typeURI defines the type of the new AIMObject that is created.
         If omitted, it is assumed the same type as the given aimObject
@@ -89,14 +93,15 @@ class AssetFactory:
         return new_asset
 
     @staticmethod
-    def get_attribute_list_from_object(orig_asset: AIMObject):
+    def get_attribute_list_from_object(orig_asset: Union[AIMObject, RelatieObject]) -> List:
         if orig_asset is None:
             raise ValueError("input can't be None")
 
         return list(orig_asset.create_dict_from_asset().keys())
 
     @staticmethod
-    def copy_fields_from_object_to_new_object(orig_object: AIMObject, new_object: AIMObject, field_list: [str]):
+    def copy_fields_from_object_to_new_object(orig_object: Union[AIMObject, RelatieObject],
+                                              new_object: Union[AIMObject, RelatieObject], field_list: [str]):
         if orig_object is None:
             raise ValueError("parameter orig_object is None")
         if new_object is None:
