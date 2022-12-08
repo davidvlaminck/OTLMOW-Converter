@@ -27,4 +27,11 @@ The core functionality of this library is creating objects of otlmow_model by, e
 assetfactory
 relationcreator
 otlmowconverter
+formats:
+csv
+xlsx
+json
+jsonld
+ttl
+
 -->
