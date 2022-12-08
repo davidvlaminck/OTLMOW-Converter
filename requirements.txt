@@ -29,3 +29,4 @@ urllib3==1.26.12
 webencodings==0.5.1
 zipp==3.10.0
 rdflib~=6.2.0
+PyLD~=2.0.3
