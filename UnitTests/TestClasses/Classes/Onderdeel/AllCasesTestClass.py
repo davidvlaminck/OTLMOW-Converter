@@ -15,17 +15,19 @@ from UnitTests.TestClasses.Datatypes.KlTestKeuzelijst import KlTestKeuzelijst
 from UnitTests.TestClasses.Datatypes.KwantWrdTest import KwantWrdTest, KwantWrdTestWaarden
 from otlmow_model.BaseClasses.StringField import StringField
 from otlmow_model.BaseClasses.TimeField import TimeField
+from otlmow_model.GeometrieTypes.PuntGeometrie import PuntGeometrie
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
-class AllCasesTestClass(AIMObject):
+class AllCasesTestClass(AIMObject, PuntGeometrie):
     """Testclass containing all possible datatypes and combinations"""
 
     typeURI = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     """De URI van het object volgens https://www.w3.org/2001/XMLSchema#anyURI."""
 
     def __init__(self):
-        super().__init__()
+        AIMObject.__init__(self)
+        PuntGeometrie.__init__(self)
 
         self.add_valid_relation(relation='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', target='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass')
         self.add_valid_relation(relation='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Voedt', target='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', deprecated='2.0')

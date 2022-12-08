@@ -2,17 +2,19 @@
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMObject import AIMObject
 from UnitTests.TestClasses.Datatypes.DtcTestComplexType import DtcTestComplexType, DtcTestComplexTypeWaarden
+from otlmow_model.GeometrieTypes.LijnGeometrie import LijnGeometrie
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
-class AnotherTestClass(AIMObject):
+class AnotherTestClass(AIMObject, LijnGeometrie):
     """Just another TestClass to test relations"""
 
     typeURI = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
     """De URI van het object volgens https://www.w3.org/2001/XMLSchema#anyURI."""
 
     def __init__(self):
-        super().__init__()
+        AIMObject.__init__(self)
+        LijnGeometrie.__init__(self)
 
         self.add_valid_relation(relation='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', target='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass')
 
