@@ -1,6 +1,7 @@
 from typing import Dict, Iterable
 
 from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
+from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
 from rdflib import Graph, FOAF, URIRef, BNode, Literal, RDF
 
 
@@ -38,6 +39,12 @@ class RDFExporter:
             asset = URIRef('https://data.awvvlaanderen.be/id/asset/' + instance.assetId.identificator)
             type_node = URIRef(instance.typeURI)
             g.add((asset, RDF.type, type_node))
+
+            # if isinstance(instance, RelatieObject):
+            #     g.add((asset, URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#bron'),
+            #            URIRef('https://data.awvvlaanderen.be/id/asset/' + instance.bronAssetId.identificator)))
+            #     g.add((asset, URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#doel'),
+            #            URIRef('https://data.awvvlaanderen.be/id/asset/' + instance.doelAssetId.identificator)))
 
             self._add_attributes_to_graph(graph=g, asset_or_attribute=instance, asset_attribute_ref=asset)
 
