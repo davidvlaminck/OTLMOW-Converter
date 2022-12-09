@@ -1,13 +1,31 @@
 import unittest
 from datetime import date, datetime, time
 
+from otlmow_model.Classes.Onderdeel.Bevestiging import Bevestiging
 from rdflib import RDF, URIRef, Literal
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.FileFormats.RDFExporter import RDFExporter
+from otlmow_converter.RelationCreator import create_relation
 
 
 class RDFExporterTests(unittest.TestCase):
+    def test_export_relation(self):
+        exporter = RDFExporter(dotnotation_settings={'waarde_shortcut_applicable': False})
+
+        instance = AllCasesTestClass()
+        instance.assetId.identificator = '0000'
+
+        instance2 = AnotherTestClass()
+        instance2.assetId.identificator = '0001'
+
+        relation = create_relation(instance, instance2, relation=Bevestiging)
+
+        graph = exporter.create_graph([instance, instance2, relation])
+        for s, p, o in graph:
+            print(f'{s} {p} {o}')
+
     def test_export_unnested_attributes(self):
         exporter = RDFExporter(dotnotation_settings={'waarde_shortcut_applicable': False})
 
@@ -32,8 +50,8 @@ class RDFExporterTests(unittest.TestCase):
         graph = exporter.create_graph([instance])
 
         subj = graph.value(predicate=RDF.type,
-                          object=URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'),
-                          any=False)
+                           object=URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'),
+                           any=False)
         self.assertIsNotNone(subj)
 
         for expected_value, expected_type, attribute_uri in [
