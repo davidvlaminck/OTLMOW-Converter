@@ -56,7 +56,7 @@ class RDFExporterTests(unittest.TestCase):
 
         for expected_value, expected_type, attribute_uri in [
             ('false', 'http://www.w3.org/2001/XMLSchema#boolean', 'testBooleanField'),
-            ('79.07', 'http://www.w3.org/2001/XMLSchema#double', 'testDecimalField'),
+            ('79.07', 'http://www.w3.org/2001/XMLSchema#decimal', 'testDecimalField'),
             ('-55', 'http://www.w3.org/2001/XMLSchema#integer', 'testIntegerField'),
             ('2019-09-20', 'http://www.w3.org/2001/XMLSchema#date', 'testDateField'),
             ('11:05:26', 'http://www.w3.org/2001/XMLSchema#time', 'testTimeField'),
@@ -75,7 +75,7 @@ class RDFExporterTests(unittest.TestCase):
         for expected_value, expected_type, attribute_uri in [
             ([76, 2], 'http://www.w3.org/2001/XMLSchema#integer', 'testIntegerFieldMetKard'),
             ([76, 2], 'http://www.w3.org/2001/XMLSchema#integer', 'testIntegerFieldMetKard'),
-            ([10.0, 20.0], 'http://www.w3.org/2001/XMLSchema#double', 'testDecimalFieldMetKard'),
+            ([10.0, 20.0], 'http://www.w3.org/2001/XMLSchema#decimal', 'testDecimalFieldMetKard'),
         ]:
             attribute_uri = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.' + attribute_uri
             with self.subTest(f'testing multiple literal value: {attribute_uri}'):
@@ -141,11 +141,11 @@ class RDFExporterTests(unittest.TestCase):
             ([Literal('string1'), Literal('string2')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testEenvoudigTypeMetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DteTestEenvoudigType.waarde'),
-            ([Literal('98.21', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('98.21', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKwantWrd',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
-            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
-              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#decimal'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKwantWrdMetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
             ([Literal('true', datatype='http://www.w3.org/2001/XMLSchema#boolean')],
@@ -235,12 +235,12 @@ class RDFExporterTests(unittest.TestCase):
         self.assertIsNotNone(subj)
 
         for expected_values, uri1, uri2, uri3 in [
-            ([Literal('65.14', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('65.14', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexType',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testKwantWrd',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
-            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
-              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#decimal'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexType',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testKwantWrdMetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
@@ -260,13 +260,13 @@ class RDFExporterTests(unittest.TestCase):
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexTypeMetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2MetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringField'),
-            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
-              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#decimal'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexTypeMetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testKwantWrd',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
-            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
-              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#decimal'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testUnionTypeMetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtuUnionType.testKwantWrd',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
@@ -284,19 +284,19 @@ class RDFExporterTests(unittest.TestCase):
                     self.assertEqual(expected_values[index], row.o)
 
         for expected_values, uri1, uri2, uri3, uri4 in [
-            ([Literal('76.8', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('76.8', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexType',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
-            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
-              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#decimal'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexType',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2MetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde'),
-            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#double'),
-              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#double')],
+            ([Literal('10.0', datatype='http://www.w3.org/2001/XMLSchema#decimal'),
+              Literal('20.0', datatype='http://www.w3.org/2001/XMLSchema#decimal')],
              'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexTypeMetKard',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2',
              'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd',
