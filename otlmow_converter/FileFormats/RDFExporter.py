@@ -1,8 +1,8 @@
 from typing import Dict, Iterable
 
+from otlmow_model.BaseClasses.FloatOrDecimalField import FloatOrDecimalField
 from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
-from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
-from rdflib import Graph, FOAF, URIRef, BNode, Literal, RDF
+from rdflib import Graph, FOAF, URIRef, BNode, Literal, RDF, XSD
 
 
 class RDFExporter:
@@ -19,7 +19,7 @@ class RDFExporter:
     def create_graph(self, list_of_objects: Iterable = None) -> Graph:
         g = Graph()
         for ns, namespace in {'foaf': FOAF,
-                              'IE': 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#',
+                              'imel': 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#',
                               'asset': 'https://data.awvvlaanderen.be/id/asset/',
                               'assetrelatie': 'https://data.awvvlaanderen.be/id/assetrelatie/',
                               'onderdeel': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#',
@@ -80,11 +80,15 @@ class RDFExporter:
                     if issubclass(attribute.field, KeuzelijstField):
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri),
                                    URIRef(attribute.field.options[waarde_item].objectUri)))
+                    if issubclass(attribute.field, FloatOrDecimalField):
+                        graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(waarde_item, datatype=XSD.decimal)))
                     else:
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(waarde_item)))
             else:
                 if issubclass(attribute.field, KeuzelijstField):
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri),
                                URIRef(attribute.field.options[attribute.waarde].objectUri)))
+                if issubclass(attribute.field, FloatOrDecimalField):
+                    graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(attribute.waarde, datatype=XSD.decimal)))
                 else:
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(attribute.waarde)))
