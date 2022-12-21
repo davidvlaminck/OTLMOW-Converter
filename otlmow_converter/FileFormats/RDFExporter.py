@@ -80,7 +80,7 @@ class RDFExporter:
                     if issubclass(attribute.field, KeuzelijstField):
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri),
                                    URIRef(attribute.field.options[waarde_item].objectUri)))
-                    if issubclass(attribute.field, FloatOrDecimalField):
+                    elif issubclass(attribute.field, FloatOrDecimalField):
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(waarde_item, datatype=XSD.decimal)))
                     else:
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(waarde_item)))
@@ -88,7 +88,7 @@ class RDFExporter:
                 if issubclass(attribute.field, KeuzelijstField):
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri),
                                URIRef(attribute.field.options[attribute.waarde].objectUri)))
-                if issubclass(attribute.field, FloatOrDecimalField):
+                elif issubclass(attribute.field, FloatOrDecimalField):
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(attribute.waarde, datatype=XSD.decimal)))
                 else:
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(attribute.waarde)))

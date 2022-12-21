@@ -239,6 +239,7 @@ class DotnotationHelperTests(TestCase):
         DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
                                                        waarde_shortcut_applicable=False)
 
+    @unittest.skip('is this funcionality we want')
     def test_set_attribute_by_dotnotation_complex_value_convert_scenarios(self):
         instance = AllCasesTestClass()
 
