@@ -239,6 +239,16 @@ class DotnotationHelperTests(TestCase):
         DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
                                                        waarde_shortcut_applicable=False)
 
+    def test_set_attribute_by_dotnotation_complex_value_convert_scenarios(self):
+        instance = AllCasesTestClass()
+
+        with self.subTest("setting None"):
+            DotnotationHelper.set_attribute_by_dotnotation(instance,
+                                                           dotnotation='testComplexTypeMetKard[].testStringField',
+                                                           value='value1|value2', convert_warnings=False)
+            self.assertEqual('value1', instance.testComplexTypeMetKard[0].testStringField)
+            self.assertEqual('value2', instance.testComplexTypeMetKard[1].testStringField)
+
     def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(self):
         instance = AllCasesTestClass()
 
