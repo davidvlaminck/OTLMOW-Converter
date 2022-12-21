@@ -47,6 +47,15 @@
             }
         },
         {
+            "name": "geojson",
+            "dotnotation": {
+                "separator": ".",
+                "cardinality separator": "|",
+                "cardinality indicator": "[]",
+                "waarde_shortcut_applicable": true
+            }
+        },
+        {
             "name": "json",
             "dotnotation": {
                 "waarde_shortcut_applicable": true
