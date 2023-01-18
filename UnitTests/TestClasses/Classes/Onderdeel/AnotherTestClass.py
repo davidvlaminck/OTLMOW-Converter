@@ -1,7 +1,7 @@
 # coding=utf-8
 from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMObject import AIMObject
-from UnitTests.TestClasses.Datatypes.DtcTestComplexType import DtcTestComplexType, DtcTestComplexTypeWaarden
+from otlmow_model.BaseClasses.StringField import StringField
 from otlmow_model.GeometrieTypes.LijnGeometrie import LijnGeometrie
 
 
@@ -18,7 +18,7 @@ class AnotherTestClass(AIMObject, LijnGeometrie):
 
         self.add_valid_relation(relation='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging', target='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass')
 
-        self._deprecatedString = OTLAttribuut(field=DtcTestComplexType,
+        self._deprecatedString = OTLAttribuut(field=StringField,
                                               naam='deprecatedString',
                                               label='Deprecated Tekstveld',
                                               objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass.deprecatedString',
@@ -28,7 +28,7 @@ class AnotherTestClass(AIMObject, LijnGeometrie):
                                               owner=self)
 
     @property
-    def deprecatedString(self) -> DtcTestComplexTypeWaarden:
+    def deprecatedString(self) -> str:
         """Tekstveld dat niet meer gebruikt wordt"""
         return self._deprecatedString.get_waarde()
 
