@@ -1,6 +1,8 @@
 import unittest
 from datetime import date
 
+from otlmow_model.BaseClasses.OTLObject import OTLObject
+
 from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestClasses.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
@@ -36,20 +38,21 @@ class TableExporterTests(unittest.TestCase):
                     "cardinality separator": "|",
                     "cardinality indicator": "[]"})
 
-        with self.subTest('_import_aim_object otlmow_model'):
+        with self.subTest('_import_otl_object otlmow_model'):
             exporter = self.set_up_exporter(class_dir_test_class=False)
-            self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject',
-                             exporter.aim_object_ref.typeURI)
+            self.assertEqual('',
+                             exporter.otl_object_ref.typeURI)
 
         with self.subTest('_import_relatie_object otlmow_model'):
             exporter = self.set_up_exporter(class_dir_test_class=False)
             self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#RelatieObject',
                              exporter.relatie_object_ref.typeURI)
 
-        with self.subTest('_import_aim_object unittestclass'):
+        with self.subTest('_import_otl_object unittestclass'):
             exporter = self.set_up_exporter()
-            self.assertEqual('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject',
-                             exporter.aim_object_ref.typeURI)
+            self.assertEqual('',
+                             exporter.otl_object_ref.typeURI)
+            self.assertTrue(issubclass(exporter.otl_object_ref, OTLObject))
 
         with self.subTest('_import_relatie_object unittestclass'):
             exporter = self.set_up_exporter()

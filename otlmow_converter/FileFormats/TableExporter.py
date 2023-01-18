@@ -1,7 +1,7 @@
 import warnings
 from typing import Union, List, Type, Any, Dict
 
-from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
+from otlmow_model.BaseClasses.OTLObject import OTLObject
 from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
@@ -14,7 +14,7 @@ class TableExporter:
                  ignore_empty_asset_id: bool = False):
         if class_directory is None:
             class_directory = 'otlmow_model.Classes'
-        self.aim_object_ref = self._import_aim_object(class_directory)
+        self.otl_object_ref = self._import_otl_object(class_directory)
         self.relatie_object_ref = self._import_relatie_object(class_directory)
 
         self.ignore_empty_asset_id = ignore_empty_asset_id
@@ -31,12 +31,12 @@ class TableExporter:
         self.master = {}  # holds different "tabs", 1 for each typeURI, or one tab 'single'
 
     @staticmethod
-    def _import_aim_object(class_directory: str) -> Union[Type[AIMObject], None]:
+    def _import_otl_object(class_directory: str) -> Union[Type[OTLObject], None]:
         try:
-            py_mod = __import__(name=f'{class_directory}.ImplementatieElement.AIMObject', fromlist=f'AIMObject')
+            py_mod = __import__(name=f'otlmow_model.BaseClasses.OTLObject', fromlist=f'OTLObject')
         except ModuleNotFoundError:
             return None
-        class_ = getattr(py_mod, 'AIMObject')
+        class_ = getattr(py_mod, 'OTLObject')
         return class_
 
     @staticmethod
@@ -79,12 +79,12 @@ class TableExporter:
             table_data.append(row)
         return table_data
 
-    def fill_master_dict(self, list_of_objects: List[Union[AIMObject, RelatieObject]],
+    def fill_master_dict(self, list_of_objects: List[Union[OTLObject, RelatieObject]],
                          split_per_type: bool = True) -> None:
         identificator_key = 'assetId.identificator'.replace('.', self.settings['separator'])
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.settings['separator'])
         for otl_object in list_of_objects:
-            if not isinstance(otl_object, self.aim_object_ref) and not isinstance(otl_object, self.relatie_object_ref):
+            if not isinstance(otl_object, self.otl_object_ref) and not isinstance(otl_object, self.relatie_object_ref):
                 warnings.warn(
                     BadTypeWarning(f'{otl_object} is not of type AIMObject or RelatieObject. Ignoring this object'))
                 continue
