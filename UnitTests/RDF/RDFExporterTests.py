@@ -20,7 +20,7 @@ class RDFExporterTests(unittest.TestCase):
         instance2 = AnotherTestClass()
         instance2.assetId.identificator = '0001'
 
-        relation = create_relation(instance, instance2, relation_type=Bevestiging)
+        relation = create_relation(source=instance, target=instance2, relation_type=Bevestiging)
 
         graph = exporter.create_graph([instance, instance2, relation])
         for s, p, o in graph:
