@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import openpyxl
+from otlmow_model.Helpers.AssetCreator import AssetCreator
 
 from otlmow_converter.AssetFactory import AssetFactory
 from otlmow_converter.DotnotationHelper import DotnotationHelper
@@ -59,7 +60,7 @@ class ExcelImporter:
             headers = data[0]
             type_index = headers.index('typeURI')
             for row in data[1:]:
-                instance = AssetFactory().dynamic_create_instance_from_uri(row[type_index], directory=class_directory)
+                instance = AssetCreator.dynamic_create_instance_from_uri(row[type_index], directory=class_directory)
                 list_of_objects.append(instance)
                 for index, row_value in enumerate(row):
                     if index == type_index:

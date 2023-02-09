@@ -3,10 +3,10 @@ from typing import Union, List, Type, Any, Dict
 
 from otlmow_model.BaseClasses.OTLObject import OTLObject
 from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
+from otlmow_model.Helpers.GenericHelper import get_shortened_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
-from otlmow_converter.HelperFunctions import get_shortened_uri
 
 
 class TableExporter:

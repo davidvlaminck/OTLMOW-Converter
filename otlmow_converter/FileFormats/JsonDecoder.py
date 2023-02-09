@@ -1,5 +1,7 @@
 import json
 
+from otlmow_model.Helpers.AssetCreator import AssetCreator
+
 from otlmow_converter.AssetFactory import AssetFactory
 from otlmow_converter.FileFormats.DictDecoder import DictDecoder
 
@@ -28,7 +30,7 @@ class JsonDecoder:
                 if 'https://wegenenverkeer.data.vlaanderen.be/ns' not in typeURI:
                     raise ValueError('typeURI should start with "https://wegenenverkeer.data.vlaanderen.be/ns" to use this decoder')
 
-                instance = AssetFactory().dynamic_create_instance_from_uri(typeURI, directory=classes_directory)
+                instance = AssetCreator.dynamic_create_instance_from_uri(typeURI, directory=classes_directory)
                 lijst.append(instance)
 
                 for key, value in obj.items():

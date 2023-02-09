@@ -126,11 +126,11 @@ if __name__ == '__main__':
                 continue
 
             if meetstation.naam[4] == '2':
-                relatie_te_leggen = create_relation(source=rechtesteun[0], target=meetstation, relation=Bevestiging)
+                relatie_te_leggen = create_relation(source=rechtesteun[0], target=meetstation, relation_type=Bevestiging)
                 nieuwe_relaties.append(relatie_te_leggen)
                 print(relatie_te_leggen)
             elif meetstation.naam[4] == '1':
-                relatie_te_leggen = create_relation(source=rechtesteun[0], target=meetstation, relation=HoortBij)
+                relatie_te_leggen = create_relation(source=rechtesteun[0], target=meetstation, relation_type=HoortBij)
                 nieuwe_relaties.append(relatie_te_leggen)
                 print(relatie_te_leggen)
 
