@@ -1,2 +1,0 @@
-class CouldNotCreateRelationError(Exception):
-    pass

@@ -6,7 +6,7 @@ from otlmow_model.Classes.Onderdeel.HoortBij import HoortBij
 from otlmow_model.Helpers.GenericHelper import print_overview_assets
 
 from otlmow_converter.OtlmowConverter import OtlmowConverter
-from otlmow_converter.RelationCreator import create_relation
+from otlmow_model.RelationCreator import create_relation
 
 
 def simplify_asset_data_set():

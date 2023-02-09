@@ -4,7 +4,7 @@ from otlmow_model.Classes.Onderdeel.Bevestiging import Bevestiging
 from shapely import wkt
 
 from otlmow_converter.OtlmowConverter import OtlmowConverter
-from otlmow_converter.RelationCreator import create_relation
+from otlmow_model.RelationCreator import create_relation
 
 if __name__ == '__main__':
     converter = OtlmowConverter()

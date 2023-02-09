@@ -2,12 +2,13 @@ import unittest
 from datetime import date, datetime, time
 
 from otlmow_model.Classes.Onderdeel.Bevestiging import Bevestiging
+from otlmow_model.Helpers.RelationCreator import create_relation
 from rdflib import RDF, URIRef, Literal
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestClasses.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.FileFormats.RDFExporter import RDFExporter
-from otlmow_converter.RelationCreator import create_relation
+
 
 
 class RDFExporterTests(unittest.TestCase):
