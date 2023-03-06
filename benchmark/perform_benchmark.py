@@ -23,7 +23,7 @@ def load_assets():
 
 
 def load_assets2():
-    converter = modul.OtlmowConverter()
+    converter = module.OtlmowConverter()
     converter.create_assets_from_file(Path(base_dir) / 'files/ten_random_classes.csv')
 
 
