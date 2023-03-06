@@ -17,8 +17,6 @@ jobs:
         uses: py-actions/py-dependency-install@v4
         with:
           path: "requirements.txt"
-      - name: install otlmow_converter
-        run: python -m pip install 'otlmow_converter==2.6.9'      
       - name: Run benchmarks
         run: python benchmark/perform_benchmark.py
       - name: commit files
