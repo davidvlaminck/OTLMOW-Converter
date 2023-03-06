@@ -1,3 +1,4 @@
+import os
 import timeit
 from pathlib import Path
 from statistics import mean, stdev
@@ -6,15 +7,17 @@ from prettytable import prettytable
 
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
+base_dir = os.path.dirname(os.path.realpath(__file__))
+
 
 def load_assets():
     converter = OtlmowConverter()
-    converter.create_assets_from_file(Path('files/all_classes.csv'))
+    converter.create_assets_from_file(Path(base_dir) / 'files/all_classes.csv')
 
 
 def load_assets2():
     converter = OtlmowConverter()
-    converter.create_assets_from_file(Path('files/ten_random_classes.csv'))
+    converter.create_assets_from_file(Path(base_dir) / 'files/ten_random_classes.csv')
 
 
 if __name__ == '__main__':

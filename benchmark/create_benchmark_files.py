@@ -8,6 +8,7 @@ import cachetools
 
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
+base_dir = os.path.dirname(os.path.realpath(__file__))
 
 def instantiate_all():
     start = time.time()
@@ -57,17 +58,17 @@ def instantiate_all():
             random_10_class.append(instance)
 
     converter = OtlmowConverter()
-    converter.create_file_from_assets(Path('all_classes.csv'), list_of_objects=all_instances_list, split_per_type=False)
-    converter.create_file_from_assets(Path('all_classes.json'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets(Path('all_classes.xlsx'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets(Path('all_classes.jsonld'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets(Path('all_classes.ttl'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets(Path('ten_random_classes.csv'), list_of_objects=random_10_class,
+    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.csv'), list_of_objects=all_instances_list, split_per_type=False)
+    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.json'), list_of_objects=all_instances_list)
+    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.xlsx'), list_of_objects=all_instances_list)
+    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.jsonld'), list_of_objects=all_instances_list)
+    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.ttl'), list_of_objects=all_instances_list)
+    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.csv'), list_of_objects=random_10_class,
                                       split_per_type=False)
-    converter.create_file_from_assets(Path('ten_random_classes.json'), list_of_objects=random_10_class)
-    converter.create_file_from_assets(Path('ten_random_classes.xlsx'), list_of_objects=random_10_class)
-    converter.create_file_from_assets(Path('ten_random_classes.ttl'), list_of_objects=random_10_class)
-    converter.create_file_from_assets(Path('ten_random_classes.jsonld'), list_of_objects=random_10_class)
+    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.json'), list_of_objects=random_10_class)
+    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.xlsx'), list_of_objects=random_10_class)
+    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.ttl'), list_of_objects=random_10_class)
+    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.jsonld'), list_of_objects=random_10_class)
 
     end = time.time()
     print(f'Time: {round(end - start, 2)}')
