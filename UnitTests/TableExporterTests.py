@@ -40,7 +40,7 @@ class TableExporterTests(unittest.TestCase):
 
         with self.subTest('_import_otl_object otlmow_model'):
             exporter = self.set_up_exporter(class_dir_test_class=False)
-            self.assertEqual('',
+            self.assertEqual(None,
                              exporter.otl_object_ref.typeURI)
 
         with self.subTest('_import_relatie_object otlmow_model'):
@@ -50,7 +50,7 @@ class TableExporterTests(unittest.TestCase):
 
         with self.subTest('_import_otl_object unittestclass'):
             exporter = self.set_up_exporter()
-            self.assertEqual('',
+            self.assertEqual(None,
                              exporter.otl_object_ref.typeURI)
             self.assertTrue(issubclass(exporter.otl_object_ref, OTLObject))
 
