@@ -57,7 +57,6 @@ def instantiate_all():
             random_10_class.append(instance)
 
     converter = OtlmowConverter()
-    DIR = os.curdir
     converter.create_file_from_assets(Path('all_classes.csv'), list_of_objects=all_instances_list, split_per_type=False)
     converter.create_file_from_assets(Path('all_classes.json'), list_of_objects=all_instances_list)
     converter.create_file_from_assets(Path('all_classes.xlsx'), list_of_objects=all_instances_list)
