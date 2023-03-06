@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import timeit
 from pathlib import Path
@@ -50,6 +51,9 @@ def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
 
 
 if __name__ == '__main__':
+    if not os.path.exists(Path(base_dir) / 'temp'):
+        os.mkdir(Path(base_dir) / 'temp')
+
     FormatDetails = namedtuple('FormatDetails', ['Extension', 'Label', 'WriteArguments'])
 
     tb = prettytable.PrettyTable()
@@ -82,3 +86,5 @@ if __name__ == '__main__':
     with open(Path(base_dir) / 'benchmark_results.txt', "w") as file:
         file.writelines(['Benchmarking results\n'])
         file.writelines(str(tb))
+
+    shutil.rmtree(Path(base_dir) / 'temp')
