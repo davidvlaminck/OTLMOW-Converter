@@ -20,7 +20,7 @@ jobs:
         with:
           path: "requirements.txt"
       - name: Install prettytable
-          run: python -m pip install prettytable
+        run: python -m pip install prettytable
       - name: Run benchmarks
         run: python benchmark/perform_benchmark.py
       - name: Push to github
