@@ -1,22 +1,29 @@
+import importlib
 import os
+import sys
 import timeit
 from pathlib import Path
 from statistics import mean, stdev
 
 from prettytable import prettytable
 
-from otlmow_converter.OtlmowConverter import OtlmowConverter
+
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
+spec = importlib.util.spec_from_file_location('OtlmowConverter', Path(base_dir) / '../otlmow_converter/OtlmowConverter.py')
+module = importlib.util.module_from_spec(spec)
+sys.modules['OtlmowConverter'] = module
+spec.loader.exec_module(module)
+
 
 def load_assets():
-    converter = OtlmowConverter()
+    converter = module.OtlmowConverter()
     converter.create_assets_from_file(Path(base_dir) / 'files/all_classes.csv')
 
 
 def load_assets2():
-    converter = OtlmowConverter()
+    converter = modul.OtlmowConverter()
     converter.create_assets_from_file(Path(base_dir) / 'files/ten_random_classes.csv')
 
 
