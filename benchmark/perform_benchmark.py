@@ -83,7 +83,7 @@ if __name__ == '__main__':
                results_dict['write_data_ten_classes_row']]
         tb.add_row(row)
 
-    with open(Path(base_dir) / 'benchmark_results.txt', "w") as file:
+    with open(Path(base_dir) / 'benchmark/benchmark_results.txt', "w") as file:
         file.writelines(['Benchmarking results\n'])
         file.writelines(str(tb))
 
