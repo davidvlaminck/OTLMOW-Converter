@@ -8,9 +8,12 @@ from typing import Dict
 
 from prettytable import prettytable
 
+# relative import
 base_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(str(Path(base_dir) / '../'))
 from otlmow_converter.OtlmowConverter import OtlmowConverter
+
+REPEAT_TIMES = 5
 
 
 def read_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
@@ -27,8 +30,9 @@ def time_read_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     read_data_key = 'read_data_ten_classes'
     if 'all_classes' in str(filepath):
         read_data_key = 'read_data_all_classes'
-    result_times = timeit.repeat(lambda: read_assets(filepath=filepath, results_dict=results_dict,
-                                                     read_data_key=read_data_key, **kwargs), repeat=6, number=1)[1:]
+    result_times = timeit.repeat(
+        lambda: read_assets(filepath=filepath, results_dict=results_dict, read_data_key=read_data_key, **kwargs),
+        repeat=REPEAT_TIMES + 1, number=1)[1:]
     st_dev = stdev(result_times)
     results_dict[read_data_key + '_row'] = f'{round(mean(result_times), 3)} +/- {round(st_dev, 3)}'
 
@@ -37,19 +41,19 @@ def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     read_data_key = 'read_data_ten_classes'
     if 'all_classes' in str(filepath):
         read_data_key = 'read_data_all_classes'
-    result_times = timeit.repeat(lambda: write_assets(filepath=filepath, results_dict=results_dict,
-                                                      read_data_key=read_data_key, **kwargs), repeat=6, number=1)[1:]
+    result_times = timeit.repeat(
+        lambda: write_assets(filepath=filepath, results_dict=results_dict, read_data_key=read_data_key, **kwargs),
+        repeat=REPEAT_TIMES + 1, number=1)[1:]
     st_dev = stdev(result_times)
     results_dict[read_data_key.replace('read', 'write') + '_row'] = \
         f'{round(mean(result_times), 3)} +/- {round(st_dev, 3)}'
 
 
 if __name__ == '__main__':
-
     FormatDetails = namedtuple('FormatDetails', ['Extension', 'Label', 'WriteArguments'])
 
     tb = prettytable.PrettyTable()
-    tb.field_names = ['Format', 'Read all classes', 'Read 10 random classes',  'Write all classes',
+    tb.field_names = ['Format', 'Read all classes', 'Read 10 random classes', 'Write all classes',
                       'Write 10 random classes']
 
     formats = [FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
