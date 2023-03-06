@@ -1,4 +1,3 @@
-import importlib
 import os
 import sys
 import timeit
@@ -8,8 +7,9 @@ from statistics import mean, stdev
 from prettytable import prettytable
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(str(Path(base_dir) / '../otlmow_converter'))
+sys.path.append(str(Path(base_dir) / '../'))
 from otlmow_converter.OtlmowConverter import OtlmowConverter
+
 
 # spec = importlib.util.spec_from_file_location('OtlmowConverter', Path(base_dir) / '../otlmow_converter/OtlmowConverter.py')
 # module = importlib.util.module_from_spec(spec)
