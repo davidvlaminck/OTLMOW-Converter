@@ -8,12 +8,11 @@ from statistics import mean, stdev
 from prettytable import prettytable
 
 
-
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
 spec = importlib.util.spec_from_file_location('OtlmowConverter', Path(base_dir) / '../otlmow_converter/OtlmowConverter.py')
 module = importlib.util.module_from_spec(spec)
-sys.modules['OtlmowConverter'] = module
+pkg = importlib.import_module('otlmow_converter')
 spec.loader.exec_module(module)
 
 
