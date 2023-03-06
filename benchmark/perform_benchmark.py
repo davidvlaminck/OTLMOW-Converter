@@ -7,22 +7,22 @@ from statistics import mean, stdev
 
 from prettytable import prettytable
 
-
 base_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(str(Path(base_dir) / '../otlmow_converter'))
+from otlmow_converter.OtlmowConverter import OtlmowConverter
 
-spec = importlib.util.spec_from_file_location('OtlmowConverter', Path(base_dir) / '../otlmow_converter/OtlmowConverter.py')
-module = importlib.util.module_from_spec(spec)
-pkg = importlib.import_module('otlmow_converter')
-spec.loader.exec_module(module)
+# spec = importlib.util.spec_from_file_location('OtlmowConverter', Path(base_dir) / '../otlmow_converter/OtlmowConverter.py')
+# module = importlib.util.module_from_spec(spec)
+# spec.loader.exec_module(module)
 
 
 def load_assets():
-    converter = module.OtlmowConverter()
+    converter = OtlmowConverter()
     converter.create_assets_from_file(Path(base_dir) / 'files/all_classes.csv')
 
 
 def load_assets2():
-    converter = module.OtlmowConverter()
+    converter = OtlmowConverter()
     converter.create_assets_from_file(Path(base_dir) / 'files/ten_random_classes.csv')
 
 
