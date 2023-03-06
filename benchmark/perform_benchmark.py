@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import sys
@@ -6,7 +7,7 @@ from pathlib import Path
 from statistics import mean, stdev
 from collections import namedtuple
 from typing import Dict
-
+import logging
 from prettytable import prettytable
 
 # relative import
@@ -15,6 +16,7 @@ sys.path.append(str(Path(base_dir) / '../'))
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 REPEAT_TIMES = 5
+logging.getLogger().setLevel(logging.ERROR)
 
 
 def read_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
@@ -31,6 +33,7 @@ def time_read_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     read_data_key = 'read_data_ten_classes'
     if 'all_classes' in str(filepath):
         read_data_key = 'read_data_all_classes'
+    print(f'reading {filepath}')
     result_times = timeit.repeat(
         lambda: read_assets(filepath=filepath, results_dict=results_dict, read_data_key=read_data_key, **kwargs),
         repeat=REPEAT_TIMES + 1, number=1)[1:]
@@ -42,6 +45,7 @@ def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     read_data_key = 'read_data_ten_classes'
     if 'all_classes' in str(filepath):
         read_data_key = 'read_data_all_classes'
+    print(f'writing to {filepath}')
     result_times = timeit.repeat(
         lambda: write_assets(filepath=filepath, results_dict=results_dict, read_data_key=read_data_key, **kwargs),
         repeat=REPEAT_TIMES + 1, number=1)[1:]
