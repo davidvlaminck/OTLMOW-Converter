@@ -2,6 +2,7 @@ from typing import Dict, Iterable
 
 from otlmow_model.BaseClasses.FloatOrDecimalField import FloatOrDecimalField
 from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
+from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
 from rdflib import Graph, FOAF, URIRef, BNode, Literal, RDF, XSD
 
 
@@ -25,6 +26,8 @@ class RDFExporter:
                               'onderdeel': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#',
                               'installatie': 'https://wegenenverkeer.data.vlaanderen.be/ns/installatie#',
                               'keuzelijst': 'https://wegenenverkeer.data.vlaanderen.be/id/concept/',
+                              'abs': 'https://wegenenverkeer.data.vlaanderen.be/ns/abstracten#',
+                              'pem': 'https://wegenenverkeer.data.vlaanderen.be/ns/proefenmeting#',
                               'loc': 'https://loc.data.wegenenverkeer.be/ns/implementatieelement#'}.items():
             g.bind(ns, namespace)
 
@@ -40,11 +43,11 @@ class RDFExporter:
             type_node = URIRef(instance.typeURI)
             g.add((asset, RDF.type, type_node))
 
-            # if isinstance(instance, RelatieObject):
-            #     g.add((asset, URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#bron'),
-            #            URIRef('https://data.awvvlaanderen.be/id/asset/' + instance.bronAssetId.identificator)))
-            #     g.add((asset, URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#doel'),
-            #            URIRef('https://data.awvvlaanderen.be/id/asset/' + instance.doelAssetId.identificator)))
+            if isinstance(instance, RelatieObject):
+                g.add((asset, URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#bron'),
+                       URIRef('https://data.awvvlaanderen.be/id/asset/' + instance.bronAssetId.identificator)))
+                g.add((asset, URIRef('https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#doel'),
+                       URIRef('https://data.awvvlaanderen.be/id/asset/' + instance.doelAssetId.identificator)))
 
             self._add_attributes_to_graph(graph=g, asset_or_attribute=instance, asset_attribute_ref=asset)
 
@@ -77,7 +80,7 @@ class RDFExporter:
 
             if attribute.kardinaliteit_max != '1':
                 for waarde_item in attribute.waarde:
-                    if issubclass(attribute.field, KeuzelijstField):
+                    if waarde_item is not None and issubclass(attribute.field, KeuzelijstField):
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri),
                                    URIRef(attribute.field.options[waarde_item].objectUri)))
                     elif issubclass(attribute.field, FloatOrDecimalField):
