@@ -6,8 +6,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    concurrency: release
-    timeout-minutes: 10
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
@@ -18,8 +17,8 @@ jobs:
         uses: py-actions/py-dependency-install@v4
         with:
           path: "requirements.txt"
-      - name: Run unittests directly
-        run: python perform_benchmark.py
+      - name: Run benchmarks
+        run: python benchmark/perform_benchmark.py
       - name: commit files
         run: |
           git config --local user.email "action@github.com"
