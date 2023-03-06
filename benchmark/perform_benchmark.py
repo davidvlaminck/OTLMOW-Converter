@@ -32,7 +32,7 @@ if __name__ == '__main__':
     result2 = timeit.repeat(load_assets2, repeat=3, number=1)[1:]
     stdev2 = stdev(result2)
 
-    with open("benchmark_results.txt", "w") as file:
+    with open(Path(base_dir) / 'benchmark_results.txt', "w") as file:
         file.writelines(['Benchmarking results\n'])
 
         tb = prettytable.PrettyTable()
