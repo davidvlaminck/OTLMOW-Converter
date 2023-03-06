@@ -2,7 +2,7 @@
 
 from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
 from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
-from otlmow_model.Helpers.AssetCreator import AssetCreator
+from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 from otlmow_converter.FileFormats.DictDecoder import DictDecoder
 
@@ -32,7 +32,7 @@ class AssetFactory:
 
         if typeURI == '':
             typeURI = orig_aim_object.typeURI
-        new_asset = AssetCreator.dynamic_create_instance_from_uri(typeURI, directory=directory)
+        new_asset = dynamic_create_instance_from_uri(typeURI, directory=directory)
 
         if len(fields_to_copy) == 0:
             fields_to_copy = AssetFactory.get_attribute_list_from_object(orig_aim_object)
