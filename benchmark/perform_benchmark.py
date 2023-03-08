@@ -73,7 +73,7 @@ if __name__ == '__main__':
         FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
         FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
         FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
-        FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={'no_read': True}),
+        # FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={'no_read': True}),
         FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})]
 
     for format_details in formats:
