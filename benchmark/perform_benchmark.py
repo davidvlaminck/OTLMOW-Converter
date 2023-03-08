@@ -48,7 +48,7 @@ def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
         read_data_key = 'read_data_all_classes'
     if 'no_read' in kwargs and kwargs['no_read']:
         kwargs.pop('no_read')
-        results_dict = csv_data
+        results_dict.update(csv_data)
 
     print(f'writing to {filepath}')
     result_times = timeit.repeat(
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
         FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
         FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
-        # FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={'no_read': True}),
+        FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={'no_read': True}),
         FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})]
 
     for format_details in formats:
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             csv_data = {'read_data_all_classes': results_dict['read_data_all_classes'],
                         'read_data_ten_classes': results_dict['read_data_ten_classes']}
 
-    with open(Path(base_dir) / 'benchmark/benchmark_results.txt', "w") as file:
+    with open(Path(base_dir) / 'benchmark_results.txt', "w") as file:
         file.writelines(['Benchmarking results\n'])
         file.writelines(str(tb))
 
