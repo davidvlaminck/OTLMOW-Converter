@@ -1,18 +1,18 @@
 class DictDecoder:
     @staticmethod
-    def set_value_by_dictitem(instanceOrAttribute, key, value, waarde_shortcut=False):
-        attribute_to_set = getattr(instanceOrAttribute, '_' + key)
+    def set_value_by_dictitem(instance_or_attribute, key, value, waarde_shortcut=False):
+        attribute_to_set = getattr(instance_or_attribute, '_' + key)
         if attribute_to_set.field.waardeObject is not None:  # complex / union / KwantWrd / dte
 
             if isinstance(value, list):
-                for index, listitem in enumerate(value):
+                for index, list_item in enumerate(value):
                     if attribute_to_set.waarde is None or len(attribute_to_set.waarde) <= index:
                         attribute_to_set.add_empty_value()
 
                     if attribute_to_set.field.waarde_shortcut_applicable and waarde_shortcut:  # dte / kwantWrd
-                        attribute_to_set.waarde[index]._waarde.set_waarde(listitem)
+                        attribute_to_set.waarde[index]._waarde.set_waarde(list_item)
                     else:  # complex / union
-                        for k, v in listitem.items():
+                        for k, v in list_item.items():
                             DictDecoder.set_value_by_dictitem(attribute_to_set.waarde[index], k, v, waarde_shortcut)
 
             elif isinstance(value, dict):  # only complex / union possible
