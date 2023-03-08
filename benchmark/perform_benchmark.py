@@ -10,13 +10,14 @@ from typing import Dict
 import logging
 from prettytable import prettytable
 
-# relative import
+# allow relative import of otlmow_converter
 base_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(str(Path(base_dir) / '../'))
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 REPEAT_TIMES = 5
 logging.getLogger().setLevel(logging.ERROR)
+csv_data = None
 
 
 def read_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
@@ -45,6 +46,10 @@ def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     read_data_key = 'read_data_ten_classes'
     if 'all_classes' in str(filepath):
         read_data_key = 'read_data_all_classes'
+    if 'no_read' in kwargs and kwargs['no_read']:
+        kwargs.pop('no_read')
+        results_dict = csv_data
+
     print(f'writing to {filepath}')
     result_times = timeit.repeat(
         lambda: write_assets(filepath=filepath, results_dict=results_dict, read_data_key=read_data_key, **kwargs),
@@ -64,11 +69,13 @@ if __name__ == '__main__':
     tb.field_names = ['Format', 'Read all classes', 'Read 10 random classes', 'Write all classes',
                       'Write 10 random classes']
 
-    formats = [FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
-               FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
-               FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
-               FormatDetails(Extension='json-ld', Label='JSON-LD', WriteArguments={}),
-               FormatDetails(Extension='ttl', Label='TTL', WriteArguments={})]
+    formats = [
+        FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
+        FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
+        FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
+        FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={'no_read': True}),
+        FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})]
+
     for format_details in formats:
         results_dict = {}
         read_all_classes_file_name = Path(base_dir) / f'files/all_classes.{format_details.Extension}'
@@ -76,8 +83,12 @@ if __name__ == '__main__':
         write_all_classes_file_name = Path(base_dir) / f'temp/all_classes.{format_details.Extension}'
         write_ten_random_classes_file_name = Path(base_dir) / f'temp/ten_random_classes.{format_details.Extension}'
 
-        for filepath in [read_all_classes_file_name, ten_random_classes_file_name]:
-            time_read_assets(filepath=filepath, results_dict=results_dict)
+        if 'no_read' in format_details.WriteArguments:
+            results_dict['read_data_all_classes_row'] = 'N/A'
+            results_dict['read_data_ten_classes_row'] = 'N/A'
+        else:
+            for filepath in [read_all_classes_file_name, ten_random_classes_file_name]:
+                time_read_assets(filepath=filepath, results_dict=results_dict)
 
         for filepath in [write_all_classes_file_name, write_ten_random_classes_file_name]:
             time_write_assets(filepath=filepath, results_dict=results_dict, **format_details.WriteArguments)
@@ -86,6 +97,10 @@ if __name__ == '__main__':
                results_dict['read_data_ten_classes_row'], results_dict['write_data_all_classes_row'],
                results_dict['write_data_ten_classes_row']]
         tb.add_row(row)
+
+        if format_details.Extension == 'csv':
+            csv_data = {'read_data_all_classes': results_dict['read_data_all_classes'],
+                        'read_data_ten_classes': results_dict['read_data_ten_classes']}
 
     with open(Path(base_dir) / 'benchmark/benchmark_results.txt', "w") as file:
         file.writelines(['Benchmarking results\n'])
