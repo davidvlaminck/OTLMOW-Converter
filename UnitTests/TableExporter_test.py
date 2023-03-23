@@ -3,7 +3,7 @@ from datetime import date
 
 from otlmow_model.BaseClasses.OTLObject import OTLObject
 
-from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
+from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestClasses.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning

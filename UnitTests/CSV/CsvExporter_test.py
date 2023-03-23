@@ -3,7 +3,7 @@ import unittest
 from datetime import date, datetime, time
 from pathlib import Path
 
-from UnitTests.SettingManagerForUnitTests import get_settings_path_for_unittests
+from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
