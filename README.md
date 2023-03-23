@@ -4,6 +4,8 @@
 [![Unittests](https://github.com/davidvlaminck/OTLMOW-ModelBuilder/actions/workflows/unittest.yml/badge.svg)](https://github.com/davidvlaminck/OTLMOW-Converter/actions/workflows/unittest.yml)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/otlmow-converter)
 [![GitHub issues](https://img.shields.io/github/issues/davidvlaminck/OTLMOW-Converter)](https://github.com/davidvlaminck/OTLMOW-Converter/issues)
+[![coverage](https://github.com/davidvlaminck/OTLMOW-Converter/blob/master/UnitTests/coverage.svg)](https://htmlpreview.github.io/?https://github.com/davidvlaminck/OTLMOW-Converter/blob/master/UnitTests/htmlcov/index.html)
+
 
 ## OTLMOW Project 
 This project aims to implement the Flemish data standard OTL (https://wegenenverkeer.data.vlaanderen.be/) in Python.
