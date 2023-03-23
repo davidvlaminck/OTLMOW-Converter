@@ -1,5 +1,4 @@
 import os
-import unittest
 from datetime import datetime
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass

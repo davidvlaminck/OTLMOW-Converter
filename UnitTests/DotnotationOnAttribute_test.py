@@ -1,6 +1,4 @@
-﻿from unittest import TestCase
-
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+﻿from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 
 

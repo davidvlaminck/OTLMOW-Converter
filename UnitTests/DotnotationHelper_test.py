@@ -1,8 +1,6 @@
 ﻿import json
 import logging
 import unittest
-import warnings
-from unittest import TestCase
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationHelper import DotnotationHelper

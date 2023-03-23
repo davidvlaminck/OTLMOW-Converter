@@ -1,5 +1,4 @@
 from datetime import date, datetime, time
-from unittest import TestCase
 
 import pytest
 from otlmow_model.Classes.Installatie.Wegberm import Wegberm
