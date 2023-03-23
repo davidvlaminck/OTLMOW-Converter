@@ -1,5 +1,5 @@
-import os
 from datetime import datetime
+from pathlib import Path
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
@@ -7,16 +7,16 @@ from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
 def set_up_encoder():
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    settings_file_location = f'{base_dir}/../settings_OTLMOW.json'
-    otl_facility = OtlmowConverter(logfile='', settings_path=settings_file_location)
+    base_dir = Path(__file__).parent
+    settings_file_location = Path(base_dir.parent / 'settings_OTLMOW.json')
+    otl_facility = OtlmowConverter(logfile=None, settings_path=settings_file_location)
     encoder = OtlAssetJSONEncoder(settings=otl_facility.settings)
     return encoder
 
 
 def test_init_encoder():
     encoder = set_up_encoder()
-    encoder is not None
+    assert encoder is not None
 
 
 def test_JsonEncode_Boolean():
