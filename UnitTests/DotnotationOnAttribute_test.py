@@ -4,83 +4,75 @@ from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTe
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 
 
-class DotnotationOnAttributeTests(TestCase):
-    def test_fill_with_dummy_data_complex_attr(self):
-        instance = AllCasesTestClass()
-        attr = instance._testComplexType
-        attr.fill_with_dummy_data()
-        self.assertIsNotNone(instance.testComplexType.testBooleanField)
-        self.assertIsNotNone(instance.testComplexType.testComplexType2MetKard[0].testStringField)
-        self.assertIsNotNone(instance.testComplexType.testKwantWrd.waarde)
-        self.assertEquals('testComplexType.testComplexType2MetKard[].testStringField',
-                          DotnotationHelper.get_dotnotation(instance.testComplexType.testComplexType2MetKard[0]._testStringField))
+def test_fill_with_dummy_data_complex_attr():
+    instance = AllCasesTestClass()
+    attr = instance._testComplexType
+    attr.fill_with_dummy_data()
+    assert instance.testComplexType.testBooleanField is not None
+    assert instance.testComplexType.testComplexType2MetKard[0].testStringField is not None
+    assert instance.testComplexType.testKwantWrd.waarde is not None
+    assert 'testComplexType.testComplexType2MetKard[].testStringField' == DotnotationHelper.get_dotnotation(
+        instance.testComplexType.testComplexType2MetKard[0]._testStringField)
 
-    def test_dotnotation_on_attribute(self):
-        instance = AllCasesTestClass()
 
-        with self.subTest('complex attribute'):
-            self.assertEqual('testComplexType', DotnotationHelper.get_dotnotation(instance._testComplexType))
-            self.assertEqual('testComplexType.testBooleanField',
-                             DotnotationHelper.get_dotnotation(instance.testComplexType._testBooleanField))
-            self.assertEqual('testComplexType.testComplexType2',
-                             DotnotationHelper.get_dotnotation(instance.testComplexType._testComplexType2))
-            self.assertEqual('testComplexType.testComplexType2.testStringField',
-                             DotnotationHelper.get_dotnotation(instance.testComplexType.testComplexType2._testStringField))
-            self.assertEqual('testComplexType.testComplexType2.testKwantWrd',
-                             DotnotationHelper.get_dotnotation(instance.testComplexType.testComplexType2._testKwantWrd))
-            self.assertEqual('testComplexType.testComplexType2.testKwantWrd.waarde',
-                             DotnotationHelper.get_dotnotation(instance.testComplexType.testComplexType2.testKwantWrd._waarde))
+def test_dotnotation_on_attribute(subtests):
+    instance = AllCasesTestClass()
 
-        with self.subTest('complex attribute with cardinality'):
-            self.assertEqual('testComplexTypeMetKard[]',
-                             DotnotationHelper.get_dotnotation(instance._testComplexTypeMetKard))
-            self.assertEqual('testComplexTypeMetKard[].testBooleanField',
-                             DotnotationHelper.get_dotnotation(instance.testComplexTypeMetKard[0]._testBooleanField))
-            self.assertEqual('testComplexTypeMetKard[].testComplexType2MetKard[]',
-                             DotnotationHelper.get_dotnotation(instance.testComplexTypeMetKard[0]._testComplexType2MetKard))
-            self.assertEqual('testComplexTypeMetKard[].testComplexType2MetKard[].testStringField',
-                             DotnotationHelper.get_dotnotation(instance.testComplexTypeMetKard[0].testComplexType2MetKard[0]._testStringField))
+    with subtests.test(msg='complex attribute'):
+        assert DotnotationHelper.get_dotnotation(instance._testComplexType) == 'testComplexType'
+        assert DotnotationHelper.get_dotnotation(instance.testComplexType._testBooleanField) == 'testComplexType.testBooleanField'
+        assert DotnotationHelper.get_dotnotation(instance.testComplexType._testComplexType2) == 'testComplexType.testComplexType2'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testComplexType.testComplexType2._testStringField) == 'testComplexType.testComplexType2.testStringField'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testComplexType.testComplexType2._testKwantWrd) == 'testComplexType.testComplexType2.testKwantWrd'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testComplexType.testComplexType2.testKwantWrd._waarde) == 'testComplexType.testComplexType2.testKwantWrd.waarde'
 
-        with self.subTest('non-complex attributes'):
-            self.assertEqual('testKeuzelijst', DotnotationHelper.get_dotnotation(instance._testKeuzelijst))
-            self.assertEqual('testStringField', DotnotationHelper.get_dotnotation(instance._testStringField))
-            self.assertEqual('testBooleanField', DotnotationHelper.get_dotnotation(instance._testBooleanField))
-            self.assertEqual('testDecimalField', DotnotationHelper.get_dotnotation(instance._testDecimalField))
+    with subtests.test(msg='complex attribute with cardinality'):
+        assert 'testComplexTypeMetKard[]' == DotnotationHelper.get_dotnotation(instance._testComplexTypeMetKard)
+        assert 'testComplexTypeMetKard[].testBooleanField' == DotnotationHelper.get_dotnotation(
+            instance.testComplexTypeMetKard[0]._testBooleanField)
+        assert 'testComplexTypeMetKard[].testComplexType2MetKard[]' == DotnotationHelper.get_dotnotation(
+            instance.testComplexTypeMetKard[0]._testComplexType2MetKard)
+        assert 'testComplexTypeMetKard[].testComplexType2MetKard[].testStringField' == DotnotationHelper.get_dotnotation(
+            instance.testComplexTypeMetKard[0].testComplexType2MetKard[0]._testStringField)
 
-        with self.subTest('non-complex attribute with cardinality'):
-            self.assertEqual('testKeuzelijstMetKard[]', DotnotationHelper.get_dotnotation(instance._testKeuzelijstMetKard))
-            self.assertEqual('testStringFieldMetKard[]', DotnotationHelper.get_dotnotation(instance._testStringFieldMetKard))
-            self.assertEqual('testDecimalFieldMetKard[]', DotnotationHelper.get_dotnotation(instance._testDecimalFieldMetKard))
+    with subtests.test(msg='non-complex attributes'):
+        assert DotnotationHelper.get_dotnotation(instance._testKeuzelijst) == 'testKeuzelijst'
+        assert DotnotationHelper.get_dotnotation(instance._testStringField) == 'testStringField'
+        assert DotnotationHelper.get_dotnotation(instance._testBooleanField) == 'testBooleanField'
+        assert DotnotationHelper.get_dotnotation(instance._testDecimalField) == 'testDecimalField'
 
-        with self.subTest('dte attribute'):
-            self.assertEqual('testEenvoudigType', DotnotationHelper.get_dotnotation(instance._testEenvoudigType))
+    with subtests.test(msg='non-complex attribute with cardinality'):
+        assert DotnotationHelper.get_dotnotation(instance._testKeuzelijstMetKard) == 'testKeuzelijstMetKard[]'
+        assert DotnotationHelper.get_dotnotation(instance._testStringFieldMetKard) == 'testStringFieldMetKard[]'
+        assert DotnotationHelper.get_dotnotation(instance._testDecimalFieldMetKard) == 'testDecimalFieldMetKard[]'
 
-        with self.subTest('kwant waarde attribute'):
-            self.assertEqual('testKwantWrd', DotnotationHelper.get_dotnotation(instance._testKwantWrd))
-            self.assertEqual('testKwantWrd.waarde', DotnotationHelper.get_dotnotation(instance.testKwantWrd._waarde))
-            self.assertEqual('testKwantWrd.standaardEenheid',
-                             DotnotationHelper.get_dotnotation(instance.testKwantWrd._standaardEenheid))
-            self.assertEqual('testKwantWrdMetKard[]', DotnotationHelper.get_dotnotation(instance._testKwantWrdMetKard))
-            self.assertEqual('testKwantWrdMetKard[].waarde',
-                             DotnotationHelper.get_dotnotation(instance.testKwantWrdMetKard[0]._waarde))
-            self.assertEqual('testKwantWrdMetKard[].standaardEenheid',
-                             DotnotationHelper.get_dotnotation(instance.testKwantWrdMetKard[0]._standaardEenheid))
+    with subtests.test(msg='dte attribute'):
+        assert DotnotationHelper.get_dotnotation(instance._testEenvoudigType) == 'testEenvoudigType'
 
-        with self.subTest('union attribute'):
-            self.assertEqual('testUnionType', DotnotationHelper.get_dotnotation(instance._testUnionType))
-            self.assertEqual('testUnionType.unionString',
-                             DotnotationHelper.get_dotnotation(instance.testUnionType._unionString))
-            self.assertEqual('testUnionType.unionKwantWrd',
-                             DotnotationHelper.get_dotnotation(instance.testUnionType._unionKwantWrd))
-            self.assertEqual('testUnionType.unionKwantWrd.waarde',
-                             DotnotationHelper.get_dotnotation(instance.testUnionType.unionKwantWrd._waarde))
+    with subtests.test(msg='kwant waarde attribute'):
+        assert DotnotationHelper.get_dotnotation(instance._testKwantWrd) == 'testKwantWrd'
+        assert DotnotationHelper.get_dotnotation(instance.testKwantWrd._waarde) == 'testKwantWrd.waarde'
+        assert DotnotationHelper.get_dotnotation(instance.testKwantWrd._standaardEenheid) == 'testKwantWrd.standaardEenheid'
+        assert DotnotationHelper.get_dotnotation(instance._testKwantWrdMetKard) == 'testKwantWrdMetKard[]'
+        assert DotnotationHelper.get_dotnotation(instance.testKwantWrdMetKard[0]._waarde) == 'testKwantWrdMetKard[].waarde'
+        assert DotnotationHelper.get_dotnotation(instance.testKwantWrdMetKard[0]._standaardEenheid) == 'testKwantWrdMetKard[' \
+                                                                                                       '].standaardEenheid'
 
-        with self.subTest('union attribute with cardinality'):
-            self.assertEqual('testUnionTypeMetKard[]',
-                             DotnotationHelper.get_dotnotation(instance._testUnionTypeMetKard))
-            self.assertEqual('testUnionTypeMetKard[].unionString',
-                             DotnotationHelper.get_dotnotation(instance.testUnionTypeMetKard[0]._unionString))
-            self.assertEqual('testUnionTypeMetKard[].unionKwantWrd',
-                             DotnotationHelper.get_dotnotation(instance.testUnionTypeMetKard[0]._unionKwantWrd))
-            self.assertEqual('testUnionTypeMetKard[].unionKwantWrd.waarde',
-                             DotnotationHelper.get_dotnotation(instance.testUnionTypeMetKard[0].unionKwantWrd._waarde))
+    with subtests.test(msg='union attribute'):
+        assert DotnotationHelper.get_dotnotation(instance._testUnionType) == 'testUnionType'
+        assert DotnotationHelper.get_dotnotation(instance.testUnionType._unionString) == 'testUnionType.unionString'
+        assert DotnotationHelper.get_dotnotation(instance.testUnionType._unionKwantWrd) == 'testUnionType.unionKwantWrd'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testUnionType.unionKwantWrd._waarde) == 'testUnionType.unionKwantWrd.waarde'
+
+    with subtests.test(msg='union attribute with cardinality'):
+        assert DotnotationHelper.get_dotnotation(instance._testUnionTypeMetKard) == 'testUnionTypeMetKard[]'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testUnionTypeMetKard[0]._unionString) == 'testUnionTypeMetKard[].unionString'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testUnionTypeMetKard[0]._unionKwantWrd) == 'testUnionTypeMetKard[].unionKwantWrd'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testUnionTypeMetKard[0].unionKwantWrd._waarde) == 'testUnionTypeMetKard[].unionKwantWrd.waarde'
