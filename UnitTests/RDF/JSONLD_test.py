@@ -81,7 +81,7 @@ def test_JsonEncode_KwantWrd():
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKwantWrd": {' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 1.0}, ' \
-               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"} '
+               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}'
 
     assert json_instance == expected
 
