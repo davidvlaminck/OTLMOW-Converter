@@ -214,7 +214,8 @@ def test_decode_testKwantWrd_waarde_shortcut_false():
     davie_decoder = JsonDecoder(
         settings={'file_formats': [{"name": "json", "dotnotation": {"waarde_shortcut_applicable": False}}]})
     lijst_objecten = davie_decoder.decode_json_string(
-        '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "testKwantWrd": { "waarde": 3.5}}]',
+        '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
+        '"testKwantWrd": { "waarde": 3.5}}]',
         classes_directory='UnitTests.TestClasses.Classes')
     assert lijst_objecten[0].testKwantWrd.waarde == 3.5
 
@@ -222,7 +223,8 @@ def test_decode_testKwantWrd_waarde_shortcut_false():
 def test_decode_testKwantWrdMetKard():
     davie_decoder = set_up_decoder()
     lijst_objecten = davie_decoder.decode_json_string(
-        '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "testKwantWrdMetKard": [4.5, 6.5]}]',
+        '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
+        '"testKwantWrdMetKard": [4.5, 6.5]}]',
         classes_directory='UnitTests.TestClasses.Classes')
     assert lijst_objecten[0].testKwantWrdMetKard[0].waarde == 4.5
     assert lijst_objecten[0].testKwantWrdMetKard[1].waarde == 6.5

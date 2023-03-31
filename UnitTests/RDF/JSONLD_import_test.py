@@ -56,7 +56,6 @@ def test_export_and_then_import_unnested_attributes():
 
     objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
     assert len(objects) == 1
-    assert len(importer.headers) == 19
 
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -87,9 +86,9 @@ def test_export_and_then_import_unnested_attributes():
 def test_export_and_then_import_nested_attributes_level_1():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = CsvImporter(settings=converter.settings)
-    exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
-    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+    exporter = JsonLdExporter(settings=converter.settings)
+    importer = JsonLdImporter(settings=converter.settings)
+    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
 
@@ -117,12 +116,10 @@ def test_export_and_then_import_nested_attributes_level_1():
     instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                            split_per_type=False)
+    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
 
     objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
     assert len(objects) == 1
-    assert len(importer.headers) == 13
 
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -153,9 +150,9 @@ def test_export_and_then_import_nested_attributes_level_1():
 def test_export_and_then_import_nested_attributes_level_2():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = CsvImporter(settings=converter.settings)
-    exporter = CsvExporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
-    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+    exporter = JsonLdExporter(settings=converter.settings)
+    importer = JsonLdImporter(settings=converter.settings)
+    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
 
@@ -175,12 +172,10 @@ def test_export_and_then_import_nested_attributes_level_2():
     instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                            split_per_type=False)
+    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
 
     objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
     assert len(objects) == 1
-    assert len(importer.headers) == 9
 
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
