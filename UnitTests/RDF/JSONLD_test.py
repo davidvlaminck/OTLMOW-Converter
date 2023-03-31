@@ -2,6 +2,7 @@ from pathlib import Path
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
+from otlmow_converter.FileFormats.OtlAssetJSONLDEncoder import OtlAssetJSONLDEncoder
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
@@ -9,11 +10,11 @@ def set_up_encoder():
     base_dir = Path(__file__).parent
     settings_file_location = Path(base_dir.parent / 'settings_OTLMOW.json')
     otl_facility = OtlmowConverter(settings_path=settings_file_location)
-    encoder = OtlAssetJSONEncoder(settings=otl_facility.settings)
+    encoder = OtlAssetJSONLDEncoder(settings=otl_facility.settings)
     return encoder
 
 
-def test_JsonEncode_only_id():
+def test_create_ld_dict_from_asset_only_id():
     encoder = set_up_encoder()
 
     instance = AllCasesTestClass()
@@ -31,7 +32,7 @@ def test_JsonEncode_only_id():
     assert json_ld_dict == expected
 
 
-def test_JsonEncode_ComplexTypeMetKard():
+def test_create_ld_dict_from_asset_ComplexTypeMetKard():
     encoder = set_up_encoder()
 
     instance = AllCasesTestClass()
@@ -59,7 +60,7 @@ def test_JsonEncode_ComplexTypeMetKard():
         'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexTypeMetKard': [{
             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testStringField': 'string',
             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testStringFieldMetKard':
-            ['lijst', 'waardes']
+                ['lijst', 'waardes']
         }, {
             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testStringField': 'string 2',
             'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testStringFieldMetKard':
@@ -68,3 +69,49 @@ def test_JsonEncode_ComplexTypeMetKard():
     }
 
     assert json_ld_dict == expected
+
+
+def test_JsonEncode_KwantWrd():
+    encoder = set_up_encoder()
+
+    instance = AllCasesTestClass()
+    instance.testKwantWrd.waarde = 1.0
+    json_instance = encoder.encode(instance)
+    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/None", "@type": ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKwantWrd": {' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 1.0}, ' \
+               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"} '
+
+    assert json_instance == expected
+
+
+def test_JsonEncode_Keuzelijst():
+    encoder = set_up_encoder()
+
+    instance = AllCasesTestClass()
+    instance.testKeuzelijst = 'waarde-1'
+    json_instance = encoder.encode(instance)
+    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/None", "@type": ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijst": ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1", ' \
+               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}'
+
+    assert json_instance == expected
+
+
+def test_JsonEncode_KeuzelijstKard():
+    encoder = set_up_encoder()
+
+    instance = AllCasesTestClass()
+    instance.testKeuzelijstMetKard = ['waarde-1', 'waarde-2']
+    json_instance = encoder.encode(instance)
+    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/None", "@type": ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijstMetKard": ' \
+               '["https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1", ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-2"], ' \
+               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}'
+
+    assert json_instance == expected
