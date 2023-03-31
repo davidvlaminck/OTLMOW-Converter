@@ -1,6 +1,9 @@
 from pathlib import Path
 
+import pytest
+
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator, DtcIdentificatorWaarden
 from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
 from otlmow_converter.FileFormats.OtlAssetJSONLDEncoder import OtlAssetJSONLDEncoder
 from otlmow_converter.OtlmowConverter import OtlmowConverter
@@ -69,49 +72,82 @@ def test_create_ld_dict_from_asset_ComplexTypeMetKard():
     }
 
     assert json_ld_dict == expected
+    
 
-
-def test_JsonEncode_KwantWrd():
+def test_json_encode_no_assetId():
     encoder = set_up_encoder()
 
     instance = AllCasesTestClass()
+    with pytest.raises(ValueError):
+        encoder.encode(instance)
+
+
+def test_json_encode_no_identificator():
+    encoder = set_up_encoder()
+
+    instance = AllCasesTestClass()
+    instance.assetId = DtcIdentificatorWaarden()
+    with pytest.raises(ValueError):
+        encoder.encode(instance)
+
+
+def test_json_encode_KwantWrd():
+    encoder = set_up_encoder()
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
     instance.testKwantWrd.waarde = 1.0
     json_instance = encoder.encode(instance)
-    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/None", "@type": ' \
+    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/0000", "@type": ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.assetId": ' '{' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcIdentificator.identificator": ' \
+               '"0000"}, ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI": ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKwantWrd": {' \
-               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 1.0}, ' \
-               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}'
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 1.0}}'
 
     assert json_instance == expected
 
 
-def test_JsonEncode_Keuzelijst():
+def test_json_encode_Keuzelijst():
     encoder = set_up_encoder()
 
     instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
     instance.testKeuzelijst = 'waarde-1'
     json_instance = encoder.encode(instance)
-    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/None", "@type": ' \
+    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/0000", "@type": ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.assetId": ' '{' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcIdentificator.identificator": ' \
+               '"0000"}, ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI": ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '\
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijst": ' \
-               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1", ' \
-               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}'
+               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1"}'
 
     assert json_instance == expected
 
 
-def test_JsonEncode_KeuzelijstKard():
+def test_json_encode_KeuzelijstKard():
     encoder = set_up_encoder()
 
     instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
     instance.testKeuzelijstMetKard = ['waarde-1', 'waarde-2']
     json_instance = encoder.encode(instance)
-    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/None", "@type": ' \
+    expected = '{"@id": "https://data.awvvlaanderen.be/id/asset/0000", "@type": ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.assetId": ' '{' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcIdentificator.identificator": ' \
+               '"0000"}, ' \
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI": ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijstMetKard": ' \
                '["https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1", ' \
-               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-2"], ' \
-               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}'
+               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-2"]}' \
+
 
     assert json_instance == expected

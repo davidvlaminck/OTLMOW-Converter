@@ -21,7 +21,7 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
 
         if 'file_formats' not in self.settings:
             raise ValueError("The settings are not loaded or don't contain settings for file formats")
-        json_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'json'), None)
+        json_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'jsonld'), None)
         if json_settings is None:
             raise ValueError("Unable to find json in file formats settings")
 
@@ -29,6 +29,9 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
 
     def create_ld_dict_from_asset(self, otl_object: OTLObject, waarde_shortcut=False) -> Dict:
         """Creates a dictionary from an OTLObject"""
+        if otl_object.assetId is None or otl_object.assetId.identificator is None:
+            raise ValueError('JSON-LD requires the assetId.identificator to not be None.')
+
         d = self._recursive_create_ld_dict_from_asset(otl_object, waarde_shortcut=waarde_shortcut)
         if d is None:
             return {}
@@ -106,10 +109,9 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
     def default(self, otl_object):
         if isinstance(otl_object, OTLObject):
             d = self.create_ld_dict_from_asset(
-                otl_object,
-                waarde_shortcut=False)
+                otl_object, waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
             if hasattr(otl_object, 'typeURI'):
-                d['typeURI'] = otl_object.typeURI
+                d['https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI'] = otl_object.typeURI
             od = OrderedDict(sorted(d.items()))
             return od
         return super().default(otl_object)
