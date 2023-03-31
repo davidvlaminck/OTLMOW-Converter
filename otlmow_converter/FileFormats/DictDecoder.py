@@ -1,3 +1,32 @@
+def get_attribute_by_uri(instance_or_attribute, key: str, waarde_shortcut: bool = False):
+    for k, v in vars(instance_or_attribute).items():
+        if k in ['_parent', '_geometry_types', '_valid_relations']:
+            continue
+
+        if v.objectUri != key:
+            continue
+
+        if waarde_shortcut:
+            if v.field.waarde_shortcut_applicable:
+                if v.kardinaliteit_max != '1':
+                    return v.waarde[0]._waarde
+                else:
+                    return v.waarde._waarde
+
+        return v
+
+
+def get_attribute_by_name(instance_or_attribute, key: str, waarde_shortcut: bool = False):
+    attribute_to_set = getattr(instance_or_attribute, '_' + key)
+    if waarde_shortcut:
+        if attribute_to_set.field.waarde_shortcut_applicable:
+            if attribute_to_set.kardinaliteit_max != '1':
+                return attribute_to_set.waarde[0]._waarde
+            else:
+                return attribute_to_set.waarde._waarde
+    return attribute_to_set
+
+
 class DictDecoder:
     @staticmethod
     def set_value_by_dictitem(instance_or_attribute, key, value, waarde_shortcut=False):

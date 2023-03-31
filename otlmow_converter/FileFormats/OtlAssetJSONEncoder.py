@@ -1,7 +1,6 @@
 import json
-import time
 from collections import OrderedDict
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Dict, Union, List
 
 from otlmow_model.BaseClasses.DateField import DateField

@@ -1,7 +1,6 @@
 import json
-import time
 from collections import OrderedDict
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Dict, Union, List
 
 from otlmow_model.BaseClasses.DateField import DateField
@@ -93,7 +92,7 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
                             d[v.objectUri] = dict_item_list
                     else:
                         if v.field == TimeField:
-                            d[v.objectUri] = time.strftime(v.waarde, "%H:%M:%S")
+                            d[v.objectUri] = time.strftime(v.waarde, format="%H:%M:%S")
                         elif v.field == DateField:
                             d[v.objectUri] = date.strftime(v.waarde, "%Y-%m-%d")
                         elif v.field == DateTimeField:
