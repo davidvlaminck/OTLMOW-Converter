@@ -58,6 +58,9 @@ def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     results_dict[read_data_key.replace('read', 'write') + '_row'] = \
         f'{round(mean(result_times), 3)} +/- {round(st_dev, 3)}'
 
+    file_size = round(os.path.getsize(filepath) / 1024, 0)
+    results_dict[read_data_key.replace('read', 'write') + '_size'] = f'{file_size} kB'
+
 
 if __name__ == '__main__':
     if not os.path.exists(Path(base_dir) / 'temp'):
@@ -66,8 +69,8 @@ if __name__ == '__main__':
     FormatDetails = namedtuple('FormatDetails', ['Extension', 'Label', 'WriteArguments'])
 
     tb = prettytable.PrettyTable()
-    tb.field_names = ['Format', 'Read all classes', 'Read 10 random classes', 'Write all classes',
-                      'Write 10 random classes']
+    tb.field_names = ['Format', 'Read all classes', 'Write all classes', 'Size all classes',
+                      'Read 10 random classes', 'Write 10 random classes', 'Size 10 random classes']
 
     formats = [
         FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
@@ -94,8 +97,11 @@ if __name__ == '__main__':
             time_write_assets(filepath=filepath, results_dict=results_dict, **format_details.WriteArguments)
 
         row = [format_details.Label, results_dict['read_data_all_classes_row'],
-               results_dict['read_data_ten_classes_row'], results_dict['write_data_all_classes_row'],
-               results_dict['write_data_ten_classes_row']]
+               results_dict['write_data_all_classes_row'],
+               results_dict['write_data_all_classes_size'],
+               results_dict['read_data_ten_classes_row'],
+               results_dict['write_data_ten_classes_row'],
+               results_dict['write_data_ten_classes_size']]
         tb.add_row(row)
 
         if format_details.Extension == 'csv':
