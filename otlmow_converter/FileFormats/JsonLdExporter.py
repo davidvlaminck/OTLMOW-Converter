@@ -1,3 +1,4 @@
+from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 from otlmow_converter.FileFormats.OtlAssetJSONLDEncoder import OtlAssetJSONLDEncoder
 
 
@@ -17,17 +18,7 @@ class JsonLdExporter:
 
     @staticmethod
     def modify_jsonld_for_context(encoded_json: str):
-        context_dict = {
-            'asset': 'https://data.awvvlaanderen.be/id/asset/',
-            'assetrelatie': 'https://data.awvvlaanderen.be/id/assetrelatie/',
-            'onderdeel': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#',
-            'installatie': 'https://wegenenverkeer.data.vlaanderen.be/ns/installatie#',
-            'imel': 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#',
-            'kl': 'https://wegenenverkeer.data.vlaanderen.be/id/concept/',
-            'abs': 'https://wegenenverkeer.data.vlaanderen.be/ns/abstracten#',
-            'pem': 'https://wegenenverkeer.data.vlaanderen.be/ns/proefenmeting#',
-            'loc': 'https://loc.data.wegenenverkeer.be/ns/implementatieelement#'
-        }
+        context_dict = JsonLdContext.context_dict
         context_str = '{'
         for short, long in context_dict.items():
             if long in encoded_json:

@@ -1,49 +1,49 @@
 {
-    "@graph": [
+    "@context": {"asset": "https://data.awvvlaanderen.be/id/asset/", "onderdeel": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#", "imel": "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#"},"@graph": [
         {
-            "@id": "https://data.awvvlaanderen.be/id/asset/0000",
-            "@type": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-            "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.assetId": {
-                "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcIdentificator.identificator": "0000"
+            "@id": "asset:0000",
+            "@type": "onderdeel:AllCasesTestClass",
+            "imel:AIMObject.assetId": {
+                "imel:DtcIdentificator.identificator": "0000"
             },
-            "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-            "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexType": {
-                "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2": {
-                    "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd": {
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 76.8
+            "imel:AIMObject.typeURI": "onderdeel:AllCasesTestClass",
+            "onderdeel:AllCasesTestClass.testComplexType": {
+                "imel:DtcTestComplexType.testComplexType2": {
+                    "imel:DtcTestComplexType2.testKwantWrd": {
+                        "imel:KwantWrdTest.waarde": 76.8
                     },
-                    "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringField": "GZBzgRhOrQvfZaN"
+                    "imel:DtcTestComplexType2.testStringField": "GZBzgRhOrQvfZaN"
                 },
-                "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2MetKard": [
+                "imel:DtcTestComplexType.testComplexType2MetKard": [
                     {
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd": {
-                            "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 10.0
+                        "imel:DtcTestComplexType2.testKwantWrd": {
+                            "imel:KwantWrdTest.waarde": 10.0
                         },
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringField": "string1"
+                        "imel:DtcTestComplexType2.testStringField": "string1"
                     },
                     {
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd": {
-                            "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 20.0
+                        "imel:DtcTestComplexType2.testKwantWrd": {
+                            "imel:KwantWrdTest.waarde": 20.0
                         },
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringField": "string2"
+                        "imel:DtcTestComplexType2.testStringField": "string2"
                     }
                 ]
             },
-            "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testComplexTypeMetKard": [
+            "onderdeel:AllCasesTestClass.testComplexTypeMetKard": [
                 {
-                    "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2": {
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd": {
-                            "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 10.0
+                    "imel:DtcTestComplexType.testComplexType2": {
+                        "imel:DtcTestComplexType2.testKwantWrd": {
+                            "imel:KwantWrdTest.waarde": 10.0
                         },
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringField": "string1"
+                        "imel:DtcTestComplexType2.testStringField": "string1"
                     }
                 },
                 {
-                    "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testComplexType2": {
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testKwantWrd": {
-                            "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#KwantWrdTest.waarde": 20.0
+                    "imel:DtcTestComplexType.testComplexType2": {
+                        "imel:DtcTestComplexType2.testKwantWrd": {
+                            "imel:KwantWrdTest.waarde": 20.0
                         },
-                        "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType2.testStringField": "string2"
+                        "imel:DtcTestComplexType2.testStringField": "string2"
                     }
                 }
             ]

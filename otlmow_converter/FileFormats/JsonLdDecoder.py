@@ -3,6 +3,7 @@ import json
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 from otlmow_converter.FileFormats.DictDecoder import DictDecoder
+from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 
 
 class JsonLdDecoder:
@@ -19,12 +20,15 @@ class JsonLdDecoder:
 
         self.settings = json_settings
 
-    def decode_json_string(self, json_string, ignore_failed_objects=False, classes_directory: str = None):
+    def decode_json_string(self, json_string: str, ignore_failed_objects=False, classes_directory: str = None):
         dict_list = json.loads(json_string)
+        context_dict = dict_list['@context']
         lijst = []
         for obj in dict_list['@graph']:
             try:
                 typeURI = obj['@type']
+
+                typeURI = JsonLdContext.replace_context(typeURI, context_dict=context_dict)
 
                 if 'https://wegenenverkeer.data.vlaanderen.be/ns' not in typeURI:
                     raise ValueError('typeURI should start with "https://wegenenverkeer.data.vlaanderen.be/ns" to use this decoder')
@@ -36,12 +40,15 @@ class JsonLdDecoder:
                     if key == '@type':
                         continue
                     if key == '@id':
+                        value = JsonLdContext.replace_context(value, context_dict=context_dict)
                         instance.assetId.identificator = value
                         continue
                     if 'typeURI' in key or value == '' or value == [] or key == 'bron' or key == 'doel':
                         continue
 
-                    DictDecoder.set_value_by_dictitem(instance, key, value, self.settings['dotnotation']['waarde_shortcut_applicable'], ld=True)
+                    DictDecoder.set_value_by_dictitem(instance, key, value,
+                                                      self.settings['dotnotation']['waarde_shortcut_applicable'],
+                                                      ld=True, ld_context=context_dict)
             except Exception as ex:
                 if not ignore_failed_objects:
                     raise ex

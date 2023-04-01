@@ -1,3 +1,7 @@
+from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
+from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
+
+
 def get_attribute_by_uri(instance_or_attribute, key: str,):
     for k, v in vars(instance_or_attribute).items():
         if k in ['_parent', '_geometry_types', '_valid_relations']:
@@ -17,10 +21,11 @@ def get_attribute_by_name(instance_or_attribute, key: str):
 
 class DictDecoder:
     @staticmethod
-    def set_value_by_dictitem(instance_or_attribute, key, value, waarde_shortcut: bool = False, ld: bool = False):
+    def set_value_by_dictitem(instance_or_attribute, key, value, waarde_shortcut: bool = False, ld: bool = False, ld_context: dict = {}):
         if not ld:
             attribute_to_set = get_attribute_by_name(instance_or_attribute, key)
         else:
+            key = JsonLdContext.replace_context(key, context_dict=ld_context)
             attribute_to_set = get_attribute_by_uri(instance_or_attribute, key)
         if attribute_to_set.field.waardeObject is not None:  # complex / union / KwantWrd / dte
 
@@ -33,18 +38,22 @@ class DictDecoder:
                         attribute_to_set.waarde[index]._waarde.set_waarde(list_item)
                     else:  # complex / union
                         for k, v in list_item.items():
-                            DictDecoder.set_value_by_dictitem(attribute_to_set.waarde[index], k, v, waarde_shortcut, ld=ld)
+                            DictDecoder.set_value_by_dictitem(attribute_to_set.waarde[index], k, v, waarde_shortcut,
+                                                              ld=ld, ld_context=ld_context)
 
             elif isinstance(value, dict):  # only complex / union possible
                 if attribute_to_set.waarde is None:
                     attribute_to_set.add_empty_value()
 
                 for k, v in value.items():
-                    DictDecoder.set_value_by_dictitem(attribute_to_set.waarde, k, v, waarde_shortcut, ld=ld)
+                    DictDecoder.set_value_by_dictitem(attribute_to_set.waarde, k, v, waarde_shortcut,
+                                                      ld=ld, ld_context=ld_context)
             else:  # must be a dte / kwantWrd
                 if attribute_to_set.waarde is None:
                     attribute_to_set.add_empty_value()
 
                 attribute_to_set.waarde._waarde.set_waarde(value)
         else:
+            if isinstance(value, str):
+                value = JsonLdContext.replace_context(value, context_dict=ld_context)
             attribute_to_set.set_waarde(value)
