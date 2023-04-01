@@ -58,7 +58,7 @@ def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     results_dict[read_data_key.replace('read', 'write') + '_row'] = \
         f'{round(mean(result_times), 3)} +/- {round(st_dev, 3)}'
 
-    file_size = round(os.path.getsize(filepath) / 1024, 0)
+    file_size = int(os.path.getsize(filepath) / 1024)
     results_dict[read_data_key.replace('read', 'write') + '_size'] = f'{file_size} kB'
 
 
