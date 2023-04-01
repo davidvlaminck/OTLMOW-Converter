@@ -4,6 +4,7 @@ import pytest
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator, DtcIdentificatorWaarden
+from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
 from otlmow_converter.FileFormats.OtlAssetJSONLDEncoder import OtlAssetJSONLDEncoder
 from otlmow_converter.OtlmowConverter import OtlmowConverter
@@ -72,7 +73,7 @@ def test_create_ld_dict_from_asset_ComplexTypeMetKard():
     }
 
     assert json_ld_dict == expected
-    
+
 
 def test_json_encode_no_assetId():
     encoder = set_up_encoder()
@@ -124,7 +125,7 @@ def test_json_encode_Keuzelijst():
                '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcIdentificator.identificator": ' \
                '"0000"}, ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI": ' \
-               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '\
+               '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijst": ' \
                '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1"}'
 
@@ -147,7 +148,30 @@ def test_json_encode_KeuzelijstKard():
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
                '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijstMetKard": ' \
                '["https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1", ' \
-               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-2"]}' \
-
+               '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-2"]}'
 
     assert json_instance == expected
+
+
+def test_modify_jsonld_for_context_minimal():
+    test_string = '{"@graph": [{"@id": "https://data.awvvlaanderen.be/id/asset/0000", "@type": ' \
+                  '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+                  '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.assetId": ' '{' \
+                  '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcIdentificator.identificator": ' \
+                  '"0000"}, ' \
+                  '"https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI": ' \
+                  '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", ' \
+                  '"https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijst": ' \
+                  '"https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-1"}]}'
+
+    expected = '{"@context": {"asset": "https://data.awvvlaanderen.be/id/asset/", ' \
+               '"onderdeel": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#", ' \
+               '"imel": "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#", ' \
+               '"kl": "https://wegenenverkeer.data.vlaanderen.be/id/concept/"},' \
+               '"@graph": [{"@id": "asset:0000", "@type": "onderdeel:AllCasesTestClass", ' \
+               '"imel:AIMObject.assetId": {"imel:DtcIdentificator.identificator": "0000"}, ' \
+               '"imel:AIMObject.typeURI": "onderdeel:AllCasesTestClass", ' \
+               '"onderdeel:AllCasesTestClass.testKeuzelijst": "kl:KlTestKeuzelijst/waarde-1"}]}'
+
+    result_string = JsonLdExporter.modify_jsonld_for_context(test_string)
+    assert result_string == expected

@@ -12,6 +12,9 @@ def get_attribute_by_name(instance_or_attribute, key: str):
     return attribute_to_set
 
 
+# dict encoder = asset object to dict
+# dict decoder = dict to asset object
+
 class DictDecoder:
     @staticmethod
     def set_value_by_dictitem(instance_or_attribute, key, value, waarde_shortcut: bool = False, ld: bool = False):

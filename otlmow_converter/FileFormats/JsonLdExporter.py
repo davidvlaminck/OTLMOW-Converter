@@ -12,4 +12,28 @@ class JsonLdExporter:
         else:
             graph_dict['@graph'] = [list_of_objects]
         encoded_json = self.encoder.encode(graph_dict)
+        encoded_json = self.modify_jsonld_for_context(encoded_json)
         self.encoder.write_json_to_file(encoded_json, filepath)
+
+    @staticmethod
+    def modify_jsonld_for_context(encoded_json: str):
+        context_dict = {
+            'asset': 'https://data.awvvlaanderen.be/id/asset/',
+            'assetrelatie': 'https://data.awvvlaanderen.be/id/assetrelatie/',
+            'onderdeel': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#',
+            'installatie': 'https://wegenenverkeer.data.vlaanderen.be/ns/installatie#',
+            'imel': 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#',
+            'kl': 'https://wegenenverkeer.data.vlaanderen.be/id/concept/',
+            'abs': 'https://wegenenverkeer.data.vlaanderen.be/ns/abstracten#',
+            'pem': 'https://wegenenverkeer.data.vlaanderen.be/ns/proefenmeting#',
+            'loc': 'https://loc.data.wegenenverkeer.be/ns/implementatieelement#'
+        }
+        context_str = '{'
+        for short, long in context_dict.items():
+            if long in encoded_json:
+                context_str += f'"{short}": "{long}", '
+                encoded_json = encoded_json.replace(long, f'{short}:')
+        context_str = context_str[:-2] + '}'
+
+        encoded_json = encoded_json.replace('"@graph"', f'"@context": {context_str},"@graph"')
+        return encoded_json
