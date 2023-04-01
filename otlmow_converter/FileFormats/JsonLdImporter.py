@@ -15,7 +15,7 @@ class JsonLdImporter:
         """
 
         ignore_failed_objects = False
-        class_directory = ''
+        class_directory = None
 
         if kwargs is not None:
             if 'ignore_failed_objects' in kwargs:
