@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
@@ -37,7 +39,7 @@ def test_return_Exporter_correct_type(subtests):
             assert isinstance(exporter, ExcelExporter)
 
     with subtests.test(msg='returning CsvExporter'):
-        exporter = FileExporter.get_exporter_from_extension('csv', settings=unittest_settings)
+        exporter = FileExporter.get_exporter_from_extension('csv', settings=unittest_settings, class_directory='')
         assert isinstance(exporter, CsvExporter)
 
     with subtests.test(msg='returning TtlExporter'):
@@ -47,3 +49,10 @@ def test_return_Exporter_correct_type(subtests):
     with subtests.test(msg='invalid extension'):
         with pytest.raises(InvalidExtensionError):
             FileExporter.get_exporter_from_extension('dwg', settings=unittest_settings)
+
+
+def test_create_file_from_assets():
+    settings_path = get_settings_path_for_unittests()
+    unittest_settings = SettingsManager.load_settings(settings_path=settings_path)
+    file_exporter = FileExporter(settings=unittest_settings)
+    file_exporter.create_file_from_assets(filepath=Path('random.json'), list_of_objects=[])
