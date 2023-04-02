@@ -23,7 +23,7 @@ jobs:
       - name: Run benchmarks
         run: python benchmark/perform_benchmark.py
       - name: Remove pyc files
-        run: rm **/*.pyc
+        run: rm -f */*.pyc
       - name: Push to github
         run: |
           git pull
