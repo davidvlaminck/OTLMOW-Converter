@@ -52,7 +52,10 @@ def test_return_Exporter_correct_type(subtests):
 
 
 def test_create_file_from_assets():
+    file_path = Path('random.json')
     settings_path = get_settings_path_for_unittests()
     unittest_settings = SettingsManager.load_settings(settings_path=settings_path)
     file_exporter = FileExporter(settings=unittest_settings)
-    file_exporter.create_file_from_assets(filepath=Path('random.json'), list_of_objects=[])
+    file_exporter.create_file_from_assets(filepath=file_path, list_of_objects=[])
+    assert Path.exists(file_path)
+    Path.unlink(file_path)
