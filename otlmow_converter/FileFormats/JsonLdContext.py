@@ -1,3 +1,5 @@
+from typing import Optional
+
 
 class JsonLdContext:
     context_dict = {
@@ -13,7 +15,9 @@ class JsonLdContext:
     }
 
     @staticmethod
-    def replace_context(short_uri: str, context_dict: dict) -> str:
+    def replace_context(short_uri: str, context_dict: dict) -> Optional[str]:
+        if short_uri is None:
+            return None
         if ':' not in short_uri:
             return short_uri
         context = short_uri.split(':')[0]
