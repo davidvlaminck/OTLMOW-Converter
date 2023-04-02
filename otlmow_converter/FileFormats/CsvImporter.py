@@ -34,7 +34,7 @@ class CsvImporter:
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
         try:
-            with open(filepath, 'r') as file:
+            with open(filepath, 'r', encoding='utf-8') as file:
                 self.headers = file.readline()[:-1].split(delimiter)
                 data = []
                 for line in file:

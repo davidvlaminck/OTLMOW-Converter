@@ -22,7 +22,10 @@ class JsonLdDecoder:
 
     def decode_json_string(self, json_string: str, ignore_failed_objects=False, classes_directory: str = None):
         dict_list = json.loads(json_string)
-        context_dict = dict_list['@context']
+        if '@context' in dict_list:
+            context_dict = dict_list['@context']
+        else:
+            context_dict = {}
         lijst = []
         for obj in dict_list['@graph']:
             try:
