@@ -1,3 +1,5 @@
+from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
+
 from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 
@@ -54,6 +56,9 @@ class DictDecoder:
 
                 attribute_to_set.waarde._waarde.set_waarde(value)
         else:
-            if isinstance(value, str):
-                value = JsonLdContext.replace_context(value, context_dict=ld_context)
+            if issubclass(attribute_to_set.field, KeuzelijstField):
+                if attribute_to_set.kardinaliteit_max != '1':
+                    value = [JsonLdContext.replace_context(list_item, context_dict=ld_context) for list_item in value]
+                else:
+                    value = JsonLdContext.replace_context(value, context_dict=ld_context)
             attribute_to_set.set_waarde(value)

@@ -13,7 +13,7 @@ class JsonLdContext:
     }
 
     @staticmethod
-    def replace_context(short_uri: str, context_dict: dict):
+    def replace_context(short_uri: str, context_dict: dict) -> str:
         if ':' not in short_uri:
             return short_uri
         context = short_uri.split(':')[0]
