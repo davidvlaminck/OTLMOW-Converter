@@ -26,9 +26,6 @@ class JsonDecoder:
             try:
                 typeURI = next(value for key, value in obj.items() if 'typeURI' in key)
 
-                if 'https://wegenenverkeer.data.vlaanderen.be/ns' not in typeURI:
-                    raise ValueError('typeURI should start with "https://wegenenverkeer.data.vlaanderen.be/ns" to use this decoder')
-
                 instance = dynamic_create_instance_from_uri(typeURI, directory=classes_directory)
                 lijst.append(instance)
 
