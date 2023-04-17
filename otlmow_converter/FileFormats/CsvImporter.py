@@ -1,3 +1,4 @@
+import csv
 import logging
 import os
 from pathlib import Path
@@ -26,20 +27,25 @@ class CsvImporter:
 
     def import_file(self, filepath: Path = None, **kwargs):
         delimiter = ';'
+        quote_char = '"'
         if kwargs is not None:
             if 'delimiter' in kwargs:
                 delimiter = kwargs['delimiter']
+            if 'quote_char' in kwargs:
+                quote_char = kwargs['quote_char']
 
         if filepath == '' or not os.path.isfile(filepath):
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
         try:
             with open(filepath, 'r', encoding='utf-8') as file:
-                self.headers = file.readline()[:-1].split(delimiter)
-                data = []
-                for line in file:
-                    data.append(line[:-1].split(delimiter))
-                self.data = data
+                csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
+                self.data = []
+                for row_nr, row in enumerate(csv_reader):
+                    if row_nr == 0:
+                        self.headers = row
+                    else:
+                        self.data.append(row)
 
         except Exception as ex:
             raise ex

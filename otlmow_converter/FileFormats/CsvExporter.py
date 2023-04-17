@@ -24,12 +24,15 @@ class CsvExporter:
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs) -> None:
         delimiter = ';'
         split_per_type = True
+        quote_char = '"'
 
         if kwargs is not None:
             if 'delimiter' in kwargs:
                 delimiter = kwargs['delimiter']
             if 'split_per_type' in kwargs:
                 split_per_type = kwargs['split_per_type']
+            if 'quote_char' in kwargs:
+                quote_char = kwargs['quote_char']
 
         if filepath is None:
             raise ValueError(f'Can not write a file to: {filepath}')
@@ -49,14 +52,23 @@ class CsvExporter:
                                  delimiter=delimiter)
         else:
             data = self.table_exporter.get_data_as_table()
-            self._write_file(file_location=filepath, data=data, delimiter=delimiter)
+            self._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
 
     @staticmethod
-    def _write_file(file_location: Path, data: List[List], delimiter: str) -> None:
+    def _write_file(file_location: Path, data: List[List], delimiter: str, quote_char: str) -> None:
         try:
             with open(file_location, "w") as file:
                 for line in data:
+                    line = list(map(lambda x: CsvExporter._wrap_field_in_quote_chars(field=x,
+                                                                                     delimiter=delimiter,
+                                                                                     quote_char=quote_char), line))
                     linestring = delimiter.join(line)
                     file.writelines(linestring + '\n')
         except Exception as ex:
             raise ex
+
+    @staticmethod
+    def _wrap_field_in_quote_chars(field: str, delimiter: str, quote_char: str) -> str:
+        if delimiter in field and quote_char not in field:
+            return f'{quote_char}{field}{quote_char}'
+        return field

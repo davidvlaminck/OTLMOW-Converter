@@ -38,6 +38,7 @@ class OtlmowConverter:
         Supported arguments for csv:
 
         delimiter (str): Specifies the delimiter for the csv file. Defaults to ';'
+        quote_char (str): Specifies the quote_char for the csv file. Defaults to '"'
 
         Supported arguments for json:
 
@@ -61,6 +62,7 @@ class OtlmowConverter:
         Supported arguments for csv:
 
         delimiter (str): Specifies the delimiter for the csv file. Defaults to ';'
+        quote_char (str): Specifies the quote_char for the csv file. Defaults to '"'
         split_per_type (bool): If True, creates a file per type instead of one file for all objects
 
         :return: Returns a list with asset objects
