@@ -1,7 +1,9 @@
 import csv
 import logging
 import os
+import sys
 from pathlib import Path
+csv.field_size_limit(sys.maxsize)
 
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
