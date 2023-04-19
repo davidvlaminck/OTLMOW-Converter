@@ -4,7 +4,7 @@ from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 
 
-def get_attribute_by_uri(instance_or_attribute, key: str,):
+def get_attribute_by_uri(instance_or_attribute, key: str):
     for k, v in vars(instance_or_attribute).items():
         if k in ['_parent', '_geometry_types', '_valid_relations']:
             continue
