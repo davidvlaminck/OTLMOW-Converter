@@ -1,5 +1,5 @@
 # coding=utf-8
-from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
+from otlmow_model.BaseClasses.OTLObject import OTLAttribuut
 from UnitTests.TestClasses.Classes.ImplementatieElement.AIMObject import AIMObject
 from otlmow_model.BaseClasses.StringField import StringField
 from otlmow_model.GeometrieTypes.LijnGeometrie import LijnGeometrie
