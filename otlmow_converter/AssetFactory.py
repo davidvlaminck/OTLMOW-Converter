@@ -1,5 +1,6 @@
 ﻿from typing import Union, List
 
+from otlmow_model.BaseClasses.OTLObject import set_value_by_dictitem
 from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
 from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -76,4 +77,4 @@ class AssetFactory:
             new_instance_dict[fieldName] = dictitem
 
         for k, v in new_instance_dict.items():
-            DictDecoder.set_value_by_dictitem(new_object, k, v, waarde_shortcut=False)
+            set_value_by_dictitem(new_object, k, v, waarde_shortcut=False)

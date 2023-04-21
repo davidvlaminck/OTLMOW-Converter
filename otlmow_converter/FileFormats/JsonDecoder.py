@@ -1,5 +1,6 @@
 import json
 
+from otlmow_model.BaseClasses.OTLObject import set_value_by_dictitem
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 from otlmow_converter.FileFormats.DictDecoder import DictDecoder
@@ -33,7 +34,7 @@ class JsonDecoder:
                     if 'typeURI' in key or value == '' or value == [] or key == 'bron' or key == 'doel':
                         continue
 
-                    DictDecoder.set_value_by_dictitem(instance, key, value, self.settings['dotnotation']['waarde_shortcut_applicable'])
+                    set_value_by_dictitem(instance, key, value, self.settings['dotnotation']['waarde_shortcut_applicable'])
             except Exception as ex:
                 if not ignore_failed_objects:
                     raise ex

@@ -1,6 +1,6 @@
 ﻿from typing import Union, Iterable, Tuple, List
 
-from otlmow_model.BaseClasses.OTLAttribuut import OTLAttribuut
+from otlmow_model.BaseClasses.OTLObject import OTLAttribuut
 from otlmow_model.BaseClasses.WaardenObject import WaardenObject
 
 
