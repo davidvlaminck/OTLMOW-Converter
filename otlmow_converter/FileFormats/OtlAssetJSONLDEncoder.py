@@ -1,13 +1,8 @@
 import json
 from collections import OrderedDict
-from datetime import date, datetime, time
-from typing import Dict, Union, List
+from typing import Dict
 
-from otlmow_model.BaseClasses.DateField import DateField
-from otlmow_model.BaseClasses.DateTimeField import DateTimeField
-from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
-from otlmow_model.BaseClasses.OTLObject import OTLAttribuut, OTLObject
-from otlmow_model.BaseClasses.TimeField import TimeField
+from otlmow_model.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 
 
 class OtlAssetJSONLDEncoder(json.JSONEncoder):
@@ -25,12 +20,13 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
 
         self.settings = json_settings
 
-    def create_ld_dict_from_asset(self, otl_object: OTLObject, waarde_shortcut=False) -> Dict:
+    @staticmethod
+    def create_ld_dict_from_asset(otl_object: OTLObject, waarde_shortcut=False) -> Dict:
         """Creates a dictionary from an OTLObject"""
         if otl_object.assetId is None or otl_object.assetId.identificator is None:
             raise ValueError('JSON-LD requires the assetId.identificator to not be None.')
 
-        d = self._recursive_create_ld_dict_from_asset(otl_object, waarde_shortcut=waarde_shortcut)
+        d = create_dict_from_asset(otl_object, waarde_shortcut=waarde_shortcut, rdf=True)
         if d is None:
             return {}
         # ns, name = get_ns_and_name_from_uri(otl_object.typeURI)
@@ -39,70 +35,6 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
         d['@id'] = aim_id
         d['@type'] = otl_object.typeURI
         return d
-
-    def _recursive_create_ld_dict_from_asset(self, asset: Union[OTLObject, OTLAttribuut, list, dict],
-                                             waarde_shortcut: bool = False) -> Union[Dict, List[Dict]]:
-        if isinstance(asset, list) and not isinstance(asset, dict):
-            l = []
-            for item in asset:
-                dict_item = self._recursive_create_ld_dict_from_asset(asset=item, waarde_shortcut=waarde_shortcut)
-                if dict_item is not None:
-                    l.append(dict_item)
-            if len(l) > 0:
-                return l
-        else:
-            d = {}
-            for k, v in vars(asset).items():
-                if k in ['_parent', '_geometry_types', '_valid_relations']:
-                    continue
-                if v.waarde is None or v.waarde == []:
-                    continue
-
-                if v.field.waardeObject is not None:  # complex
-                    if waarde_shortcut and v.field.waarde_shortcut_applicable:
-                        if isinstance(v.waarde, list):
-                            dict_item_list = [item.waarde for item in v.waarde]
-                            if len(dict_item_list) > 0:
-                                d[v.objectUri] = dict_item_list
-                        else:
-                            dict_item = v.waarde.waarde
-                            if dict_item is not None:
-                                d[v.objectUri] = dict_item
-                    else:
-                        dict_item = self._recursive_create_ld_dict_from_asset(asset=v.waarde,
-                                                                              waarde_shortcut=waarde_shortcut)
-                        if dict_item is not None:
-                            d[v.objectUri] = dict_item
-                else:
-                    if isinstance(v.waarde, list):
-                        dict_item_list = []
-                        for item in v.waarde:
-                            if v.field == TimeField:
-                                dict_item_list.append(time.strftime(item, "%H:%M:%S"))
-                            elif v.field == DateField:
-                                dict_item_list.append(date.strftime(item, "%Y-%m-%d"))
-                            elif v.field == DateTimeField:
-                                dict_item_list.append(datetime.strftime(item, "%Y-%m-%d %H:%M:%S"))
-                            elif issubclass(v.field, KeuzelijstField):
-                                dict_item_list.append(v.field.options[item].objectUri)
-                            else:
-                                dict_item_list.append(item)
-                        if len(dict_item_list) > 0:
-                            d[v.objectUri] = dict_item_list
-                    else:
-                        if v.field == TimeField:
-                            d[v.objectUri] = time.strftime(v.waarde, format="%H:%M:%S")
-                        elif v.field == DateField:
-                            d[v.objectUri] = date.strftime(v.waarde, "%Y-%m-%d")
-                        elif v.field == DateTimeField:
-                            d[v.objectUri] = datetime.strftime(v.waarde, "%Y-%m-%d %H:%M:%S")
-                        elif issubclass(v.field, KeuzelijstField):
-                            d[v.objectUri] = v.field.options[v.waarde].objectUri
-                        else:
-                            d[v.objectUri] = v.waarde
-
-            if len(d.items()) > 0:
-                return d
 
     def default(self, otl_object):
         if isinstance(otl_object, OTLObject):
