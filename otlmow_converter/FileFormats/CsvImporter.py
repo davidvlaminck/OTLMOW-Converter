@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+
 csv.field_size_limit(2147483647)
 
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -83,7 +84,8 @@ class CsvImporter:
 
                 if cardinality_indicator in self.headers[index]:
                     if self.headers[index].count(cardinality_indicator) > 1:
-                        logging.warning(f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
+                        logging.warning(
+                            f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
                         continue
                     value = row.split(self.settings['dotnotation']['cardinality separator'])
                 else:
@@ -96,14 +98,11 @@ class CsvImporter:
                     self.headers[index] = 'geometry'
 
                 try:
-                    DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=instance,
-                                                                   dotnotation=self.headers[index],
-                                                                   value=value,
-                                                                   convert_warnings=False,
-                                                                   separator=self.settings['dotnotation']['separator'],
-                                                                   cardinality_indicator=cardinality_indicator,
-                                                                   waarde_shortcut_applicable=self.settings['dotnotation'][
-                                                                       'waarde_shortcut_applicable'])
+                    DotnotationHelper.set_attribute_by_dotnotation(
+                        instanceOrAttribute=instance, dotnotation=self.headers[index], value=value,
+                        convert_warnings=False, separator=self.settings['dotnotation']['separator'],
+                        cardinality_indicator=cardinality_indicator,
+                        waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
                 except AttributeError as exc:
                     raise AttributeError(self.headers[index]) from exc
 
