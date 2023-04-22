@@ -1,21 +1,8 @@
 from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
+from otlmow_model.BaseClasses.OTLObject import get_attribute_by_name, get_attribute_by_uri
 
 from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
-
-
-def get_attribute_by_uri(instance_or_attribute, key: str):
-    for k, v in vars(instance_or_attribute).items():
-        if k in ['_parent', '_geometry_types', '_valid_relations']:
-            continue
-
-        if v.objectUri == key:
-            return v
-
-
-def get_attribute_by_name(instance_or_attribute, key: str):
-    attribute_to_set = getattr(instance_or_attribute, '_' + key)
-    return attribute_to_set
 
 
 # dict encoder = asset object to dict
