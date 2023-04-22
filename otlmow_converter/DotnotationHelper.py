@@ -94,6 +94,8 @@ class DotnotationHelper:
                 return collected_attributes
             else:
                 attribute = getattr(instance_or_attribute, first)
+                if isinstance(attribute, list):
+                    attribute = attribute[0]
                 return DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=attribute,
                                                                        dotnotation=rest,
                                                                        cardinality_indicator=cardinality_indicator,

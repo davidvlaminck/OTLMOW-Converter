@@ -33,7 +33,6 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
         # encoded_uri = encode_short_uri(f'{ns}#{name}')
         aim_id = f'https://data.awvvlaanderen.be/id/asset/{otl_object.assetId.identificator}'
         d['@id'] = aim_id
-        d['@type'] = otl_object.typeURI
         return d
 
     def default(self, otl_object):
