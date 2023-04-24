@@ -39,6 +39,7 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
         if isinstance(otl_object, OTLObject):
             d = self.create_ld_dict_from_asset(
                 otl_object, waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
+            # TODO should no longer be required
             if hasattr(otl_object, 'typeURI'):
                 d['https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI'] = otl_object.typeURI
             od = OrderedDict(sorted(d.items()))
