@@ -31,7 +31,7 @@ class JsonDecoder:
                 lijst.append(instance)
 
                 for key, value in obj.items():
-                    if 'typeURI' in key or value == '' or value == [] or key == 'bron' or key == 'doel':
+                    if 'typeURI' in key or value == '' or value == []:
                         continue
 
                     set_value_by_dictitem(instance, key, value, self.settings['dotnotation']['waarde_shortcut_applicable'])
