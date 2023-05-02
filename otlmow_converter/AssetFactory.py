@@ -5,8 +5,6 @@ from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
 from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
-from otlmow_converter.FileFormats.DictDecoder import DictDecoder
-
 
 class AssetFactory:
     @staticmethod
@@ -36,7 +34,7 @@ class AssetFactory:
         new_asset = dynamic_create_instance_from_uri(typeURI, directory=directory)
 
         if len(fields_to_copy) == 0:
-            fields_to_copy = AssetFactory.get_attribute_list_from_object(orig_aim_object)
+            fields_to_copy = [orig_aim_object]
 
         if 'typeURI' in fields_to_copy:
             fields_to_copy.remove('typeURI')
@@ -45,13 +43,6 @@ class AssetFactory:
 
         AssetFactory.copy_fields_from_object_to_new_object(orig_aim_object, new_asset, fields_to_copy)
         return new_asset
-
-    @staticmethod
-    def get_attribute_list_from_object(orig_asset: Union[AIMObject, RelatieObject]) -> List:
-        if orig_asset is None:
-            raise ValueError("input can't be None")
-
-        return list(orig_asset.create_dict_from_asset().keys())
 
     @staticmethod
     def copy_fields_from_object_to_new_object(orig_object: Union[AIMObject, RelatieObject],
