@@ -35,13 +35,6 @@ The core functionality of this library is creating objects of otlmow_model by, e
 <!--- 
 assetfactory
 relationcreator
-formats:
-csv
-xlsx
-json
-jsonld
-ttl
-IFC
 
 -->
 In the following example 100 objects are created and exported to a csv file.
@@ -68,7 +61,7 @@ converter.create_file_from_assets(filepath=Path('new_cameras.json'), list_of_obj
 ```
 
 ## Formats
-The following file formats are supported
+The following file formats are supported in OtlmowConverter
 | File format | Read | Write | DAVIE compliant |
 | --- | --- | --- | --- |
 | CSV | Yes | Yes | Yes |
