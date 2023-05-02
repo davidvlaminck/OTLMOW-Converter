@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     for exoten in list_exoten:
         new_invasieve_exoten = AssetFactory.create_otl_object_using_other_otl_object_as_template(
-            orig_aim_object=exoten, typeURI=InvasieveExoten.typeURI, fields_to_copy=list_of_attributes_to_copy)
+            orig_otl_object=exoten, typeURI=InvasieveExoten.typeURI, fields_to_copy=list_of_attributes_to_copy)
 
         new_invasieve_exoten.assetId.identificator = f'normalized_{exoten.assetId.identificator}'
         list_objects.append(new_invasieve_exoten)

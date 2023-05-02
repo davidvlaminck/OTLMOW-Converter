@@ -8,7 +8,7 @@ from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 class AssetFactory:
     @staticmethod
-    def create_otl_object_using_other_otl_object_as_template(orig_aim_object: OTLObject,
+    def create_otl_object_using_other_otl_object_as_template(orig_otl_object: OTLObject,
                                                              typeURI: str = '', fields_to_copy: [str] = None,
                                                              directory: str = None) -> OTLObject:
         """Creates an OTLObject, using another OTLObject as template.
@@ -22,26 +22,26 @@ class AssetFactory:
         if fields_to_copy is None:
             fields_to_copy = []
 
-        if not isinstance(orig_aim_object, OTLObject):
-            raise ValueError(f'{orig_aim_object} is not an OTLObject, not supported')
+        if not isinstance(orig_otl_object, OTLObject):
+            raise ValueError(f'{orig_otl_object} is not an OTLObject, not supported')
 
         if typeURI != '':
-            if typeURI != orig_aim_object.typeURI and (fields_to_copy == [] or fields_to_copy is None):
-                raise ValueError("parameter typeURI is different from orig_aim_object. parameter fields_to_copy cannot be empty")
+            if typeURI != orig_otl_object.typeURI and (fields_to_copy == [] or fields_to_copy is None):
+                raise ValueError("parameter typeURI is different from orig_otl_object. parameter fields_to_copy cannot be empty")
 
         if typeURI == '':
-            typeURI = orig_aim_object.typeURI
+            typeURI = orig_otl_object.typeURI
         new_asset = dynamic_create_instance_from_uri(typeURI, directory=directory)
 
         if len(fields_to_copy) == 0:
-            fields_to_copy = [orig_aim_object]
+            fields_to_copy = [orig_otl_object]
 
         if 'typeURI' in fields_to_copy:
             fields_to_copy.remove('typeURI')
         if 'assetId' in fields_to_copy:
             fields_to_copy.remove('assetId')
 
-        AssetFactory.copy_fields_from_object_to_new_object(orig_aim_object, new_asset, fields_to_copy)
+        AssetFactory.copy_fields_from_object_to_new_object(orig_otl_object, new_asset, fields_to_copy)
         return new_asset
 
     @staticmethod
