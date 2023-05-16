@@ -49,7 +49,7 @@ class CsvExporter:
                 specific_filename = filepath.stem + '_' + type_name.replace('#', '_') + filepath.suffix
 
                 self._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
-                                 delimiter=delimiter)
+                                 delimiter=delimiter, quote_char=quote_char)
         else:
             data = self.table_exporter.get_data_as_table()
             self._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)

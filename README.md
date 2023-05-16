@@ -35,13 +35,37 @@ The core functionality of this library is creating objects of otlmow_model by, e
 <!--- 
 assetfactory
 relationcreator
-otlmowconverter
-formats:
-csv
-xlsx
-json
-jsonld
-ttl
-IFC
 
 -->
+In the following example 100 objects are created and exported to a csv file.
+```
+from otlmow_converter.OtlmowConverter import OtlmowConverter
+from otlmow_model.Classes.Onderdeel.Camera import Camera
+
+created_assets = []
+for nr in range(1, 100):
+    d = {'toestand': 'in-gebruik', 'isPtz': (nr <= 50),
+        'assetId': {'identificator': f'camera_{nr}'}}
+    created_assets.append(Camera.from_dict(d))
+
+converter = OtlmowConverter()
+converter.create_file_from_assets(filepath=Path('new_cameras.csv'), list_of_objects=created_assets)
+```
+It's also possible to import objects from a file and export it to a different format.
+```
+from otlmow_converter.OtlmowConverter import OtlmowConverter
+
+converter = OtlmowConverter()
+created_assets = converter.create_assets_from_file(filepath=Path('new_cameras.csv'))
+converter.create_file_from_assets(filepath=Path('new_cameras.json'), list_of_objects=created_assets)
+```
+
+## Formats
+The following file formats are supported in OtlmowConverter
+| File format | Read | Write | DAVIE compliant |
+| --- | --- | --- | --- |
+| CSV | Yes | Yes | Yes |
+| Excel | Yes | Yes | Yes |
+| JSON | Yes | Yes | Yes |
+| JSON-LD| Yes | Yes | No |
+| TTL | No | Yes | No |
