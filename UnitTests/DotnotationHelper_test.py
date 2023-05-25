@@ -251,7 +251,6 @@ def test_get_attributes_by_dotnotation_waarde_shortcut(subtests):
                                                    waarde_shortcut_applicable=False)
 
 
-@unittest.skip('is this funcionality we want')
 def test_set_attribute_by_dotnotation_complex_value_convert_scenarios(subtests):
     instance = AllCasesTestClass()
 
@@ -261,6 +260,12 @@ def test_set_attribute_by_dotnotation_complex_value_convert_scenarios(subtests):
                                                        value='value1|value2', convert_warnings=False)
         assert instance.testComplexTypeMetKard[0].testStringField == 'value1'
         assert instance.testComplexTypeMetKard[1].testStringField == 'value2'
+
+    with subtests.test(msg='setting None'):
+        DotnotationHelper.set_attribute_by_dotnotation(instance,
+                                                       dotnotation='testComplexTypeMetKard[].testStringField',
+                                                       value='value1', convert_warnings=False)
+        assert instance.testComplexTypeMetKard[0].testStringField == 'value1'
 
 
 def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, caplog):
