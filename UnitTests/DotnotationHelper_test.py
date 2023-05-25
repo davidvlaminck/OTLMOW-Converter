@@ -380,7 +380,7 @@ def test_set_attributes_by_dotnotation_default_values(subtests):
         assert instance.testComplexType.testComplexType2.testKwantWrd.waarde == 4.0
 
 
-@unittest.skip('chaning settings not yet implemented')
+@unittest.skip('changing settings not yet implemented')
 def test_set_attribute_by_dotnotation_using_settings(subtests):
     DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='()', separator='*', waarde_shortcut_applicable=False)
 
