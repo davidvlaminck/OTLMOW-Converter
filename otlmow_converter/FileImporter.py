@@ -4,6 +4,7 @@ from pathlib import Path
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
+from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 from otlmow_converter.FileFormats.JsonImporter import JsonImporter
 from otlmow_converter.FileFormats.JsonLdImporter import JsonLdImporter
 
@@ -38,6 +39,8 @@ class FileImporter:
             return CsvImporter(settings=settings)
         elif extension == 'json':
             return JsonImporter(settings=settings)
+        elif extension == 'geojson':
+            return GeoJSONImporter(settings=settings)
         elif extension == 'jsonld':
             return JsonLdImporter(settings=settings)
         elif extension in ['xls', 'xlsx']:
