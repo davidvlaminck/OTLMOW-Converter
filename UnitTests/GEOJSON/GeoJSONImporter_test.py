@@ -191,7 +191,7 @@ def test_decode_ComplexTypeMetKard():
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
                            "testComplexTypeMetKard[].testStringField": "string",
-                           "testComplexTypeMetKard[].testBooleanField": True}}]})
+                           "testComplexTypeMetKard[].testBooleanField": 'true'}}]})
 
     assert lijst_objecten[0].testComplexTypeMetKard[0].testStringField == 'string'
     assert lijst_objecten[0].testComplexTypeMetKard[0].testBooleanField

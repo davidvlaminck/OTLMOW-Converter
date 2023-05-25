@@ -1,6 +1,6 @@
 ﻿from typing import Union, Iterable, Tuple, List
 
-from otlmow_model.BaseClasses.OTLObject import OTLAttribuut
+from otlmow_model.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
 from otlmow_model.BaseClasses.WaardenObject import WaardenObject
 
 
@@ -55,73 +55,143 @@ class DotnotationHelper:
 
         return dotnotation
 
-    # TODO add allow_nested_lists parameter
     @staticmethod
-    def get_attributes_by_dotnotation(
-            instance_or_attribute, dotnotation: str, separator: str = '', cardinality_indicator: str = '',
-            waarde_shortcut_applicable: Union[bool, None] = None) -> Union[OTLAttribuut, List[OTLAttribuut]]:
-        """Returns the attribute matching the dotnotation starting from a given class instance name or attribute
+    def get_attribute_by_dotnotation(instance_or_attribute: Union[OTLAttribuut, OTLObject],
+                                     dotnotation: str, separator: str = '.', cardinality_indicator: str = '[]',
+                                     cardinality_seperator: str = '|', waarde_shortcut_applicable: bool = True
+                                     ) -> Union[OTLAttribuut, List[OTLAttribuut]]:
+        """Returns the attribute matching the dotnotation starting from a given class instance name or attribute.
+        If there is an attribute with cardinality > 1, the first instantiated attribute of that list is used.
         :param instance_or_attribute: class or attribute to start the dotnotation from
         :param dotnotation: a string representing a hierarchical structure of attributes
         :type: str
         :return: returns the attribute matching the dotnotation starting from a given class instance name or attribute
-        :rtype: OTLAttribuut or a list of OTLAttribuut
+        :rtype: OTLAttribuut
         """
-        cardinality_indicator, separator, waarde_shortcut_applicable = DotnotationHelper.set_parameters_to_class_vars(
-            cardinality_indicator, separator, waarde_shortcut_applicable)
 
-        if waarde_shortcut_applicable and separator not in dotnotation:
-            attribute = getattr(instance_or_attribute, '_' + dotnotation.replace(cardinality_indicator, ''))
-            if attribute.field.waarde_shortcut_applicable:
-                waardenObject = getattr(instance_or_attribute, dotnotation.replace(cardinality_indicator, ''))
-                if attribute.kardinaliteit_max != '1':
-                    collected_attributes = []
-                    for waardenObject_in_list in waardenObject:
-                        collected_attributes.append(getattr(waardenObject_in_list, '_waarde'))
-                    return collected_attributes
-                else:
-                    return getattr(waardenObject, '_waarde')
+        if len(dotnotation.split(DotnotationHelper.cardinality_indicator)) > 2:
+            raise ValueError("can't use dotnotation for lists of lists")
 
         if separator in dotnotation:
-            first = dotnotation.split(separator)[0]
+            first_part = dotnotation.split(separator)[0]
             rest = dotnotation.split(separator, 1)[1]
-            if cardinality_indicator in first:
-                first = first.replace(cardinality_indicator, '')
-                attribute = getattr(instance_or_attribute, first)
-                collected_attributes = []
-                for attr_in_list in attribute:
-                    collected_attributes.append(DotnotationHelper.get_attributes_by_dotnotation(attr_in_list, rest))
-                return collected_attributes
+            if cardinality_indicator in first_part:
+                first_part = first_part.replace(cardinality_indicator, '')
+                attribute = get_attribute_by_name(instance_or_attribute, first_part)
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                return DotnotationHelper.get_attribute_by_dotnotation(attribute.waarde[0], dotnotation=rest)
             else:
-                attribute = getattr(instance_or_attribute, first)
-                if isinstance(attribute, list):
-                    attribute = attribute[0]
-                return DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=attribute,
-                                                                       dotnotation=rest,
-                                                                       cardinality_indicator=cardinality_indicator,
-                                                                       separator=separator,
-                                                                       waarde_shortcut_applicable=waarde_shortcut_applicable)
+                attribute = get_attribute_by_name(instance_or_attribute, first_part)
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                return DotnotationHelper.get_attribute_by_dotnotation(attribute.waarde, dotnotation=rest)
         else:
+            cardinality = False
             if cardinality_indicator in dotnotation:
-                return getattr(instance_or_attribute, '_' + dotnotation.replace(cardinality_indicator, ''))
-            else:
-                return getattr(instance_or_attribute, '_' + dotnotation)
+                dotnotation = dotnotation.replace(cardinality_indicator, '')
+                cardinality = True
+            attribute = get_attribute_by_name(instance_or_attribute, dotnotation)
+            if attribute.field.waarde_shortcut_applicable and waarde_shortcut_applicable:
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                if cardinality:
+                    return attribute.waarde[0]._waarde
+                return attribute.waarde._waarde
+            return attribute
 
     @staticmethod
-    def set_attribute_by_dotnotation(instanceOrAttribute, dotnotation, value, convert=True,
-                                     convert_warnings: bool = True,
-                                     separator: str = '', cardinality_indicator: str = '',
-                                     waarde_shortcut_applicable: Union[bool, None] = None) -> None:
+    def set_attribute_by_dotnotation(instance_or_attribute, dotnotation: str, value, convert=True, separator: str = '.',
+                                     convert_warnings: bool = True, cardinality_indicator: str = '[]',
+                                     cardinality_seperator: str = '|', waarde_shortcut_applicable: bool = True) -> None:
 
-        cardinality_indicator, separator, waarde_shortcut_applicable = DotnotationHelper.set_parameters_to_class_vars(
-            cardinality_indicator, separator, waarde_shortcut_applicable)
+        if len(dotnotation.split(DotnotationHelper.cardinality_indicator)) > 2:
+            raise ValueError("can't use dotnotation for lists of lists")
+
+        if separator in dotnotation:
+            first_part = dotnotation.split(separator)[0]
+            rest = dotnotation.split(separator, 1)[1]
+
+            if cardinality_indicator in first_part:
+                first_part = first_part.replace(cardinality_indicator, '')
+                attribute = get_attribute_by_name(instance_or_attribute, first_part)
+                for index, v in enumerate(value.split(cardinality_seperator)):
+                    if attribute.waarde is None or len(attribute.waarde) <= index:
+                        attribute.add_empty_value()
+                    DotnotationHelper.set_attribute_by_dotnotation(attribute.waarde[index], dotnotation=rest, value=v)
+                return
+            else:
+                attribute = get_attribute_by_name(instance_or_attribute, first_part)
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                return DotnotationHelper.set_attribute_by_dotnotation(attribute.waarde, dotnotation=rest, value=value)
+
+        else:
+            cardinality = False
+            if cardinality_indicator in dotnotation:
+                dotnotation = dotnotation.replace(cardinality_indicator, '')
+                cardinality = True
+
+            attribute = get_attribute_by_name(instance_or_attribute, dotnotation)
+
+            if attribute.field.waarde_shortcut_applicable and waarde_shortcut_applicable:
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                if cardinality:
+                    value = value.split(cardinality_seperator)
+                    for index, v in enumerate(value):
+                        if len(attribute.waarde) <= index:
+                            attribute.add_empty_value()
+                        attribute.waarde[index]._waarde.set_waarde(v)
+                    return
+                else:
+                    attribute = attribute.waarde._waarde
+
+            if cardinality:
+                value = value.split(cardinality_seperator)
+            attribute.set_waarde(value)
+            return
+
+
+
+        if separator in dotnotation:
+            first_part = dotnotation.split(separator)[0]
+            rest = dotnotation.split(separator, 1)[1]
+            if cardinality_indicator in first_part:
+                first_part = first_part.replace(cardinality_indicator, '')
+                attribute = get_attribute_by_name(instance_or_attribute, first_part)
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                return DotnotationHelper.get_attribute_by_dotnotation(attribute.waarde[0], dotnotation=rest)
+            else:
+                attribute = get_attribute_by_name(instance_or_attribute, first_part)
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                return DotnotationHelper.get_attribute_by_dotnotation(attribute.waarde, dotnotation=rest)
+        else:
+            cardinality = False
+            if cardinality_indicator in dotnotation:
+                dotnotation = dotnotation.replace(cardinality_indicator, '')
+                cardinality = True
+            attribute = get_attribute_by_name(instance_or_attribute, dotnotation)
+            if attribute.field.waarde_shortcut_applicable and waarde_shortcut_applicable:
+                if attribute.waarde is None:
+                    attribute.add_empty_value()
+                if cardinality:
+                    return attribute.waarde[0]._waarde
+                return attribute.waarde._waarde
+            return attribute
+
+
+
+
 
         if dotnotation.count(cardinality_indicator) == 0:
-            gets = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instanceOrAttribute,
-                                                                   dotnotation=dotnotation,
-                                                                   separator=separator,
-                                                                   cardinality_indicator=cardinality_indicator,
-                                                                   waarde_shortcut_applicable=waarde_shortcut_applicable)
+            gets = DotnotationHelper.get_attribute_by_dotnotation(instance_or_attribute=instance_or_attribute,
+                                                                  dotnotation=dotnotation,
+                                                                  separator=separator,
+                                                                  cardinality_indicator=cardinality_indicator,
+                                                                  waarde_shortcut_applicable=waarde_shortcut_applicable)
             if convert:
                 gets.set_waarde(DotnotationHelper.convert_waarde_to_correct_type(value, gets, convert_warnings))
             else:
@@ -132,11 +202,11 @@ class DotnotationHelper:
 
         if separator not in dotnotation:
             # set list directly
-            attribute = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instanceOrAttribute,
-                                                                        dotnotation=dotnotation,
-                                                                        separator=separator,
-                                                                        cardinality_indicator=cardinality_indicator,
-                                                                        waarde_shortcut_applicable=waarde_shortcut_applicable)
+            attribute = DotnotationHelper.get_attribute_by_dotnotation(instance_or_attribute=instance_or_attribute,
+                                                                       dotnotation=dotnotation,
+                                                                       separator=separator,
+                                                                       cardinality_indicator=cardinality_indicator,
+                                                                       waarde_shortcut_applicable=waarde_shortcut_applicable)
 
             if not isinstance(attribute, list) and not attribute.field.waarde_shortcut_applicable:
                 if convert:
@@ -161,7 +231,7 @@ class DotnotationHelper:
                 parent_waarde_attr.add_empty_value()
 
             for index, list_item in enumerate(value):
-                DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=parent_waarde_attr.waarde[index],
+                DotnotationHelper.set_attribute_by_dotnotation(instance_or_attribute=parent_waarde_attr.waarde[index],
                                                                dotnotation='waarde',
                                                                value=list_item,
                                                                convert=convert,
@@ -177,14 +247,14 @@ class DotnotationHelper:
 
         if cardinality_indicator not in first:
             # cardinality indicator not in first part => go one deeper
-            attribute = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instanceOrAttribute,
+            attribute = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instance_or_attribute,
                                                                         dotnotation=first,
                                                                         separator=separator,
                                                                         cardinality_indicator=cardinality_indicator,
                                                                         waarde_shortcut_applicable=waarde_shortcut_applicable)
             if attribute.waarde is None:
                 attribute.add_empty_value()
-            DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde, dotnotation=rest,
+            DotnotationHelper.set_attribute_by_dotnotation(instance_or_attribute=attribute.waarde, dotnotation=rest,
                                                            value=value, convert=convert,
                                                            convert_warnings=convert_warnings, separator=separator,
                                                            cardinality_indicator=cardinality_indicator,
@@ -194,7 +264,7 @@ class DotnotationHelper:
         if cardinality_indicator in first:
             # shortcut waarde can't be applicable to this attribute because there is still a 2nd part in dotnotation
             # this must be a union / complex type
-            attribute = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instanceOrAttribute,
+            attribute = DotnotationHelper.get_attributes_by_dotnotation(instance_or_attribute=instance_or_attribute,
                                                                         dotnotation=first.replace(cardinality_indicator,
                                                                                                   ''),
                                                                         separator=separator,
@@ -208,7 +278,7 @@ class DotnotationHelper:
                 for index, value_item in enumerate(value):
                     if attribute.waarde is None or len(attribute.waarde) <= index:
                         attribute.add_empty_value()
-                    DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde[index],
+                    DotnotationHelper.set_attribute_by_dotnotation(instance_or_attribute=attribute.waarde[index],
                                                                    dotnotation=rest, value=value_item, convert=convert,
                                                                    convert_warnings=convert_warnings, separator=separator,
                                                                    cardinality_indicator=cardinality_indicator,

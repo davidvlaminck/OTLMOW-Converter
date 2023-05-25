@@ -87,7 +87,7 @@ class CsvImporter:
                         logging.warning(
                             f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
                         continue
-                    value = row.split(self.settings['dotnotation']['cardinality_separator'])
+                    value = row
                 else:
                     value = row
 
@@ -99,7 +99,7 @@ class CsvImporter:
 
                 try:
                     DotnotationHelper.set_attribute_by_dotnotation(
-                        instanceOrAttribute=instance, dotnotation=self.headers[index], value=value,
+                        instance_or_attribute=instance, dotnotation=self.headers[index], value=value,
                         convert_warnings=False, separator=self.settings['dotnotation']['separator'],
                         cardinality_indicator=cardinality_indicator,
                         waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
