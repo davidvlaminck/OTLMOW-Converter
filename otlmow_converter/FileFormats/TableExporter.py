@@ -23,7 +23,7 @@ class TableExporter:
             dotnotation_settings = {}
         self.settings = dotnotation_settings
 
-        for required_attribute in ['separator', 'cardinality separator', 'cardinality indicator',
+        for required_attribute in ['separator', 'cardinality_separator', 'cardinality indicator',
                                    'waarde_shortcut_applicable']:
             if required_attribute not in self.settings:
                 raise ValueError("The settings are not loaded or don't contain the full dotnotation settings")
@@ -137,7 +137,7 @@ class TableExporter:
                         list_string += str(list_item)
                 else:
                     list_string += list_item
-                list_string += self.settings['cardinality separator']
+                list_string += self.settings['cardinality_separator']
             return list_string[:-1]
         if values_as_strings and not isinstance(value, str):
             return str(value)

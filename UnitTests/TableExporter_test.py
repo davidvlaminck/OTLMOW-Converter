@@ -35,7 +35,7 @@ class TableExporterTests(unittest.TestCase):
         with self.subTest('load with incorrect settings (attribute missing)'):
             with self.assertRaises(ValueError):
                 TableExporter(dotnotation_settings={
-                    "cardinality separator": "|",
+                    "cardinality_separator": "|",
                     "cardinality indicator": "[]"})
 
         with self.subTest('_import_otl_object otlmow_model'):
@@ -383,7 +383,7 @@ class TableExporterTests(unittest.TestCase):
         with self.subTest('empty list'):
             settings = {
                 "separator": "+",
-                "cardinality separator": "*",
+                "cardinality_separator": "*",
                 "cardinality indicator": "()",
                 "waarde_shortcut_applicable": False
             }

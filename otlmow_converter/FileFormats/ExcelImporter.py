@@ -73,7 +73,7 @@ class ExcelImporter:
                             logging.warning(f'{header} is a list of lists. This is not allowed in the Excel format')
                             continue
 
-                        card_separator = self.settings['dotnotation']['cardinality separator']
+                        card_separator = self.settings['dotnotation']['cardinality_separator']
                         if isinstance(row_value, str) and card_separator in row_value:
                             row_value = row_value.split(card_separator)
                         elif not isinstance(row_value, list):

@@ -87,7 +87,7 @@ class CsvImporter:
                         logging.warning(
                             f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
                         continue
-                    value = row.split(self.settings['dotnotation']['cardinality separator'])
+                    value = row.split(self.settings['dotnotation']['cardinality_separator'])
                 else:
                     value = row
 

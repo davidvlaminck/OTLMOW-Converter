@@ -4,7 +4,7 @@
             "name": "OTLMOW",
             "dotnotation": {
                 "separator": ".",
-                "cardinality separator": "|",
+                "cardinality_separator": "|",
                 "cardinality indicator": "[]",
                 "waarde_shortcut_applicable": false
             }
@@ -13,7 +13,7 @@
             "name": "dwg property set",
             "dotnotation": {
                 "separator": ".",
-                "cardinality separator": "|",
+                "cardinality_separator": "|",
                 "cardinality indicator": "[]",
                 "waarde_shortcut_applicable": true
             }
@@ -22,7 +22,7 @@
             "name": "csv",
             "dotnotation": {
                 "separator": ".",
-                "cardinality separator": "|",
+                "cardinality_separator": "|",
                 "cardinality indicator": "[]",
                 "waarde_shortcut_applicable": true
             },
@@ -32,7 +32,7 @@
             "name": "xls",
             "dotnotation": {
                 "separator": ".",
-                "cardinality separator": "|",
+                "cardinality_separator": "|",
                 "cardinality indicator": "[]",
                 "waarde_shortcut_applicable": true
             }
@@ -41,7 +41,7 @@
             "name": "rvt",
             "dotnotation": {
                 "separator": ".",
-                "cardinality separator": "|",
+                "cardinality_separator": "|",
                 "cardinality indicator": "[]",
                 "waarde_shortcut_applicable": true
             }
@@ -50,7 +50,7 @@
             "name": "geojson",
             "dotnotation": {
                 "separator": ".",
-                "cardinality separator": "|",
+                "cardinality_separator": "|",
                 "cardinality indicator": "[]",
                 "waarde_shortcut_applicable": true
             }
@@ -77,7 +77,7 @@
             "name": "geojson",
             "dotnotation": {
                 "separator": ".",
-                "cardinality separator": "|",
+                "cardinality_separator": "|",
                 "cardinality indicator": "[]",
                 "waarde_shortcut_applicable": true
             }
