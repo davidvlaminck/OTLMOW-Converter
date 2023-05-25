@@ -68,7 +68,7 @@ def test_decode_StringfieldMetKard():
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-                           "testStringFieldMetKard": ["string", "string2"]}}]})
+                           "testStringFieldMetKard[]": "string|string2"}}]})
 
     assert lijst_objecten[0].testStringFieldMetKard == ["string", "string2"]
 
@@ -152,8 +152,8 @@ def test_decode_testKwantWrdMetKard():
         class_directory='UnitTests.TestClasses.Classes', data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
-            "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-                           "testKwantWrdMetKard": [4.5, 6.5]}}]})
+            "properties": {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+                           'testKwantWrdMetKard[]': '4.5|6.5'}}]})
 
     assert lijst_objecten[0].testKwantWrdMetKard[0].waarde == 4.5
     assert lijst_objecten[0].testKwantWrdMetKard[1].waarde == 6.5
@@ -190,8 +190,8 @@ def test_decode_ComplexTypeMetKard():
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-                           "testComplexTypeMetKard[].testStringField": ["string"],
-                           "testComplexTypeMetKard[].testBooleanField": [True]}}]})
+                           "testComplexTypeMetKard[].testStringField": "string",
+                           "testComplexTypeMetKard[].testBooleanField": True}}]})
 
     assert lijst_objecten[0].testComplexTypeMetKard[0].testStringField == 'string'
     assert lijst_objecten[0].testComplexTypeMetKard[0].testBooleanField
