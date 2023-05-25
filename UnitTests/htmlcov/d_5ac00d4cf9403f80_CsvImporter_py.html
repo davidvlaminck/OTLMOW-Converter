@@ -64,8 +64,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_DictDecoder_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.5">coverage.py v7.2.5</a>,
-            created at 2023-05-02 12:51 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.6">coverage.py v7.2.6</a>,
+            created at 2023-05-25 14:51 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -169,7 +169,7 @@
     <p class="run"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">                        <span class="nam">logging</span><span class="op">.</span><span class="nam">warning</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">                            <span class="str">f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">                        <span class="key">continue</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">                    <span class="nam">value</span> <span class="op">=</span> <span class="nam">row</span><span class="op">.</span><span class="nam">split</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">settings</span><span class="op">[</span><span class="str">'dotnotation'</span><span class="op">]</span><span class="op">[</span><span class="str">'cardinality separator'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">                    <span class="nam">value</span> <span class="op">=</span> <span class="nam">row</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t">                <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t">                    <span class="nam">value</span> <span class="op">=</span> <span class="nam">row</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -181,7 +181,7 @@
     <p class="pln"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">                <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">                    <span class="nam">DotnotationHelper</span><span class="op">.</span><span class="nam">set_attribute_by_dotnotation</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">                        <span class="nam">instanceOrAttribute</span><span class="op">=</span><span class="nam">instance</span><span class="op">,</span> <span class="nam">dotnotation</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">headers</span><span class="op">[</span><span class="nam">index</span><span class="op">]</span><span class="op">,</span> <span class="nam">value</span><span class="op">=</span><span class="nam">value</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">                        <span class="nam">instance_or_attribute</span><span class="op">=</span><span class="nam">instance</span><span class="op">,</span> <span class="nam">dotnotation</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">headers</span><span class="op">[</span><span class="nam">index</span><span class="op">]</span><span class="op">,</span> <span class="nam">value</span><span class="op">=</span><span class="nam">value</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">                        <span class="nam">convert_warnings</span><span class="op">=</span><span class="key">False</span><span class="op">,</span> <span class="nam">separator</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">settings</span><span class="op">[</span><span class="str">'dotnotation'</span><span class="op">]</span><span class="op">[</span><span class="str">'separator'</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">                        <span class="nam">cardinality_indicator</span><span class="op">=</span><span class="nam">cardinality_indicator</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">                        <span class="nam">waarde_shortcut_applicable</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">settings</span><span class="op">[</span><span class="str">'dotnotation'</span><span class="op">]</span><span class="op">[</span><span class="str">'waarde_shortcut_applicable'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -197,8 +197,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_DictDecoder_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.5">coverage.py v7.2.5</a>,
-            created at 2023-05-02 12:51 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.6">coverage.py v7.2.6</a>,
+            created at 2023-05-25 14:51 +0000
         </p>
     </div>
 </footer>
