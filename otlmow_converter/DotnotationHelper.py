@@ -201,14 +201,19 @@ class DotnotationHelper:
                                                                         cardinality_indicator=cardinality_indicator,
                                                                         waarde_shortcut_applicable=waarde_shortcut_applicable)
 
-            for index, value_item in enumerate(value):
-                if attribute.waarde is None or len(attribute.waarde) <= index:
-                    attribute.add_empty_value()
-                DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde[index],
-                                                               dotnotation=rest, value=value_item, convert=convert,
-                                                               convert_warnings=convert_warnings, separator=separator,
-                                                               cardinality_indicator=cardinality_indicator,
-                                                               waarde_shortcut_applicable=waarde_shortcut_applicable)
+            if not isinstance(value, list):
+                value = value.split('|')
+
+            if isinstance(value, list):
+                for index, value_item in enumerate(value):
+                    if attribute.waarde is None or len(attribute.waarde) <= index:
+                        attribute.add_empty_value()
+                    DotnotationHelper.set_attribute_by_dotnotation(instanceOrAttribute=attribute.waarde[index],
+                                                                   dotnotation=rest, value=value_item, convert=convert,
+                                                                   convert_warnings=convert_warnings, separator=separator,
+                                                                   cardinality_indicator=cardinality_indicator,
+                                                                   waarde_shortcut_applicable=waarde_shortcut_applicable)
+
 
     @classmethod
     def list_attributes_and_values_by_dotnotation(cls, asset=None, waarde_shortcut: bool = False, separator: str = '.',
