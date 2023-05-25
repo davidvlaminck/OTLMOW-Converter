@@ -117,4 +117,3 @@ def test_load_test_ested_attributes_2_levels():
     assert instance.testComplexTypeMetKard[1].testComplexType2.testStringField == 'string2'
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testKwantWrd.waarde is None
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
-
