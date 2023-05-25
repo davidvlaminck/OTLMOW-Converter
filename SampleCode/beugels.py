@@ -14,7 +14,7 @@ from otlmow_converter.OtlmowConverter import OtlmowConverter
 if __name__ == '__main__':
     converter = OtlmowConverter()
 
-    assets = converter.create_assets_from_file(Path('DA-2023-00340_export.json'))
+    assets = converter.create_assets_from_file(Path('DA-2023-00435_export_dev.json'))
     beugel_dict = {a.assetId.identificator: a for a in assets if isinstance(a, Bevestigingsbeugel)}
 
     steun_types = [Seinbrug.typeURI, WVLichtmast.typeURI, Lichtmast.typeURI, RechteSteun.typeURI]
@@ -58,4 +58,4 @@ if __name__ == '__main__':
             bypass_relatie.doelAssetId = beugel.camera_id
             aan_te_leveren.append(bypass_relatie)
 
-    converter.create_file_from_assets(filepath=Path('nieuwe_bevestigingen.json'), list_of_objects=aan_te_leveren)
+    converter.create_file_from_assets(filepath=Path('nieuwe_bevestigingen_dev.json'), list_of_objects=aan_te_leveren)
