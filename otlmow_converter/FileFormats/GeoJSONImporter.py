@@ -50,7 +50,7 @@ class GeoJSONImporter:
 
                 DotnotationHelper.set_attribute_by_dotnotation(
                     instance_or_attribute=asset, dotnotation=dotnotation, value=props[dotnotation],
-                    waarde_shortcut_applicable=settings_wsc, separator=settings_sep,
+                    waarde_shortcut=settings_wsc, separator=settings_sep,
                     cardinality_indicator=settings_card)
 
             if 'geometry' in data_object:

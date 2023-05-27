@@ -102,7 +102,7 @@ class CsvImporter:
                         instance_or_attribute=instance, dotnotation=self.headers[index], value=value,
                         convert_warnings=False, separator=self.settings['dotnotation']['separator'],
                         cardinality_indicator=cardinality_indicator,
-                        waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                        waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
                 except AttributeError as exc:
                     raise AttributeError(self.headers[index]) from exc
 

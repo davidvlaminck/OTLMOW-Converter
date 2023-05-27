@@ -385,7 +385,7 @@ class TableExporterTests(unittest.TestCase):
                 "separator": "+",
                 "cardinality_separator": "*",
                 "cardinality indicator": "()",
-                "waarde_shortcut_applicable": False
+                "waarde_shortcut": False
             }
             exporter = TableExporter(dotnotation_settings=settings, class_directory='UnitTests.TestClasses.Classes')
 

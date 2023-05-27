@@ -124,22 +124,19 @@ def test_get_dotnotation_default_values_waarde_shortcut(subtests):
     instance = AllCasesTestClass()
     with subtests.test(msg='attribute 2 levels deep with waarde shortcut enabled'):
         dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrd._waarde,
-                                                          waarde_shortcut_applicable=True)
+                                                          waarde_shortcut=True)
         assert dotnotation == 'testKwantWrd'
 
     with subtests.test(msg='attribute 2 levels deep with waarde shortcut enabled and cardinality > 1'):
         dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrdMetKard[0]._waarde,
-                                                          waarde_shortcut_applicable=True)
+                                                          waarde_shortcut=True)
         assert dotnotation == 'testKwantWrdMetKard[]'
 
     with subtests.test(msg='attribute 4 levels deep with waarde shortcut disabled'):
         dotnotation = DotnotationHelper().get_dotnotation(
             instance.testComplexType.testComplexType2.testKwantWrd._waarde,
-            waarde_shortcut_applicable=True)
+            waarde_shortcut=True)
         assert dotnotation == 'testComplexType.testComplexType2.testKwantWrd'
-
-    DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
-                                                   waarde_shortcut_applicable=False)
 
 
 def test_get_dotnotation_default_values(subtests):
@@ -153,7 +150,7 @@ def test_get_dotnotation_default_values(subtests):
         assert dotnotation == 'testStringFieldMetKard[]'
 
     with subtests.test(msg='attribute 2 levels deep with waarde shortcut disabled'):
-        dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrd._waarde)
+        dotnotation = DotnotationHelper().get_dotnotation(instance.testKwantWrd._waarde, waarde_shortcut=False)
         assert dotnotation == 'testKwantWrd.waarde'
 
     with subtests.test(msg='attribute 2 levels deep'):
@@ -173,7 +170,8 @@ def test_get_dotnotation_default_values(subtests):
         assert dotnotation == 'testComplexTypeMetKard[].testComplexType2MetKard[].testStringField'
 
     with subtests.test(msg='attribute 4 levels deep with waarde shortcut disabled'):
-        dotnotation = DotnotationHelper().get_dotnotation(instance.testComplexType.testComplexType2.testKwantWrd._waarde)
+        dotnotation = DotnotationHelper().get_dotnotation(instance.testComplexType.testComplexType2.testKwantWrd._waarde,
+                                                          waarde_shortcut=False)
         assert dotnotation == 'testComplexType.testComplexType2.testKwantWrd.waarde'
 
 
@@ -192,7 +190,7 @@ def test_get_attribute_by_dotnotation_default_values(subtests):
 
     with subtests.test(msg='attribute 2 levels deep with waarde shortcut disabled'):
         result_attribute = DotnotationHelper.get_attribute_by_dotnotation(instance, 'testKwantWrd.waarde',
-                                                                          waarde_shortcut_applicable=False)
+                                                                          waarde_shortcut=False)
         expected_attribute = instance.testKwantWrd._waarde
         assert result_attribute == expected_attribute
 
@@ -236,9 +234,6 @@ def test_get_attribute_by_dotnotation_default_values(subtests):
 
 
 def test_get_attribute_by_dotnotation_waarde_shortcut(subtests):
-    DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
-                                                   waarde_shortcut_applicable=True)
-
     instance = AllCasesTestClass()
     with subtests.test(msg='attribute 2 levels deep with waarde shortcut enabled'):
         result_attribute = DotnotationHelper.get_attribute_by_dotnotation(instance, 'testKwantWrd')
@@ -255,9 +250,6 @@ def test_get_attribute_by_dotnotation_waarde_shortcut(subtests):
                                                                            'testComplexType.testComplexType2.testKwantWrd')
         expected_attribute = instance.testComplexType.testComplexType2.testKwantWrd._waarde
         assert result_attribute.objectUri == expected_attribute.objectUri
-
-    DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
-                                                   waarde_shortcut_applicable=False)
 
 
 def test_set_attribute_by_dotnotation_complex_value_convert_scenarios(subtests):
@@ -329,8 +321,6 @@ def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, 
 
 
 def test_set_attributes_by_dotnotation_default_values(subtests):
-    DotnotationHelper.set_parameters_to_class_vars(cardinality_indicator='[]', separator='.',
-                                                   waarde_shortcut_applicable=False)
     instance = AllCasesTestClass()
 
     with subtests.test(msg='attribute 1 level deep'):
@@ -380,33 +370,26 @@ def test_set_attributes_by_dotnotation_default_values(subtests):
         assert instance.testComplexType.testComplexType2.testKwantWrd.waarde == 4.0
 
 
-@unittest.skip('changing settings not yet implemented')
 def test_set_attribute_by_dotnotation_using_settings(subtests):
-    DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='()', separator='*', waarde_shortcut_applicable=False)
+    dnh = DotnotationHelper(cardinality_indicator='()', separator='*', waarde_shortcut=False, cardinality_separator='/')
 
     instance = AllCasesTestClass()
 
     with subtests.test(msg='attribute 1 level deep with cardinality > 1'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testStringFieldMetKard()', ['a', 'b'])
+        dnh.set_attribute_by_dotnotation_instance(instance, 'testStringFieldMetKard()', 'a/b')
         assert instance.testStringFieldMetKard == ['a', 'b']
 
     with subtests.test(msg='attribute 2 levels deep'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testComplexType*testStringField', "abc")
+        dnh.set_attribute_by_dotnotation_instance(instance, 'testComplexType*testStringField', "abc")
         assert instance.testComplexType.testStringField == 'abc'
 
     with subtests.test(msg='attribute 2 levels deep with cardinality > 1'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance,
-                                                       'testComplexTypeMetKard()*testStringField', '1.1|1.2')
+        dnh.set_attribute_by_dotnotation_instance(instance,
+                                                       'testComplexTypeMetKard()*testStringField', '1.1/1.2')
         assert instance.testComplexTypeMetKard[1].testStringField == '1.2'
-
-    DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
-                                                   waarde_shortcut_applicable=False)
 
 
 def test_set_attribute_by_dotnotation_waarde_shortcut(subtests):
-    DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
-                                                   waarde_shortcut_applicable=True)
-
     instance = AllCasesTestClass()
 
     with subtests.test(msg='attribute 1 level deep with waarde shortcut enabled'):
@@ -437,6 +420,3 @@ def test_set_attribute_by_dotnotation_waarde_shortcut(subtests):
                                                        '6.0|7.0')
         assert instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde == 6.0
         assert instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde == 7.0
-
-    DotnotationHelper.set_class_vars_to_parameters(cardinality_indicator='[]', separator='.',
-                                                   waarde_shortcut_applicable=False)

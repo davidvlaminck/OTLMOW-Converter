@@ -9,7 +9,7 @@ from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 def set_up_importer():
     return GeoJSONImporter(
         settings={'file_formats': [{"name": "geojson", "dotnotation": {
-            "waarde_shortcut_applicable": True,
+            "waarde_shortcut": True,
             "separator": '.',
             'cardinality indicator': '[]'
         }}]})

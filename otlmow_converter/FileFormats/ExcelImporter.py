@@ -84,7 +84,7 @@ class ExcelImporter:
                             convert_warnings=False,
                             separator=self.settings['dotnotation']['separator'],
                             cardinality_indicator=cardinality_indicator,
-                            waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                            waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
                     except TypeError as type_error:
                         if 'Expecting a string' in type_error.args[0]:
                             DotnotationHelper.set_attribute_by_dotnotation(
@@ -92,7 +92,7 @@ class ExcelImporter:
                                 convert_warnings=False,
                                 separator=self.settings['dotnotation']['separator'],
                                 cardinality_indicator=cardinality_indicator,
-                                waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                                waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
                         else:
                             raise type_error
 
