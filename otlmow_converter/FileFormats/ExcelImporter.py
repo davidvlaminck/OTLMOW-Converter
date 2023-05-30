@@ -22,6 +22,7 @@ class ExcelImporter:
             raise ValueError("Unable to find xls in file formats settings")
 
         self.settings = xls_settings
+        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
         self.data: Dict[str, List] = {}
         self.objects = []
 
@@ -79,20 +80,14 @@ class ExcelImporter:
                             row_value = None
 
                     try:
-                        DotnotationHelper.set_attribute_by_dotnotation(
+                        self.dotnotation_helper.set_attribute_by_dotnotation_instance(
                             instance_or_attribute=instance, dotnotation=header, value=row_value,
-                            convert_warnings=False,
-                            separator=self.settings['dotnotation']['separator'],
-                            cardinality_indicator=cardinality_indicator,
-                            waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
+                            convert_warnings=False)
                     except TypeError as type_error:
                         if 'Expecting a string' in type_error.args[0]:
-                            DotnotationHelper.set_attribute_by_dotnotation(
+                            self.dotnotation_helper.set_attribute_by_dotnotation_instance(
                                 instance_or_attribute=instance, dotnotation=header, value=str(row_value),
-                                convert_warnings=False,
-                                separator=self.settings['dotnotation']['separator'],
-                                cardinality_indicator=cardinality_indicator,
-                                waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
+                                convert_warnings=False)
                         else:
                             raise type_error
 

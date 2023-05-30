@@ -35,7 +35,8 @@ class FileImporterTests(TestCase):
             FileImporter.get_importer_from_extension(extension='jpg', settings={})
 
     def test_get_importer_from_extension_valid_extensions(self):
-        empty_settings = {'file_formats': [{'name': 'csv'}, {'name': 'json'},  {'name': 'xls'}]}
+        empty_settings = {'file_formats': [{'name': 'csv', 'dotnotation': {}}, {'name': 'json', 'dotnotation': {}},
+                                           {'name': 'xls', 'dotnotation': {}}]}
         importer = FileImporter.get_importer_from_extension(extension='csv', settings=empty_settings)
         self.assertIsInstance(importer, CsvImporter)
 

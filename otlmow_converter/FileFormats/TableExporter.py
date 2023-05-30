@@ -107,9 +107,8 @@ class TableExporter:
                 toegekend_door_key: otl_object.assetId.toegekendDoor
             }
 
-            for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(
-                    asset=otl_object, waarde_shortcut=self.settings['waarde_shortcut'],
-                    cardinality_indicator=self.settings['cardinality_indicator'], separator=self.settings['separator']):
+            for k, v in self.dotnotation_helper.list_attributes_and_values_by_dotnotation_instance(
+                    instance_or_attribute=otl_object):
                 if k in [identificator_key, toegekend_door_key]:
                     continue
                 if k not in self.master[short_uri]['headers']:

@@ -24,6 +24,7 @@ class CsvImporter:
             raise ValueError("Unable to find csv in file formats settings")
 
         self.settings = csv_settings
+        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
         self.headers = []
         self.data = [[]]
         self.objects = []
@@ -98,11 +99,9 @@ class CsvImporter:
                     self.headers[index] = 'geometry'
 
                 try:
-                    DotnotationHelper.set_attribute_by_dotnotation(
+                    self.dotnotation_helper.set_attribute_by_dotnotation_instance(
                         instance_or_attribute=instance, dotnotation=self.headers[index], value=value,
-                        convert_warnings=False, separator=self.settings['dotnotation']['separator'],
-                        cardinality_indicator=cardinality_indicator,
-                        waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
+                        convert_warnings=False)
                 except AttributeError as exc:
                     raise AttributeError(self.headers[index]) from exc
 
