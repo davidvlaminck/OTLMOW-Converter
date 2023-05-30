@@ -32,9 +32,9 @@ class GeoJSONImporter:
 
     def decode_objects(self, data, ignore_failed_objects: bool = False, class_directory: str = None):
         list_of_objects = []
-        settings_wsc = self.settings['dotnotation']['waarde_shortcut_applicable']
+        settings_wsc = self.settings['dotnotation']['waarde_shortcut']
         settings_sep = self.settings['dotnotation']['separator']
-        settings_card = self.settings['dotnotation']['cardinality indicator']
+        settings_card = self.settings['dotnotation']['cardinality_indicator']
 
         for data_object in data['features']:
             props = data_object['properties']

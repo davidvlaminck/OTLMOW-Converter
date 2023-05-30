@@ -5,8 +5,8 @@
             "dotnotation": {
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality indicator": "[]",
-                "waarde_shortcut_applicable": false
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": false
             }
         },
         {
@@ -14,8 +14,8 @@
             "dotnotation": {
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality indicator": "[]",
-                "waarde_shortcut_applicable": true
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": true
             }
         },
         {
@@ -23,8 +23,8 @@
             "dotnotation": {
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality indicator": "[]",
-                "waarde_shortcut_applicable": true
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": true
             },
             "delimiter": ";"
         },
@@ -33,8 +33,8 @@
             "dotnotation": {
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality indicator": "[]",
-                "waarde_shortcut_applicable": true
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": true
             }
         },
         {
@@ -42,8 +42,8 @@
             "dotnotation": {
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality indicator": "[]",
-                "waarde_shortcut_applicable": true
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": true
             }
         },
         {
@@ -51,26 +51,26 @@
             "dotnotation": {
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality indicator": "[]",
-                "waarde_shortcut_applicable": true
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": true
             }
         },
         {
             "name": "json",
             "dotnotation": {
-                "waarde_shortcut_applicable": true
+                "waarde_shortcut": true
             }
         },
         {
             "name": "jsonld",
             "dotnotation": {
-                "waarde_shortcut_applicable": false
+                "waarde_shortcut": false
             }
         },
         {
             "name": "ttl",
             "dotnotation": {
-                "waarde_shortcut_applicable": false
+                "waarde_shortcut": false
             }
         },
         {
@@ -78,8 +78,8 @@
             "dotnotation": {
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality indicator": "[]",
-                "waarde_shortcut_applicable": true
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": true
             }
         }
     ]

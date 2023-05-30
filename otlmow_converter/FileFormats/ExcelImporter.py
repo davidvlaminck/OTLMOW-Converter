@@ -53,7 +53,7 @@ class ExcelImporter:
             if 'class_directory' in kwargs:
                 class_directory = kwargs['class_directory']
 
-        cardinality_indicator = self.settings['dotnotation']['cardinality indicator']
+        cardinality_indicator = self.settings['dotnotation']['cardinality_indicator']
 
         for sheet, data in self.data.items():
             headers = data[0]
@@ -84,7 +84,7 @@ class ExcelImporter:
                             convert_warnings=False,
                             separator=self.settings['dotnotation']['separator'],
                             cardinality_indicator=cardinality_indicator,
-                            waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                            waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
                     except TypeError as type_error:
                         if 'Expecting a string' in type_error.args[0]:
                             DotnotationHelper.set_attribute_by_dotnotation(
@@ -92,7 +92,7 @@ class ExcelImporter:
                                 convert_warnings=False,
                                 separator=self.settings['dotnotation']['separator'],
                                 cardinality_indicator=cardinality_indicator,
-                                waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                                waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
                         else:
                             raise type_error
 

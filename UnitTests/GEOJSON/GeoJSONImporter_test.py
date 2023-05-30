@@ -11,7 +11,7 @@ def set_up_importer():
         settings={'file_formats': [{"name": "geojson", "dotnotation": {
             "waarde_shortcut": True,
             "separator": '.',
-            'cardinality indicator': '[]'
+            'cardinality_indicator': '[]'
         }}]})
 
 

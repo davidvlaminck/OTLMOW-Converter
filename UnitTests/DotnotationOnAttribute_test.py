@@ -18,15 +18,21 @@ def test_dotnotation_on_attribute(subtests):
 
     with subtests.test(msg='complex attribute'):
         assert DotnotationHelper.get_dotnotation(instance._testComplexType) == 'testComplexType'
-        assert DotnotationHelper.get_dotnotation(instance.testComplexType._testBooleanField) == 'testComplexType.testBooleanField'
-        assert DotnotationHelper.get_dotnotation(instance.testComplexType._testComplexType2) == 'testComplexType.testComplexType2'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testComplexType._testBooleanField) == 'testComplexType.testBooleanField'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testComplexType._testComplexType2) == 'testComplexType.testComplexType2'
         assert DotnotationHelper.get_dotnotation(
             instance.testComplexType.testComplexType2._testStringField) == 'testComplexType.testComplexType2.testStringField'
         assert DotnotationHelper.get_dotnotation(
-            instance.testComplexType.testComplexType2._testKwantWrd) == 'testComplexType.testComplexType2.testKwantWrd.waarde'
+            waarde_shortcut=False,
+            attribute=instance.testComplexType.testComplexType2._testKwantWrd) == 'testComplexType.testComplexType2.testKwantWrd'
         assert DotnotationHelper.get_dotnotation(
             instance.testComplexType.testComplexType2.testKwantWrd._waarde,
-            waarde_shortcut=True) == 'testComplexType.testComplexType2.testKwantWrd.waarde'
+            waarde_shortcut=False) == 'testComplexType.testComplexType2.testKwantWrd.waarde'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testComplexType.testComplexType2.testKwantWrd._waarde,
+            waarde_shortcut=True) == 'testComplexType.testComplexType2.testKwantWrd'
 
     with subtests.test(msg='complex attribute with cardinality'):
         assert 'testComplexTypeMetKard[]' == DotnotationHelper.get_dotnotation(instance._testComplexTypeMetKard)
@@ -52,20 +58,23 @@ def test_dotnotation_on_attribute(subtests):
         assert DotnotationHelper.get_dotnotation(instance._testEenvoudigType) == 'testEenvoudigType'
 
     with subtests.test(msg='kwant waarde attribute'):
-        assert DotnotationHelper.get_dotnotation(instance._testKwantWrd) == 'testKwantWrd'
-        assert DotnotationHelper.get_dotnotation(instance.testKwantWrd._waarde) == 'testKwantWrd.waarde'
-        assert DotnotationHelper.get_dotnotation(instance.testKwantWrd._standaardEenheid) == 'testKwantWrd.standaardEenheid'
-        assert DotnotationHelper.get_dotnotation(instance._testKwantWrdMetKard) == 'testKwantWrdMetKard[]'
-        assert DotnotationHelper.get_dotnotation(instance.testKwantWrdMetKard[0]._waarde) == 'testKwantWrdMetKard[].waarde'
-        assert DotnotationHelper.get_dotnotation(instance.testKwantWrdMetKard[0]._standaardEenheid) == 'testKwantWrdMetKard[' \
-                                                                                                       '].standaardEenheid'
+        assert DotnotationHelper.get_dotnotation(instance._testKwantWrd, waarde_shortcut=False) == 'testKwantWrd'
+        assert DotnotationHelper.get_dotnotation(instance.testKwantWrd._waarde, waarde_shortcut=False) == 'testKwantWrd.waarde'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testKwantWrd._standaardEenheid) == 'testKwantWrd.standaardEenheid'
+        assert DotnotationHelper.get_dotnotation(instance._testKwantWrdMetKard, waarde_shortcut=False) == 'testKwantWrdMetKard[]'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testKwantWrdMetKard[0]._waarde, waarde_shortcut=False) == 'testKwantWrdMetKard[].waarde'
+        assert DotnotationHelper.get_dotnotation(
+            instance.testKwantWrdMetKard[0]._standaardEenheid) == 'testKwantWrdMetKard[' \
+                                                                  '].standaardEenheid'
 
     with subtests.test(msg='union attribute'):
         assert DotnotationHelper.get_dotnotation(instance._testUnionType) == 'testUnionType'
         assert DotnotationHelper.get_dotnotation(instance.testUnionType._unionString) == 'testUnionType.unionString'
         assert DotnotationHelper.get_dotnotation(instance.testUnionType._unionKwantWrd) == 'testUnionType.unionKwantWrd'
         assert DotnotationHelper.get_dotnotation(
-            instance.testUnionType.unionKwantWrd._waarde) == 'testUnionType.unionKwantWrd.waarde'
+            instance.testUnionType.unionKwantWrd._waarde, waarde_shortcut=False) == 'testUnionType.unionKwantWrd.waarde'
 
     with subtests.test(msg='union attribute with cardinality'):
         assert DotnotationHelper.get_dotnotation(instance._testUnionTypeMetKard) == 'testUnionTypeMetKard[]'

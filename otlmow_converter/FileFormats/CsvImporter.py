@@ -80,7 +80,7 @@ class CsvImporter:
                 if self.headers[index] in ['bron.typeURI', 'doel.typeURI']:
                     continue  # TODO get bron and doel
 
-                cardinality_indicator = self.settings['dotnotation']['cardinality indicator']
+                cardinality_indicator = self.settings['dotnotation']['cardinality_indicator']
 
                 if cardinality_indicator in self.headers[index]:
                     if self.headers[index].count(cardinality_indicator) > 1:
@@ -102,7 +102,7 @@ class CsvImporter:
                         instance_or_attribute=instance, dotnotation=self.headers[index], value=value,
                         convert_warnings=False, separator=self.settings['dotnotation']['separator'],
                         cardinality_indicator=cardinality_indicator,
-                        waarde_shortcut=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                        waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
                 except AttributeError as exc:
                     raise AttributeError(self.headers[index]) from exc
 
