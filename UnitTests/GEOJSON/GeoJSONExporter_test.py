@@ -185,9 +185,9 @@ def test_convert_wkt_string_to_geojson_point():
 
 def test_convert_wkt_string_to_geojson_polygon():
     exporter = set_up_exporter()
-    point = exporter.convert_wkt_string_to_geojson(
+    polygon = exporter.convert_wkt_string_to_geojson(
         'POLYGON Z ((200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.8 0, 200000.1 200000.2 0))')
-    assert point == {
+    assert polygon == {
         "type": "Polygon",
         "coordinates": [[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0], [200000.1, 200000.2, 0]]],
         "bbox": [200000.1, 200000.2, 0, 200000.5, 200000.8, 0],
@@ -196,9 +196,9 @@ def test_convert_wkt_string_to_geojson_polygon():
 
 def test_convert_wkt_string_to_geojson_multipolygon():
     exporter = set_up_exporter()
-    point = exporter.convert_wkt_string_to_geojson(
+    multipolygon = exporter.convert_wkt_string_to_geojson(
         'MULTIPOLYGON Z (((200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.8 0, 200000.1 200000.2 0)), ((200002.1 200002.2 0, 200002.3 200002.4 0, 200002.5 200002.8 0, 200002.1 200002.2 0)))')
-    assert point == {
+    assert multipolygon == {
         "type": "MultiPolygon",
         "coordinates": [[[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
                           [200000.1, 200000.2, 0]]],
