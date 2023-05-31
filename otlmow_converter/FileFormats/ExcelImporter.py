@@ -22,6 +22,7 @@ class ExcelImporter:
             raise ValueError("Unable to find xls in file formats settings")
 
         self.settings = xls_settings
+        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
         self.data: Dict[str, List] = {}
         self.objects = []
 
@@ -53,7 +54,7 @@ class ExcelImporter:
             if 'class_directory' in kwargs:
                 class_directory = kwargs['class_directory']
 
-        cardinality_indicator = self.settings['dotnotation']['cardinality indicator']
+        cardinality_indicator = self.settings['dotnotation']['cardinality_indicator']
 
         for sheet, data in self.data.items():
             headers = data[0]
@@ -73,32 +74,20 @@ class ExcelImporter:
                             logging.warning(f'{header} is a list of lists. This is not allowed in the Excel format')
                             continue
 
-                        card_separator = self.settings['dotnotation']['cardinality separator']
-                        if isinstance(row_value, str) and card_separator in row_value:
-                            row_value = row_value.split(card_separator)
-                        elif not isinstance(row_value, list):
-                            row_value = [row_value]
-
                     # clear geom
                     if header == 'geometry':
                         if row_value == '':
                             row_value = None
 
                     try:
-                        DotnotationHelper.set_attribute_by_dotnotation(
-                            instanceOrAttribute=instance, dotnotation=header, value=row_value,
-                            convert_warnings=False,
-                            separator=self.settings['dotnotation']['separator'],
-                            cardinality_indicator=cardinality_indicator,
-                            waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                        self.dotnotation_helper.set_attribute_by_dotnotation_instance(
+                            instance_or_attribute=instance, dotnotation=header, value=row_value,
+                            convert_warnings=False)
                     except TypeError as type_error:
                         if 'Expecting a string' in type_error.args[0]:
-                            DotnotationHelper.set_attribute_by_dotnotation(
-                                instanceOrAttribute=instance, dotnotation=header, value=str(row_value),
-                                convert_warnings=False,
-                                separator=self.settings['dotnotation']['separator'],
-                                cardinality_indicator=cardinality_indicator,
-                                waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                            self.dotnotation_helper.set_attribute_by_dotnotation_instance(
+                                instance_or_attribute=instance, dotnotation=header, value=str(row_value),
+                                convert_warnings=False)
                         else:
                             raise type_error
 

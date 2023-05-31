@@ -118,7 +118,7 @@ jsonDataCase6 = """[{
 def set_up_decoder():
     return JsonDecoder(
         settings={'file_formats': [{"name": "json", "dotnotation": {
-            "waarde_shortcut_applicable": True,
+            "waarde_shortcut": True,
             "separator": '.',
             'cardinality_indicator': '[]'
         }}]})
@@ -212,7 +212,7 @@ def test_decode_testKwantWrd_waarde_shortcut_false():
     davie_decoder = set_up_decoder()
     davie_decoder.settings['dotnotation']['waarde_shortcut_applicable'] = False
     davie_decoder = JsonDecoder(
-        settings={'file_formats': [{"name": "json", "dotnotation": {"waarde_shortcut_applicable": False}}]})
+        settings={'file_formats': [{"name": "json", "dotnotation": {"waarde_shortcut": False}}]})
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testKwantWrd": { "waarde": 3.5}}]',

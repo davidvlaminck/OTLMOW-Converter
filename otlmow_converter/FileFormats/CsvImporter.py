@@ -24,6 +24,7 @@ class CsvImporter:
             raise ValueError("Unable to find csv in file formats settings")
 
         self.settings = csv_settings
+        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
         self.headers = []
         self.data = [[]]
         self.objects = []
@@ -80,14 +81,14 @@ class CsvImporter:
                 if self.headers[index] in ['bron.typeURI', 'doel.typeURI']:
                     continue  # TODO get bron and doel
 
-                cardinality_indicator = self.settings['dotnotation']['cardinality indicator']
+                cardinality_indicator = self.settings['dotnotation']['cardinality_indicator']
 
                 if cardinality_indicator in self.headers[index]:
                     if self.headers[index].count(cardinality_indicator) > 1:
                         logging.warning(
                             f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
                         continue
-                    value = row.split(self.settings['dotnotation']['cardinality separator'])
+                    value = row
                 else:
                     value = row
 
@@ -98,11 +99,9 @@ class CsvImporter:
                     self.headers[index] = 'geometry'
 
                 try:
-                    DotnotationHelper.set_attribute_by_dotnotation(
-                        instanceOrAttribute=instance, dotnotation=self.headers[index], value=value,
-                        convert_warnings=False, separator=self.settings['dotnotation']['separator'],
-                        cardinality_indicator=cardinality_indicator,
-                        waarde_shortcut_applicable=self.settings['dotnotation']['waarde_shortcut_applicable'])
+                    self.dotnotation_helper.set_attribute_by_dotnotation_instance(
+                        instance_or_attribute=instance, dotnotation=self.headers[index], value=value,
+                        convert_warnings=False)
                 except AttributeError as exc:
                     raise AttributeError(self.headers[index]) from exc
 

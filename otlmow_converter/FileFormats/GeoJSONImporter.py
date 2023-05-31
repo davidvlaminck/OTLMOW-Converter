@@ -9,6 +9,7 @@ from otlmow_converter.DotnotationHelper import DotnotationHelper
 class GeoJSONImporter:
     def __init__(self, settings):
         self.settings = next(s for s in settings['file_formats'] if s['name'] == 'geojson')
+        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
 
     def import_file(self, filepath: Path = None, **kwargs) -> list:
         """Imports a json file created with Davie and decodes it to OTL objects
@@ -32,9 +33,6 @@ class GeoJSONImporter:
 
     def decode_objects(self, data, ignore_failed_objects: bool = False, class_directory: str = None):
         list_of_objects = []
-        settings_wsc = self.settings['dotnotation']['waarde_shortcut_applicable']
-        settings_sep = self.settings['dotnotation']['separator']
-        settings_card = self.settings['dotnotation']['cardinality indicator']
 
         for data_object in data['features']:
             props = data_object['properties']
@@ -48,10 +46,8 @@ class GeoJSONImporter:
                 if dotnotation == 'typeURI':
                     continue
 
-                DotnotationHelper.set_attribute_by_dotnotation(
-                    instanceOrAttribute=asset, dotnotation=dotnotation, value=props[dotnotation],
-                    waarde_shortcut_applicable=settings_wsc, separator=settings_sep,
-                    cardinality_indicator=settings_card)
+                self.dotnotation_helper.set_attribute_by_dotnotation_instance(
+                    instance_or_attribute=asset, dotnotation=dotnotation, value=props[dotnotation])
 
             if 'geometry' in data_object:
                 geom = data_object['geometry']

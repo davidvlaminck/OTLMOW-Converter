@@ -13,7 +13,7 @@ class RDFExporter:
             dotnotation_settings = {}
         self.settings = dotnotation_settings
 
-        for required_attribute in ['waarde_shortcut_applicable']:
+        for required_attribute in ['waarde_shortcut']:
             if required_attribute not in self.settings:
                 raise ValueError("The settings are not loaded or don't contain the full dotnotation settings")
 

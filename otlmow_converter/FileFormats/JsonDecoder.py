@@ -34,7 +34,7 @@ class JsonDecoder:
                     if 'typeURI' in key or value == '' or value == []:
                         continue
 
-                    set_value_by_dictitem(instance, key, value, self.settings['dotnotation']['waarde_shortcut_applicable'])
+                    set_value_by_dictitem(instance, key, value, self.settings['dotnotation']['waarde_shortcut'])
             except Exception as ex:
                 if not ignore_failed_objects:
                     raise ex

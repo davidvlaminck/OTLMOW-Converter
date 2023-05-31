@@ -50,7 +50,7 @@ class JsonLdDecoder:
                         continue
 
                     DictDecoder.set_value_by_dictitem(instance, key, value,
-                                                      self.settings['dotnotation']['waarde_shortcut_applicable'],
+                                                      self.settings['dotnotation']['waarde_shortcut'],
                                                       ld=True, ld_context=context_dict)
             except Exception as ex:
                 if not ignore_failed_objects:

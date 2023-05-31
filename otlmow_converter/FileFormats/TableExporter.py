@@ -23,10 +23,12 @@ class TableExporter:
             dotnotation_settings = {}
         self.settings = dotnotation_settings
 
-        for required_attribute in ['separator', 'cardinality separator', 'cardinality indicator',
-                                   'waarde_shortcut_applicable']:
+        for required_attribute in ['separator', 'cardinality_separator', 'cardinality_indicator',
+                                   'waarde_shortcut']:
             if required_attribute not in self.settings:
                 raise ValueError("The settings are not loaded or don't contain the full dotnotation settings")
+
+        self.dotnotation_helper = DotnotationHelper(**self.settings)
 
         self.master = {}  # holds different "tabs", 1 for each typeURI, or one tab 'single'
 
@@ -105,9 +107,8 @@ class TableExporter:
                 toegekend_door_key: otl_object.assetId.toegekendDoor
             }
 
-            for k, v in DotnotationHelper.list_attributes_and_values_by_dotnotation(
-                    asset=otl_object, waarde_shortcut=self.settings['waarde_shortcut_applicable'],
-                    cardinality_indicator=self.settings['cardinality indicator'], separator=self.settings['separator']):
+            for k, v in self.dotnotation_helper.list_attributes_and_values_by_dotnotation_instance(
+                    instance_or_attribute=otl_object):
                 if k in [identificator_key, toegekend_door_key]:
                     continue
                 if k not in self.master[short_uri]['headers']:
@@ -137,7 +138,7 @@ class TableExporter:
                         list_string += str(list_item)
                 else:
                     list_string += list_item
-                list_string += self.settings['cardinality separator']
+                list_string += self.settings['cardinality_separator']
             return list_string[:-1]
         if values_as_strings and not isinstance(value, str):
             return str(value)

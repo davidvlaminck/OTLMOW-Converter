@@ -10,7 +10,7 @@ from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 
 class DictDecoder:
     @staticmethod
-    def set_value_by_dictitem(instance_or_attribute, key, value, waarde_shortcut: bool = False, ld: bool = False, ld_context: dict = {}):
+    def set_value_by_dictitem(instance_or_attribute, key, value, waarde_shortcut: bool = False, ld: bool = False, ld_context: dict={}):
         if not ld:
             attribute_to_set = get_attribute_by_name(instance_or_attribute, key)
         else:
