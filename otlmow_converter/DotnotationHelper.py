@@ -125,9 +125,12 @@ class DotnotationHelper:
                 attribute = get_attribute_by_name(instance_or_attribute, first_part)
                 if attribute.waarde is None:
                     attribute.add_empty_value()
-                return DotnotationHelper.set_attribute_by_dotnotation(attribute.waarde, dotnotation=rest, value=value)
+                DotnotationHelper.set_attribute_by_dotnotation(attribute.waarde, dotnotation=rest, value=value)
+                return
 
         else:
+            if value is None:
+                return
             cardinality = False
             if cardinality_indicator in dotnotation:
                 dotnotation = dotnotation.replace(cardinality_indicator, '')
