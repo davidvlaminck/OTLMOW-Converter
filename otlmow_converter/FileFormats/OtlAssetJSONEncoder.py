@@ -19,15 +19,15 @@ class OtlAssetJSONEncoder(json.JSONEncoder):
 
         self.settings = json_settings
 
-    def default(self, otlObject):
-        if isinstance(otlObject, OTLObject):
-            d = otlObject.create_dict_from_asset(
+    def default(self, otl_object):
+        if isinstance(otl_object, OTLObject):
+            d = otl_object.create_dict_from_asset(
                 waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
-            if hasattr(otlObject, 'typeURI'):
-                d['typeURI'] = otlObject.typeURI
+            if hasattr(otl_object, 'typeURI'):
+                d['typeURI'] = otl_object.typeURI
             od = OrderedDict(sorted(d.items()))
             return od
-        return super().default(otlObject)
+        return super().default(otl_object)
 
     # no usage?
     @classmethod
