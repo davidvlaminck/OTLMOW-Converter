@@ -67,5 +67,6 @@ The following file formats are supported in OtlmowConverter
 | CSV | Yes | Yes | Yes |
 | Excel | Yes | Yes | Yes |
 | JSON | Yes | Yes | Yes |
+| GEOJSON| Yes | Yes | Yes |
 | JSON-LD| Yes | Yes | No |
 | TTL | No | Yes | No |
