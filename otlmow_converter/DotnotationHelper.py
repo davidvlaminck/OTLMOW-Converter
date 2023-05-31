@@ -129,14 +129,17 @@ class DotnotationHelper:
                 return
 
         else:
-            if value is None:
-                return
             cardinality = False
             if cardinality_indicator in dotnotation:
                 dotnotation = dotnotation.replace(cardinality_indicator, '')
                 cardinality = True
 
             attribute = get_attribute_by_name(instance_or_attribute, dotnotation)
+            if value is None:
+                if cardinality:
+                    attribute.set_waarde([])
+                else:
+                    attribute.set_waarde(None)
 
             if attribute.field.waarde_shortcut_applicable and waarde_shortcut:
                 if attribute.waarde is None:
