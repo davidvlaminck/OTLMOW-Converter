@@ -59,18 +59,28 @@ class GeoJSONImporter:
     def construct_wkt_string_from_geojson(self, geom):
         geo_type = geom['type']
         coords = geom['coordinates']
+
+        first_coord = coords
+        while isinstance(first_coord[0], list):
+            first_coord = first_coord[0]
+
         z_part = ''
-        if len(coords[0]) == 3:
+        if len(first_coord) == 3:
             z_part = ' Z'
         
-        wkt = geo_type.upper() + z_part + ' (' + self.construct_wkt_string_from_coords(coords) + ')'
+        wkt = geo_type.upper() + z_part + ' ' + self.construct_wkt_string_from_coords(coords)
         return wkt
 
     def construct_wkt_string_from_coords(self, coords):
         wkt = ''
+        if not isinstance(coords[0], list):
+            return '(' + self.construct_wkt_string_from_coord(coords) + ')'
         for coord in coords:
-            wkt += self.construct_wkt_string_from_coord(coord) + ', '
-        return wkt[:-2]
+            if isinstance(coords[0][0], list):
+                wkt += self.construct_wkt_string_from_coords(coord) + ', '
+            else:
+                wkt += self.construct_wkt_string_from_coord(coord) + ', '
+        return '(' + wkt[:-2] + ')'
 
     def construct_wkt_string_from_coord(self, coord):
         wkt = ''

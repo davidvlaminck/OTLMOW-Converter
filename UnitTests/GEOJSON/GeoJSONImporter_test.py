@@ -207,3 +207,40 @@ def test_decode_ComplexType2():
                            "testComplexType.testComplexType2.testStringField": "string"}}]})
 
     assert lijst_objecten[0].testComplexType.testComplexType2.testStringField == 'string'
+
+
+def test_construct_wkt_string_from_geojson_point():
+    importer = set_up_importer()
+
+    point = importer.construct_wkt_string_from_geojson(
+        {"type": "Point", "coordinates": [200000.1, 200000.2, 0]})
+    assert point == 'POINT Z (200000.1 200000.2 0)'
+
+
+def test_construct_wkt_string_from_geojson_line():
+    importer = set_up_importer()
+
+    line = importer.construct_wkt_string_from_geojson(
+        {"type": "LineString", "coordinates": [[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.6, 0],
+                                               [200000.7, 200000.8, 0]]})
+    assert line == 'LINESTRING Z (200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.6 0, 200000.7 200000.8 0)'
+
+
+def test_construct_wkt_string_from_geojson_polygon():
+    importer = set_up_importer()
+
+    polygon = importer.construct_wkt_string_from_geojson(
+        {"type": "Polygon", "coordinates": [[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
+                                                [200000.1, 200000.2, 0]]]})
+    assert polygon == 'POLYGON Z ((200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.8 0, 200000.1 200000.2 0))'
+
+
+def test_construct_wkt_string_from_geojson_multipolygon():
+    importer = set_up_importer()
+
+    multipolygon = importer.construct_wkt_string_from_geojson(
+        {"type": "MultiPolygon", "coordinates": [[[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
+                                                [200000.1, 200000.2, 0]]],
+                                                [[[200002.1, 200002.2, 0], [200002.3, 200002.4, 0], [200002.5, 200002.8, 0],
+                                                [200002.1, 200002.2, 0]]]]})
+    assert multipolygon == 'MULTIPOLYGON Z (((200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.8 0, 200000.1 200000.2 0)), ((200002.1 200002.2 0, 200002.3 200002.4 0, 200002.5 200002.8 0, 200002.1 200002.2 0)))'
