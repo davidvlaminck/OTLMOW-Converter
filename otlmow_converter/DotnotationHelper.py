@@ -140,6 +140,7 @@ class DotnotationHelper:
                     attribute.set_waarde([])
                 else:
                     attribute.set_waarde(None)
+                return
 
             if attribute.field.waarde_shortcut_applicable and waarde_shortcut:
                 if attribute.waarde is None:
