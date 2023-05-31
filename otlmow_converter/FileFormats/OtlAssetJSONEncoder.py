@@ -1,13 +1,7 @@
 import json
 from collections import OrderedDict
-from datetime import date, datetime, time
-from typing import Dict, Union, List
 
-from otlmow_model.BaseClasses.DateField import DateField
-from otlmow_model.BaseClasses.DateTimeField import DateTimeField
-from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
-from otlmow_model.BaseClasses.OTLObject import OTLAttribuut, OTLObject
-from otlmow_model.BaseClasses.TimeField import TimeField
+from otlmow_model.BaseClasses.OTLObject import OTLObject
 
 
 class OtlAssetJSONEncoder(json.JSONEncoder):
