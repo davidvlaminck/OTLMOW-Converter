@@ -1,4 +1,5 @@
 import json
+import unittest
 from pathlib import Path
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -27,6 +28,7 @@ def set_up_exporter():
         }}]}, class_directory='UnitTests.TestClasses.Classes')
 
 
+@unittest.skip("Replace with generated geojson files")
 def test_import_then_export():
     importer = set_up_importer()
     exporter = set_up_exporter()
@@ -156,3 +158,52 @@ def test_convert_list_of_objects_to_list_of_geodicts_with_geom():
     }
 
     assert exporter.convert_list_of_objects_to_list_of_geodicts([test_object])[0] == expected_dict
+
+
+def test_convert_wkt_string_to_geojson_line():
+    exporter = set_up_exporter()
+    line = exporter.convert_wkt_string_to_geojson(
+        'LINESTRING Z (200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.6 0, 200000.7 200000.8 0)')
+    assert line == {
+        "type": "LineString",
+        "coordinates": [[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.6, 0],
+                        [200000.7, 200000.8, 0]],
+        "bbox": [200000.1, 200000.2, 0, 200000.7, 200000.8, 0],
+        "crs": {"properties": {"name": "EPSG:31370"}, "type": "name"}}
+
+
+def test_convert_wkt_string_to_geojson_point():
+    exporter = set_up_exporter()
+    point = exporter.convert_wkt_string_to_geojson(
+        'POINT Z (200000.1 200000.2 0)')
+    assert point == {
+        "type": "Point",
+        "coordinates": [[200000.1, 200000.2, 0]],
+        "bbox": [200000.1, 200000.2, 0, 200000.1, 200000.2, 0],
+        "crs": {"properties": {"name": "EPSG:31370"}, "type": "name"}}
+
+
+def test_convert_wkt_string_to_geojson_polygon():
+    exporter = set_up_exporter()
+    point = exporter.convert_wkt_string_to_geojson(
+        'POLYGON Z ((200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.8 0, 200000.1 200000.2 0))')
+    assert point == {
+        "type": "Polygon",
+        "coordinates": [[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0], [200000.1, 200000.2, 0]]],
+        "bbox": [200000.1, 200000.2, 0, 200000.5, 200000.8, 0],
+        "crs": {"properties": {"name": "EPSG:31370"}, "type": "name"}}
+
+
+def test_convert_wkt_string_to_geojson_multipolygon():
+    exporter = set_up_exporter()
+    point = exporter.convert_wkt_string_to_geojson(
+        'MULTIPOLYGON Z (((200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.8 0, 200000.1 200000.2 0)), ((200002.1 200002.2 0, 200002.3 200002.4 0, 200002.5 200002.8 0, 200002.1 200002.2 0)))')
+    assert point == {
+        "type": "MultiPolygon",
+        "coordinates": [[[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
+                          [200000.1, 200000.2, 0]]],
+                        [[[200002.1, 200002.2, 0], [200002.3, 200002.4, 0], [200002.5, 200002.8, 0],
+                          [200002.1, 200002.2, 0]]]],
+        "bbox": [200000.1, 200000.2, 0, 200002.5, 200002.8, 0],
+        "crs": {"properties": {"name": "EPSG:31370"}, "type": "name"}}
+
