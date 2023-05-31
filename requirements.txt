@@ -6,3 +6,7 @@ PyLD>=2.0.0
 pytest>=6.2.5
 pytest-cov==4.0.0
 pytest-subtests>=0.8.0
+prettytable>=3.6.0
+cachetools>=5.3.0
+pandas>=2.0.1
+geojson>=3.0.1

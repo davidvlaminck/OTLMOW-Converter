@@ -5,7 +5,7 @@ from pathlib import Path
 from otlmow_model.BaseClasses.OTLObject import OTLObject
 
 
-class OtlAssetJSONEncoder(json.JSONEncoder):
+class OtlAssetGeoJSONEncoder(json.JSONEncoder):
     def __init__(self, indent=None, settings=None):
         super().__init__(indent=indent)
         if settings is None:
@@ -14,7 +14,7 @@ class OtlAssetJSONEncoder(json.JSONEncoder):
 
         if 'file_formats' not in self.settings:
             raise ValueError("The settings are not loaded or don't contain settings for file formats")
-        json_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'json'), None)
+        json_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'geojson'), None)
         if json_settings is None:
             raise ValueError("Unable to find json in file formats settings")
 

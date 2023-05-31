@@ -62,6 +62,7 @@ def instantiate_all():
     converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.json'), list_of_objects=all_instances_list)
     converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.xlsx'), list_of_objects=all_instances_list)
     converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.jsonld'), list_of_objects=all_instances_list)
+    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.geojson'), list_of_objects=all_instances_list)
     converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.ttl'), list_of_objects=all_instances_list)
     converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.csv'), list_of_objects=random_10_class,
                                       split_per_type=False)
@@ -69,6 +70,7 @@ def instantiate_all():
     converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.xlsx'), list_of_objects=random_10_class)
     converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.ttl'), list_of_objects=random_10_class)
     converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.jsonld'), list_of_objects=random_10_class)
+    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.geojson'), list_of_objects=random_10_class)
 
     end = time.time()
     print(f'Time: {round(end - start, 2)}')

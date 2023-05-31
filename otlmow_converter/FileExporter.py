@@ -3,6 +3,7 @@ from pathlib import Path
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
+from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
 from otlmow_converter.FileFormats.JsonExporter import JsonExporter
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 from otlmow_converter.FileFormats.TtlExporter import TtlExporter
@@ -33,6 +34,8 @@ class FileExporter:
             return TtlExporter(settings=settings)
         elif extension == 'jsonld':
             return JsonLdExporter(settings=settings)
+        elif extension == 'geojson':
+            return GeoJSONExporter(settings=settings)
         else:
             raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx, xls, ttl, jsonld')
 

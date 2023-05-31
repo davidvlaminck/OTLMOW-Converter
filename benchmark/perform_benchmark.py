@@ -77,6 +77,7 @@ if __name__ == '__main__':
         FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
         FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
         FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={}),
+        FormatDetails(Extension='geojson', Label='GeoJSON', WriteArguments={}),
         FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})]
 
     for format_details in formats:
