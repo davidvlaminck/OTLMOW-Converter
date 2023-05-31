@@ -28,15 +28,14 @@ def set_up_exporter():
         }}]}, class_directory='UnitTests.TestClasses.Classes')
 
 
-@unittest.skip("Replace with generated geojson files")
 def test_import_then_export():
     importer = set_up_importer()
     exporter = set_up_exporter()
 
-    import_file_path = base_dir / 'DA-2022-00776_export.geojson'
-    export_file_path = base_dir / 'DA-2022-00776_after_export.geojson'
+    import_file_path = base_dir.parent.parent / 'benchmark/files/all_classes.geojson'
+    export_file_path = base_dir / 'after_export.geojson'
     objects = importer.import_file(import_file_path)
-    assert len(objects) == 6
+    assert len(objects) == 608
 
     exporter.export_to_file(export_file_path, objects)
 

@@ -43,7 +43,8 @@ class DotnotationHelper:
 
         return dotnotation
 
-    def get_attribute_by_dotnotation_instance(self, instance_or_attribute: Union[OTLAttribuut, OTLObject], dotnotation: str
+    def get_attribute_by_dotnotation_instance(self, instance_or_attribute: Union[OTLAttribuut, OTLObject],
+                                              dotnotation: str
                                               ) -> Union[OTLAttribuut, List[OTLAttribuut]]:
         return DotnotationHelper.get_attribute_by_dotnotation(
             instance_or_attribute=instance_or_attribute, dotnotation=dotnotation, separator=self.separator,
@@ -52,7 +53,8 @@ class DotnotationHelper:
     @classmethod
     def get_attribute_by_dotnotation(cls, instance_or_attribute: Union[OTLAttribuut, OTLObject], dotnotation: str,
                                      separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                     waarde_shortcut: bool = WAARDE_SHORTCUT) -> Union[OTLAttribuut, List[OTLAttribuut]]:
+                                     waarde_shortcut: bool = WAARDE_SHORTCUT) -> Union[
+        OTLAttribuut, List[OTLAttribuut]]:
         """Returns the attribute matching the dotnotation starting from a given class instance name or attribute.
         If there is an attribute with cardinality > 1, the first instantiated attribute of that list is used.
         :param instance_or_attribute: class or attribute to start the dotnotation from
@@ -94,20 +96,25 @@ class DotnotationHelper:
             return attribute
 
     def set_attribute_by_dotnotation_instance(
-            self, instance_or_attribute: Union[OTLAttribuut, OTLObject], dotnotation: str, value: object, convert: bool = True,
-            convert_warnings: bool = True) -> None:
+            self, instance_or_attribute: Union[OTLAttribuut, OTLObject], dotnotation: str, value: object,
+            convert: bool = True, convert_warnings: bool = True) -> None:
         return DotnotationHelper.set_attribute_by_dotnotation(
             instance_or_attribute=instance_or_attribute, dotnotation=dotnotation, value=value, convert=convert,
-            convert_warnings=convert_warnings, separator=self.separator, cardinality_indicator=self.cardinality_indicator,
+            convert_warnings=convert_warnings, separator=self.separator,
+            cardinality_indicator=self.cardinality_indicator,
             cardinality_separator=self.cardinality_separator, waarde_shortcut=self.waarde_shortcut)
 
     @classmethod
     def set_attribute_by_dotnotation(cls, instance_or_attribute: Union[OTLAttribuut, OTLObject], dotnotation: str,
                                      value: object, convert: bool = True, convert_warnings: bool = True,
                                      separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                     cardinality_separator: str = CARDINALITY_SEPARATOR, waarde_shortcut: bool = True) -> None:
+                                     cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                     waarde_shortcut: bool = True) -> None:
         if len(dotnotation.split(cardinality_indicator)) > 2:
             raise ValueError("can't use dotnotation for lists of lists")
+
+        if value == '':
+            value = None
 
         if separator in dotnotation:
             first_part = dotnotation.split(separator)[0]
@@ -116,6 +123,10 @@ class DotnotationHelper:
             if cardinality_indicator in first_part:
                 first_part = first_part.replace(cardinality_indicator, '')
                 attribute = get_attribute_by_name(instance_or_attribute, first_part)
+                if value is None:
+                    attribute.set_waarde(None)
+                    return
+
                 for index, v in enumerate(value.split(cardinality_separator)):
                     if attribute.waarde is None or len(attribute.waarde) <= index:
                         attribute.add_empty_value()
