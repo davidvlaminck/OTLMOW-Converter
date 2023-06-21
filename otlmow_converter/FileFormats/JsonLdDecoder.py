@@ -1,13 +1,14 @@
 import json
 
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
+from otlmow_model.BaseClasses.OTLObject import OTLObject
 
 from otlmow_converter.FileFormats.DictDecoder import DictDecoder
 from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 
 
 class JsonLdDecoder:
-    def __init__(self, settings=None):
+    def __init__(self, settings=None, class_directory: str = None):
         if settings is None:
             settings = {}
         self.settings = settings
@@ -19,6 +20,7 @@ class JsonLdDecoder:
             raise ValueError("Unable to find json in file formats settings")
 
         self.settings = json_settings
+        self.class_directory = class_directory
 
     def decode_json_string(self, json_string: str, ignore_failed_objects=False, classes_directory: str = None):
         dict_list = json.loads(json_string)
@@ -26,35 +28,43 @@ class JsonLdDecoder:
             context_dict = dict_list['@context']
         else:
             context_dict = {}
+
         lijst = []
+
         for obj in dict_list['@graph']:
             try:
-                typeURI = obj['@type']
-
-                typeURI = JsonLdContext.replace_context(typeURI, context_dict=context_dict)
-
-                if 'https://wegenenverkeer.data.vlaanderen.be/ns' not in typeURI:
-                    raise ValueError('typeURI should start with "https://wegenenverkeer.data.vlaanderen.be/ns" to use this decoder')
-
-                instance = dynamic_create_instance_from_uri(typeURI, directory=classes_directory)
+                rdf_dict = self.transform_dict_to_rdf(d=obj, context_dict=context_dict)
+                del rdf_dict['@id']
+                del rdf_dict['@type']
+                instance = OTLObject.from_dict(rdf_dict, rdf=True, directory=self.class_directory,
+                                               waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
                 lijst.append(instance)
-
-                for key, value in obj.items():
-                    if key == '@type':
-                        continue
-                    if key == '@id':
-                        value = JsonLdContext.replace_context(value, context_dict=context_dict)
-                        instance.assetId.identificator = value
-                        continue
-                    if 'typeURI' in key or value == '' or value == [] or key == 'bron' or key == 'doel':
-                        continue
-
-                    DictDecoder.set_value_by_dictitem(instance, key, value,
-                                                      self.settings['dotnotation']['waarde_shortcut'],
-                                                      ld=True, ld_context=context_dict)
             except Exception as ex:
                 if not ignore_failed_objects:
                     raise ex
-        return lijst
+
+    def transform_dict_to_rdf(self, d: dict, context_dict: dict):
+        new_dict = {}
+        for k, v in d.items():
+            if ':' in k:
+                k = JsonLdContext.replace_context(k, context_dict=context_dict)
+
+            if isinstance(v, dict):
+                v = self.transform_dict_to_rdf(v, context_dict=context_dict)
+            elif isinstance(v, str) and v and ':' in v:
+                v = JsonLdContext.replace_context(v, context_dict=context_dict)
+            elif isinstance(v, list):
+                value_list = []
+                for list_item in v:
+                    if isinstance(list_item, dict):
+                        value_list.append(self.transform_dict_to_rdf(list_item, context_dict=context_dict))
+                    elif isinstance(list_item, str) and list_item and ':' in list_item:
+                        value_list.append(JsonLdContext.replace_context(list_item, context_dict=context_dict))
+                    else:
+                        value_list.append(list_item)
+                v = value_list
+            new_dict[k] = v
+        return new_dict
+
 
 
