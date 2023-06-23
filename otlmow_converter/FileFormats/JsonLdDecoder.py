@@ -22,7 +22,7 @@ class JsonLdDecoder:
         self.settings = json_settings
         self.class_directory = class_directory
 
-    def decode_json_string(self, json_string: str, ignore_failed_objects=False, classes_directory: str = None):
+    def decode_json_string(self, json_string: str, ignore_failed_objects=False) -> [OTLObject]:
         dict_list = json.loads(json_string)
         if '@context' in dict_list:
             context_dict = dict_list['@context']
@@ -42,6 +42,7 @@ class JsonLdDecoder:
             except Exception as ex:
                 if not ignore_failed_objects:
                     raise ex
+        return lijst
 
     def transform_dict_to_rdf(self, d: dict, context_dict: dict):
         new_dict = {}

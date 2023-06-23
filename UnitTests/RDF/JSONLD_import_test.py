@@ -54,7 +54,7 @@ def test_export_and_then_import_unnested_attributes():
 
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
 
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location)
     assert len(objects) == 1
 
     instance = objects[0]
@@ -118,7 +118,7 @@ def test_export_and_then_import_nested_attributes_level_1():
 
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
 
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location)
     assert len(objects) == 1
 
     instance = objects[0]
@@ -174,7 +174,7 @@ def test_export_and_then_import_nested_attributes_level_2():
 
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
 
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location)
     assert len(objects) == 1
 
     instance = objects[0]
