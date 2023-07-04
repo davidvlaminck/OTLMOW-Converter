@@ -8,9 +8,7 @@ from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 if __name__ == '__main__':
     converter = OtlmowConverter()
-
     assets = []
-    # read file with csv reader
     with open(Path('202306191351_multipoints.csv')) as csv_file:
         # example:
         # "uuid"	"wkt_string"	"uri"
@@ -22,11 +20,9 @@ if __name__ == '__main__':
             wkt = wkt[:-1].replace('MULTIPOINT Z (', '')
             parts = set(wkt.split(','))
             if len(parts) == 1:
-                print(f'found one: {row[1]}')
                 asset = dynamic_create_instance_from_uri(row[2])
                 asset.assetId.identificator = get_aim_id_from_uuid_and_typeURI(row[0], row[2])
                 asset.geometry = 'POINT Z ' + parts.pop()
                 assets.append(asset)
-                print(asset)
 
     converter.create_file_from_assets(filepath=Path('multipoints_fix.json'), list_of_objects=assets)
