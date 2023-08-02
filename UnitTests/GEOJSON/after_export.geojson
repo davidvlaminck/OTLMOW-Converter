@@ -12395,31 +12395,7 @@
                 "theoretischeLevensduur": "19",
                 "toestand": "in-opbouw"
             },
-            "type": "Feature",
-            "geometry": {
-                "bbox": [
-                    200000.0,
-                    200000.0,
-                    0.0,
-                    200000.0,
-                    200000.0,
-                    0.0
-                ],
-                "type": "Point",
-                "coordinates": [
-                    [
-                        200000.0,
-                        200000.0,
-                        0.0
-                    ]
-                ],
-                "crs": {
-                    "properties": {
-                        "name": "EPSG:31370"
-                    },
-                    "type": "name"
-                }
-            }
+            "type": "Feature"
         },
         {
             "id": "uFSmekKk",
