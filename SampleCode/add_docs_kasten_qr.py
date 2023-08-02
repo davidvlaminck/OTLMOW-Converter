@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     kast_list = []
 
-    for data_row in data[0:1]:
+    for data_row in data[1:]:
         kast = Wegkantkast()
         kast.assetId.identificator = get_aim_id_from_uuid_and_typeURI(data_row[1], Wegkantkast.typeURI)
         kast.elektrischSchema.bestandsnaam = data_row[3]
