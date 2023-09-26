@@ -13,5 +13,4 @@ class DeprecatedTestClass(AIMObject, VlakGeometrie):
     deprecated_version = '2.0.0'
 
     def __init__(self):
-        AIMObject.__init__(self)
-        VlakGeometrie.__init__(self)
+        super().__init__()

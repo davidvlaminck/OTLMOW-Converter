@@ -22,10 +22,7 @@ class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
 
     @abstractmethod
     def __init__(self):
-        AIMDBStatus.__init__(self)
-        AIMToestand.__init__(self)
-        OTLAsset.__init__(self)
-        RelationInteractor.__init__(self)
+        super().__init__()
 
         self._assetId = OTLAttribuut(field=DtcIdentificator,
                                      naam='assetId',

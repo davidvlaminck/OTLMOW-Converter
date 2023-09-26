@@ -16,9 +16,7 @@ class RelatieObject(AIMDBStatus, DavieRelatieAttributes, OTLObject):
 
     @abstractmethod
     def __init__(self):
-        AIMDBStatus.__init__(self)
-        DavieRelatieAttributes.__init__(self)
-        OTLObject.__init__(self)
+        super().__init__()
 
         self._assetId = OTLAttribuut(field=DtcIdentificator,
                                      naam='assetId',
