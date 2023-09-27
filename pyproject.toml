@@ -20,7 +20,7 @@ classifiers = [
 requires-python = ">=3.7"
 dependencies = [
     'openpyxl >= 3.0',
-    'otlmow_model >= 2.7.6',
+    'otlmow_model >= 2.8.1',
     'rdflib >= 6.0.0',
     'geojson>=3.0.1',
     'prettytable>=3.6.0'

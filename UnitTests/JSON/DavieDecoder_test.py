@@ -6,6 +6,7 @@ from otlmow_model.Classes.Onderdeel.ExterneDetectie import ExterneDetectie
 from otlmow_model.Classes.Onderdeel.HeeftBetrokkene import HeeftBetrokkene
 from otlmow_model.Classes.Onderdeel.Netwerkpoort import Netwerkpoort
 from otlmow_model.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
+from otlmow_model.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonDecoder import JsonDecoder
@@ -133,7 +134,7 @@ def test_invalid_typeURI():
 
 def test_decode_invalid_attribute():
     davie_decoder = set_up_decoder()
-    with pytest.raises(AttributeError):
+    with pytest.warns(NonStandardAttributeWarning):
         davie_decoder.decode_json_string(
             '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "invalid_attribute": "some value"}]',
             classes_directory='UnitTests.TestClasses.Classes')
