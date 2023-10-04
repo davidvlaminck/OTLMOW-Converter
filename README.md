@@ -13,8 +13,12 @@ It is split into different packages to reduce compatibility issues
 - [otlmow_model](https://github.com/davidvlaminck/OTLMOW-Model)
 - [otlmow_modelbuilder](https://github.com/davidvlaminck/OTLMOW-ModelBuilder)
 - [otlmow_converter](https://github.com/davidvlaminck/OTLMOW-Converter) (you are currently looking at this package)
-- [otlmow_template](https://github.com/davidvlaminck/OTLMOW-Template) 
-- [otlmow_postenmapping](https://github.com/davidvlaminck/OTLMOW-PostenMapping) 
+- [otlmow_template](https://github.com/davidvlaminck/OTLMOW-Template)
+- [otlmow_postenmapping](https://github.com/davidvlaminck/OTLMOW-PostenMapping)
+- [otlmow_davie](https://github.com/davidvlaminck/OTLMOW-DAVIE)
+- [otlmow_visuals](https://github.com/davidvlaminck/OTLMOW-Visuals)
+- [otlmow_gui](https://github.com/davidvlaminck/OTLMOW-GUI)
+
 
 ## Installation and requirements
 OTLMOW-Converter has two dependencies besides the standard Python libraries: pandas and openpyxl. It will be automatically installed when installing this library. 
