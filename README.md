@@ -33,38 +33,14 @@ To upgrade an existing installation use:
 pip install otlmow_converter --upgrade
 ```
 
-## Usage
-The core functionality of this library is creating objects of otlmow_model by, either using helper functions or reading a DAVIE file. Then the user can manipulate the objects and finally export them to a valid DAVIE file that can be imported in the application.
+## Code examples and usage
+See the [Readme notebook](https://github.com/davidvlaminck/OTLMOW-Converter/blob/master/Readme.ipynb)
 
 <!--- 
 assetfactory
 relationcreator
-
 -->
-In the following example 100 objects are created and exported to a csv file.
-```
-from otlmow_converter.OtlmowConverter import OtlmowConverter
-from otlmow_model.Classes.Onderdeel.Camera import Camera
-
-created_assets = []
-for nr in range(1, 100):
-    d = {'toestand': 'in-gebruik', 'isPtz': (nr <= 50),
-        'assetId': {'identificator': f'camera_{nr}'}}
-    created_assets.append(Camera.from_dict(d))
-
-converter = OtlmowConverter()
-converter.create_file_from_assets(filepath=Path('new_cameras.csv'), list_of_objects=created_assets)
-```
-It's also possible to import objects from a file and export it to a different format.
-```
-from otlmow_converter.OtlmowConverter import OtlmowConverter
-
-converter = OtlmowConverter()
-created_assets = converter.create_assets_from_file(filepath=Path('new_cameras.csv'))
-converter.create_file_from_assets(filepath=Path('new_cameras.json'), list_of_objects=created_assets)
-```
-
-## Formats
+## Supported formats
 The following file formats are supported in OtlmowConverter
 | File format | Read | Write | DAVIE compliant |
 | --- | --- | --- | --- |
