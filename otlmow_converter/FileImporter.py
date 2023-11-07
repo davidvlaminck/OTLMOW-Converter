@@ -2,11 +2,6 @@ import os
 from pathlib import Path
 
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
-from otlmow_converter.FileFormats.CsvImporter import CsvImporter
-from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
-from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
-from otlmow_converter.FileFormats.JsonImporter import JsonImporter
-from otlmow_converter.FileFormats.JsonLdImporter import JsonLdImporter
 
 
 class FileImporter:
@@ -36,14 +31,19 @@ class FileImporter:
     @staticmethod
     def get_importer_from_extension(extension: str, settings: dict):
         if extension == 'csv':
+            from otlmow_converter.FileFormats.CsvImporter import CsvImporter
             return CsvImporter(settings=settings)
         elif extension == 'json':
+            from otlmow_converter.FileFormats.JsonImporter import JsonImporter
             return JsonImporter(settings=settings)
         elif extension == 'geojson':
+            from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
             return GeoJSONImporter(settings=settings)
         elif extension == 'jsonld':
+            from otlmow_converter.FileFormats.JsonLdImporter import JsonLdImporter
             return JsonLdImporter(settings=settings)
         elif extension in ['xls', 'xlsx']:
+            from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
             return ExcelImporter(settings=settings)
         else:
             raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx')

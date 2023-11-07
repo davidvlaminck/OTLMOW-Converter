@@ -1,12 +1,6 @@
 from pathlib import Path
 
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
-from otlmow_converter.FileFormats.CsvExporter import CsvExporter
-from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
-from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
-from otlmow_converter.FileFormats.JsonExporter import JsonExporter
-from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
-from otlmow_converter.FileFormats.TtlExporter import TtlExporter
 from otlmow_converter.FileImporter import FileImporter
 
 
@@ -25,16 +19,22 @@ class FileExporter:
             class_directory = None
             if kwargs is not None and 'class_directory' in kwargs:
                 class_directory = kwargs['class_directory']
+            from otlmow_converter.FileFormats.CsvExporter import CsvExporter
             return CsvExporter(settings=settings, class_directory=class_directory)
         elif extension == 'json':
+            from otlmow_converter.FileFormats.JsonExporter import JsonExporter
             return JsonExporter(settings=settings)
         elif extension in ['xls', 'xlsx']:
+            from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
             return ExcelExporter(settings=settings)
         elif extension == 'ttl':
+            from otlmow_converter.FileFormats.TtlExporter import TtlExporter
             return TtlExporter(settings=settings)
         elif extension == 'jsonld':
+            from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
             return JsonLdExporter(settings=settings)
         elif extension == 'geojson':
+            from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
             return GeoJSONExporter(settings=settings)
         else:
             raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx, xls, ttl, jsonld')
