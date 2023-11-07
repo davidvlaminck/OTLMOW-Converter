@@ -15,15 +15,17 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent"
 ]
 requires-python = ">=3.7"
 dependencies = [
     'openpyxl >= 3.0',
-    'otlmow_model >= 2.8.1',
+    'otlmow-model >= 2.8.1',
     'rdflib >= 6.0.0',
     'geojson>=3.0.1',
-    'prettytable>=3.6.0'
+    'prettytable>=3.6.0',
+    'numpy >= 1.18',
 ]
 
 [tool.setuptools.packages.find]
