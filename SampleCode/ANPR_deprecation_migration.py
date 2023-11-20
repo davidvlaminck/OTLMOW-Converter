@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 from otlmow_model.BaseClasses.OTLObject import create_dict_from_asset, OTLObject
 from otlmow_model.Helpers.OTLObjectHelper import print_overview_assets
 
@@ -15,8 +14,11 @@ if __name__ == '__main__':
     anprs = [a for a in assets if a.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#ANPRCamera']
     relations = [a for a in assets if a.typeURI != 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#ANPRCamera']
 
-    modelnamen = {a.modelnaam for a in anprs}
-    print(modelnamen)
+    actief = [a for a in anprs if a.isActief]
+    niet_actief = [a for a in anprs if not a.isActief]
+
+    print(len(actief))
+    print(len(niet_actief))
 
     assets_to_deliver = []
     for index, anpr in enumerate(anprs):
@@ -36,7 +38,9 @@ if __name__ == '__main__':
         dict_camera['assetId']['identificator'] = local_id
         dict_camera['assetId']['toegekendDoor'] = None
 
-        assets_to_deliver.append(OTLObject.from_dict(dict_camera))
+        camera_object = OTLObject.from_dict(dict_camera)
+        camera_object.beeldverwerkingsinstelling[0].typeBeeldverwerking = 'anpr'
+        assets_to_deliver.append(camera_object)
 
         # create a copy camera relation
         for relation in relations:
@@ -62,4 +66,4 @@ if __name__ == '__main__':
 
     print_overview_assets(assets_to_deliver)
 
-    converter.create_file_from_assets(Path('DA-2023-01229_export_ANPR_tei_deliver.json'), assets_to_deliver)
+    converter.create_file_from_assets(Path('export_ANPR_prd_deliver.json'), assets_to_deliver)
