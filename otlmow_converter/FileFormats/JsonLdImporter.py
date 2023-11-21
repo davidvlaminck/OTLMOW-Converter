@@ -4,8 +4,8 @@ from otlmow_converter.FileFormats.JsonLdDecoder import JsonLdDecoder
 
 
 class JsonLdImporter:
-    def __init__(self, settings, class_directory: str = None):
-        self.decoder = JsonLdDecoder(settings=settings, class_directory=class_directory)
+    def __init__(self, settings, model_directory: str = None):
+        self.decoder = JsonLdDecoder(settings=settings, model_directory=model_directory)
 
     def import_file(self, filepath: Path, **kwargs) -> list:
         """Imports a json file created with Davie and decodes it to OTL objects
@@ -21,8 +21,8 @@ class JsonLdImporter:
         if kwargs is not None:
             if 'ignore_failed_objects' in kwargs:
                 ignore_failed_objects = kwargs['ignore_failed_objects']
-            if 'class_directory' in kwargs:
-                self.decoder.class_directory = kwargs['class_directory']
+            if 'model_directory' in kwargs:
+                self.decoder.model_directory = kwargs['model_directory']
 
         with open(filepath, 'r') as file:
             data = file.read()

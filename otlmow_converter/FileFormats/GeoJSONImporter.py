@@ -31,7 +31,7 @@ class GeoJSONImporter:
 
         return self.decode_objects(data, ignore_failed_objects=ignore_failed_objects)
 
-    def decode_objects(self, data, ignore_failed_objects: bool = False, class_directory: str = None):
+    def decode_objects(self, data, ignore_failed_objects: bool = False, model_directory: str = None):
         list_of_objects = []
 
         for data_object in data['features']:
@@ -41,7 +41,7 @@ class GeoJSONImporter:
                     continue
                 raise ValueError('typeURI not found in properties')
 
-            asset = dynamic_create_instance_from_uri(props['typeURI'], directory=class_directory)
+            asset = dynamic_create_instance_from_uri(props['typeURI'], model_directory=model_directory)
             for dotnotation in props:
                 if dotnotation == 'typeURI':
                     continue

@@ -8,7 +8,7 @@ from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 
 
 class JsonLdDecoder:
-    def __init__(self, settings=None, class_directory: str = None):
+    def __init__(self, settings=None, model_directory: str = None):
         if settings is None:
             settings = {}
         self.settings = settings
@@ -20,7 +20,7 @@ class JsonLdDecoder:
             raise ValueError("Unable to find json in file formats settings")
 
         self.settings = json_settings
-        self.class_directory = class_directory
+        self.model_directory = model_directory
 
     def decode_json_string(self, json_string: str, ignore_failed_objects=False) -> [OTLObject]:
         dict_list = json.loads(json_string)
@@ -36,7 +36,7 @@ class JsonLdDecoder:
                 rdf_dict = self.transform_dict_to_rdf(d=obj, context_dict=context_dict)
                 del rdf_dict['@id']
                 del rdf_dict['@type']
-                instance = OTLObject.from_dict(rdf_dict, rdf=True, directory=self.class_directory,
+                instance = OTLObject.from_dict(rdf_dict, rdf=True, model_directory=self.model_directory,
                                                waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
                 lijst.append(instance)
             except Exception as ex:

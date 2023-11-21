@@ -16,11 +16,11 @@ class FileExporter:
     @staticmethod
     def get_exporter_from_extension(extension: str, settings: dict, **kwargs):
         if extension == 'csv':
-            class_directory = None
-            if kwargs is not None and 'class_directory' in kwargs:
-                class_directory = kwargs['class_directory']
+            model_directory = None
+            if kwargs is not None and 'model_directory' in kwargs:
+                model_directory = kwargs['model_directory']
             from otlmow_converter.FileFormats.CsvExporter import CsvExporter
-            return CsvExporter(settings=settings, class_directory=class_directory)
+            return CsvExporter(settings=settings, model_directory=model_directory)
         elif extension == 'json':
             from otlmow_converter.FileFormats.JsonExporter import JsonExporter
             return JsonExporter(settings=settings)

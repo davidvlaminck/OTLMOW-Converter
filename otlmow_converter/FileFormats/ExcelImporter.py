@@ -49,10 +49,10 @@ class ExcelImporter:
 
     def create_objects_from_data(self, **kwargs):
         list_of_objects = []
-        class_directory = None
+        model_directory = None
         if kwargs is not None:
-            if 'class_directory' in kwargs:
-                class_directory = kwargs['class_directory']
+            if 'model_directory' in kwargs:
+                model_directory = kwargs['model_directory']
 
         cardinality_indicator = self.settings['dotnotation']['cardinality_indicator']
 
@@ -60,7 +60,7 @@ class ExcelImporter:
             headers = data[0]
             type_index = headers.index('typeURI')
             for row in data[1:]:
-                instance = dynamic_create_instance_from_uri(row[type_index], directory=class_directory)
+                instance = dynamic_create_instance_from_uri(row[type_index], model_directory=model_directory)
                 list_of_objects.append(instance)
                 for index, row_value in enumerate(row):
                     if index == type_index:

@@ -20,14 +20,14 @@ class JsonDecoder:
 
         self.settings = json_settings
 
-    def decode_json_string(self, jsonString, ignore_failed_objects=False, classes_directory: str = None):
+    def decode_json_string(self, jsonString, ignore_failed_objects=False, model_directory: str = None):
         dict_list = json.loads(jsonString)
         lijst = []
         for obj in dict_list:
             try:
                 typeURI = next(value for key, value in obj.items() if 'typeURI' in key)
 
-                instance = dynamic_create_instance_from_uri(typeURI, directory=classes_directory)
+                instance = dynamic_create_instance_from_uri(typeURI, model_directory=model_directory)
                 lijst.append(instance)
 
                 for key, value in obj.items():

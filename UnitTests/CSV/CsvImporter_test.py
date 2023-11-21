@@ -42,7 +42,7 @@ def test_load_test_file():
     otl_facility = OtlmowConverter(settings_path=settings_file_location)
     importer = CsvImporter(settings=otl_facility.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
-    importer.import_file(file_location, class_directory='UnitTests.TestClasses.Classes')
+    importer.import_file(file_location, model_directory='UnitTests.TestClasses')
     assert len(importer.data) == 1
     assert len(importer.headers) == 35
 
@@ -52,7 +52,7 @@ def test_load_test_unnested_attributes():
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = CsvImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.csv'
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(objects) == 1
     assert len(importer.headers) == 17
 
@@ -86,7 +86,7 @@ def test_load_test_nested_attributes_1_level(caplog):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.csv'
 
     caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(caplog.records) == 12  # TODO supress logs
 
     assert len(objects) == 1
@@ -124,7 +124,7 @@ def test_load_test_nested_attributes_2_levels(caplog):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.csv'
 
     caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(caplog.records) == 7  # TODO supress logs
 
     assert len(objects) == 1
@@ -153,7 +153,7 @@ def test_load_test_subset_file(caplog):
     file_location = Path(__file__).parent / 'template_file_text_onderdeel_AllCasesTestClass.csv'
 
     caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(caplog.records) == 24  # TODO supress logs
 
     assert len(objects) == 1

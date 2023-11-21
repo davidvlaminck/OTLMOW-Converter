@@ -1,14 +1,12 @@
 import csv
 import logging
 import os
-import sys
 from pathlib import Path
 
-csv.field_size_limit(2147483647)
-
 from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
-
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+
+csv.field_size_limit(2147483647)
 
 
 class CsvImporter:
@@ -42,7 +40,7 @@ class CsvImporter:
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
         try:
-            with open(filepath, 'r', encoding='utf-8') as file:
+            with open(filepath, encoding='utf-8') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
                 self.data = []
                 for row_nr, row in enumerate(csv_reader):
@@ -58,11 +56,11 @@ class CsvImporter:
 
     def create_objects_from_data(self, **kwargs):
         list_of_objects = []
-        class_directory = None
+        model_directory = None
 
         if kwargs is not None:
-            if 'class_directory' in kwargs:
-                class_directory = kwargs['class_directory']
+            if 'model_directory' in kwargs:
+                model_directory = kwargs['model_directory']
 
         try:
             type_index = self.headers.index('typeURI')
@@ -70,7 +68,7 @@ class CsvImporter:
             raise ValueError('The data is missing essential typeURI data')
 
         for record in self.data:
-            instance = dynamic_create_instance_from_uri(record[type_index], directory=class_directory)
+            instance = dynamic_create_instance_from_uri(record[type_index], model_directory=model_directory)
             list_of_objects.append(instance)
             for index, row in enumerate(record):
                 if index == type_index:

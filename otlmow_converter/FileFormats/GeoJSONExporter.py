@@ -10,14 +10,14 @@ from geojson import LineString, Point, MultiPoint, MultiLineString, Polygon, Mul
 
 
 class GeoJSONExporter:
-    def __init__(self, settings, class_directory: str = 'otlmow_model.Classes', ):
+    def __init__(self, settings, model_directory: str = 'otlmow_model'):
         self.settings = next(s for s in settings['file_formats'] if s['name'] == 'geojson')
         self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
         self.encoder = OtlAssetGeoJSONEncoder(indent=4, settings=settings)
-        if class_directory is None:
-            class_directory = 'otlmow_model.Classes'
+        if model_directory is None:
+            model_directory = 'otlmow_model'
         self.table_exporter = TableExporter(dotnotation_settings=self.settings['dotnotation'],
-                                            class_directory=class_directory)
+                                            model_directory=model_directory)
 
     def export_to_file(self, filepath: Path, list_of_objects: list = None):
         list_of_dicts = self.convert_list_of_objects_to_list_of_geodicts(list_of_objects)

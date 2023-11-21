@@ -5,7 +5,7 @@ from otlmow_converter.FileFormats.TableExporter import TableExporter
 
 
 class CsvExporter:
-    def __init__(self, settings=None, class_directory: str = None, ignore_empty_asset_id: bool = False):
+    def __init__(self, settings=None, model_directory: str = None, ignore_empty_asset_id: bool = False):
         if settings is None:
             settings = {}
         self.settings = settings
@@ -18,7 +18,7 @@ class CsvExporter:
 
         self.settings = csv_settings
         self.table_exporter = TableExporter(dotnotation_settings=csv_settings['dotnotation'],
-                                            class_directory=class_directory,
+                                            model_directory=model_directory,
                                             ignore_empty_asset_id=ignore_empty_asset_id)
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs) -> None:

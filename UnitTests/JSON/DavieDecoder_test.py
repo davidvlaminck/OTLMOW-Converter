@@ -129,7 +129,7 @@ def test_invalid_typeURI():
     davie_decoder = set_up_decoder()
     with pytest.raises(ValueError):
         davie_decoder.decode_json_string('[{"typeURI": "https://invalid.uri.com"}]',
-                                         classes_directory='UnitTests.TestClasses.Classes')
+                                         model_directory='UnitTests.TestClasses')
 
 
 def test_decode_invalid_attribute():
@@ -137,14 +137,14 @@ def test_decode_invalid_attribute():
     with pytest.warns(NonStandardAttributeWarning):
         davie_decoder.decode_json_string(
             '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "invalid_attribute": "some value"}]',
-            classes_directory='UnitTests.TestClasses.Classes')
+            model_directory='UnitTests.TestClasses')
 
 
 def test_decode_empty_value():
     davie_decoder = set_up_decoder()
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "toestand": ""}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert AllCasesTestClass.typeURI == lijst_objecten[0].typeURI
     assert isinstance(lijst_objecten[0], AllCasesTestClass)
     assert lijst_objecten[0].toestand is None
@@ -154,7 +154,7 @@ def test_decode_Stringfield():
     davie_decoder = set_up_decoder()
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "testStringField": "string"}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testStringField == 'string'
 
 
@@ -163,7 +163,7 @@ def test_decode_StringfieldMetKard():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testStringFieldMetKard": ["string", "string2"]}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testStringFieldMetKard == ["string", "string2"]
 
 
@@ -171,7 +171,7 @@ def test_decode_DecimalNumberField():
     davie_decoder = set_up_decoder()
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "testDecimalField": 2.5}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testDecimalField == 2.5
 
 
@@ -180,7 +180,7 @@ def test_decode_TimeField():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testTimeField": "22:22:22"}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testTimeField == time(hour=22, minute=22, second=22)
 
 
@@ -189,7 +189,7 @@ def test_decode_DateTimeField():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testDateTimeField": "2022-2-2 22:22:22"}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testDateTimeField == datetime(year=2022, month=2, day=2, hour=22, minute=22, second=22)
 
 
@@ -197,7 +197,7 @@ def test_decode_DateField():
     davie_decoder = set_up_decoder()
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "testDateField": "2022-2-2"}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testDateField == date(year=2022, month=2, day=2)
 
 
@@ -205,7 +205,7 @@ def test_decode_testKwantWrd():
     davie_decoder = set_up_decoder()
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", "testKwantWrd": 3.5}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testKwantWrd.waarde == 3.5
 
 
@@ -217,7 +217,7 @@ def test_decode_testKwantWrd_waarde_shortcut_false():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testKwantWrd": { "waarde": 3.5}}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testKwantWrd.waarde == 3.5
 
 
@@ -226,7 +226,7 @@ def test_decode_testKwantWrdMetKard():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testKwantWrdMetKard": [4.5, 6.5]}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testKwantWrdMetKard[0].waarde == 4.5
     assert lijst_objecten[0].testKwantWrdMetKard[1].waarde == 6.5
 
@@ -236,7 +236,7 @@ def test_decode_UnionType():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testUnionType" : {"unionString": "string"}}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testUnionType.unionString == 'string'
 
 
@@ -245,7 +245,7 @@ def test_decode_ComplexType():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testComplexType" : {"testStringField": "string"}}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testComplexType.testStringField == 'string'
 
 
@@ -254,7 +254,7 @@ def test_decode_ComplexTypeMetKard():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testComplexTypeMetKard" : [{"testStringField": "string"}, {"testBooleanField": true}]}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testComplexTypeMetKard[0].testStringField == 'string'
     assert lijst_objecten[0].testComplexTypeMetKard[1].testBooleanField
 
@@ -264,7 +264,7 @@ def test_decode_ComplexType2():
     lijst_objecten = davie_decoder.decode_json_string(
         '[{"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass", '
         '"testComplexType" : {"testComplexType2" : {"testStringField": "string"}}}]',
-        classes_directory='UnitTests.TestClasses.Classes')
+        model_directory='UnitTests.TestClasses')
     assert lijst_objecten[0].testComplexType.testComplexType2.testStringField == 'string'
 
 

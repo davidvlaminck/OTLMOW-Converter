@@ -18,10 +18,10 @@ class TableExporterTests(unittest.TestCase):
         settings = load_settings(settings_file_location)
         csv_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'csv'), None)
         if class_dir_test_class:
-            class_dir = 'UnitTests.TestClasses.Classes'
+            class_dir = 'UnitTests.TestClasses'
         else:
             class_dir = None
-        return TableExporter(dotnotation_settings=csv_settings['dotnotation'], class_directory=class_dir)
+        return TableExporter(dotnotation_settings=csv_settings['dotnotation'], model_directory=class_dir)
 
     def test_init_exporter_only_load_with_settings(self):
         with self.subTest('load with correct settings'):
@@ -386,7 +386,7 @@ class TableExporterTests(unittest.TestCase):
             "cardinality_indicator": "()",
             "waarde_shortcut": False
         }
-        exporter = TableExporter(dotnotation_settings=settings, class_directory='UnitTests.TestClasses.Classes')
+        exporter = TableExporter(dotnotation_settings=settings, model_directory='UnitTests.TestClasses')
 
         instance = AllCasesTestClass()
         instance.assetId.identificator = '0000-0000'

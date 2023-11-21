@@ -25,7 +25,7 @@ def set_up_exporter():
             "separator": '.',
             'cardinality_indicator': '[]',
             'cardinality_separator': '|'
-        }}]}, class_directory='UnitTests.TestClasses.Classes')
+        }}]}, model_directory='UnitTests.TestClasses')
 
 
 def test_import_then_export():

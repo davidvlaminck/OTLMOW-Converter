@@ -10,12 +10,12 @@ from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 
 
 class TableExporter:
-    def __init__(self, dotnotation_settings: Dict = None, class_directory: str = 'otlmow_model.Classes',
+    def __init__(self, dotnotation_settings: Dict = None, model_directory: str = 'otlmow_model',
                  ignore_empty_asset_id: bool = False):
-        if class_directory is None:
-            class_directory = 'otlmow_model.Classes'
-        self.otl_object_ref = self._import_otl_object(class_directory)
-        self.relatie_object_ref = self._import_relatie_object(class_directory)
+        if model_directory is None:
+            model_directory = 'otlmow_model'
+        self.otl_object_ref = self._import_otl_object(model_directory)
+        self.relatie_object_ref = self._import_relatie_object(model_directory)
 
         self.ignore_empty_asset_id = ignore_empty_asset_id
 
@@ -33,7 +33,7 @@ class TableExporter:
         self.master = {}  # holds different "tabs", 1 for each typeURI, or one tab 'single'
 
     @staticmethod
-    def _import_otl_object(class_directory: str) -> Union[Type[OTLObject], None]:
+    def _import_otl_object(model_directory: str) -> Union[Type[OTLObject], None]:
         try:
             py_mod = __import__(name=f'otlmow_model.BaseClasses.OTLObject', fromlist=f'OTLObject')
         except ModuleNotFoundError:
@@ -42,9 +42,9 @@ class TableExporter:
         return class_
 
     @staticmethod
-    def _import_relatie_object(class_directory: str) -> Union[Type[RelatieObject], None]:
+    def _import_relatie_object(model_directory: str) -> Union[Type[RelatieObject], None]:
         try:
-            py_mod = __import__(name=f'{class_directory}.ImplementatieElement.RelatieObject', fromlist=f'RelatieObject')
+            py_mod = __import__(name=f'{model_directory}.Classes.ImplementatieElement.RelatieObject', fromlist=f'RelatieObject')
         except ModuleNotFoundError:
             return None
         class_ = getattr(py_mod, 'RelatieObject')

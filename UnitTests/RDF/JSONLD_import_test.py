@@ -25,7 +25,7 @@ def test_export_and_then_import_unnested_attributes():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     exporter = JsonLdExporter(settings=converter.settings)
-    importer = JsonLdImporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+    importer = JsonLdImporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -87,7 +87,7 @@ def test_export_and_then_import_nested_attributes_level_1():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     exporter = JsonLdExporter(settings=converter.settings)
-    importer = JsonLdImporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+    importer = JsonLdImporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -151,7 +151,7 @@ def test_export_and_then_import_nested_attributes_level_2():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     exporter = JsonLdExporter(settings=converter.settings)
-    importer = JsonLdImporter(settings=converter.settings, class_directory='UnitTests.TestClasses.Classes')
+    importer = JsonLdImporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'

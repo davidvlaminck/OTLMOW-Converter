@@ -36,7 +36,7 @@ def test_load_test_unnested_attributes():
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.xlsx'
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(objects) == 1
 
     instance = objects[0]
@@ -67,7 +67,7 @@ def test_load_test_nested_attributes_1_level():
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.xlsx'
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(objects) == 1
 
     instance = objects[0]
@@ -100,7 +100,7 @@ def test_load_test_ested_attributes_2_levels():
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.xlsx'
-    objects = importer.import_file(filepath=file_location, class_directory='UnitTests.TestClasses.Classes')
+    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(objects) == 1
 
     instance = objects[0]

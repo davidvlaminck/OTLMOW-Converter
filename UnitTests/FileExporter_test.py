@@ -39,7 +39,7 @@ def test_return_Exporter_correct_type(subtests):
             assert isinstance(exporter, ExcelExporter)
 
     with subtests.test(msg='returning CsvExporter'):
-        exporter = FileExporter.get_exporter_from_extension('csv', settings=unittest_settings, class_directory='')
+        exporter = FileExporter.get_exporter_from_extension('csv', settings=unittest_settings, model_directory='')
         assert isinstance(exporter, CsvExporter)
 
     with subtests.test(msg='returning TtlExporter'):

@@ -10,15 +10,15 @@ class AssetFactory:
     @staticmethod
     def create_otl_object_using_other_otl_object_as_template(orig_otl_object: OTLObject,
                                                              typeURI: str = '', fields_to_copy: [str] = None,
-                                                             directory: str = None) -> OTLObject:
+                                                             model_directory: str = None) -> OTLObject:
         """Creates an OTLObject, using another OTLObject as template.
         The parameter typeURI defines the type of the new OTLObject that is created.
         If omitted, it is assumed the same type as the given aimObject
         The parameter fields_to_copy dictates what fields are copied from the first object
         When the types do not match, fields_to_copy can not be empty"""
 
-        if directory is None:
-            directory = 'otlmow_model.Classes'
+        if model_directory is None:
+            model_directory = 'otlmow_model'
         if fields_to_copy is None:
             fields_to_copy = []
 
@@ -31,7 +31,7 @@ class AssetFactory:
 
         if typeURI == '':
             typeURI = orig_otl_object.typeURI
-        new_asset = dynamic_create_instance_from_uri(typeURI, directory=directory)
+        new_asset = dynamic_create_instance_from_uri(typeURI, model_directory=model_directory)
 
         if len(fields_to_copy) == 0:
             fields_to_copy = [orig_otl_object]
