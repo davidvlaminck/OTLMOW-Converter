@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_GeoJSONExporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-04 06:45 +0000
+            created at 2023-11-21 18:44 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -131,10 +131,10 @@
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="key">def</span> <span class="nam">create_objects_from_data</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">        <span class="nam">list_of_objects</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">        <span class="nam">class_directory</span> <span class="op">=</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">        <span class="nam">model_directory</span> <span class="op">=</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">        <span class="key">if</span> <span class="nam">kwargs</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">            <span class="key">if</span> <span class="str">'class_directory'</span> <span class="key">in</span> <span class="nam">kwargs</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">                <span class="nam">class_directory</span> <span class="op">=</span> <span class="nam">kwargs</span><span class="op">[</span><span class="str">'class_directory'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">            <span class="key">if</span> <span class="str">'model_directory'</span> <span class="key">in</span> <span class="nam">kwargs</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">                <span class="nam">model_directory</span> <span class="op">=</span> <span class="nam">kwargs</span><span class="op">[</span><span class="str">'model_directory'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">        <span class="nam">cardinality_indicator</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">settings</span><span class="op">[</span><span class="str">'dotnotation'</span><span class="op">]</span><span class="op">[</span><span class="str">'cardinality_indicator'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -142,7 +142,7 @@
     <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">            <span class="nam">headers</span> <span class="op">=</span> <span class="nam">data</span><span class="op">[</span><span class="num">0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">            <span class="nam">type_index</span> <span class="op">=</span> <span class="nam">headers</span><span class="op">.</span><span class="nam">index</span><span class="op">(</span><span class="str">'typeURI'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t">            <span class="key">for</span> <span class="nam">row</span> <span class="key">in</span> <span class="nam">data</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">                <span class="nam">instance</span> <span class="op">=</span> <span class="nam">dynamic_create_instance_from_uri</span><span class="op">(</span><span class="nam">row</span><span class="op">[</span><span class="nam">type_index</span><span class="op">]</span><span class="op">,</span> <span class="nam">directory</span><span class="op">=</span><span class="nam">class_directory</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">                <span class="nam">instance</span> <span class="op">=</span> <span class="nam">dynamic_create_instance_from_uri</span><span class="op">(</span><span class="nam">row</span><span class="op">[</span><span class="nam">type_index</span><span class="op">]</span><span class="op">,</span> <span class="nam">model_directory</span><span class="op">=</span><span class="nam">model_directory</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t64" href="#t64">64</a></span><span class="t">                <span class="nam">list_of_objects</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">instance</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t65" href="#t65">65</a></span><span class="t">                <span class="key">for</span> <span class="nam">index</span><span class="op">,</span> <span class="nam">row_value</span> <span class="key">in</span> <span class="nam">enumerate</span><span class="op">(</span><span class="nam">row</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t66" href="#t66">66</a></span><span class="t">                    <span class="key">if</span> <span class="nam">index</span> <span class="op">==</span> <span class="nam">type_index</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -183,7 +183,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_GeoJSONExporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-04 06:45 +0000
+            created at 2023-11-21 18:44 +0000
         </p>
     </div>
 </footer>

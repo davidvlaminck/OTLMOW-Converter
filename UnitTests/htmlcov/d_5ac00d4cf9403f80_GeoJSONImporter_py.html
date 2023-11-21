@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_JsonDecoder_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-04 06:45 +0000
+            created at 2023-11-21 18:44 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -113,7 +113,7 @@
     <p class="pln"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">decode_objects</span><span class="op">(</span><span class="nam">data</span><span class="op">,</span> <span class="nam">ignore_failed_objects</span><span class="op">=</span><span class="nam">ignore_failed_objects</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">    <span class="key">def</span> <span class="nam">decode_objects</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">data</span><span class="op">,</span> <span class="nam">ignore_failed_objects</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">False</span><span class="op">,</span> <span class="nam">class_directory</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="key">None</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">    <span class="key">def</span> <span class="nam">decode_objects</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">data</span><span class="op">,</span> <span class="nam">ignore_failed_objects</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">False</span><span class="op">,</span> <span class="nam">model_directory</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="key">None</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">        <span class="nam">list_of_objects</span> <span class="op">=</span> <span class="op">[</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">        <span class="key">for</span> <span class="nam">data_object</span> <span class="key">in</span> <span class="nam">data</span><span class="op">[</span><span class="str">'features'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -123,7 +123,7 @@
     <p class="mis show_mis"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">                    <span class="key">continue</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">                <span class="key">raise</span> <span class="nam">ValueError</span><span class="op">(</span><span class="str">'typeURI not found in properties'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">            <span class="nam">asset</span> <span class="op">=</span> <span class="nam">dynamic_create_instance_from_uri</span><span class="op">(</span><span class="nam">props</span><span class="op">[</span><span class="str">'typeURI'</span><span class="op">]</span><span class="op">,</span> <span class="nam">directory</span><span class="op">=</span><span class="nam">class_directory</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">            <span class="nam">asset</span> <span class="op">=</span> <span class="nam">dynamic_create_instance_from_uri</span><span class="op">(</span><span class="nam">props</span><span class="op">[</span><span class="str">'typeURI'</span><span class="op">]</span><span class="op">,</span> <span class="nam">model_directory</span><span class="op">=</span><span class="nam">model_directory</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">            <span class="key">for</span> <span class="nam">dotnotation</span> <span class="key">in</span> <span class="nam">props</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">                <span class="key">if</span> <span class="nam">dotnotation</span> <span class="op">==</span> <span class="str">'typeURI'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">                    <span class="key">continue</span>&nbsp;</span><span class="r"></span></p>
@@ -178,7 +178,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_JsonDecoder_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-04 06:45 +0000
+            created at 2023-11-21 18:44 +0000
         </p>
     </div>
 </footer>
