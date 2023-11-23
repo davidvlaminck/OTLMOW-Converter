@@ -70,14 +70,3 @@ class OtlmowConverter:
         """
         file_exporter = FileExporter(settings=self.settings)
         return file_exporter.create_file_from_assets(filepath=filepath, list_of_objects=list_of_objects, **kwargs)
-
-    @staticmethod
-    def _validate_environment(environment: str):
-        if environment is None:
-            return 'prd'
-        environment = environment.lower()
-        if environment in ['', 'prd']:
-            return 'prd'
-        elif environment in ['tei', 'dev', 'aim']:
-            return environment
-        raise ValueError("Valid options for the environment parameter are: '', 'prd', 'tei', 'dev' and 'aim'")
