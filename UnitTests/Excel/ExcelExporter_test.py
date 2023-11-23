@@ -44,6 +44,7 @@ def test_export_and_then_import_unnested_attributes():
     exporter = ExcelExporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
     instance = AllCasesTestClass()
+    instance.geometry = 'POINT Z(200000 200000)'
     instance.assetId.identificator = '0000-0000'
     instance.testBooleanField = False
     instance.testDateField = date(2019, 9, 20)
@@ -84,6 +85,7 @@ def test_export_and_then_import_unnested_attributes():
     assert instance.testStringFieldMetKard[0] == 'string1'
     assert instance.testStringFieldMetKard[1] == 'string2'
     assert instance.testTimeField == time(11, 5, 26)
+    assert instance.geometry == 'POINT Z(200000 200000)'
 
     os.unlink(file_location)
 
