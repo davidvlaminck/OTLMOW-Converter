@@ -1,5 +1,5 @@
-from otlmow_model.BaseClasses.KeuzelijstField import KeuzelijstField
-from otlmow_model.BaseClasses.OTLObject import get_attribute_by_name, get_attribute_by_uri
+from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import get_attribute_by_name, get_attribute_by_uri
 
 from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter

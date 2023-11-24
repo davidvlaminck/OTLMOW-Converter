@@ -1,7 +1,7 @@
 ﻿from typing import Union, Iterable, Tuple, List
 
-from otlmow_model.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
-from otlmow_model.BaseClasses.WaardenObject import WaardenObject
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
+from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
 
 SEPARATOR = '.'
 CARDINALITY_SEPARATOR = '|'

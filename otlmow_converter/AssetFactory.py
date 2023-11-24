@@ -1,9 +1,9 @@
 ﻿from typing import Union, List
 
-from otlmow_model.BaseClasses.OTLObject import set_value_by_dictitem, OTLObject
-from otlmow_model.Classes.ImplementatieElement.AIMObject import AIMObject
-from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
-from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem, OTLObject
+from otlmow_model.OtlmowModel.Classes.ImplementatieElement.AIMObject import AIMObject
+from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
+from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 
 class AssetFactory:

@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 

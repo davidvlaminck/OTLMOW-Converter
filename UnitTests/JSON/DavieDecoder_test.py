@@ -1,14 +1,14 @@
 from datetime import date, datetime, time
 
 import pytest
-from otlmow_model.Classes.Installatie.Wegberm import Wegberm
-from otlmow_model.Classes.Onderdeel.ExterneDetectie import ExterneDetectie
-from otlmow_model.Classes.Onderdeel.HeeftBetrokkene import HeeftBetrokkene
-from otlmow_model.Classes.Onderdeel.Netwerkpoort import Netwerkpoort
-from otlmow_model.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
-from otlmow_model.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
+from otlmow_model.OtlmowModel.Classes.Installatie.Wegberm import Wegberm
+from otlmow_model.OtlmowModel.Classes.Onderdeel.ExterneDetectie import ExterneDetectie
+from otlmow_model.OtlmowModel.Classes.Onderdeel.HeeftBetrokkene import HeeftBetrokkene
+from otlmow_model.OtlmowModel.Classes.Onderdeel.Netwerkpoort import Netwerkpoort
+from otlmow_model.OtlmowModel.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
+from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonDecoder import JsonDecoder
 
 # TODO: refactor to only use AllCasesTestClass

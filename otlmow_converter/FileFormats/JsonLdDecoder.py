@@ -1,9 +1,7 @@
 import json
 
-from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
-from otlmow_model.BaseClasses.OTLObject import OTLObject
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
-from otlmow_converter.FileFormats.DictDecoder import DictDecoder
 from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 
 

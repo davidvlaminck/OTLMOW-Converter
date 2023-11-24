@@ -1,11 +1,11 @@
 from datetime import date, datetime, time
 
-from otlmow_model.Classes.Onderdeel.Bevestiging import Bevestiging
-from otlmow_model.Helpers.RelationCreator import create_relation
+from otlmow_model.OtlmowModel.Classes.Onderdeel.Bevestiging import Bevestiging
+from otlmow_model.OtlmowModel.Helpers.RelationCreator import create_relation
 from rdflib import RDF, URIRef, Literal
 
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from UnitTests.TestClasses.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.FileFormats.RDFExporter import RDFExporter
 
 

@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 
-from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 
 csv.field_size_limit(2147483647)

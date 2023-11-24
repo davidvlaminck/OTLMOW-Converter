@@ -1,5 +1,5 @@
-﻿from otlmow_model.Classes.Onderdeel.Exoten import Exoten
-from otlmow_model.Classes.Onderdeel.InvasieveExoten import InvasieveExoten
+﻿from otlmow_model.OtlmowModel.Classes.Onderdeel.Exoten import Exoten
+from otlmow_model.OtlmowModel.Classes.Onderdeel.InvasieveExoten import InvasieveExoten
 
 from otlmow_converter.AssetFactory import AssetFactory
 

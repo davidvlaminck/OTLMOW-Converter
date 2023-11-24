@@ -1,11 +1,11 @@
 import unittest
 from datetime import date
 
-from otlmow_model.BaseClasses.OTLObject import OTLObject
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
 from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from UnitTests.TestClasses.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 from otlmow_converter.FileFormats.TableExporter import TableExporter
 from otlmow_converter.SettingsManager import load_settings

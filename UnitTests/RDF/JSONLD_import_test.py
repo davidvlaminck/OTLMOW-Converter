@@ -4,8 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator, DtcIdentificatorWaarden
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 from otlmow_converter.FileFormats.JsonLdImporter import JsonLdImporter
 from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder

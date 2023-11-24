@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import openpyxl
-from otlmow_model.Helpers.AssetCreator import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 

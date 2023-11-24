@@ -2,7 +2,7 @@ from datetime import time, datetime, date
 
 import pytest
 
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 
 

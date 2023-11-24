@@ -1,9 +1,9 @@
 import warnings
 from typing import Union, List, Type, Any, Dict
 
-from otlmow_model.BaseClasses.OTLObject import OTLObject
-from otlmow_model.Classes.ImplementatieElement.RelatieObject import RelatieObject
-from otlmow_model.Helpers.GenericHelper import get_shortened_uri
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
+from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning

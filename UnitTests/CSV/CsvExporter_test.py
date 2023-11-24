@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter

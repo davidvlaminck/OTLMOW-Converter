@@ -2,7 +2,7 @@ import json
 from collections import OrderedDict
 from typing import Dict
 
-from otlmow_model.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 
 
 class OtlAssetJSONLDEncoder(json.JSONEncoder):

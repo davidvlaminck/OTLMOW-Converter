@@ -2,10 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from UnitTests.TestClasses.Datatypes.DtcIdentificator import DtcIdentificator, DtcIdentificatorWaarden
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Datatypes.DtcIdentificator import DtcIdentificatorWaarden
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
-from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
 from otlmow_converter.FileFormats.OtlAssetJSONLDEncoder import OtlAssetJSONLDEncoder
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 

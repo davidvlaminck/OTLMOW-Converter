@@ -2,7 +2,7 @@ import json
 from collections import OrderedDict
 from pathlib import Path
 
-from otlmow_model.BaseClasses.OTLObject import OTLObject
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
 
 class OtlAssetGeoJSONEncoder(json.JSONEncoder):

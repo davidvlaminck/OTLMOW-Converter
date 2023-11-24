@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
-from UnitTests.TestClasses.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
