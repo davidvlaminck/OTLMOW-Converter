@@ -1,5 +1,10 @@
+import importlib
+import sys
 import warnings
+from pathlib import Path
 from typing import Union, List, Type, Any, Dict
+
+import otlmow_model
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
@@ -10,10 +15,17 @@ from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 
 
 class TableExporter:
-    def __init__(self, dotnotation_settings: Dict = None, model_directory: str = 'otlmow_model',
+    def __init__(self, dotnotation_settings: Dict = None, model_directory: Path = None,
                  ignore_empty_asset_id: bool = False):
+
+
         if model_directory is None:
-            model_directory = 'otlmow_model'
+            current_file_path = Path(__file__)
+            model_directory = Path(otlmow_model.__file__) / 'OtlmowModel'
+
+
+
+
         self.otl_object_ref = self._import_otl_object(model_directory)
         self.relatie_object_ref = self._import_relatie_object(model_directory)
 
@@ -33,22 +45,29 @@ class TableExporter:
         self.master = {}  # holds different "tabs", 1 for each typeURI, or one tab 'single'
 
     @staticmethod
-    def _import_otl_object(model_directory: str) -> Union[Type[OTLObject], None]:
+    def _import_otl_object(model_directory: Path) -> Union[Type[OTLObject], None]:
         try:
-            py_mod = __import__(name=f'otlmow_model.BaseClasses.OTLObject', fromlist=f'OTLObject')
+            mod = importlib.import_module('otlmow_model.OtlmowModel.BaseClasses.OTLObject')
+            class_ = getattr(mod, 'OTLObject')
+            return class_
+
         except ModuleNotFoundError:
-            return None
-        class_ = getattr(py_mod, 'OTLObject')
-        return class_
+            raise ModuleNotFoundError(f'When dynamically importing class OTLObject, the import failed. '
+                                      f'Make sure you are directing to the (parent) directory where OtlmowModel is '
+                                      f'located in.')
 
     @staticmethod
-    def _import_relatie_object(model_directory: str) -> Union[Type[RelatieObject], None]:
+    def _import_relatie_object(model_directory: Path) -> Union[Type[RelatieObject], None]:
+        sys.path.insert(1, str(model_directory))
         try:
-            py_mod = __import__(name=f'{model_directory}.Classes.ImplementatieElement.RelatieObject', fromlist=f'RelatieObject')
+            mod = importlib.import_module('OtlmowModel.Classes.ImplementatieElement.RelatieObject')
+            class_ = getattr(mod, 'RelatieObject')
+            return class_
+
         except ModuleNotFoundError:
-            return None
-        class_ = getattr(py_mod, 'RelatieObject')
-        return class_
+            raise ModuleNotFoundError(f'When dynamically importing class RelatieObject, the import failed. '
+                                      f'Make sure you are directing to the (parent) directory where OtlmowModel is '
+                                      f'located in.')
 
     @staticmethod
     def _sort_headers(headers: List[str]) -> List[str]:
