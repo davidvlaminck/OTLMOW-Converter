@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -20,7 +21,7 @@ class JsonDecoder:
 
         self.settings = json_settings
 
-    def decode_json_string(self, jsonString, ignore_failed_objects=False, model_directory: str = None):
+    def decode_json_string(self, jsonString, ignore_failed_objects=False, model_directory: Path = None):
         dict_list = json.loads(jsonString)
         lijst = []
         for obj in dict_list:

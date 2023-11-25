@@ -1,9 +1,12 @@
 from datetime import time, datetime, date
+from pathlib import Path
 
 import pytest
 
-from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
+
+model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
 def set_up_importer():
@@ -27,7 +30,7 @@ def test_decode_invalid_attribute():
     importer = set_up_importer()
     with pytest.raises(AttributeError):
         importer.decode_objects(
-            model_directory='UnitTests.TestClasses', data=
+            model_directory=model_directory_path, data=
             {"type": "FeatureCollection", "features": [{
                 "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
                 "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -37,21 +40,21 @@ def test_decode_invalid_attribute():
 def test_decode_empty_value():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
                            "toestand": None}}]})
 
     assert AllCasesTestClass.typeURI == lijst_objecten[0].typeURI
-    assert isinstance(lijst_objecten[0], AllCasesTestClass)
+    assert lijst_objecten[0].is_instance_of(AllCasesTestClass, model_directory=model_directory_path, dynamic_created=True)
     assert lijst_objecten[0].toestand is None
 
 
 def test_decode_Stringfield():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -64,7 +67,7 @@ def test_decode_Stringfield():
 def test_decode_StringfieldMetKard():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -76,7 +79,7 @@ def test_decode_StringfieldMetKard():
 def test_decode_DecimalNumberField():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -88,7 +91,7 @@ def test_decode_DecimalNumberField():
 def test_decode_TimeField():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -100,7 +103,7 @@ def test_decode_TimeField():
 def test_decode_DateTimeField():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -112,7 +115,7 @@ def test_decode_DateTimeField():
 def test_decode_DateField():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -124,7 +127,7 @@ def test_decode_DateField():
 def test_decode_testKwantWrd():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -137,7 +140,7 @@ def test_decode_testKwantWrd_waarde_shortcut_false():
     importer = set_up_importer()
     importer.settings['dotnotation']['waarde_shortcut_applicable'] = False
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -149,7 +152,7 @@ def test_decode_testKwantWrd_waarde_shortcut_false():
 def test_decode_testKwantWrdMetKard():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
@@ -162,7 +165,7 @@ def test_decode_testKwantWrdMetKard():
 def test_decode_UnionType():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -174,7 +177,7 @@ def test_decode_UnionType():
 def test_decode_ComplexType():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -186,7 +189,7 @@ def test_decode_ComplexType():
 def test_decode_ComplexTypeMetKard():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -200,7 +203,7 @@ def test_decode_ComplexTypeMetKard():
 def test_decode_ComplexType2():
     importer = set_up_importer()
     lijst_objecten = importer.decode_objects(
-        model_directory='UnitTests.TestClasses', data=
+        model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",

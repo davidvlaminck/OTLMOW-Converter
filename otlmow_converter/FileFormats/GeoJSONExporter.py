@@ -10,7 +10,7 @@ from geojson import LineString, Point, MultiPoint, MultiLineString, Polygon, Mul
 
 
 class GeoJSONExporter:
-    def __init__(self, settings, model_directory: str = 'otlmow_model'):
+    def __init__(self, settings, model_directory: Path = None):
         self.settings = next(s for s in settings['file_formats'] if s['name'] == 'geojson')
         self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
         self.encoder = OtlAssetGeoJSONEncoder(indent=4, settings=settings)

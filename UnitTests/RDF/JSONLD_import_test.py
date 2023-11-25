@@ -2,12 +2,9 @@ import os
 from datetime import date, datetime, time
 from pathlib import Path
 
-import pytest
-
-from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 from otlmow_converter.FileFormats.JsonLdImporter import JsonLdImporter
-from otlmow_converter.FileFormats.OtlAssetJSONEncoder import OtlAssetJSONEncoder
 from otlmow_converter.FileFormats.OtlAssetJSONLDEncoder import OtlAssetJSONLDEncoder
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 

@@ -6,7 +6,7 @@ from otlmow_converter.FileFormats.TableExporter import TableExporter
 
 
 class ExcelExporter:
-    def __init__(self, settings=None, model_directory: str = None, ignore_empty_asset_id: bool = False):
+    def __init__(self, settings=None, model_directory: Path = None, ignore_empty_asset_id: bool = False):
 
         if settings is None:
             settings = {}

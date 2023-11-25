@@ -13,8 +13,8 @@ class FileExporter:
         exporter = self.get_exporter_from_extension(extension=extension, settings=self.settings, **kwargs)
         return exporter.export_to_file(filepath=filepath, list_of_objects=list_of_objects, **kwargs)
 
-    @staticmethod
-    def get_exporter_from_extension(extension: str, settings: dict, **kwargs):
+    @classmethod
+    def get_exporter_from_extension(cls, extension: str, settings: dict, **kwargs):
         if extension == 'csv':
             model_directory = None
             if kwargs is not None and 'model_directory' in kwargs:

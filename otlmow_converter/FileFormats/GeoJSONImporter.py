@@ -31,7 +31,7 @@ class GeoJSONImporter:
 
         return self.decode_objects(data, ignore_failed_objects=ignore_failed_objects)
 
-    def decode_objects(self, data, ignore_failed_objects: bool = False, model_directory: str = None):
+    def decode_objects(self, data, ignore_failed_objects: bool = False, model_directory: Path = None):
         list_of_objects = []
 
         for data_object in data['features']:

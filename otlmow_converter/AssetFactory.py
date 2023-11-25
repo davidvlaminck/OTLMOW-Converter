@@ -1,4 +1,5 @@
-﻿from typing import Union, List
+﻿from pathlib import Path
+from typing import Union, List
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem, OTLObject
 from otlmow_model.OtlmowModel.Classes.ImplementatieElement.AIMObject import AIMObject
@@ -10,7 +11,7 @@ class AssetFactory:
     @staticmethod
     def create_otl_object_using_other_otl_object_as_template(orig_otl_object: OTLObject,
                                                              typeURI: str = '', fields_to_copy: [str] = None,
-                                                             model_directory: str = None) -> OTLObject:
+                                                             model_directory: Path = None) -> OTLObject:
         """Creates an OTLObject, using another OTLObject as template.
         The parameter typeURI defines the type of the new OTLObject that is created.
         If omitted, it is assumed the same type as the given aimObject
@@ -18,7 +19,10 @@ class AssetFactory:
         When the types do not match, fields_to_copy can not be empty"""
 
         if model_directory is None:
-            model_directory = 'otlmow_model'
+            import otlmow_model
+            otlmow_path = otlmow_model.__path__
+            model_directory = Path(otlmow_path._path[0])
+
         if fields_to_copy is None:
             fields_to_copy = []
 

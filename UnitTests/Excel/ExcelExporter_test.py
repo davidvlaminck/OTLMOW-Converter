@@ -5,11 +5,13 @@ from pathlib import Path
 import pytest
 
 from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
-from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
+
+model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 def set_up_converter():
     settings_file_location = get_settings_path_for_unittests()
@@ -41,7 +43,7 @@ def test_export_and_then_import_unnested_attributes():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
-    exporter = ExcelExporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
     instance = AllCasesTestClass()
     instance.geometry = 'POINT Z (200000 200000 0)'
@@ -63,7 +65,7 @@ def test_export_and_then_import_unnested_attributes():
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
                             split_per_type=False)
 
-    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
+    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
 
     instance = objects[0]
@@ -87,14 +89,14 @@ def test_export_and_then_import_unnested_attributes():
     assert instance.testTimeField == time(11, 5, 26)
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
-    # os.unlink(file_location)
+    os.unlink(file_location)
 
 
 def test_export_and_then_import_nested_attributes_level_1():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
-    exporter = ExcelExporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -135,7 +137,7 @@ def test_export_and_then_import_nested_attributes_level_1():
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
                             split_per_type=False)
 
-    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
+    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
 
     instance = objects[0]
@@ -171,7 +173,7 @@ def test_export_and_then_import_nested_attributes_level_2():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
-    exporter = ExcelExporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -195,7 +197,7 @@ def test_export_and_then_import_nested_attributes_level_2():
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
                             split_per_type=False)
 
-    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
+    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'

@@ -4,7 +4,7 @@ import warnings
 from pathlib import Path
 from typing import Union, List, Type, Any, Dict
 
-import otlmow_model
+
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
@@ -18,15 +18,12 @@ class TableExporter:
     def __init__(self, dotnotation_settings: Dict = None, model_directory: Path = None,
                  ignore_empty_asset_id: bool = False):
 
-
         if model_directory is None:
-            current_file_path = Path(__file__)
-            model_directory = Path(otlmow_model.__file__) / 'OtlmowModel'
+            import otlmow_model
+            otlmow_path = otlmow_model.__path__
+            model_directory = Path(otlmow_path._path[0])
 
-
-
-
-        self.otl_object_ref = self._import_otl_object(model_directory)
+        self.otl_object_ref = self._import_otl_object()
         self.relatie_object_ref = self._import_relatie_object(model_directory)
 
         self.ignore_empty_asset_id = ignore_empty_asset_id
@@ -44,8 +41,9 @@ class TableExporter:
 
         self.master = {}  # holds different "tabs", 1 for each typeURI, or one tab 'single'
 
-    @staticmethod
-    def _import_otl_object(model_directory: Path) -> Union[Type[OTLObject], None]:
+    @classmethod
+    def _import_otl_object(cls) -> Union[Type[OTLObject], None]:
+        import otlmow_model
         try:
             mod = importlib.import_module('otlmow_model.OtlmowModel.BaseClasses.OTLObject')
             class_ = getattr(mod, 'OTLObject')
@@ -56,8 +54,8 @@ class TableExporter:
                                       f'Make sure you are directing to the (parent) directory where OtlmowModel is '
                                       f'located in.')
 
-    @staticmethod
-    def _import_relatie_object(model_directory: Path) -> Union[Type[RelatieObject], None]:
+    @classmethod
+    def _import_relatie_object(cls, model_directory: Path) -> Union[Type[RelatieObject], None]:
         sys.path.insert(1, str(model_directory))
         try:
             mod = importlib.import_module('OtlmowModel.Classes.ImplementatieElement.RelatieObject')

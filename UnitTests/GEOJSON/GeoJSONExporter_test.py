@@ -2,11 +2,12 @@ import json
 import unittest
 from pathlib import Path
 
-from UnitTests.TestClasses.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
 from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 
 base_dir = Path(__file__).parent
+model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
 def set_up_importer():
@@ -25,10 +26,10 @@ def set_up_exporter():
             "separator": '.',
             'cardinality_indicator': '[]',
             'cardinality_separator': '|'
-        }}]}, model_directory='UnitTests.TestClasses')
+        }}]}, model_directory=model_directory_path)
 
 
-@unittest.skip
+@ unittest.skip('takes too long to run')
 def test_import_then_export():
     importer = set_up_importer()
     exporter = set_up_exporter()
