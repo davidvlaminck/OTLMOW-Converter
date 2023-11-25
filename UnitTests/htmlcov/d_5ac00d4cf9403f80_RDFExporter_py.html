@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for /home/runner/work/OTLMOW-Converter/OTLMOW-Converter/otlmow_converter/FileFormats/RDFExporter.py: 93%</title>
+    <title>Coverage for /home/runner/work/OTLMOW-Converter/OTLMOW-Converter/otlmow_converter/FileFormats/RDFExporter.py: 90%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>/home/runner/work/OTLMOW-Converter/OTLMOW-Converter/otlmow_converter/FileFormats/RDFExporter.py</b>:
-            <span class="pc_cov">93%</span>
+            <span class="pc_cov">90%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">60 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">56<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">4<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">54<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">6<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_TableExporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-04 06:45 +0000
+            created at 2023-11-25 08:41 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -82,9 +82,9 @@
 <main id="source">
     <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">from</span> <span class="nam">typing</span> <span class="key">import</span> <span class="nam">Dict</span><span class="op">,</span> <span class="nam">Iterable</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_model</span><span class="op">.</span><span class="nam">BaseClasses</span><span class="op">.</span><span class="nam">FloatOrDecimalField</span> <span class="key">import</span> <span class="nam">FloatOrDecimalField</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_model</span><span class="op">.</span><span class="nam">BaseClasses</span><span class="op">.</span><span class="nam">KeuzelijstField</span> <span class="key">import</span> <span class="nam">KeuzelijstField</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_model</span><span class="op">.</span><span class="nam">Classes</span><span class="op">.</span><span class="nam">ImplementatieElement</span><span class="op">.</span><span class="nam">RelatieObject</span> <span class="key">import</span> <span class="nam">RelatieObject</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_model</span><span class="op">.</span><span class="nam">OtlmowModel</span><span class="op">.</span><span class="nam">BaseClasses</span><span class="op">.</span><span class="nam">FloatOrDecimalField</span> <span class="key">import</span> <span class="nam">FloatOrDecimalField</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_model</span><span class="op">.</span><span class="nam">OtlmowModel</span><span class="op">.</span><span class="nam">BaseClasses</span><span class="op">.</span><span class="nam">KeuzelijstField</span> <span class="key">import</span> <span class="nam">KeuzelijstField</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_model</span><span class="op">.</span><span class="nam">OtlmowModel</span><span class="op">.</span><span class="nam">Classes</span><span class="op">.</span><span class="nam">ImplementatieElement</span><span class="op">.</span><span class="nam">RelatieObject</span> <span class="key">import</span> <span class="nam">RelatieObject</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">rdflib</span> <span class="key">import</span> <span class="nam">Graph</span><span class="op">,</span> <span class="nam">FOAF</span><span class="op">,</span> <span class="nam">URIRef</span><span class="op">,</span> <span class="nam">BNode</span><span class="op">,</span> <span class="nam">Literal</span><span class="op">,</span> <span class="nam">RDF</span><span class="op">,</span> <span class="nam">XSD</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -126,9 +126,9 @@
     <p class="run"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">            <span class="nam">g</span><span class="op">.</span><span class="nam">add</span><span class="op">(</span><span class="op">(</span><span class="nam">asset</span><span class="op">,</span> <span class="nam">RDF</span><span class="op">.</span><span class="nam">type</span><span class="op">,</span> <span class="nam">type_node</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t45" href="#t45">45</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t46" href="#t46">46</a></span><span class="t">            <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">instance</span><span class="op">,</span> <span class="nam">RelatieObject</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">                <span class="nam">g</span><span class="op">.</span><span class="nam">add</span><span class="op">(</span><span class="op">(</span><span class="nam">asset</span><span class="op">,</span> <span class="nam">URIRef</span><span class="op">(</span><span class="str">'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#bron'</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t">                <span class="nam">g</span><span class="op">.</span><span class="nam">add</span><span class="op">(</span><span class="op">(</span><span class="nam">asset</span><span class="op">,</span> <span class="nam">URIRef</span><span class="op">(</span><span class="str">'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#bron'</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t">                       <span class="nam">URIRef</span><span class="op">(</span><span class="str">'https://data.awvvlaanderen.be/id/asset/'</span> <span class="op">+</span> <span class="nam">instance</span><span class="op">.</span><span class="nam">bronAssetId</span><span class="op">.</span><span class="nam">identificator</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">                <span class="nam">g</span><span class="op">.</span><span class="nam">add</span><span class="op">(</span><span class="op">(</span><span class="nam">asset</span><span class="op">,</span> <span class="nam">URIRef</span><span class="op">(</span><span class="str">'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#doel'</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t">                <span class="nam">g</span><span class="op">.</span><span class="nam">add</span><span class="op">(</span><span class="op">(</span><span class="nam">asset</span><span class="op">,</span> <span class="nam">URIRef</span><span class="op">(</span><span class="str">'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#doel'</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">                       <span class="nam">URIRef</span><span class="op">(</span><span class="str">'https://data.awvvlaanderen.be/id/asset/'</span> <span class="op">+</span> <span class="nam">instance</span><span class="op">.</span><span class="nam">doelAssetId</span><span class="op">.</span><span class="nam">identificator</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">            <span class="nam">self</span><span class="op">.</span><span class="nam">_add_attributes_to_graph</span><span class="op">(</span><span class="nam">graph</span><span class="op">=</span><span class="nam">g</span><span class="op">,</span> <span class="nam">asset_or_attribute</span><span class="op">=</span><span class="nam">instance</span><span class="op">,</span> <span class="nam">asset_attribute_ref</span><span class="op">=</span><span class="nam">asset</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -186,7 +186,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_TableExporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-04 06:45 +0000
+            created at 2023-11-25 08:41 +0000
         </p>
     </div>
 </footer>
