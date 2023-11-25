@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "otlmow_converter"
-version = "0.13"
+version = "0.14"
 authors = [{name = "David Vlaminck", email = "david.vlaminck@mow.vlaanderen.be"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -21,7 +21,7 @@ classifiers = [
 requires-python = ">=3.7"
 dependencies = [
     'openpyxl >= 3.0',
-    'otlmow-model >= 2.9.1',
+    'otlmow-model >= 2.9.2',
     'rdflib >= 6.0.0',
     'geojson>=3.0.1',
     'prettytable>=3.6.0',
