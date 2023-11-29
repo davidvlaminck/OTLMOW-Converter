@@ -3,6 +3,8 @@
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
 
+from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+
 SEPARATOR = '.'
 CARDINALITY_SEPARATOR = '|'
 CARDINALITY_INDICATOR = '[]'
@@ -116,7 +118,7 @@ class DotnotationHelper:
         """
 
         if len(dotnotation.split(cardinality_indicator)) > 2:
-            raise ValueError("can't use dotnotation for lists of lists")
+            raise DotnotationListOfListError("can't use dotnotation for lists of lists")
 
         if separator in dotnotation:
             first_part = dotnotation.split(separator)[0]
