@@ -1,9 +1,13 @@
 import os
 from datetime import date, datetime, time
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 
+from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
+from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
@@ -120,3 +124,48 @@ def test_load_test_ested_attributes_2_levels():
     assert instance.testComplexTypeMetKard[1].testComplexType2.testStringField == 'string2'
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testKwantWrd.waarde is None
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
+
+
+def test_get_index_of_typeURI_column_in_sheet():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    importer = ExcelImporter(settings=converter.settings)
+    file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
+    orig_create_objects_from_data = importer.create_objects_from_data
+    importer.create_objects_from_data = Mock()
+    importer.import_file(filepath=file_location, model_directory=model_directory_path)
+
+    for sheet, data in importer.data.items():
+        sheet_name = str(sheet)
+        headers = data[0]
+        if sheet_name == '<Worksheet "correct_sheet">':
+            type_uri_index = importer.get_index_of_typeURI_column_in_sheet(
+                filepath=file_location, sheet='correct_sheet', headers=headers, data=data)
+            assert type_uri_index == 0
+            break
+
+    importer = ExcelImporter(settings=converter.settings)
+    importer.create_objects_from_data = orig_create_objects_from_data
+
+    try:
+        importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    except Exception as ex:
+        assert isinstance(ex, ExceptionsGroup)
+        assert len(ex.exceptions) == 3
+
+        exception_1 = ex.exceptions[0]
+        assert isinstance(exception_1, TypeUriNotInFirstRowError)
+        assert exception_1.file_path == file_location
+        assert exception_1.tab == 'type_uri_third_row'
+
+        exception_2 = ex.exceptions[1]
+        assert isinstance(exception_2, NoTypeUriInExcelTabError)
+        assert exception_2.file_path == file_location
+        assert exception_2.tab == 'no_type_uri_in_sheet'
+
+        exception_3 = ex.exceptions[2]
+        assert isinstance(exception_3, NoTypeUriInExcelTabError)
+        assert exception_3.file_path == file_location
+        assert exception_3.tab == 'empty_sheet'
+
+
