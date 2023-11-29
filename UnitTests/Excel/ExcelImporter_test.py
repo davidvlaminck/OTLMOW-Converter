@@ -6,6 +6,7 @@ from unittest.mock import Mock
 import pytest
 
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
@@ -102,7 +103,7 @@ def test_load_test_nested_attributes_1_level():
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-def test_load_test_ested_attributes_2_levels():
+def test_load_test_nested_attributes_2_levels():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
@@ -149,6 +150,7 @@ def test_get_index_of_typeURI_column_in_sheet():
 
     try:
         importer.import_file(filepath=file_location, model_directory=model_directory_path)
+        assert False
     except Exception as ex:
         assert isinstance(ex, ExceptionsGroup)
         assert len(ex.exceptions) == 3
@@ -167,5 +169,21 @@ def test_get_index_of_typeURI_column_in_sheet():
         assert isinstance(exception_3, NoTypeUriInExcelTabError)
         assert exception_3.file_path == file_location
         assert exception_3.tab == 'empty_sheet'
+
+
+def test_check_headers():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    importer = ExcelImporter(settings=converter.settings)
+    file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
+
+    try:
+        importer.check_headers(
+            filepath=file_location, model_directory=model_directory_path, sheet='<Worksheet "correct_sheet">',
+            headers=['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
+            type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass')
+        assert False
+    except InvalidColumnNamesInExcelTabError as ex:
+        assert ex.bad_columns == ['bad_name_field', '[DEPRECATED] d_a', 'list[].list[]']
 
 

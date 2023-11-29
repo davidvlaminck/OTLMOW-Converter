@@ -7,7 +7,9 @@ import openpyxl
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 
@@ -65,6 +67,8 @@ class ExcelImporter:
                 headers = data[0]
                 type_uri_index = self.get_index_of_typeURI_column_in_sheet(
                     filepath=filepath, sheet=sheet, headers=headers, data=data)
+                self.check_headers(headers=headers, sheet=sheet, filepath=filepath, type_uri=data[1][type_uri_index],
+                                   model_directory=model_directory)
 
                 for row in data[1:]:
                     instance = dynamic_create_instance_from_uri(row[type_uri_index], model_directory=model_directory)
@@ -96,7 +100,9 @@ class ExcelImporter:
                                     instance_or_attribute=instance, dotnotation=header, value=str(row_value),
                                     convert_warnings=False)
                             else:
-                                raise type_error
+                                exception_group.add_exception(type_error)
+                        except Exception as ex:
+                            exception_group.add_exception(ex)
             except BaseException as ex:
                 exception_group.add_exception(ex)
 
@@ -129,3 +135,28 @@ class ExcelImporter:
                     message=f'The typeURI is not in the first row in Excel tab {sheet_name} in file {filepath.name}.'
                             f' Please remove the excess rows', file_path=filepath, tab=sheet_name)
         return type_index
+
+    def check_headers(self, headers, sheet, filepath, type_uri, model_directory):
+        sheet_name = str(sheet)[12:-2]
+        instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
+        error = InvalidColumnNamesInExcelTabError(
+            message=f'There are invalid column names in Excel tab {sheet_name} in file {filepath.name}, see attribute '
+                    f'bad_columns', file_path=filepath, tab=sheet_name)
+        for header in headers:
+            if header == 'typeURI':
+                continue
+            if header in ['bron.typeURI', 'doel.typeURI']:
+                continue
+            if header.startswith('[DEPRECATED] '):
+                error.bad_columns.append(header)
+                continue
+            try:
+                self.dotnotation_helper.get_attribute_by_dotnotation_instance(
+                    instance_or_attribute=instance, dotnotation=header)
+            except (AttributeError, DotnotationListOfListError):
+                error.bad_columns.append(header)
+
+        if len(error.bad_columns) > 0:
+            raise error
+
+
