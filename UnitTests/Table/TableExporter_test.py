@@ -11,7 +11,7 @@ from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 from otlmow_converter.FileFormats.TableExporter import TableExporter
 from otlmow_converter.SettingsManager import load_settings
 
-model_directory_path = Path(__file__).parent / 'TestModel'
+model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
 def set_up_exporter(class_dir_test_class=True):
@@ -44,18 +44,10 @@ def test_init_exporter_only_load_with_settings(subtests):
         exporter = set_up_exporter(class_dir_test_class=False)
         assert exporter.otl_object_ref.typeURI is None
 
-    with subtests.test(msg='_import_relatie_object otlmow_model'):
-        exporter = set_up_exporter(class_dir_test_class=False)
-        assert 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#RelatieObject' == exporter.relatie_object_ref.typeURI
-
     with subtests.test(msg='_import_otl_object unittestclass'):
         exporter = set_up_exporter()
         assert exporter.otl_object_ref.typeURI is None
         assert issubclass(exporter.otl_object_ref, OTLObject) == True
-
-    with subtests.test(msg='_import_relatie_object unittestclass'):
-        exporter = set_up_exporter()
-        assert 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#RelatieObject' == exporter.relatie_object_ref.typeURI
 
 
 def test_master_dict_basic_functionality(subtests):
@@ -190,18 +182,18 @@ def test_fill_master_dict_edge_cases(subtests):
             list_of_objects[0].assetId.identificator = ''
             exporter.fill_master_dict(list_of_objects)
 
-    with subtests.test(msg='object in list with valid assetId -> string'):
+    with (subtests.test(msg='object in list with valid assetId -> string')):
         exporter = set_up_exporter()
         list_of_objects = [AllCasesTestClass()]
         list_of_objects[0].assetId.identificator = '0'
         exporter.fill_master_dict(list_of_objects)
         tabular_data = exporter.master['onderdeel#AllCasesTestClass']
 
-        assert 'typeURI'== tabular_data['headers'][0]
+        assert 'typeURI' == tabular_data['headers'][0]
         assert 'assetId.identificator' == tabular_data['headers'][1]
-        assert 'assetId.toegekendDoor'== tabular_data['headers'][2]
-        assert 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'== tabular_data['data'][0]['typeURI']
-        assert '0'== tabular_data['data'][0]['assetId.identificator']
+        assert 'assetId.toegekendDoor' == tabular_data['headers'][2]
+        assert 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass' == tabular_data['data'][0]['typeURI']
+        assert '0' == tabular_data['data'][0]['assetId.identificator']
         assert None == tabular_data['data'][0]['assetId.toegekendDoor']
 
 
@@ -220,8 +212,8 @@ def test_get_data_as_table_basic_functionality(subtests):
         exporter.fill_master_dict(list_of_objects)
         table_data = exporter.get_data_as_table('onderdeel#AllCasesTestClass')
         assert [['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
-                              ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0',
-                               '']] == table_data
+                ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0',
+                 '']] == table_data
 
     with subtests.test(msg='one object, primitive attributes in reverse order'):
         exporter = set_up_exporter()
@@ -253,7 +245,7 @@ def test_get_data_as_table_two_different_types_split_false():
         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', '', '', 'string1'],
         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', '', 'notitie2', '']]
     assert expected_data == table_data
-    
+
 
 def test_get_data_as_table_basic_nonempty_objects_same_type():
     exporter = set_up_exporter()
@@ -307,7 +299,8 @@ def test_fill_master_dict_cardinality(subtests):
         list_of_objects[0].assetId.identificator = '0'
         list_of_objects[0].testStringFieldMetKard = ['string1', 'string2']
         exporter.fill_master_dict(list_of_objects)
-        assert ['string1', 'string2'] == exporter.master['onderdeel#AllCasesTestClass']['data'][0]['testStringFieldMetKard[]']
+        assert ['string1', 'string2'] == exporter.master['onderdeel#AllCasesTestClass']['data'][0][
+            'testStringFieldMetKard[]']
 
 
 def test_stringify_value(subtests):
@@ -353,6 +346,7 @@ def test_stringify_value(subtests):
     with subtests.test(msg='list of list'):
         with pytest.raises(ValueError):
             exporter._stringify_value([[]])
+
 
 def test_get_data_as_table_different_cardinality_among_subattributes(subtests):
     with subtests.test(msg='empty list'):

@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Union, List, Type, Any, Dict
 
 
-
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
@@ -24,7 +23,6 @@ class TableExporter:
             model_directory = Path(otlmow_path._path[0])
 
         self.otl_object_ref = self._import_otl_object()
-        self.relatie_object_ref = self._import_relatie_object(model_directory)
 
         self.ignore_empty_asset_id = ignore_empty_asset_id
 
@@ -103,9 +101,13 @@ class TableExporter:
         identificator_key = 'assetId.identificator'.replace('.', self.settings['separator'])
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.settings['separator'])
         for otl_object in list_of_objects:
-            if not isinstance(otl_object, self.otl_object_ref) and not isinstance(otl_object, self.relatie_object_ref):
+            if not hasattr(otl_object, 'is_instance_of'):
                 warnings.warn(
-                    BadTypeWarning(f'{otl_object} is not of type AIMObject or RelatieObject. Ignoring this object'))
+                    BadTypeWarning(f'{otl_object} does not have an is_instance_of method. Ignoring this object'))
+                continue
+            if not otl_object.is_instance_of(self.otl_object_ref):
+                warnings.warn(
+                    BadTypeWarning(f'{otl_object} is not of type AIMObject. Ignoring this object'))
                 continue
 
             if not self.ignore_empty_asset_id:
