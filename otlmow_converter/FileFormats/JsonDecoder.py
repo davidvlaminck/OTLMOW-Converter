@@ -4,8 +4,6 @@ from pathlib import Path
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
-from otlmow_converter.FileFormats.DictDecoder import DictDecoder
-
 
 class JsonDecoder:
     def __init__(self, settings=None):
