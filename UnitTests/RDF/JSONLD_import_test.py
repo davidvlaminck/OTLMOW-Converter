@@ -8,6 +8,8 @@ from otlmow_converter.FileFormats.JsonLdImporter import JsonLdImporter
 from otlmow_converter.FileFormats.OtlAssetJSONLDEncoder import OtlAssetJSONLDEncoder
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
+model_directory_path = Path(__file__).parent.parent / 'TestModel'
+
 
 def set_up_encoder():
     base_dir = Path(__file__).parent
@@ -21,7 +23,7 @@ def test_export_and_then_import_unnested_attributes():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     exporter = JsonLdExporter(settings=converter.settings)
-    importer = JsonLdImporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    importer = JsonLdImporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -83,7 +85,7 @@ def test_export_and_then_import_nested_attributes_level_1():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     exporter = JsonLdExporter(settings=converter.settings)
-    importer = JsonLdImporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    importer = JsonLdImporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -147,7 +149,7 @@ def test_export_and_then_import_nested_attributes_level_2():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     exporter = JsonLdExporter(settings=converter.settings)
-    importer = JsonLdImporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    importer = JsonLdImporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.json_ld'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'

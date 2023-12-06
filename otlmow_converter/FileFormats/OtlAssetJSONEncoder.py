@@ -22,8 +22,8 @@ class OtlAssetJSONEncoder(json.JSONEncoder):
 
     def default(self, otl_object):
         if isinstance(otl_object, OTLObject):
-            d = otl_object.create_dict_from_asset(
-                waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
+            d = otl_object.create_dict_from_asset(datetime_as_string=True,
+                                                  waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
             if hasattr(otl_object, 'typeURI'):
                 d['typeURI'] = otl_object.typeURI
             od = OrderedDict(sorted(d.items()))
