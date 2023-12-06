@@ -26,7 +26,7 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
         if otl_object.assetId is None or otl_object.assetId.identificator is None:
             raise ValueError('JSON-LD requires the assetId.identificator to not be None.')
 
-        d = create_dict_from_asset(otl_object, waarde_shortcut=waarde_shortcut, rdf=True)
+        d = create_dict_from_asset(otl_object, datetime_as_string=True, waarde_shortcut=waarde_shortcut, rdf=True)
         if d is None:
             return {}
         # ns, name = get_ns_and_name_from_uri(otl_object.typeURI)
@@ -37,7 +37,7 @@ class OtlAssetJSONLDEncoder(json.JSONEncoder):
 
     def default(self, otl_object):
         if isinstance(otl_object, OTLObject):
-            d = self.create_ld_dict_from_asset(
+            d = self.create_ld_dict_from_asset(otl_object=
                 otl_object, waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
             # TODO should no longer be required
             if hasattr(otl_object, 'typeURI'):

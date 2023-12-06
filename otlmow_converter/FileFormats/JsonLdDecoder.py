@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
@@ -6,7 +7,7 @@ from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 
 
 class JsonLdDecoder:
-    def __init__(self, settings=None, model_directory: str = None):
+    def __init__(self, settings=None, model_directory: Path = None):
         if settings is None:
             settings = {}
         self.settings = settings
@@ -20,7 +21,7 @@ class JsonLdDecoder:
         self.settings = json_settings
         self.model_directory = model_directory
 
-    def decode_json_string(self, json_string: str, ignore_failed_objects=False) -> [OTLObject]:
+    def decode_json_string(self, json_string: str, ignore_failed_objects=False, model_directory: Path = None) -> [OTLObject]:
         dict_list = json.loads(json_string)
         if '@context' in dict_list:
             context_dict = dict_list['@context']
@@ -29,12 +30,15 @@ class JsonLdDecoder:
 
         lijst = []
 
+        if model_directory is None:
+            model_directory = self.model_directory
+
         for obj in dict_list['@graph']:
             try:
                 rdf_dict = self.transform_dict_to_rdf(d=obj, context_dict=context_dict)
                 del rdf_dict['@id']
                 del rdf_dict['@type']
-                instance = OTLObject.from_dict(rdf_dict, rdf=True, model_directory=self.model_directory,
+                instance = OTLObject.from_dict(rdf_dict, rdf=True, model_directory=model_directory,
                                                waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
                 lijst.append(instance)
             except Exception as ex:
