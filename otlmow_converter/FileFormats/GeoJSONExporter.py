@@ -5,7 +5,7 @@ import numpy as np
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.FileFormats.OtlAssetGeoJSONEncoder import OtlAssetGeoJSONEncoder
-from otlmow_converter.FileFormats.TableExporter import TableExporter
+from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
 from geojson import LineString, Point, MultiPoint, MultiLineString, Polygon, MultiPolygon, GeometryCollection
 
 
@@ -16,8 +16,8 @@ class GeoJSONExporter:
         self.encoder = OtlAssetGeoJSONEncoder(indent=4, settings=settings)
         if model_directory is None:
             model_directory = 'otlmow_model'
-        self.table_exporter = TableExporter(dotnotation_settings=self.settings['dotnotation'],
-                                            model_directory=model_directory)
+        self.table_exporter = DotnotationTableExporter(dotnotation_settings=self.settings['dotnotation'],
+                                                       model_directory=model_directory)
 
     def export_to_file(self, filepath: Path, list_of_objects: list = None):
         list_of_dicts = self.convert_list_of_objects_to_list_of_geodicts(list_of_objects)

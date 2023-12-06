@@ -8,7 +8,7 @@ from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
-from otlmow_converter.FileFormats.TableExporter import TableExporter
+from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
 from otlmow_converter.SettingsManager import load_settings
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
@@ -22,7 +22,7 @@ def set_up_exporter(class_dir_test_class=True):
         model_directory = model_directory_path
     else:
         model_directory = None
-    return TableExporter(dotnotation_settings=csv_settings['dotnotation'], model_directory=model_directory)
+    return DotnotationTableExporter(dotnotation_settings=csv_settings['dotnotation'], model_directory=model_directory)
 
 
 def test_init_exporter_only_load_with_settings(subtests):
@@ -32,11 +32,11 @@ def test_init_exporter_only_load_with_settings(subtests):
 
     with subtests.test(msg='load without settings'):
         with pytest.raises(ValueError):
-            TableExporter()
+            DotnotationTableExporter()
 
     with subtests.test(msg='load with incorrect settings (attribute missing)'):
         with pytest.raises(ValueError):
-            TableExporter(dotnotation_settings={
+            DotnotationTableExporter(dotnotation_settings={
                 "cardinality_separator": "|",
                 "cardinality indicator": "[]"})
 
@@ -138,17 +138,17 @@ def test_master_dict_basic_functionality(subtests):
 
 def test_sort_headers(subtests):
     with subtests.test(msg='no headers'):
-        result = TableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'])
+        result = DotnotationTableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'])
         expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
         assert expected == result
 
     with subtests.test(msg='2 headers'):
-        result = TableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'b', 'a'])
+        result = DotnotationTableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'b', 'a'])
         expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a', 'b']
         assert expected == result
 
     with subtests.test(msg='complex headers'):
-        result = TableExporter._sort_headers(
+        result = DotnotationTableExporter._sort_headers(
             ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.2', 'a.1'])
         expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.1', 'a.2']
         assert expected == result
@@ -383,7 +383,7 @@ def test_get_data_as_table_different_dotnotation_settings():
         "cardinality_indicator": "()",
         "waarde_shortcut": False
     }
-    exporter = TableExporter(dotnotation_settings=settings, model_directory=model_directory_path)
+    exporter = DotnotationTableExporter(dotnotation_settings=settings, model_directory=model_directory_path)
 
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000-0000'

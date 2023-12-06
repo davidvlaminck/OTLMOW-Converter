@@ -13,7 +13,7 @@ from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 
 
-class TableExporter:
+class DotnotationTableExporter:
     def __init__(self, dotnotation_settings: Dict = None, model_directory: Path = None,
                  ignore_empty_asset_id: bool = False):
 

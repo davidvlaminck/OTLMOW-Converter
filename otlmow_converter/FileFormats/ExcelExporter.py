@@ -2,7 +2,7 @@ from pathlib import Path
 
 from openpyxl import Workbook
 
-from otlmow_converter.FileFormats.TableExporter import TableExporter
+from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
 
 
 class ExcelExporter:
@@ -20,9 +20,9 @@ class ExcelExporter:
 
         self.settings = xls_settings
 
-        self.table_exporter = TableExporter(dotnotation_settings=xls_settings['dotnotation'],
-                                            model_directory=model_directory,
-                                            ignore_empty_asset_id=ignore_empty_asset_id)
+        self.table_exporter = DotnotationTableExporter(dotnotation_settings=xls_settings['dotnotation'],
+                                                       model_directory=model_directory,
+                                                       ignore_empty_asset_id=ignore_empty_asset_id)
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs):
         self.table_exporter.fill_master_dict(list_of_objects=list_of_objects, split_per_type=True)
