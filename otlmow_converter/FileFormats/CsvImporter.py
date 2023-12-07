@@ -5,6 +5,7 @@ from pathlib import Path
 
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 csv.field_size_limit(2147483647)
 
@@ -27,6 +28,9 @@ class CsvImporter:
         self.data = [[]]
         self.objects = []
 
+        self.dotnotation_table_converter = DotnotationTableConverter()
+        self.dotnotation_table_converter.load_settings(self.settings['dotnotation'])
+
     def import_file(self, filepath: Path = None, **kwargs):
         delimiter = ';'
         quote_char = '"'
@@ -39,68 +43,20 @@ class CsvImporter:
         if filepath == '' or not os.path.isfile(filepath):
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
-        try:
-            with open(filepath, encoding='utf-8') as file:
-                csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
-                self.data = []
-                for row_nr, row in enumerate(csv_reader):
-                    if row_nr == 0:
-                        self.headers = row
-                    else:
-                        self.data.append(row)
-
-        except Exception as ex:
-            raise ex
-
-        return self.create_objects_from_data(**kwargs)
-
-    def create_objects_from_data(self, **kwargs):
-        list_of_objects = []
         model_directory = None
-
         if kwargs is not None:
             if 'model_directory' in kwargs:
                 model_directory = kwargs['model_directory']
+        self.dotnotation_table_converter.model_directory = model_directory
 
         try:
-            type_index = self.headers.index('typeURI')
-        except ValueError:
-            raise ValueError('The data is missing essential typeURI data')
+            with open(filepath, encoding='utf-8') as file:
+                csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
 
-        for record in self.data:
-            instance = dynamic_create_instance_from_uri(record[type_index], model_directory=model_directory)
-            list_of_objects.append(instance)
-            for index, row in enumerate(record):
-                if index == type_index:
-                    continue
-                if row == '':
-                    continue
+                data = list(csv_reader)
+                list_of_dicts = self.dotnotation_table_converter.transform_2d_sequence_to_list_of_dicts(
+                    two_d_sequence=data, empty_string_equals_none=True)
+                return self.dotnotation_table_converter.get_data_from_table(list_of_dicts)
 
-                if self.headers[index] in ['bron.typeURI', 'doel.typeURI']:
-                    continue  # TODO get bron and doel
-
-                cardinality_indicator = self.settings['dotnotation']['cardinality_indicator']
-
-                if cardinality_indicator in self.headers[index]:
-                    if self.headers[index].count(cardinality_indicator) > 1:
-                        logging.warning(
-                            f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
-                        continue
-                    value = row
-                else:
-                    value = row
-
-                if self.headers[index] == 'geometry':
-                    value = value
-                    if value == '':
-                        value = None
-                    self.headers[index] = 'geometry'
-
-                try:
-                    self.dotnotation_helper.set_attribute_by_dotnotation_instance(
-                        instance_or_attribute=instance, dotnotation=self.headers[index], value=value,
-                        convert_warnings=False)
-                except AttributeError as exc:
-                    raise AttributeError(self.headers[index]) from exc
-
-        return list_of_objects
+        except Exception as ex:
+            raise ex

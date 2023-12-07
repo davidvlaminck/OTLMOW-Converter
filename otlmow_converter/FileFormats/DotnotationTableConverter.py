@@ -196,7 +196,7 @@ class DotnotationTableConverter:
 
         return master_dict
 
-    def get_data_from_table(self, table_data: Sequence[Dict]) -> [OTLObject]:
+    def get_data_from_table(self, table_data: Sequence[Dict], empty_string_equals_none: bool = False) -> [OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -209,6 +209,8 @@ class DotnotationTableConverter:
                 try:
                     value = row.get(header, None)
                     if value is None:
+                        continue
+                    if empty_string_equals_none and value == '':
                         continue
                     self.dotnotation_helper.set_attribute_by_dotnotation_instance(
                         instance_or_attribute=instance, dotnotation=header, value=value,
@@ -230,7 +232,8 @@ class DotnotationTableConverter:
         return matrix
 
     @classmethod
-    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: Sequence[Sequence]) -> Sequence[Dict]:
+    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: Sequence[Sequence],
+                                               empty_string_equals_none: bool = False) -> Sequence[Dict]:
         """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
         header_row = two_d_sequence[0]
@@ -240,9 +243,12 @@ class DotnotationTableConverter:
         for row in two_d_sequence[1:]:
             data_dict = {}
             for header, index in header_dict.items():
-                if row[index] is None:
+                value = row[index]
+                if value is None:
                     continue
-                data_dict[header] = row[index]
+                if empty_string_equals_none and value == '':
+                    continue
+                data_dict[header] = value
             list_of_dicts.append(data_dict)
 
         return list_of_dicts
