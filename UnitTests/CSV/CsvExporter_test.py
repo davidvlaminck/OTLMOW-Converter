@@ -9,6 +9,7 @@ import pytest
 from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
+from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
@@ -277,8 +278,10 @@ def test_export_list_of_lists():
     converter = OtlmowConverter(settings_path=settings_file_location)
     exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_lists.csv'
+
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
     instance.testComplexTypeMetKard[0].testKwantWrdMetKard[0].waarde = 10.0
-    with pytest.raises(ValueError):
+
+    with pytest.raises(DotnotationListOfListError):
         exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)

@@ -1,7 +1,6 @@
-import importlib
 import warnings
 from pathlib import Path
-from typing import Union, Type, Dict, Sequence, Any, Iterable
+from typing import Dict, Sequence, Any, Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -9,6 +8,7 @@ from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
+from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 
@@ -25,13 +25,7 @@ class DotnotationTableConverter:
                  dates_as_strings: bool = False,
                  separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                  cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT):
-        self.model_directory: Path
-        if model_directory is None:
-            import otlmow_model
-            otlmow_path = otlmow_model.__path__
-            self.model_directory = Path(otlmow_path._path[0])
-        else:
-            self.model_directory = model_directory
+        self.model_directory: Path = model_directory
 
         self.ignore_empty_asset_id: bool = ignore_empty_asset_id
         self.dates_as_strings: bool = dates_as_strings
@@ -40,8 +34,6 @@ class DotnotationTableConverter:
         self.cardinality_separator: str = cardinality_separator
         self.cardinality_indicator: str = cardinality_indicator
         self.waarde_shortcut: bool = waarde_shortcut
-
-        self.otl_object_ref = self._import_otl_object()
 
         self.dotnotation_helper: DotnotationHelper = self.get_dotnotation_helper()
 
@@ -60,18 +52,6 @@ class DotnotationTableConverter:
     def get_dotnotation_helper(self) -> DotnotationHelper:
         return DotnotationHelper(separator=self.separator, cardinality_separator=self.cardinality_separator,
                                  cardinality_indicator=self.cardinality_indicator, waarde_shortcut=self.waarde_shortcut)
-
-    @classmethod
-    def _import_otl_object(cls) -> Union[Type[OTLObject], None]:
-        try:
-            mod = importlib.import_module('otlmow_model.OtlmowModel.BaseClasses.OTLObject')
-            class_ = getattr(mod, 'OTLObject')
-            return class_
-
-        except ModuleNotFoundError:
-            raise ModuleNotFoundError(f'When dynamically importing class OTLObject, the import failed. '
-                                      f'Make sure you are directing to the (parent) directory where OtlmowModel is '
-                                      f'located in.')
 
     @classmethod
     def _sort_headers(cls, headers: dict) -> Iterable[str]:
@@ -98,18 +78,14 @@ class DotnotationTableConverter:
         header_count = 3
 
         for otl_object in list_of_objects:
-            if not hasattr(otl_object, 'is_instance_of'):
-                warnings.warn(
-                    BadTypeWarning(f'{otl_object} does not have an is_instance_of method. Ignoring this object'))
-                continue
-            if not otl_object.is_instance_of(self.otl_object_ref):
-                warnings.warn(
-                    BadTypeWarning(f'{otl_object} is not of type AIMObject. Ignoring this object'))
+            if not hasattr(otl_object, 'typeURI'):
+                warnings.warn(BadTypeWarning(f'{otl_object} does not have a typeURI so this can not be instantiated. '
+                                             f'Ignoring this object'))
                 continue
 
             if not self.ignore_empty_asset_id:
                 if otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
-                    raise ValueError(f'{otl_object} does not have an asset-id.')
+                    raise ValueError(f'{otl_object} does not have an assetId.')
 
             data_dict = {
                 'typeURI': otl_object.typeURI,
@@ -141,18 +117,14 @@ class DotnotationTableConverter:
         master_dict = {}
 
         for otl_object in list_of_objects:
-            if not hasattr(otl_object, 'is_instance_of'):
-                warnings.warn(
-                    BadTypeWarning(f'{otl_object} does not have an is_instance_of method. Ignoring this object'))
-                continue
-            if not otl_object.is_instance_of(self.otl_object_ref):
-                warnings.warn(
-                    BadTypeWarning(f'{otl_object} is not of type AIMObject. Ignoring this object'))
+            if not hasattr(otl_object, 'typeURI'):
+                warnings.warn(BadTypeWarning(f'{otl_object} does not have a typeURI so this can not be instantiated. '
+                                             f'Ignoring this object'))
                 continue
 
             if not self.ignore_empty_asset_id:
                 if otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
-                    raise ValueError(f'{otl_object} does not have an asset-id.')
+                    raise ValueError(f'{otl_object} does not have an assetId.')
 
             short_uri = get_shortened_uri(otl_object.typeURI)
             if short_uri not in master_dict:
@@ -259,7 +231,7 @@ class DotnotationTableConverter:
     def _turn_value_to_string(self, value: Any) -> str:
         if isinstance(value, list):
             if isinstance(value[0], list):
-                raise ValueError(f'Not possible to turn a list of a list into a string')
+                raise DotnotationListOfListError(f'Not possible to turn a list of a list into a string')
 
             str_list = [(str(item) if item is not None else '') for item in value]
             return self.cardinality_separator.join(str_list)

@@ -29,15 +29,6 @@ def test_init_exporter_only_load_with_settings(subtests):
         exporter = set_up_converter()
         assert exporter is not None
 
-    with subtests.test(msg='_import_otl_object otlmow_model'):
-        exporter = set_up_converter(class_dir_test_class=False)
-        assert exporter.otl_object_ref.typeURI is None
-
-    with subtests.test(msg='_import_otl_object unittestclass'):
-        exporter = set_up_converter()
-        assert exporter.otl_object_ref.typeURI is None
-        assert issubclass(exporter.otl_object_ref, OTLObject) == True
-
 
 def test_get_data_from_table():
     importer = set_up_converter()
