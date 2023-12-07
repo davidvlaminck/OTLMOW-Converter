@@ -155,7 +155,8 @@ class DotnotationTableConverter:
         list_of_dicts.insert(0, header_dict)
         return list_of_dicts
 
-    def get_tables_per_type_from_data(self, list_of_objects: [OTLObject]) -> Dict[str, Sequence[Dict]]:
+    def get_tables_per_type_from_data(self, list_of_objects: [OTLObject], values_as_string: bool = False
+                                      ) -> Dict[str, Sequence[Dict]]:
         """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
         first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', self.separator)
@@ -194,7 +195,10 @@ class DotnotationTableConverter:
                 if k not in header_dict:
                     header_dict[k] = header_count
                     header_count += 1
-                data_dict[k] = v
+                if values_as_string:
+                    data_dict[k] = self._turn_value_to_string(v)
+                else:
+                    data_dict[k] = v
             master_dict[short_uri].append(data_dict)
 
         return master_dict
