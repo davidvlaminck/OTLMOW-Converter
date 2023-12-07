@@ -1,7 +1,7 @@
 import importlib
 import warnings
 from pathlib import Path
-from typing import Union, List, Type, Dict, Sequence, Any
+from typing import Union, List, Type, Dict, Sequence, Any, Iterator
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -112,7 +112,7 @@ class DotnotationTableConverter:
 
         return sorted_list
 
-    def get_single_table_from_data(self, list_of_objects: [OTLObject], values_as_string: bool = False) -> Sequence[Dict]:
+    def get_single_table_from_data(self, list_of_objects: Iterator[OTLObject], values_as_string: bool = False) -> Sequence[Dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', self.separator)
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.separator)

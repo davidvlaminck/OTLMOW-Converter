@@ -1,12 +1,12 @@
 import csv
 from pathlib import Path
-from typing import List
+from typing import List, Iterator
 
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 
 class CsvExporter:
-    def __init__(self, settings=None, model_directory: str = None, ignore_empty_asset_id: bool = False):
+    def __init__(self, settings=None, model_directory: Path = None, ignore_empty_asset_id: bool = False):
         if settings is None:
             settings = {}
 
@@ -22,7 +22,7 @@ class CsvExporter:
             model_directory=model_directory, ignore_empty_asset_id=ignore_empty_asset_id)
         self.dotnotation_table_converter.load_settings(csv_settings['dotnotation'])
 
-    def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs) -> None:
+    def export_to_file(self, filepath: Path, list_of_objects: Iterator, **kwargs) -> None:
         delimiter = ';'
         split_per_type = True
         quote_char = '"'
