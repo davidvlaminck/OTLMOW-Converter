@@ -49,14 +49,17 @@ def test_load_test_file():
     assert assets[0].assetId.identificator == 'UgVLnoH'
 
 
-def test_load_test_unnested_attributes():
+def test_load_test_unnested_attributes(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = CsvImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.csv'
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(objects) == 1
 
+    caplog.records.clear()
+    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
+    assert len(objects) == 1
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert not instance.testBooleanField
@@ -88,11 +91,9 @@ def test_load_test_nested_attributes_1_level(caplog):
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-
     assert len(caplog.records) == 0
 
     assert len(objects) == 1
-
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.assetId.identificator == 'YKAzZDhhdTXqkD'
@@ -126,9 +127,9 @@ def test_load_test_nested_attributes_2_levels(caplog):
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
 
     assert len(objects) == 1
-
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.testComplexType.testComplexType2.testKwantWrd.waarde == 76.8

@@ -276,13 +276,6 @@ def test_set_attribute_by_dotnotation_complex_value_convert_scenarios(subtests):
         assert instance.testComplexTypeMetKard[0].testStringField == 'value1'
 
 
-def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios_6( caplog):
-    instance = AllCasesTestClass()
-    DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', [6.0],
-                                                   convert_warnings=False)
-    assert instance.testDecimalFieldMetKard[0] == 6.0
-
-
 def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, caplog):
     instance = AllCasesTestClass()
 

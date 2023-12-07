@@ -1,7 +1,7 @@
 import importlib
 import warnings
 from pathlib import Path
-from typing import Union, List, Type, Dict, Sequence, Any, Iterator
+from typing import Union, Type, Dict, Sequence, Any, Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -74,32 +74,7 @@ class DotnotationTableConverter:
                                       f'located in.')
 
     @classmethod
-    def _get_index_of_typeURI_column_in_sheet(cls, filepath: Path, sheet: str, headers: List[str],
-                                              data: List[List[str]]) -> int:
-        try:
-            type_index = headers.index('typeURI')
-        except ValueError:
-            type_index = -1
-        if type_index == -1:
-            for row in data[1:5]:
-                try:
-                    type_index = row.index('typeURI')
-                except ValueError:
-                    type_index = -1
-                if type_index != -1:
-                    break
-            if type_index == -1:
-                raise NoTypeUriInExcelTabError(
-                    message=f'Could not find typeURI within 5 rows in Excel tab {sheet} in file {filepath.name}',
-                    file_path=filepath, tab=sheet)
-            else:
-                raise TypeUriNotInFirstRowError(
-                    message=f'The typeURI is not in the first row in Excel tab {sheet} in file {filepath.name}.'
-                            f' Please remove the excess rows', file_path=filepath, tab=sheet)
-        return type_index
-
-    @classmethod
-    def _sort_headers(cls, headers: dict) -> Sequence[str]:
+    def _sort_headers(cls, headers: dict) -> Iterable[str]:
         if headers is None or headers == {}:
             return []
         headers.pop('typeURI')
@@ -112,7 +87,8 @@ class DotnotationTableConverter:
 
         return sorted_list
 
-    def get_single_table_from_data(self, list_of_objects: Iterator[OTLObject], values_as_string: bool = False) -> Sequence[Dict]:
+    def get_single_table_from_data(self, list_of_objects: Iterable[OTLObject], values_as_string: bool = False
+                                   ) -> Sequence[Dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', self.separator)
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.separator)
@@ -155,7 +131,7 @@ class DotnotationTableConverter:
         list_of_dicts.insert(0, header_dict)
         return list_of_dicts
 
-    def get_tables_per_type_from_data(self, list_of_objects: [OTLObject], values_as_string: bool = False
+    def get_tables_per_type_from_data(self, list_of_objects: Iterable[OTLObject], values_as_string: bool = False
                                       ) -> Dict[str, Sequence[Dict]]:
         """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
         first row is the header"""
@@ -204,7 +180,7 @@ class DotnotationTableConverter:
         return master_dict
 
     def get_data_from_table(self, table_data: Sequence[Dict], empty_string_equals_none: bool = False,
-                            convert_strings_to_types: bool = False) -> [OTLObject]:
+                            convert_strings_to_types: bool = False) -> Iterable[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -264,7 +240,7 @@ class DotnotationTableConverter:
         return list_of_dicts
 
     @classmethod
-    def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool):
+    def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool) -> Any:
         value = input_dict.get(item, None)
         if empty_string_equals_none and value is None:
             return ''
