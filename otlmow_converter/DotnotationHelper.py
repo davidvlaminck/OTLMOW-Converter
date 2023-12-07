@@ -237,7 +237,8 @@ class DotnotationHelper:
                     attribute = attribute.waarde._waarde
 
             if cardinality:
-                value = value.split(cardinality_separator)
+                if not isinstance(value, list) and isinstance(value, str):
+                    value = value.split(cardinality_separator)
                 if convert:
                     value = [attribute.field.convert_to_correct_type(v, log_warnings=False) for v in value]
             elif convert:

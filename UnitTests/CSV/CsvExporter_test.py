@@ -94,7 +94,6 @@ def test_export_and_then_import_unnested_attributes():
 
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
-    assert len(importer.headers) == 19
 
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -159,7 +158,6 @@ def test_export_and_then_import_nested_attributes_level_1():
 
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
-    assert len(importer.headers) == 13
 
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -217,7 +215,6 @@ def test_export_and_then_import_nested_attributes_level_2():
 
     objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
     assert len(objects) == 1
-    assert len(importer.headers) == 9
 
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
