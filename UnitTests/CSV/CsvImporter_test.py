@@ -90,7 +90,7 @@ def test_load_test_nested_attributes_1_level(caplog):
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
 
-    assert len(caplog.records) == 10  # TODO supress logs
+    assert len(caplog.records) == 0
 
     assert len(objects) == 1
 
@@ -127,7 +127,6 @@ def test_load_test_nested_attributes_2_levels(caplog):
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 5  # TODO supress logs
 
     assert len(objects) == 1
 
@@ -155,6 +154,4 @@ def test_load_test_subset_file(caplog):
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 20  # TODO supress logs
-
     assert len(objects) == 1

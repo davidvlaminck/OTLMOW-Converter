@@ -196,7 +196,8 @@ class DotnotationTableConverter:
 
         return master_dict
 
-    def get_data_from_table(self, table_data: Sequence[Dict], empty_string_equals_none: bool = False) -> [OTLObject]:
+    def get_data_from_table(self, table_data: Sequence[Dict], empty_string_equals_none: bool = False,
+                            convert_strings_to_types: bool = False) -> [OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -214,7 +215,7 @@ class DotnotationTableConverter:
                         continue
                     self.dotnotation_helper.set_attribute_by_dotnotation_instance(
                         instance_or_attribute=instance, dotnotation=header, value=value,
-                        convert_warnings=False)
+                        convert=convert_strings_to_types)
                 except AttributeError:
                     asset_id = row['assetId.identificator']
                     raise AttributeError(f'{header} for asset {asset_id}')

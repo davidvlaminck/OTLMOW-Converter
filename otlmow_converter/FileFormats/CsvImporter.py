@@ -56,7 +56,8 @@ class CsvImporter:
                 data = list(csv_reader)
                 list_of_dicts = self.dotnotation_table_converter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=data, empty_string_equals_none=True)
-                return self.dotnotation_table_converter.get_data_from_table(list_of_dicts)
+                return self.dotnotation_table_converter.get_data_from_table(list_of_dicts,
+                                                                            convert_strings_to_types=True)
 
         except Exception as ex:
             raise ex
