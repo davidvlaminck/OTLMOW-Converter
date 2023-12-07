@@ -2,6 +2,8 @@ import csv
 import os
 from pathlib import Path
 
+from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
+from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 csv.field_size_limit(2147483647)
@@ -42,12 +44,16 @@ class CsvImporter:
         try:
             with open(filepath, encoding='utf-8') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
-
                 data = list(csv_reader)
+
                 list_of_dicts = self.dotnotation_table_converter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=data, empty_string_equals_none=True)
-                return self.dotnotation_table_converter.get_data_from_table(list_of_dicts,
-                                                                            convert_strings_to_types=True)
-
-        except Exception as ex:
-            raise ex
+                return self.dotnotation_table_converter.get_data_from_table(
+                    table_data=list_of_dicts, convert_strings_to_types=True)
+        except TypeUriNotInFirstRowError:
+            raise TypeUriNotInFirstRowError(
+                message=f'The typeURI is not in the first row in file {filepath.name}.'
+                        f' Please remove the excess rows', file_path=filepath)
+        except NoTypeUriInTableError:
+            raise NoTypeUriInTableError(message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
+                                        file_path=filepath)

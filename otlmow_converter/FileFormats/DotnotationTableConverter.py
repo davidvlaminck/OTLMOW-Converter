@@ -9,7 +9,7 @@ from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
-from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
+from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 
 SEPARATOR = '.'
@@ -185,6 +185,16 @@ class DotnotationTableConverter:
         header"""
         instances = []
         headers = table_data[0]
+        if 'typeURI' not in headers:
+            type_uri_in_first_rows = False
+            for row in table_data[1:5]:
+                if 'typeURI' in row.values():
+                    type_uri_in_first_rows = True
+                    break
+            if not type_uri_in_first_rows:
+                raise NoTypeUriInTableError
+            else:
+                raise TypeUriNotInFirstRowError
         headers.pop('typeURI')
         for row in table_data[1:]:
             instance = dynamic_create_instance_from_uri(row['typeURI'], model_directory=self.model_directory)
