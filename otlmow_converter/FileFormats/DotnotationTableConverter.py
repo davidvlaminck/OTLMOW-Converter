@@ -44,15 +44,15 @@ class DotnotationTableConverter:
 
         self.dotnotation_helper: DotnotationHelper = self.get_dotnotation_helper()
 
-    def load_from_settings(self, settings: Dict):
-        if 'separator' in settings:
-            self.separator = settings['separator']
-        if 'cardinality_separator' in settings:
-            self.cardinality_separator = settings['cardinality_separator']
-        if 'cardinality_indicator' in settings:
-            self.cardinality_indicator = settings['cardinality_indicator']
-        if 'waarde_shortcut' in settings:
-            self.waarde_shortcut = settings['waarde_shortcut']
+    def load_settings(self, dotnotation_settings: Dict):
+        if 'separator' in dotnotation_settings:
+            self.separator = dotnotation_settings['separator']
+        if 'cardinality_separator' in dotnotation_settings:
+            self.cardinality_separator = dotnotation_settings['cardinality_separator']
+        if 'cardinality_indicator' in dotnotation_settings:
+            self.cardinality_indicator = dotnotation_settings['cardinality_indicator']
+        if 'waarde_shortcut' in dotnotation_settings:
+            self.waarde_shortcut = dotnotation_settings['waarde_shortcut']
 
         self.dotnotation_helper: DotnotationHelper = self.get_dotnotation_helper()
 
@@ -73,8 +73,8 @@ class DotnotationTableConverter:
                                       f'located in.')
 
     @classmethod
-    def get_index_of_typeURI_column_in_sheet(cls, filepath: Path, sheet: str, headers: List[str],
-                                             data: List[List[str]]) -> int:
+    def _get_index_of_typeURI_column_in_sheet(cls, filepath: Path, sheet: str, headers: List[str],
+                                              data: List[List[str]]) -> int:
         try:
             type_index = headers.index('typeURI')
         except ValueError:
@@ -97,6 +97,20 @@ class DotnotationTableConverter:
                             f' Please remove the excess rows', file_path=filepath, tab=sheet)
         return type_index
 
+    @classmethod
+    def _sort_headers(cls, headers: dict) -> Sequence[str]:
+        if headers is None or headers == {}:
+            return []
+        headers.pop('typeURI')
+        headers.pop('assetId.identificator')
+        headers.pop('assetId.toegekendDoor')
+        sorted_list = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
+
+        sorted_rest = sorted(headers)
+        sorted_list.extend(sorted_rest)
+
+        return sorted_list
+
     def get_single_table_from_data(self, list_of_objects: [OTLObject]) -> Sequence[Dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
         pass
@@ -109,15 +123,49 @@ class DotnotationTableConverter:
     def get_data_from_table(self, table_data: Sequence[Dict]) -> [OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
-        pass
+        instances = []
+        headers = table_data[0]
+        headers.pop('typeURI')
+        for row in table_data[1:]:
+            instance = dynamic_create_instance_from_uri(row['typeURI'], model_directory=self.model_directory)
+            instances.append(instance)
+            for header in headers:
+                try:
+                    value = row.get(header, None)
+                    if value is None:
+                        continue
+                    self.dotnotation_helper.set_attribute_by_dotnotation_instance(
+                        instance_or_attribute=instance, dotnotation=header, value=value,
+                        convert_warnings=False)
+                except AttributeError:
+                    asset_id = row['assetId.identificator']
+                    raise AttributeError(f'{header} for asset {asset_id}')
+
+        return instances
 
     def transform_list_of_dicts_to_2d_sequence(self, list_of_dicts: Sequence[Dict]) -> Sequence[Sequence]:
         """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
-        # also try this with numpy arrays to see what is faster
-        pass
+        # TODO also try this with numpy arrays to see what is faster
+
+        sorted_headers = self._sort_headers(list_of_dicts[0])
+        matrix = [[d.get(header, None) for header in sorted_headers] for d in list_of_dicts[1:]]
+        matrix.insert(0, sorted_headers)
+        return matrix
 
     def transform_2d_sequence_to_list_of_dicts(self, two_d_sequence: Sequence[Sequence]) -> Sequence[Dict]:
         """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
-        # also try this with numpy arrays to see what is faster
-        pass
+        # TODO also try this with numpy arrays to see what is faster
+        header_row = two_d_sequence[0]
+        header_dict = {header: index for index, header in enumerate(header_row)}
+
+        list_of_dicts = [header_dict]
+        for row in two_d_sequence[1:]:
+            data_dict = {}
+            for header, index in header_dict.items():
+                if row[index] is None:
+                    continue
+                data_dict[header] = row[index]
+            list_of_dicts.append(data_dict)
+
+        return list_of_dicts
 
