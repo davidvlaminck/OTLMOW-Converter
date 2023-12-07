@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-from typing import List, Iterator, Iterable
+from typing import Iterable
 
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
