@@ -1,3 +1,4 @@
+import csv
 import os
 import shutil
 from datetime import date, datetime, time
@@ -52,9 +53,9 @@ def test_import_then_export_file():
     exporter.export_to_file(list_of_objects=objects, filepath=new_file_location, split_per_type=False)
     assert os.path.isfile(new_file_location)
 
-    with open(file_location, 'r') as input_file:
+    with open(file_location) as input_file:
         input_file_lines = list(input_file)
-    with open(new_file_location, 'r') as output_file:
+    with open(new_file_location) as output_file:
         output_file_lines = list(output_file)
     assert input_file_lines == output_file_lines
 
@@ -96,25 +97,24 @@ def test_export_unnested_attributes():
 
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)
 
-    with open(file_location, 'r') as file:
-        lines = list(file)
+    with open(file_location, newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file, delimiter=';', quotechar='"')
+        lines = list(csv_reader)
     assert len(lines) == 2
 
-    line_0 = lines[0].split(';')
-    assert len(line_0) == 19
+    line_0 = lines[0]
     assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testBooleanField',
                       'testDateField', 'testDateTimeField', 'testDecimalField', 'testDecimalFieldMetKard[]',
                       'testEenvoudigType', 'testEenvoudigTypeMetKard[]', 'testIntegerField',
                       'testIntegerFieldMetKard[]', 'testKeuzelijst', 'testKeuzelijstMetKard[]',
                       'testKwantWrd', 'testKwantWrdMetKard[]', 'testStringField', 'testStringFieldMetKard[]',
-                      'testTimeField\n']
+                      'testTimeField']
 
-    line_1 = lines[1].split(';')
-    assert len(line_1) == 19
+    line_1 = lines[1]
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'False',
                       '2019-09-20', '2001-12-15 22:22:15', '79.07', '10.0|20.0', 'string1', 'string1|string2', '-55',
                       '76|2', 'waarde-4', 'waarde-4|waarde-3', '98.21', '10.0|20.0', 'oFfeDLp', 'string1|string2',
-                      '11:05:26\n']
+                      '11:05:26']
 
     shutil.rmtree(temp_dir_path)
 
@@ -136,29 +136,25 @@ def test_export_unnested_attributes_split_per_type():
     instance2.notitie = 'notitie'
 
     exporter.export_to_file(list_of_objects=[instance, instance2], filepath=file_location, split_per_type=True)
-    with open(temp_dir_path / 'unnested_onderdeel_AllCasesTestClass.csv', 'r') as file:
-        lines = list(file)
+    with open(temp_dir_path / 'unnested_onderdeel_AllCasesTestClass.csv', newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file, delimiter=';', quotechar='"')
+        lines = list(csv_reader)
     assert len(lines) == 2
 
-    line_0 = lines[0].split(';')
-    assert len(line_0) == 4
-    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testStringField\n']
+    line_0 = lines[0]
+    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testStringField']
 
-    line_1 = lines[1].split(';')
-    assert len(line_1) == 4
-    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '',
-                      'oFfeDLp\n']
+    line_1 = lines[1]
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'oFfeDLp']
 
     with open(temp_dir_path / 'unnested_onderdeel_AnotherTestClass.csv', 'r') as file:
         lines = list(file)
     assert len(lines) == 2
 
     line_0 = lines[0].split(';')
-    assert len(line_0) == 4
     assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie\n']
 
     line_1 = lines[1].split(';')
-    assert len(line_1) == 4
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '0001', '',
                       'notitie\n']
 
@@ -168,9 +164,12 @@ def test_export_unnested_attributes_split_per_type():
 def test_export_and_then_import_nested_attributes_level_1():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = CsvImporter(settings=converter.settings)
     exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
-    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+
+    temp_dir_path = Path(__file__).parent / 'remove_after_test'
+    os.mkdir(temp_dir_path)
+    file_location = temp_dir_path / 'nested_level_1.csv'
+
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
 
@@ -198,44 +197,38 @@ def test_export_and_then_import_nested_attributes_level_1():
     instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                            split_per_type=False)
+    exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)
 
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(objects) == 1
+    with open(file_location, newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file, delimiter=';', quotechar='"')
+        lines = list(csv_reader)
 
-    instance = objects[0]
-    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
-    assert instance.assetId.identificator == '0000'
-    assert instance.testComplexType.testBooleanField
-    assert instance.testComplexType.testKwantWrd.waarde == 65.14
-    assert instance.testComplexType.testKwantWrdMetKard[0].waarde == 10.0
-    assert instance.testComplexType.testKwantWrdMetKard[1].waarde == 20.0
-    assert instance.testComplexType.testStringField == 'KmCtMXM'
-    assert instance.testComplexType.testStringFieldMetKard[0] == 'string1'
-    assert instance.testComplexType.testStringFieldMetKard[1] == 'string2'
-    assert instance.testComplexTypeMetKard[0].testBooleanField
-    assert not instance.testComplexTypeMetKard[1].testBooleanField
-    assert instance.testComplexTypeMetKard[0].testKwantWrd.waarde == 10.0
-    assert instance.testComplexTypeMetKard[1].testKwantWrd.waarde == 20.0
-    assert instance.testComplexTypeMetKard[0].testKwantWrdMetKard[0].waarde is None
-    assert instance.testComplexTypeMetKard[0].testKwantWrdMetKard[0].waarde is None
-    assert instance.testComplexTypeMetKard[0].testStringField == 'string1'
-    assert instance.testComplexTypeMetKard[1].testStringField == 'string2'
-    assert instance.testUnionType.unionString == 'RWKofW'
-    assert instance.testUnionType.unionKwantWrd.waarde is None
-    assert instance.testUnionTypeMetKard[0].unionKwantWrd.waarde == 10.0
-    assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
+    assert len(lines) == 2
 
-    os.unlink(file_location)
+    line_0 = lines[0]
+    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testComplexType.testBooleanField',
+                      'testComplexType.testKwantWrd', 'testComplexType.testKwantWrdMetKard[]',
+                      'testComplexType.testStringField', 'testComplexType.testStringFieldMetKard[]',
+                      'testComplexTypeMetKard[].testBooleanField', 'testComplexTypeMetKard[].testKwantWrd',
+                      'testComplexTypeMetKard[].testStringField', 'testUnionType.unionString',
+                      'testUnionTypeMetKard[].unionKwantWrd']
+    line_1 = lines[1]
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '',
+                      'True', '65.14', '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
+                      'string1|string2', 'RWKofW', '10.0|20.0']
+
+    shutil.rmtree(temp_dir_path)
 
 
 def test_export_and_then_import_nested_attributes_level_2():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = CsvImporter(settings=converter.settings)
     exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
-    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
+
+    temp_dir_path = Path(__file__).parent / 'remove_after_test'
+    os.mkdir(temp_dir_path)
+    file_location = temp_dir_path / 'nested_level_2.csv'
+
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
 
@@ -255,29 +248,28 @@ def test_export_and_then_import_nested_attributes_level_2():
     instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                            split_per_type=False)
+    exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)
 
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(objects) == 1
+    with open(file_location, newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file, delimiter=';', quotechar='"')
+        lines = list(csv_reader)
 
-    instance = objects[0]
-    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
-    assert instance.assetId.identificator == '0000'
-    assert instance.testComplexType.testComplexType2.testKwantWrd.waarde == 76.8
-    assert instance.testComplexType.testComplexType2.testStringField == 'GZBzgRhOrQvfZaN'
-    assert instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde == 10.0
-    assert instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde == 20.0
-    assert instance.testComplexType.testComplexType2MetKard[0].testStringField == 'string1'
-    assert instance.testComplexType.testComplexType2MetKard[1].testStringField == 'string2'
-    assert instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde == 10.0
-    assert instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde == 20.0
-    assert instance.testComplexTypeMetKard[0].testComplexType2.testStringField == 'string1'
-    assert instance.testComplexTypeMetKard[1].testComplexType2.testStringField == 'string2'
-    assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testKwantWrd.waarde is None
-    assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
+    assert len(lines) == 2
 
-    os.unlink(file_location)
+    line_0 = lines[0]
+    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor',
+                      'testComplexType.testComplexType2.testKwantWrd',
+                      'testComplexType.testComplexType2.testStringField',
+                      'testComplexType.testComplexType2MetKard[].testKwantWrd',
+                      'testComplexType.testComplexType2MetKard[].testStringField',
+                      'testComplexTypeMetKard[].testComplexType2.testKwantWrd',
+                      'testComplexTypeMetKard[].testComplexType2.testStringField']
+
+    line_1 = lines[1]
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '',
+                      '76.8', 'GZBzgRhOrQvfZaN', '10.0|20.0', 'string1|string2', '10.0|20.0', 'string1|string2']
+
+    shutil.rmtree(temp_dir_path)
 
 
 def test_export_list_of_lists():
