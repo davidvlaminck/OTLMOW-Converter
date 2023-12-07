@@ -1,10 +1,7 @@
 import csv
-import logging
 import os
 from pathlib import Path
 
-from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
-from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 csv.field_size_limit(2147483647)
@@ -14,22 +11,15 @@ class CsvImporter:
     def __init__(self, settings=None):
         if settings is None:
             settings = {}
-        self.settings = settings
 
-        if 'file_formats' not in self.settings:
+        if 'file_formats' not in settings:
             raise ValueError("The settings are not loaded or don't contain settings for file formats")
         csv_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'csv'), None)
         if csv_settings is None:
             raise ValueError("Unable to find csv in file formats settings")
 
-        self.settings = csv_settings
-        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
-        self.headers = []
-        self.data = [[]]
-        self.objects = []
-
         self.dotnotation_table_converter = DotnotationTableConverter()
-        self.dotnotation_table_converter.load_settings(self.settings['dotnotation'])
+        self.dotnotation_table_converter.load_settings(csv_settings['dotnotation'])
 
     def import_file(self, filepath: Path = None, **kwargs):
         delimiter = ';'
