@@ -1,7 +1,7 @@
 import importlib
 import warnings
 from pathlib import Path
-from typing import Union, List, Type, Dict, Sequence
+from typing import Union, List, Type, Dict, Sequence, Any
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -112,7 +112,7 @@ class DotnotationTableConverter:
 
         return sorted_list
 
-    def get_single_table_from_data(self, list_of_objects: [OTLObject]) -> Sequence[Dict]:
+    def get_single_table_from_data(self, list_of_objects: [OTLObject], values_as_string: bool = False) -> Sequence[Dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', self.separator)
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.separator)
@@ -147,7 +147,10 @@ class DotnotationTableConverter:
                 if k not in header_dict:
                     header_dict[k] = header_count
                     header_count += 1
-                data_dict[k] = v
+                if values_as_string:
+                    data_dict[k] = self._turn_value_to_string(v)
+                else:
+                    data_dict[k] = v
             list_of_dicts.append(data_dict)
         list_of_dicts.insert(0, header_dict)
         return list_of_dicts
@@ -223,12 +226,14 @@ class DotnotationTableConverter:
         return instances
 
     @classmethod
-    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: Sequence[Dict]) -> Sequence[Sequence]:
+    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: Sequence[Dict],
+                                               empty_string_equals_none: bool = False) -> Sequence[Sequence]:
         """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
 
         sorted_headers = cls._sort_headers(list_of_dicts[0])
-        matrix = [[d.get(header, None) for header in sorted_headers] for d in list_of_dicts[1:]]
+        matrix = [[cls._get_item_from_dict(input_dict=d, item=header, empty_string_equals_none=empty_string_equals_none)
+                   for header in sorted_headers] for d in list_of_dicts[1:]]
         matrix.insert(0, sorted_headers)
         return matrix
 
@@ -253,3 +258,21 @@ class DotnotationTableConverter:
             list_of_dicts.append(data_dict)
 
         return list_of_dicts
+
+    @classmethod
+    def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool):
+        value = input_dict.get(item, None)
+        if empty_string_equals_none and value is None:
+            return ''
+        return value
+
+    def _turn_value_to_string(self, value: Any) -> str:
+        if isinstance(value, list):
+            if isinstance(value[0], list):
+                raise ValueError(f'Not possible to turn a list of a list into a string')
+
+            str_list = [(str(item) if item is not None else '') for item in value]
+            return self.cardinality_separator.join(str_list)
+        if not isinstance(value, str):
+            return str(value)
+        return value

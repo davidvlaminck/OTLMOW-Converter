@@ -1,25 +1,25 @@
 from pathlib import Path
 from typing import List
 
-from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
+from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 
 class CsvExporter:
     def __init__(self, settings=None, model_directory: str = None, ignore_empty_asset_id: bool = False):
         if settings is None:
             settings = {}
+
         self.settings = settings
 
-        if 'file_formats' not in self.settings:
+        if 'file_formats' not in settings:
             raise ValueError("The settings are not loaded or don't contain settings for file formats")
         csv_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'csv'), None)
         if csv_settings is None:
             raise ValueError("Unable to find csv in file formats settings")
 
-        self.settings = csv_settings
-        self.table_exporter = DotnotationTableExporter(dotnotation_settings=csv_settings['dotnotation'],
-                                                       model_directory=model_directory,
-                                                       ignore_empty_asset_id=ignore_empty_asset_id)
+        self.dotnotation_table_converter = DotnotationTableConverter(
+            model_directory=model_directory, ignore_empty_asset_id=ignore_empty_asset_id)
+        self.dotnotation_table_converter.load_settings(csv_settings['dotnotation'])
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs) -> None:
         delimiter = ';'
@@ -41,6 +41,13 @@ class CsvExporter:
             delimiter = self.settings['delimiter']
             if delimiter == '':
                 delimiter = ';'
+
+        single_table = self.dotnotation_table_converter.get_single_table_from_data(list_of_objects=list_of_objects,
+                                                                                   values_as_string=True)
+        data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(list_of_dicts=single_table,
+                                                                                       empty_string_equals_none=True)
+        self._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
+        return
 
         self.table_exporter.fill_master_dict(list_of_objects=list_of_objects, split_per_type=split_per_type)
         if split_per_type:
