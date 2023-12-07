@@ -234,7 +234,7 @@ def test_export_and_then_import_nested_attributes_level_2():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = CsvImporter(settings=converter.settings)
-    exporter = CsvExporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.csv'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -258,7 +258,7 @@ def test_export_and_then_import_nested_attributes_level_2():
     exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
                             split_per_type=False)
 
-    objects = importer.import_file(filepath=file_location, model_directory='UnitTests.TestClasses')
+    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
 
     instance = objects[0]
@@ -283,8 +283,7 @@ def test_export_and_then_import_nested_attributes_level_2():
 def test_export_list_of_lists():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = CsvImporter(settings=converter.settings)
-    exporter = CsvExporter(settings=converter.settings, model_directory='UnitTests.TestClasses')
+    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_lists.csv'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
