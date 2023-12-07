@@ -66,6 +66,56 @@ def test_get_data_from_table():
     assert objects[1].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
 
 
+def test_get_single_table_from_data():
+    importer = set_up_converter()
+
+    instance_1 = AllCasesTestClass()
+    instance_1.assetId.identificator = '0'
+    instance_1.testStringField = 'string1'
+
+    instance_2 = AnotherTestClass()
+    instance_2.assetId.identificator = '1'
+    instance_2.notitie = 'notitie'
+
+    expected_list_of_dicts_data = [
+        {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'testStringField': 3, 'notitie': 4},
+        {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+         'assetId.identificator': '0', 'testStringField': 'string1'},
+        {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
+         'assetId.identificator': '1', 'notitie': 'notitie'}]
+
+    list_of_dicts = importer.get_single_table_from_data([instance_1, instance_2])
+    assert list_of_dicts == expected_list_of_dicts_data
+
+
+def test_get_tables_per_type_from_data():
+    importer = set_up_converter()
+
+    instance_1 = AllCasesTestClass()
+    instance_1.assetId.identificator = '0'
+    instance_1.testStringField = 'string1'
+
+    instance_2 = AnotherTestClass()
+    instance_2.assetId.identificator = '1'
+    instance_2.notitie = 'notitie'
+
+    expected_list_of_dicts_data = {
+        'onderdeel#AllCasesTestClass': [
+            {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'testStringField': 3},
+            {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+             'assetId.identificator': '0', 'testStringField': 'string1'}
+        ],
+        'onderdeel#AnotherTestClass': [
+            {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'notitie': 3},
+            {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
+             'assetId.identificator': '1', 'notitie': 'notitie'}
+        ]
+    }
+
+    list_of_dicts = importer.get_tables_per_type_from_data([instance_1, instance_2])
+    assert list_of_dicts == expected_list_of_dicts_data
+
+
 def test_transform_list_of_dicts_to_2d_sequence():
     importer = set_up_converter()
 
