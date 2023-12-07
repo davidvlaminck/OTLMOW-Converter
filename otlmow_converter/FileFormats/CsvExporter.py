@@ -44,10 +44,10 @@ class CsvExporter:
                 delimiter = ';'
 
         if not split_per_type:
-            single_table = self.dotnotation_table_converter.get_single_table_from_data(list_of_objects=list_of_objects,
-                                                                                       values_as_string=True)
-            data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(list_of_dicts=single_table,
-                                                                                           empty_string_equals_none=True)
+            single_table = self.dotnotation_table_converter.get_single_table_from_data(
+                list_of_objects=list_of_objects, values_as_string=True)
+            data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(
+                list_of_dicts=single_table, empty_string_equals_none=True)
             self._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
             return
 
@@ -61,8 +61,8 @@ class CsvExporter:
             self._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
                              delimiter=delimiter, quote_char=quote_char)
 
-    @staticmethod
-    def _write_file(file_location: Path, data: List[List], delimiter: str, quote_char: str) -> None:
+    @classmethod
+    def _write_file(cls, file_location: Path, data: List[List], delimiter: str, quote_char: str) -> None:
         with open(file_location, "w") as file:
             csv_writer = csv.writer(file, delimiter=delimiter, quotechar=quote_char, quoting=csv.QUOTE_MINIMAL)
             for line in data:
