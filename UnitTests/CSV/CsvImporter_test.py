@@ -39,7 +39,6 @@ def test_load_test_file_multiple_types():
     assert len(objects) == 15
 
 
-
 def test_load_test_file():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     otl_facility = OtlmowConverter(settings_path=settings_file_location)
