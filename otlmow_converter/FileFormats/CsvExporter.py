@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 
-from otlmow_converter.FileFormats.TableExporter import TableExporter
+from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
 
 
 class CsvExporter:
@@ -17,9 +17,9 @@ class CsvExporter:
             raise ValueError("Unable to find csv in file formats settings")
 
         self.settings = csv_settings
-        self.table_exporter = TableExporter(dotnotation_settings=csv_settings['dotnotation'],
-                                            model_directory=model_directory,
-                                            ignore_empty_asset_id=ignore_empty_asset_id)
+        self.table_exporter = DotnotationTableExporter(dotnotation_settings=csv_settings['dotnotation'],
+                                                       model_directory=model_directory,
+                                                       ignore_empty_asset_id=ignore_empty_asset_id)
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs) -> None:
         delimiter = ';'
