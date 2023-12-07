@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="d_5ac00d4cf9403f80_DictDecoder_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_5ac00d4cf9403f80_DotnotationTableImporter_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_ExcelImporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-25 08:41 +0000
+            created at 2023-12-07 09:44 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -84,7 +84,7 @@
     <p class="pln"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">openpyxl</span> <span class="key">import</span> <span class="nam">Workbook</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_converter</span><span class="op">.</span><span class="nam">FileFormats</span><span class="op">.</span><span class="nam">TableExporter</span> <span class="key">import</span> <span class="nam">TableExporter</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t"><span class="key">from</span> <span class="nam">otlmow_converter</span><span class="op">.</span><span class="nam">FileFormats</span><span class="op">.</span><span class="nam">DotnotationTableExporter</span> <span class="key">import</span> <span class="nam">DotnotationTableExporter</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">class</span> <span class="nam">ExcelExporter</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -102,9 +102,9 @@
     <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">settings</span> <span class="op">=</span> <span class="nam">xls_settings</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">table_exporter</span> <span class="op">=</span> <span class="nam">TableExporter</span><span class="op">(</span><span class="nam">dotnotation_settings</span><span class="op">=</span><span class="nam">xls_settings</span><span class="op">[</span><span class="str">'dotnotation'</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">                                            <span class="nam">model_directory</span><span class="op">=</span><span class="nam">model_directory</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">                                            <span class="nam">ignore_empty_asset_id</span><span class="op">=</span><span class="nam">ignore_empty_asset_id</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">table_exporter</span> <span class="op">=</span> <span class="nam">DotnotationTableExporter</span><span class="op">(</span><span class="nam">dotnotation_settings</span><span class="op">=</span><span class="nam">xls_settings</span><span class="op">[</span><span class="str">'dotnotation'</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">                                                       <span class="nam">model_directory</span><span class="op">=</span><span class="nam">model_directory</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">                                                       <span class="nam">ignore_empty_asset_id</span><span class="op">=</span><span class="nam">ignore_empty_asset_id</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">    <span class="key">def</span> <span class="nam">export_to_file</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">filepath</span><span class="op">:</span> <span class="nam">Path</span> <span class="op">=</span> <span class="key">None</span><span class="op">,</span> <span class="nam">list_of_objects</span><span class="op">:</span> <span class="nam">list</span> <span class="op">=</span> <span class="key">None</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">table_exporter</span><span class="op">.</span><span class="nam">fill_master_dict</span><span class="op">(</span><span class="nam">list_of_objects</span><span class="op">=</span><span class="nam">list_of_objects</span><span class="op">,</span> <span class="nam">split_per_type</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -134,12 +134,12 @@
 <footer>
     <div class="content">
         <p>
-            <a id="prevFileLink" class="nav" href="d_5ac00d4cf9403f80_DictDecoder_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_5ac00d4cf9403f80_DotnotationTableImporter_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_ExcelImporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-11-25 08:41 +0000
+            created at 2023-12-07 09:44 +0000
         </p>
     </div>
 </footer>
