@@ -44,7 +44,7 @@ def test_export_and_then_import_unnested_attributes(caplog):
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
-    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
+    file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes_generated.xlsx'
     instance = AllCasesTestClass()
     instance.geometry = 'POINT Z (200000 200000 0)'
     instance.assetId.identificator = '0000-0000'
@@ -99,7 +99,7 @@ def test_export_and_then_import_nested_attributes_level_1(caplog):
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
-    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
+    file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
 
@@ -177,7 +177,7 @@ def test_export_and_then_import_nested_attributes_level_2(caplog):
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
-    file_location = Path(__file__).parent / 'Testfiles' / 'export_then_import.xlsx'
+    file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_2_generated.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
 
