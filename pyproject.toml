@@ -26,6 +26,7 @@ dependencies = [
     'geojson>=3.0.1',
     'prettytable>=3.6.0',
     'numpy >= 1.18',
+    'lxml>=4.9.3'
 ]
 
 [tool.setuptools.packages.find]

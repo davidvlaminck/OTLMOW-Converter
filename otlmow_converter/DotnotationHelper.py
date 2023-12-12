@@ -187,13 +187,21 @@ class DotnotationHelper:
                 for index, v in enumerate(value.split(cardinality_separator)):
                     if attribute.waarde is None or len(attribute.waarde) <= index:
                         attribute.add_empty_value()
-                    DotnotationHelper.set_attribute_by_dotnotation(attribute.waarde[index], dotnotation=rest, value=v)
+                    DotnotationHelper.set_attribute_by_dotnotation(
+                        attribute.waarde[index], dotnotation=rest, value=v,
+                        separator=separator, cardinality_indicator=cardinality_indicator,
+                        waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                        convert=convert, convert_warnings=convert_warnings)
                 return
             else:
                 attribute = get_attribute_by_name(instance_or_attribute, first_part)
                 if attribute.waarde is None:
                     attribute.add_empty_value()
-                DotnotationHelper.set_attribute_by_dotnotation(attribute.waarde, dotnotation=rest, value=value)
+                DotnotationHelper.set_attribute_by_dotnotation(
+                    attribute.waarde, dotnotation=rest, value=value, convert=convert,
+                    separator=separator, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                    convert_warnings=convert_warnings)
                 return
 
         else:
@@ -215,16 +223,26 @@ class DotnotationHelper:
                     attribute.add_empty_value()
                 if cardinality:
                     value = value.split(cardinality_separator)
+                    if convert:
+                        value = [attribute.waarde[0]._waarde.field.convert_to_correct_type(v, log_warnings=False)
+                                 for v in value]
                     for index, v in enumerate(value):
                         if len(attribute.waarde) <= index:
                             attribute.add_empty_value()
                         attribute.waarde[index]._waarde.set_waarde(v)
                     return
                 else:
+                    if convert:
+                        value = attribute.waarde._waarde.field.convert_to_correct_type(value, log_warnings=False)
                     attribute = attribute.waarde._waarde
 
             if cardinality:
-                value = value.split(cardinality_separator)
+                if not isinstance(value, list) and isinstance(value, str):
+                    value = value.split(cardinality_separator)
+                if convert:
+                    value = [attribute.field.convert_to_correct_type(v, log_warnings=False) for v in value]
+            elif convert:
+                value = attribute.field.convert_to_correct_type(value, log_warnings=False)
             attribute.set_waarde(value)
             return
 

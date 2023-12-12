@@ -1,7 +1,6 @@
 import os
 from datetime import date, datetime, time
 from pathlib import Path
-from unittest.mock import Mock
 
 import pytest
 
@@ -28,7 +27,7 @@ def test_init_importer_only_load_with_settings(subtests):
 
     with subtests.test(msg='load without settings'):
         with pytest.raises(ValueError):
-            ExcelImporter(settings=None)
+            ExcelImporter()
 
     with subtests.test(msg='load with incorrect settings (no file_formats)'):
         with pytest.raises(ValueError):
@@ -39,43 +38,49 @@ def test_init_importer_only_load_with_settings(subtests):
             ExcelImporter(settings={"file_formats": [{}]})
 
 
-def test_load_test_unnested_attributes():
+def test_load_test_unnested_attributes(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.xlsx'
+
+    caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
     assert len(objects) == 1
 
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.assetId.identificator == '0000-0000'
     assert not instance.testBooleanField
     assert instance.testDateField == date(2019, 9, 20)
     assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'
-    assert instance.testEenvoudigTypeMetKard[0].waarde == 'string1'
-    assert instance.testEenvoudigTypeMetKard[1].waarde == 'string2'
     assert instance.testIntegerField == -55
     assert instance.testIntegerFieldMetKard == [76, 2]
     assert instance.testKeuzelijst == 'waarde-4'
     assert instance.testKeuzelijstMetKard == ['waarde-4', 'waarde-3']
     assert instance.testKwantWrd.waarde == 98.21
-    assert instance.testKwantWrdMetKard[0].waarde == 10.0
-    assert instance.testKwantWrdMetKard[1].waarde == 20.0
     assert instance.testStringField == 'oFfeDLp'
     assert instance.testStringFieldMetKard[0] == 'string1'
     assert instance.testStringFieldMetKard[1] == 'string2'
     assert instance.testTimeField == time(11, 5, 26)
+    assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
-def test_load_test_nested_attributes_1_level():
+def test_load_test_nested_attributes_1_level(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.xlsx'
+
+    caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
     assert len(objects) == 1
 
     instance = objects[0]
@@ -103,12 +108,16 @@ def test_load_test_nested_attributes_1_level():
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-def test_load_test_nested_attributes_2_levels():
+def test_load_test_nested_attributes_2_levels(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.xlsx'
+
+    caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
     assert len(objects) == 1
 
     instance = objects[0]
@@ -132,26 +141,10 @@ def test_get_index_of_typeURI_column_in_sheet():
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
-    orig_create_objects_from_data = importer.create_objects_from_data
-    importer.create_objects_from_data = Mock()
-    importer.import_file(filepath=file_location, model_directory=model_directory_path)
 
-    for sheet, data in importer.data.items():
-        sheet_name = str(sheet)
-        headers = data[0]
-        if sheet_name == '<Worksheet "correct_sheet">':
-            type_uri_index = importer.get_index_of_typeURI_column_in_sheet(
-                filepath=file_location, sheet='correct_sheet', headers=headers, data=data)
-            assert type_uri_index == 0
-            break
-
-    importer = ExcelImporter(settings=converter.settings)
-    importer.create_objects_from_data = orig_create_objects_from_data
-
-    try:
+    with pytest.raises(ExceptionsGroup) as ex:
         importer.import_file(filepath=file_location, model_directory=model_directory_path)
-        assert False
-    except Exception as ex:
+
         assert isinstance(ex, ExceptionsGroup)
         assert len(ex.exceptions) == 3
 

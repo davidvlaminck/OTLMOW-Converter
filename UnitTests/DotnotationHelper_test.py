@@ -286,44 +286,44 @@ def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, 
         assert instance.testDecimalField is None
 
     with subtests.test(msg='correctly typed and convert=True'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', 9.0, convert_warnings=False)
-        assert instance.testDecimalField == 9.0
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', 2.0, convert_warnings=False)
+        assert instance.testDecimalField == 2.0
 
     with subtests.test(msg='correctly typed and convert=False'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', 8.0, convert=False,
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', 3.0, convert=False,
                                                        convert_warnings=False)
-        assert instance.testDecimalField == 8.0
+        assert instance.testDecimalField == 3.0
 
     with subtests.test(msg='incorrectly typed and convert=True'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', "7.0", convert_warnings=False)
-        assert instance.testDecimalField == 7.0
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', "4.0", convert_warnings=False)
+        assert instance.testDecimalField == 4.0
 
     with subtests.test(msg='incorrectly typed and convert=False (converted by set_waarde method on attribute itself)'):
         caplog.clear()
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', "6.0", convert=False)
-        assert instance.testDecimalField == 6.0
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', "5.0", convert=False)
+        assert instance.testDecimalField == 5.0
         assert caplog.records[0].levelno == logging.WARNING
         caplog.clear()
 
     with subtests.test(msg='cardinality > 1 and correctly typed and convert=True'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard', [9.0],
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', [6.0],
                                                        convert_warnings=False)
-        assert instance.testDecimalFieldMetKard[0] == 9.0
+        assert instance.testDecimalFieldMetKard[0] == 6.0
 
     with subtests.test(msg='cardinality > 1 and correctly typed and convert=False'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard', [8.0], convert=False)
-        assert instance.testDecimalFieldMetKard[0] == 8.0
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', [7.0], convert=False)
+        assert instance.testDecimalFieldMetKard[0] == 7.0
 
     with subtests.test(msg='cardinality > 1 and incorrectly typed and convert=True'):
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard', ["7.0"],
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', ["8.0"],
                                                        convert_warnings=False)
-        assert instance.testDecimalFieldMetKard[0] == 7.0
+        assert instance.testDecimalFieldMetKard[0] == 8.0
 
     with subtests.test(
             msg='cardinality > 1 and incorrectly typed and convert=False (converted by set_waarde method on attribute itself)'):
         caplog.clear()
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard', ["6.0"], convert=False)
-        assert instance.testDecimalFieldMetKard[0] == 6.0
+        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', ["9.0"], convert=False)
+        assert instance.testDecimalFieldMetKard[0] == 9.0
         assert caplog.records[0].levelno == logging.WARNING
         caplog.clear()
 

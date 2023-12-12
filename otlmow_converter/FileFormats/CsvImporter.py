@@ -1,10 +1,10 @@
 import csv
-import logging
 import os
 from pathlib import Path
 
-from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
-from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
+from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
+from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 csv.field_size_limit(2147483647)
 
@@ -13,19 +13,15 @@ class CsvImporter:
     def __init__(self, settings=None):
         if settings is None:
             settings = {}
-        self.settings = settings
 
-        if 'file_formats' not in self.settings:
+        if 'file_formats' not in settings:
             raise ValueError("The settings are not loaded or don't contain settings for file formats")
         csv_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'csv'), None)
         if csv_settings is None:
             raise ValueError("Unable to find csv in file formats settings")
 
-        self.settings = csv_settings
-        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
-        self.headers = []
-        self.data = [[]]
-        self.objects = []
+        self.dotnotation_table_converter = DotnotationTableConverter()
+        self.dotnotation_table_converter.load_settings(csv_settings['dotnotation'])
 
     def import_file(self, filepath: Path = None, **kwargs):
         delimiter = ';'
@@ -39,68 +35,28 @@ class CsvImporter:
         if filepath == '' or not os.path.isfile(filepath):
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
+        model_directory = None
+        if kwargs is not None and 'model_directory' in kwargs:
+            model_directory = kwargs['model_directory']
+        self.dotnotation_table_converter.model_directory = model_directory
+
         try:
             with open(filepath, encoding='utf-8') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
-                self.data = []
-                for row_nr, row in enumerate(csv_reader):
-                    if row_nr == 0:
-                        self.headers = row
-                    else:
-                        self.data.append(row)
+                data = list(csv_reader)
 
-        except Exception as ex:
-            raise ex
-
-        return self.create_objects_from_data(**kwargs)
-
-    def create_objects_from_data(self, **kwargs):
-        list_of_objects = []
-        model_directory = None
-
-        if kwargs is not None:
-            if 'model_directory' in kwargs:
-                model_directory = kwargs['model_directory']
-
-        try:
-            type_index = self.headers.index('typeURI')
-        except ValueError:
-            raise ValueError('The data is missing essential typeURI data')
-
-        for record in self.data:
-            instance = dynamic_create_instance_from_uri(record[type_index], model_directory=model_directory)
-            list_of_objects.append(instance)
-            for index, row in enumerate(record):
-                if index == type_index:
-                    continue
-                if row == '':
-                    continue
-
-                if self.headers[index] in ['bron.typeURI', 'doel.typeURI']:
-                    continue  # TODO get bron and doel
-
-                cardinality_indicator = self.settings['dotnotation']['cardinality_indicator']
-
-                if cardinality_indicator in self.headers[index]:
-                    if self.headers[index].count(cardinality_indicator) > 1:
-                        logging.warning(
-                            f'{self.headers[index]} is a list of lists. This is not allowed in the CSV format')
-                        continue
-                    value = row
-                else:
-                    value = row
-
-                if self.headers[index] == 'geometry':
-                    value = value
-                    if value == '':
-                        value = None
-                    self.headers[index] = 'geometry'
-
-                try:
-                    self.dotnotation_helper.set_attribute_by_dotnotation_instance(
-                        instance_or_attribute=instance, dotnotation=self.headers[index], value=value,
-                        convert_warnings=False)
-                except AttributeError as exc:
-                    raise AttributeError(self.headers[index]) from exc
-
-        return list_of_objects
+                list_of_dicts = self.dotnotation_table_converter.transform_2d_sequence_to_list_of_dicts(
+                    two_d_sequence=data, empty_string_equals_none=True)
+                return self.dotnotation_table_converter.get_data_from_table(
+                    table_data=list_of_dicts, convert_strings_to_types=True)
+        except TypeUriNotInFirstRowError as e:
+            raise TypeUriNotInFirstRowError(
+                message=f'The typeURI is not in the first row in file {filepath.name}.'
+                f' Please remove the excess rows',
+                file_path=filepath,
+            ) from e
+        except NoTypeUriInTableError as e:
+            raise NoTypeUriInTableError(
+                message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
+                file_path=filepath,
+            ) from e

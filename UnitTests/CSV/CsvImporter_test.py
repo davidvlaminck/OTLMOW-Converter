@@ -3,11 +3,14 @@ from pathlib import Path
 
 import pytest
 
+from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
+from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
+
 
 def test_init_importer_only_load_with_settings(subtests):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
@@ -19,7 +22,7 @@ def test_init_importer_only_load_with_settings(subtests):
 
     with subtests.test(msg='load without settings'):
         with pytest.raises(ValueError):
-            CsvImporter(settings=None)
+            CsvImporter()
 
     with subtests.test(msg='load with incorrect settings (no file_formats)'):
         with pytest.raises(ValueError):
@@ -32,10 +35,9 @@ def test_init_importer_only_load_with_settings(subtests):
 
 def test_load_test_file_multiple_types():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    file_location = Path(__file__).parent / 'export_multiple_types.csv'
+    file_location = Path(__file__).parent / 'Testfiles' / 'export_multiple_types.csv'
     otl_facility = OtlmowConverter(settings_path=settings_file_location)
     objects = otl_facility.create_assets_from_file(file_location)
-
     assert len(objects) == 15
 
 
@@ -44,20 +46,22 @@ def test_load_test_file():
     otl_facility = OtlmowConverter(settings_path=settings_file_location)
     importer = CsvImporter(settings=otl_facility.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
-    importer.import_file(file_location, model_directory=model_directory_path)
-    assert len(importer.data) == 1
-    assert len(importer.headers) == 35
+    assets = importer.import_file(file_location, model_directory=model_directory_path)
+    assert len(assets) == 1
+    assert assets[0].assetId.identificator == 'UgVLnoH'
 
 
-def test_load_test_unnested_attributes():
+def test_load_test_unnested_attributes(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = CsvImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.csv'
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(objects) == 1
-    assert len(importer.headers) == 17
 
+    caplog.records.clear()
+    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
+    assert len(objects) == 1
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert not instance.testBooleanField
@@ -89,11 +93,9 @@ def test_load_test_nested_attributes_1_level(caplog):
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 12  # TODO supress logs
+    assert len(caplog.records) == 0
 
     assert len(objects) == 1
-    assert len(importer.headers) == 15
-
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.assetId.identificator == 'YKAzZDhhdTXqkD'
@@ -127,11 +129,9 @@ def test_load_test_nested_attributes_2_levels(caplog):
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 7  # TODO supress logs
+    assert len(caplog.records) == 0
 
     assert len(objects) == 1
-    assert len(importer.headers) == 9
-
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.testComplexType.testComplexType2.testKwantWrd.waarde == 76.8
@@ -152,11 +152,26 @@ def test_load_test_subset_file(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     otl_facility = OtlmowConverter(settings_path=settings_file_location)
     importer = CsvImporter(settings=otl_facility.settings)
-    file_location = Path(__file__).parent / 'template_file_text_onderdeel_AllCasesTestClass.csv'
+    file_location = Path(__file__).parent / 'Testfiles' / 'template_file_text_onderdeel_AllCasesTestClass.csv'
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 24  # TODO supress logs
-
     assert len(objects) == 1
-    assert len(importer.headers) == 39
+
+
+def test_raise_errors():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    importer = CsvImporter(settings=converter.settings)
+
+    file_location = Path(__file__).parent / 'Testfiles' / 'type_uri_not_in_first_row.csv'
+    with pytest.raises(TypeUriNotInFirstRowError) as exc:
+        importer.import_file(filepath=file_location, model_directory=model_directory_path)
+        assert exc.value.message == 'The typeURI is not in the first row in file type_uri_not_in_first_row.csv'
+        assert exc.value.file_path == file_location
+
+    file_location = Path(__file__).parent / 'Testfiles' / 'type_uri_not_in_file.csv'
+    with pytest.raises(NoTypeUriInTableError) as exc:
+        importer.import_file(filepath=file_location, model_directory=model_directory_path)
+        assert exc.value.message == 'Could not find typeURI within 5 rows in the csv file type_uri_not_in_file.csv'
+        assert exc.value.file_path == file_location

@@ -29,15 +29,6 @@ def test_init_exporter_only_load_with_settings(subtests):
         exporter = set_up_converter()
         assert exporter is not None
 
-    with subtests.test(msg='_import_otl_object otlmow_model'):
-        exporter = set_up_converter(class_dir_test_class=False)
-        assert exporter.otl_object_ref.typeURI is None
-
-    with subtests.test(msg='_import_otl_object unittestclass'):
-        exporter = set_up_converter()
-        assert exporter.otl_object_ref.typeURI is None
-        assert issubclass(exporter.otl_object_ref, OTLObject) == True
-
 
 def test_get_data_from_table():
     importer = set_up_converter()
@@ -151,108 +142,13 @@ def test_transform_2d_sequence_to_list_of_dicts():
 
 
 # TODO check for additional tests in these comments
-# def test_master_dict_basic_functionality(subtests):
-#     with subtests.test(msg='empty list'):
-#         exporter = set_up_importer()
-#         exporter.fill_master_dict([])
-#         expected_master_dict = {}
-#         assert expected_master_dict == exporter.master
-#
+
 #     with subtests.test(msg='list with bad object'):
 #         with pytest.warns(BadTypeWarning):
 #             exporter = set_up_importer()
 #             exporter.fill_master_dict([BadTypeWarning])
 #             expected_master_dict = {}
-#             assert expected_master_dict == exporter.master
-#
-#     with subtests.test(msg='single AllCasesTestClass'):
-#         exporter = set_up_importer()
-#         exporter.ignore_empty_asset_id = True
-#         exporter.fill_master_dict([AllCasesTestClass()])
-#         expected_master_dict = {'onderdeel#AllCasesTestClass': {
-#             'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
-#             'data': [{
-#                 'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-#                 'assetId.identificator': None, 'assetId.toegekendDoor': None
-#             }]
-#         }}
-#         assert expected_master_dict == exporter.master
-#
-#     with subtests.test(msg='double AllCasesTestClass'):
-#         exporter = set_up_importer()
-#         exporter.ignore_empty_asset_id = True
-#         exporter.fill_master_dict([AllCasesTestClass(), AllCasesTestClass()])
-#         expected_master_dict = {'onderdeel#AllCasesTestClass': {
-#             'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
-#             'data': [{
-#                 'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-#                 'assetId.identificator': None, 'assetId.toegekendDoor': None
-#             }, {
-#                 'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-#                 'assetId.identificator': None, 'assetId.toegekendDoor': None
-#             }]
-#         }}
-#
-#         assert expected_master_dict == exporter.master
-#
-#     with subtests.test(msg='two different classes'):
-#         exporter = set_up_importer()
-#         exporter.ignore_empty_asset_id = True
-#         exporter.fill_master_dict([AllCasesTestClass(), AnotherTestClass()])
-#         expected_master_dict = {'onderdeel#AllCasesTestClass': {
-#             'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
-#             'data': [{
-#                 'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-#                 'assetId.identificator': None, 'assetId.toegekendDoor': None
-#             }]
-#         }, 'onderdeel#AnotherTestClass': {
-#             'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
-#             'data': [{
-#                 'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
-#                 'assetId.identificator': None, 'assetId.toegekendDoor': None
-#             }]
-#         }}
-#         assert expected_master_dict == exporter.master
-#
-#     with subtests.test(msg='two different classes, split_per_type=False'):
-#         exporter = set_up_importer()
-#         exporter.ignore_empty_asset_id = True
-#         list_of_objects = [AllCasesTestClass(), AnotherTestClass()]
-#         list_of_objects[0].assetId.identificator = '0'
-#         list_of_objects[1].assetId.identificator = '1'
-#         list_of_objects[0].testStringField = 'string1'
-#         list_of_objects[1].notitie = 'notitie2'
-#
-#         exporter.fill_master_dict(list_of_objects, split_per_type=False)
-#         expected_master_dict = {'single': {
-#             'headers': ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testStringField', 'notitie'],
-#             'data': [{
-#                 'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
-#                 'assetId.identificator': '0', 'assetId.toegekendDoor': None, 'testStringField': 'string1'
-#             }, {
-#                 'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
-#                 'assetId.identificator': '1', 'assetId.toegekendDoor': None, 'notitie': 'notitie2'
-#             }]
-#         }}
-#         assert expected_master_dict == exporter.master
-#
-#
-# def test_sort_headers(subtests):
-#     with subtests.test(msg='no headers'):
-#         result = DotnotationTableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'])
-#         expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
-#         assert expected == result
-#
-#     with subtests.test(msg='2 headers'):
-#         result = DotnotationTableExporter._sort_headers(['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'b', 'a'])
-#         expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a', 'b']
-#         assert expected == result
-#
-#     with subtests.test(msg='complex headers'):
-#         result = DotnotationTableExporter._sort_headers(
-#             ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.2', 'a.1'])
-#         expected = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'a.1', 'a.2']
-#         assert expected == result
+#             assert expected_master_dict == exporter.master    #
 #
 #
 # def test_fill_master_dict_edge_cases(subtests):
@@ -315,66 +211,7 @@ def test_transform_2d_sequence_to_list_of_dicts():
 #         assert [['typeURI', 'assetId.identificator', 'assetId.toegekendDoor'],
 #                 ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0',
 #                  '']] == table_data
-#
-#     with subtests.test(msg='one object, primitive attributes in reverse order'):
-#         exporter = set_up_importer()
-#         list_of_objects = [AllCasesTestClass()]
-#         list_of_objects[0].assetId.identificator = '0'
-#         list_of_objects[0].testStringField = 'test'
-#         list_of_objects[0].testIntegerField = 1
-#         exporter.fill_master_dict(list_of_objects)
-#         table_data = exporter.get_data_as_table('onderdeel#AllCasesTestClass')
-#         expected_data = [
-#             ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testIntegerField', 'testStringField'],
-#             ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', '', '1', 'test']]
-#         assert expected_data == table_data
-#
-#
-# def test_get_data_as_table_two_different_types_split_false():
-#     exporter = set_up_importer()
-#     exporter.ignore_empty_asset_id = True
-#     list_of_objects = [AllCasesTestClass(), AnotherTestClass()]
-#     list_of_objects[0].assetId.identificator = '0'
-#     list_of_objects[1].assetId.identificator = '1'
-#     list_of_objects[0].testStringField = 'string1'
-#     list_of_objects[1].notitie = 'notitie2'
-#
-#     exporter.fill_master_dict(list_of_objects, split_per_type=False)
-#     table_data = exporter.get_data_as_table()
-#     expected_data = [
-#         ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie', 'testStringField'],
-#         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', '', '', 'string1'],
-#         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', '', 'notitie2', '']]
-#     assert expected_data == table_data
-#
-#
-# def test_get_data_as_table_basic_nonempty_objects_same_type():
-#     exporter = set_up_importer()
-#     list_of_objects = [AllCasesTestClass(), AllCasesTestClass()]
-#     list_of_objects[0].assetId.identificator = '0'
-#     list_of_objects[0].testDecimalField = 1.0
-#     list_of_objects[0].testBooleanField = True
-#     list_of_objects[0].testKeuzelijst = 'waarde-1'
-#     list_of_objects[0].testComplexType.testStringField = 'string in complex veld'
-#     list_of_objects[0].testComplexType.testKwantWrd.waarde = 2.0
-#
-#     list_of_objects[1].assetId.identificator = '1'
-#     list_of_objects[1].testBooleanField = False
-#     list_of_objects[1].testKeuzelijstMetKard = ['waarde-2']
-#     list_of_objects[1].testDateField = date(2022, 2, 2)
-#     list_of_objects[1].testDecimalField = 2.5
-#
-#     exporter.fill_master_dict(list_of_objects)
-#     table_data = exporter.get_data_as_table('onderdeel#AllCasesTestClass')
-#     expected_data = [
-#         ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testBooleanField',
-#          'testComplexType.testKwantWrd', 'testComplexType.testStringField', 'testDateField', 'testDecimalField',
-#          'testKeuzelijst', 'testKeuzelijstMetKard[]'],
-#         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', '', 'True', '2.0',
-#          'string in complex veld', '', '1.0', 'waarde-1', ''],
-#         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '1', '', 'False', '', '',
-#          '2022-02-02', '2.5', '', 'waarde-2']]
-#     assert expected_data == table_data
+##
 #
 #
 # def test_fill_master_dict_cardinality(subtests):

@@ -1,8 +1,9 @@
 from pathlib import Path
+from typing import List
 
 from openpyxl import Workbook
 
-from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
+from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 
 class ExcelExporter:
@@ -20,31 +21,27 @@ class ExcelExporter:
 
         self.settings = xls_settings
 
-        self.table_exporter = DotnotationTableExporter(dotnotation_settings=xls_settings['dotnotation'],
-                                                       model_directory=model_directory,
-                                                       ignore_empty_asset_id=ignore_empty_asset_id)
+        self.dotnotation_table_converter = DotnotationTableConverter()
+        self.dotnotation_table_converter.load_settings(xls_settings['dotnotation'])
 
     def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs):
-        self.table_exporter.fill_master_dict(list_of_objects=list_of_objects, split_per_type=True)
-        self._write_file(file_location=filepath)
+        table_dict = self.dotnotation_table_converter.get_tables_per_type_from_data(
+            list_of_objects=list_of_objects, values_as_string=True)
 
-        return
-
-    def _write_file(self, file_location: Path):
-        wb = Workbook()
-        if len(self.table_exporter.master.keys()) == 0:
+        wb = Workbook(write_only=True)
+        if not list_of_objects:
             raise ValueError('There are no asset data to export to Excel')
-        for class_name in self.table_exporter.master:
-            self._create_sheet_by_name(wb, class_name)
-        wb.remove(wb['Sheet'])
-        wb.save(file_location)
+        for class_name in table_dict:
+            self._create_sheet_by_name(wb, class_name=class_name, table_data=table_dict[class_name])
+        wb.save(filepath)
 
-    def _create_sheet_by_name(self, wb: Workbook, class_name: str):
-        if len(self.table_exporter.master[class_name]['data']) == 0:
+    def _create_sheet_by_name(self, wb: Workbook, class_name: str, table_data: List[dict]):
+        if not table_data:
             return
 
-        asset_data_table = self.table_exporter.get_data_as_table(class_name, values_as_strings=False)
+        data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(
+            list_of_dicts=table_data, empty_string_equals_none=True)
+
         sheet = wb.create_sheet(class_name)
-        for row_nr, row in enumerate(asset_data_table):
-            for col_nr, col in enumerate(row):
-                sheet.cell(row=row_nr + 1, column=col_nr + 1).value = col
+        for row in data:
+            sheet.append(row)

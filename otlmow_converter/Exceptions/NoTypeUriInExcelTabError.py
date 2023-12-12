@@ -1,10 +1,8 @@
 from pathlib import Path
 
-from otlmow_converter.Exceptions.FailedToImportFileError import FailedToImportFileError
+from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 
 
-class NoTypeUriInExcelTabError(FailedToImportFileError):
+class NoTypeUriInExcelTabError(NoTypeUriInTableError):
     def __init__(self, message, file_path: Path, tab: str = None):
-        super().__init__(message, file_path)
-        self.file_path = file_path
-        self.tab = tab
+        super().__init__(message, file_path, tab=tab)

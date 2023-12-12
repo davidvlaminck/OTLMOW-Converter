@@ -1,27 +1,28 @@
+import csv
 from pathlib import Path
-from typing import List
+from typing import Iterable
 
-from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
+from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 
 class CsvExporter:
-    def __init__(self, settings=None, model_directory: str = None, ignore_empty_asset_id: bool = False):
+    def __init__(self, settings=None, model_directory: Path = None, ignore_empty_asset_id: bool = False):
         if settings is None:
             settings = {}
+
         self.settings = settings
 
-        if 'file_formats' not in self.settings:
+        if 'file_formats' not in settings:
             raise ValueError("The settings are not loaded or don't contain settings for file formats")
         csv_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'csv'), None)
         if csv_settings is None:
             raise ValueError("Unable to find csv in file formats settings")
 
-        self.settings = csv_settings
-        self.table_exporter = DotnotationTableExporter(dotnotation_settings=csv_settings['dotnotation'],
-                                                       model_directory=model_directory,
-                                                       ignore_empty_asset_id=ignore_empty_asset_id)
+        self.dotnotation_table_converter = DotnotationTableConverter(
+            model_directory=model_directory, ignore_empty_asset_id=ignore_empty_asset_id)
+        self.dotnotation_table_converter.load_settings(csv_settings['dotnotation'])
 
-    def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs) -> None:
+    def export_to_file(self, filepath: Path, list_of_objects: Iterable, **kwargs) -> None:
         delimiter = ';'
         split_per_type = True
         quote_char = '"'
@@ -39,36 +40,30 @@ class CsvExporter:
 
         if delimiter == '':
             delimiter = self.settings['delimiter']
-            if delimiter == '':
-                delimiter = ';'
+        if delimiter == '':
+            delimiter = ';'
 
-        self.table_exporter.fill_master_dict(list_of_objects=list_of_objects, split_per_type=split_per_type)
-        if split_per_type:
-            for type_name in self.table_exporter.master:
-                data = self.table_exporter.get_data_as_table(type_name=type_name)
-                specific_filename = filepath.stem + '_' + type_name.replace('#', '_') + filepath.suffix
-
-                self._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
-                                 delimiter=delimiter, quote_char=quote_char)
-        else:
-            data = self.table_exporter.get_data_as_table()
+        if not split_per_type:
+            single_table = self.dotnotation_table_converter.get_single_table_from_data(
+                list_of_objects=list_of_objects, values_as_string=True)
+            data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(
+                list_of_dicts=single_table, empty_string_equals_none=True)
             self._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
+            return
 
-    @staticmethod
-    def _write_file(file_location: Path, data: List[List], delimiter: str, quote_char: str) -> None:
-        try:
-            with open(file_location, "w") as file:
-                for line in data:
-                    line = list(map(lambda x: CsvExporter._wrap_field_in_quote_chars(field=x,
-                                                                                     delimiter=delimiter,
-                                                                                     quote_char=quote_char), line))
-                    linestring = delimiter.join(line)
-                    file.writelines(linestring + '\n')
-        except Exception as ex:
-            raise ex
+        multi_table_dict = self.dotnotation_table_converter.get_tables_per_type_from_data(
+            list_of_objects=list_of_objects, values_as_string=True)
+        for short_uri, table_data in multi_table_dict.items():
+            data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(
+                list_of_dicts=table_data, empty_string_equals_none=True)
+            specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
 
-    @staticmethod
-    def _wrap_field_in_quote_chars(field: str, delimiter: str, quote_char: str) -> str:
-        if delimiter in field and quote_char not in field:
-            return f'{quote_char}{field}{quote_char}'
-        return field
+            self._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
+                             delimiter=delimiter, quote_char=quote_char)
+
+    @classmethod
+    def _write_file(cls, file_location: Path, data: Iterable[Iterable], delimiter: str, quote_char: str) -> None:
+        with open(file_location, "w", newline='', encoding='utf-8') as file:
+            csv_writer = csv.writer(file, delimiter=delimiter, quotechar=quote_char, quoting=csv.QUOTE_MINIMAL)
+            for line in data:
+                csv_writer.writerow(line)
