@@ -28,7 +28,7 @@ def test_init_importer_only_load_with_settings(subtests):
 
     with subtests.test(msg='load without settings'):
         with pytest.raises(ValueError):
-            ExcelImporter(settings=None)
+            ExcelImporter()
 
     with subtests.test(msg='load with incorrect settings (no file_formats)'):
         with pytest.raises(ValueError):
@@ -39,12 +39,16 @@ def test_init_importer_only_load_with_settings(subtests):
             ExcelImporter(settings={"file_formats": [{}]})
 
 
-def test_load_test_unnested_attributes():
+def test_load_test_unnested_attributes(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.xlsx'
+
+    caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
     assert len(objects) == 1
 
     instance = objects[0]
@@ -70,12 +74,16 @@ def test_load_test_unnested_attributes():
     assert instance.testTimeField == time(11, 5, 26)
 
 
-def test_load_test_nested_attributes_1_level():
+def test_load_test_nested_attributes_1_level(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.xlsx'
+
+    caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
     assert len(objects) == 1
 
     instance = objects[0]
@@ -103,12 +111,16 @@ def test_load_test_nested_attributes_1_level():
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-def test_load_test_nested_attributes_2_levels():
+def test_load_test_nested_attributes_2_levels(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.xlsx'
+
+    caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(caplog.records) == 0
+
     assert len(objects) == 1
 
     instance = objects[0]
@@ -138,8 +150,8 @@ def test_get_index_of_typeURI_column_in_sheet():
 
     for sheet, data in importer.data.items():
         sheet_name = str(sheet)
-        headers = data[0]
         if sheet_name == '<Worksheet "correct_sheet">':
+            headers = data[0]
             type_uri_index = importer.get_index_of_typeURI_column_in_sheet(
                 filepath=file_location, sheet='correct_sheet', headers=headers, data=data)
             assert type_uri_index == 0
