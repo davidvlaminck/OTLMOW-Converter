@@ -86,7 +86,7 @@ class ExcelImporter:
     @classmethod
     def get_data_dict_from_file_path(cls, filepath) -> Dict[str, Sequence[Sequence]]:
         data = {}
-        book = openpyxl.load_workbook(filepath, data_only=True)
+        book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
 
         for sheet in book.worksheets:
             sheet_name = str(sheet)[12:-2]
