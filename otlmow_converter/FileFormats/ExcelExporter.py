@@ -30,12 +30,11 @@ class ExcelExporter:
         table_dict = self.dotnotation_table_converter.get_tables_per_type_from_data(
             list_of_objects=list_of_objects, values_as_string=True)
 
-        wb = Workbook()  # write_only=True
+        wb = Workbook(write_only=True)
         if not list_of_objects:
             raise ValueError('There are no asset data to export to Excel')
         for class_name in table_dict:
             self._create_sheet_by_name(wb, class_name=class_name, table_data=table_dict[class_name])
-        wb.remove(wb['Sheet'])
         wb.save(filepath)
 
     def _create_sheet_by_name(self, wb: Workbook, class_name: str, table_data: Sequence[dict]):
@@ -46,6 +45,5 @@ class ExcelExporter:
             list_of_dicts=table_data, empty_string_equals_none=True)
 
         sheet = wb.create_sheet(class_name)
-        for row_nr, row in enumerate(data):
-            for col_nr, col in enumerate(row):
-                sheet.cell(row=row_nr + 1, column=col_nr + 1).value = col
+        for row in data:
+            sheet.append(row)
