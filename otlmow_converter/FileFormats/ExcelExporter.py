@@ -5,6 +5,8 @@ from openpyxl import Workbook
 from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
 
 
+# TODO check https://openpyxl.readthedocs.io/en/stable/optimized.html
+
 class ExcelExporter:
     def __init__(self, settings=None, model_directory: Path = None, ignore_empty_asset_id: bool = False):
 

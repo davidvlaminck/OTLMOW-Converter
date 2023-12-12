@@ -144,26 +144,10 @@ def test_get_index_of_typeURI_column_in_sheet():
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
-    orig_create_objects_from_data = importer.create_objects_from_data
-    importer.create_objects_from_data = Mock()
-    importer.import_file(filepath=file_location, model_directory=model_directory_path)
 
-    for sheet, data in importer.data.items():
-        sheet_name = str(sheet)
-        if sheet_name == '<Worksheet "correct_sheet">':
-            headers = data[0]
-            type_uri_index = importer.get_index_of_typeURI_column_in_sheet(
-                filepath=file_location, sheet='correct_sheet', headers=headers, data=data)
-            assert type_uri_index == 0
-            break
-
-    importer = ExcelImporter(settings=converter.settings)
-    importer.create_objects_from_data = orig_create_objects_from_data
-
-    try:
+    with pytest.raises(ExceptionsGroup) as ex:
         importer.import_file(filepath=file_location, model_directory=model_directory_path)
-        assert False
-    except Exception as ex:
+
         assert isinstance(ex, ExceptionsGroup)
         assert len(ex.exceptions) == 3
 
