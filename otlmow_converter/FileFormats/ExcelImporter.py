@@ -80,7 +80,7 @@ class ExcelImporter:
         return list_of_objects
 
     @classmethod
-    def get_data_dict_from_file_path(cls, filepath) -> Dict[str, Sequence[Sequence]]:
+    def get_data_dict_from_file_path(cls, filepath) -> Dict[str, List[List]]:
         data = {}
         book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
 

@@ -40,8 +40,8 @@ class CsvExporter:
 
         if delimiter == '':
             delimiter = self.settings['delimiter']
-            if delimiter == '':
-                delimiter = ';'
+        if delimiter == '':
+            delimiter = ';'
 
         if not split_per_type:
             single_table = self.dotnotation_table_converter.get_single_table_from_data(
@@ -56,7 +56,7 @@ class CsvExporter:
         for short_uri, table_data in multi_table_dict.items():
             data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(
                 list_of_dicts=table_data, empty_string_equals_none=True)
-            specific_filename = filepath.stem + '_' + short_uri.replace('#', '_') + filepath.suffix
+            specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
 
             self._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
                              delimiter=delimiter, quote_char=quote_char)

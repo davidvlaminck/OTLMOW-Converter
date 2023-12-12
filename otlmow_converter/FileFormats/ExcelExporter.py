@@ -1,12 +1,10 @@
 from pathlib import Path
-from typing import Sequence
+from typing import List
 
 from openpyxl import Workbook
 
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
-
-# TODO check https://openpyxl.readthedocs.io/en/stable/optimized.html
 
 class ExcelExporter:
     def __init__(self, settings=None, model_directory: Path = None, ignore_empty_asset_id: bool = False):
@@ -37,8 +35,8 @@ class ExcelExporter:
             self._create_sheet_by_name(wb, class_name=class_name, table_data=table_dict[class_name])
         wb.save(filepath)
 
-    def _create_sheet_by_name(self, wb: Workbook, class_name: str, table_data: Sequence[dict]):
-        if len(table_data) == 0:
+    def _create_sheet_by_name(self, wb: Workbook, class_name: str, table_data: List[dict]):
+        if not table_data:
             return
 
         data = self.dotnotation_table_converter.transform_list_of_dicts_to_2d_sequence(

@@ -1,7 +1,6 @@
 import warnings
-from collections.abc import MutableSequence
 from pathlib import Path
-from typing import Dict, Sequence, Any, Iterable
+from typing import Dict, Any, Iterable, List
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -69,7 +68,7 @@ class DotnotationTableConverter:
         return sorted_list
 
     def get_single_table_from_data(self, list_of_objects: Iterable[OTLObject], values_as_string: bool = False
-                                   ) -> Sequence[Dict]:
+                                   ) -> List[Dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', self.separator)
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.separator)
@@ -106,7 +105,7 @@ class DotnotationTableConverter:
         return list_of_dicts
 
     def get_tables_per_type_from_data(self, list_of_objects: Iterable[OTLObject], values_as_string: bool = False
-                                      ) -> Dict[str, Sequence[Dict]]:
+                                      ) -> Dict[str, List[Dict]]:
         """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
         first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', self.separator)
@@ -120,7 +119,8 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not self.ignore_empty_asset_id and (otl_object.assetId.identificator is None or otl_object.assetId.identificator == ''):
+            if not self.ignore_empty_asset_id and (otl_object.assetId.identificator is None or 
+                                                   otl_object.assetId.identificator == ''):
                 raise ValueError(f'{otl_object} does not have an assetId.')
 
             short_uri = get_shortened_uri(otl_object.typeURI)
@@ -145,11 +145,11 @@ class DotnotationTableConverter:
 
         return master_dict
 
-    def get_data_from_table(self, table_data: Sequence[Dict], empty_string_equals_none: bool = False,
-                            convert_strings_to_types: bool = False) -> Sequence[OTLObject]:
+    def get_data_from_table(self, table_data: List[Dict], empty_string_equals_none: bool = False,
+                            convert_strings_to_types: bool = False) -> List[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
-        instances = MutableSequence()
+        instances = []
         headers = table_data[0]
         if 'typeURI' not in headers:
             type_uri_in_first_rows = any('typeURI' in row.values() for row in table_data[1:5])
@@ -171,15 +171,15 @@ class DotnotationTableConverter:
                     self.dotnotation_helper.set_attribute_by_dotnotation_instance(
                         instance_or_attribute=instance, dotnotation=header, value=value,
                         convert=convert_strings_to_types)
-                except AttributeError:
+                except AttributeError as e:
                     asset_id = row['assetId.identificator']
-                    raise AttributeError(f'{header} for asset {asset_id}')
+                    raise AttributeError(f'{header} for asset {asset_id}') from e
 
         return instances
 
     @classmethod
-    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: Sequence[Dict],
-                                               empty_string_equals_none: bool = False) -> Sequence[Sequence]:
+    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],
+                                               empty_string_equals_none: bool = False) -> List[List]:
         """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
 
@@ -190,8 +190,8 @@ class DotnotationTableConverter:
         return matrix
 
     @classmethod
-    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: Sequence[Sequence],
-                                               empty_string_equals_none: bool = False) -> Sequence[Dict]:
+    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: List[List],
+                                               empty_string_equals_none: bool = False) -> List[Dict]:
         """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
         header_row = two_d_sequence[0]
