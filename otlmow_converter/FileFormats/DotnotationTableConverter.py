@@ -55,7 +55,7 @@ class DotnotationTableConverter:
 
     @classmethod
     def _sort_headers(cls, headers: dict) -> Iterable[str]:
-        if headers is None or headers == {}:
+        if headers is None or not headers:
             return []
         headers.pop('typeURI')
         headers.pop('assetId.identificator')
@@ -83,9 +83,9 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not self.ignore_empty_asset_id:
-                if otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
-                    raise ValueError(f'{otl_object} does not have an assetId.')
+            if not self.ignore_empty_asset_id and (otl_object.assetId.identificator is None 
+                                                   or otl_object.assetId.identificator == ''):
+                raise ValueError(f'{otl_object} does not have an assetId.')
 
             data_dict = {
                 'typeURI': otl_object.typeURI,
@@ -122,9 +122,8 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not self.ignore_empty_asset_id:
-                if otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
-                    raise ValueError(f'{otl_object} does not have an assetId.')
+            if not self.ignore_empty_asset_id and (otl_object.assetId.identificator is None or otl_object.assetId.identificator == ''):
+                raise ValueError(f'{otl_object} does not have an assetId.')
 
             short_uri = get_shortened_uri(otl_object.typeURI)
             if short_uri not in master_dict:
@@ -152,17 +151,13 @@ class DotnotationTableConverter:
         return master_dict
 
     def get_data_from_table(self, table_data: Sequence[Dict], empty_string_equals_none: bool = False,
-                            convert_strings_to_types: bool = False) -> Iterable[OTLObject]:
+                            convert_strings_to_types: bool = False) -> Sequence[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
         headers = table_data[0]
         if 'typeURI' not in headers:
-            type_uri_in_first_rows = False
-            for row in table_data[1:5]:
-                if 'typeURI' in row.values():
-                    type_uri_in_first_rows = True
-                    break
+            type_uri_in_first_rows = any('typeURI' in row.values() for row in table_data[1:5])
             if not type_uri_in_first_rows:
                 raise NoTypeUriInTableError
             else:
@@ -223,18 +218,14 @@ class DotnotationTableConverter:
 
     @classmethod
     def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool) -> Any:
-        value = input_dict.get(item, None)
-        if empty_string_equals_none and value is None:
-            return ''
-        return value
+        value = input_dict.get(item)
+        return '' if empty_string_equals_none and value is None else value
 
     def _turn_value_to_string(self, value: Any) -> str:
         if isinstance(value, list):
             if isinstance(value[0], list):
-                raise DotnotationListOfListError(f'Not possible to turn a list of a list into a string')
+                raise DotnotationListOfListError('Not possible to turn a list of a list into a string')
 
             str_list = [(str(item) if item is not None else '') for item in value]
             return self.cardinality_separator.join(str_list)
-        if not isinstance(value, str):
-            return str(value)
-        return value
+        return value if isinstance(value, str) else str(value)
