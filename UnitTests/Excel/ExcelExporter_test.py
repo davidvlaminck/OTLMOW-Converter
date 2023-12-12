@@ -39,7 +39,7 @@ def test_init_importer_only_load_with_settings(subtests):
             ExcelExporter(settings={"file_formats": [{}]})
 
 
-def test_export_and_then_import_unnested_attributes():
+def test_export_and_then_import_unnested_attributes(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
@@ -62,8 +62,10 @@ def test_export_and_then_import_unnested_attributes():
     instance.testStringField = 'oFfeDLp'
     instance.testStringFieldMetKard = ['string1', 'string2']
     instance.testTimeField = time(11, 5, 26)
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                            split_per_type=False)
+
+    caplog.records.clear()
+    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
+    assert len(caplog.records) == 0
 
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
@@ -92,7 +94,7 @@ def test_export_and_then_import_unnested_attributes():
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_1():
+def test_export_and_then_import_nested_attributes_level_1(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
@@ -134,8 +136,9 @@ def test_export_and_then_import_nested_attributes_level_1():
     instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                            split_per_type=False)
+    caplog.records.clear()
+    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
+    assert len(caplog.records) == 0
 
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
@@ -169,7 +172,7 @@ def test_export_and_then_import_nested_attributes_level_1():
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_2():
+def test_export_and_then_import_nested_attributes_level_2(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = ExcelImporter(settings=converter.settings)
@@ -194,8 +197,9 @@ def test_export_and_then_import_nested_attributes_level_2():
     instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location,
-                            split_per_type=False)
+    caplog.records.clear()
+    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
+    assert len(caplog.records) == 0
 
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
