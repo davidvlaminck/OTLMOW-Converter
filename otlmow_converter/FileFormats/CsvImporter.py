@@ -55,6 +55,8 @@ class CsvImporter:
                 f' Please remove the excess rows',
                 file_path=filepath,
             ) from e
-        except NoTypeUriInTableError:
-            raise NoTypeUriInTableError(message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
-                                        file_path=filepath)
+        except NoTypeUriInTableError as e:
+            raise NoTypeUriInTableError(
+                message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
+                file_path=filepath,
+            ) from e
