@@ -59,7 +59,7 @@ class ExcelImporter:
                 list_of_dicts = self.dotnotation_table_converter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
                 list_of_objects.extend(self.dotnotation_table_converter.get_data_from_table(
-                    table_data=list_of_dicts, convert_strings_to_types=True))
+                    table_data=list_of_dicts, convert_strings_to_types=True, convert_datetimes_to_dates=True))
             except TypeUriNotInFirstRowError :
                 exception_group.add_exception(TypeUriNotInFirstRowError(
                     message=f'The typeURI is not in the first row in file {filepath.name}.'

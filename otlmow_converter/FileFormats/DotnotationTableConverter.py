@@ -1,7 +1,9 @@
+import datetime
 import warnings
 from pathlib import Path
 from typing import Dict, Any, Iterable, List
 
+from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
@@ -146,7 +148,7 @@ class DotnotationTableConverter:
         return master_dict
 
     def get_data_from_table(self, table_data: List[Dict], empty_string_equals_none: bool = False,
-                            convert_strings_to_types: bool = False) -> List[OTLObject]:
+                            convert_strings_to_types: bool = False, convert_datetimes_to_dates: bool = False) -> List[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -168,6 +170,15 @@ class DotnotationTableConverter:
                         continue
                     if empty_string_equals_none and value == '':
                         continue
+                    if convert_datetimes_to_dates:
+                        attr = self.dotnotation_helper.get_attribute_by_dotnotation_instance(
+                            instance_or_attribute=instance, dotnotation=header)
+                        if attr.field is DateField:
+                            if isinstance(value, datetime.datetime):
+                                value = value.date()
+                            elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], datetime.datetime):
+                                value = [v.date() for v in value]
+
                     self.dotnotation_helper.set_attribute_by_dotnotation_instance(
                         instance_or_attribute=instance, dotnotation=header, value=value,
                         convert=convert_strings_to_types)

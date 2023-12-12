@@ -46,7 +46,7 @@ def test_load_test_unnested_attributes(caplog):
 
     caplog.records.clear()
     objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    # assert len(caplog.records) == 0 # TODO fix this test
+    assert len(caplog.records) == 0
 
     assert len(objects) == 1
 
