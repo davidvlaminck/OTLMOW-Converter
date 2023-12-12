@@ -10,13 +10,12 @@ from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
-
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
+
 
 def set_up_converter():
     settings_file_location = get_settings_path_for_unittests()
-    otl_converter = OtlmowConverter(settings_path=settings_file_location)
-    return otl_converter
+    return OtlmowConverter(settings_path=settings_file_location)
 
 
 def test_init_importer_only_load_with_settings(subtests):
@@ -28,7 +27,7 @@ def test_init_importer_only_load_with_settings(subtests):
 
     with subtests.test(msg='load without settings'):
         with pytest.raises(ValueError):
-            ExcelExporter(settings=None)
+            ExcelExporter()
 
     with subtests.test(msg='load with incorrect settings (no file_formats)'):
         with pytest.raises(ValueError):
@@ -74,7 +73,7 @@ def test_export_and_then_import_unnested_attributes(caplog):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.assetId.identificator == '0000-0000'
 
-    assert not instance.testBooleanField 
+    assert not instance.testBooleanField
     assert instance.testDateField == date(2019, 9, 20)
     assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
     assert instance.testDecimalField == 79.07

@@ -5,7 +5,6 @@ from typing import Dict, List, Sequence
 import openpyxl
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
-from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
@@ -28,9 +27,6 @@ class ExcelImporter:
             raise ValueError("Unable to find xls in file formats settings")
 
         self.settings = xls_settings
-        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
-        self.data: Dict[str, List] = {}
-        self.objects = []
 
         self.dotnotation_table_converter = DotnotationTableConverter()
         self.dotnotation_table_converter.load_settings(xls_settings['dotnotation'])
@@ -134,7 +130,7 @@ class ExcelImporter:
                 error.bad_columns.append(header)
                 continue
             try:
-                self.dotnotation_helper.get_attribute_by_dotnotation_instance(
+                self.dotnotation_table_converter.dotnotation_helper.get_attribute_by_dotnotation_instance(
                     instance_or_attribute=instance, dotnotation=header)
             except (AttributeError, DotnotationListOfListError):
                 error.bad_columns.append(header)

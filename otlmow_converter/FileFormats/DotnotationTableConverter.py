@@ -1,4 +1,5 @@
 import warnings
+from collections.abc import MutableSequence
 from pathlib import Path
 from typing import Dict, Sequence, Any, Iterable
 
@@ -99,10 +100,7 @@ class DotnotationTableConverter:
                 if k not in header_dict:
                     header_dict[k] = header_count
                     header_count += 1
-                if values_as_string:
-                    data_dict[k] = self._turn_value_to_string(v)
-                else:
-                    data_dict[k] = v
+                data_dict[k] = self._turn_value_to_string(v) if values_as_string else v
             list_of_dicts.append(data_dict)
         list_of_dicts.insert(0, header_dict)
         return list_of_dicts
@@ -142,10 +140,7 @@ class DotnotationTableConverter:
                 if k not in header_dict:
                     header_dict[k] = header_count
                     header_count += 1
-                if values_as_string:
-                    data_dict[k] = self._turn_value_to_string(v)
-                else:
-                    data_dict[k] = v
+                data_dict[k] = self._turn_value_to_string(v) if values_as_string else v
             master_dict[short_uri].append(data_dict)
 
         return master_dict
@@ -154,7 +149,7 @@ class DotnotationTableConverter:
                             convert_strings_to_types: bool = False) -> Sequence[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
-        instances = []
+        instances = MutableSequence()
         headers = table_data[0]
         if 'typeURI' not in headers:
             type_uri_in_first_rows = any('typeURI' in row.values() for row in table_data[1:5])
