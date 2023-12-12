@@ -36,9 +36,8 @@ class CsvImporter:
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
         model_directory = None
-        if kwargs is not None:
-            if 'model_directory' in kwargs:
-                model_directory = kwargs['model_directory']
+        if kwargs is not None and 'model_directory' in kwargs:
+            model_directory = kwargs['model_directory']
         self.dotnotation_table_converter.model_directory = model_directory
 
         try:
@@ -50,10 +49,12 @@ class CsvImporter:
                     two_d_sequence=data, empty_string_equals_none=True)
                 return self.dotnotation_table_converter.get_data_from_table(
                     table_data=list_of_dicts, convert_strings_to_types=True)
-        except TypeUriNotInFirstRowError:
+        except TypeUriNotInFirstRowError as e:
             raise TypeUriNotInFirstRowError(
                 message=f'The typeURI is not in the first row in file {filepath.name}.'
-                        f' Please remove the excess rows', file_path=filepath)
+                f' Please remove the excess rows',
+                file_path=filepath,
+            ) from e
         except NoTypeUriInTableError:
             raise NoTypeUriInTableError(message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
                                         file_path=filepath)
