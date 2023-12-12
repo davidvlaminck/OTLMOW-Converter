@@ -91,6 +91,8 @@ class ExcelImporter:
         for sheet in book.worksheets:
             sheet_name = str(sheet)[12:-2]
             data[sheet_name] = [[cell.value for cell in row] for row in sheet.rows]
+
+        book.close()
         return data
 
     @classmethod

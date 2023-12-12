@@ -33,7 +33,7 @@ class ExcelExporter:
         return
 
     def _write_file(self, file_location: Path):
-        wb = Workbook()
+        wb = Workbook()  # write_only=True
         if len(self.table_exporter.master.keys()) == 0:
             raise ValueError('There are no asset data to export to Excel')
         for class_name in self.table_exporter.master:
