@@ -29,6 +29,15 @@
             "delimiter": ";"
         },
         {
+            "name": "pandas",
+            "dotnotation": {
+                "separator": ".",
+                "cardinality_separator": "|",
+                "cardinality_indicator": "[]",
+                "waarde_shortcut": true
+            }
+        },
+        {
             "name": "xls",
             "dotnotation": {
                 "separator": ".",

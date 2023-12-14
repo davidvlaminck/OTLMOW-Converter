@@ -1,0 +1,372 @@
+import os
+import unittest
+from datetime import date, datetime, time
+from pathlib import Path
+
+import pytest
+from pandas import DataFrame
+
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
+from otlmow_converter.FileFormats.PandasConverter import PandasConverter
+from otlmow_converter.OtlmowConverter import OtlmowConverter
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+model_directory_path = Path(__file__).parent.parent / 'TestModel'
+
+
+def test_init_importer_only_load_with_settings(subtests):
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+
+    with subtests.test(msg='load with correct settings'):
+        importer = PandasConverter(settings=converter.settings)
+        assert importer is not None
+
+    with subtests.test(msg='load without settings'):
+        with pytest.raises(ValueError):
+            PandasConverter(settings=None)
+
+    with subtests.test(msg='load with incorrect settings (no file_formats)'):
+        with pytest.raises(ValueError):
+            PandasConverter(settings={"auth_options": [{}]})
+
+    with subtests.test(msg='load with incorrect settings (file_formats but no xls)'):
+        with pytest.raises(ValueError):
+            PandasConverter(settings={"file_formats": [{}]})
+
+
+def test_convert_objects_to_dataframe_unnested_attributes():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    converter = PandasConverter(settings=converter.settings)
+
+    instances = [
+        AllCasesTestClass.from_dict(
+            {
+                'assetId':
+                    {'identificator': '0000'},
+                'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+                'testBooleanField': False,
+                'testDateField': date(2019, 9, 20),
+                'testDateTimeField': datetime(2001, 12, 15, 22, 22, 15),
+                'testDecimalField': 79.07,
+                'testDecimalFieldMetKard': [10.0, 20.0],
+                'testIntegerField': -55,
+                'testIntegerFieldMetKard': [76, 2],
+                'testKeuzelijst': 'waarde-4',
+                'testKeuzelijstMetKard': ['waarde-4', 'waarde-3'],
+                'testStringField': 'oFfeDLp',
+                'testStringFieldMetKard': ['string1', 'string2'],
+                'testTimeField': time(11, 5, 26)
+            }, model_directory=model_directory_path)]
+
+    df = converter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    assert df.shape == (1, 14)
+
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == '0000'
+    assert df['testBooleanField'][0] == False
+    assert df['testDateField'][0] == date(2019, 9, 20)
+    assert df['testDateTimeField'][0] == datetime(2001, 12, 15, 22, 22, 15)
+    assert df['testDecimalField'][0] == 79.07
+    assert df['testDecimalFieldMetKard[]'][0] == [10.0, 20.0]
+    assert df['testIntegerField'][0] == -55
+    assert df['testIntegerFieldMetKard[]'][0] == [76, 2]
+    assert df['testKeuzelijst'][0] == 'waarde-4'
+    assert df['testKeuzelijstMetKard[]'][0] == ['waarde-4', 'waarde-3']
+    assert df['testStringField'][0] == 'oFfeDLp'
+    assert df['testStringFieldMetKard[]'][0] == ['string1', 'string2']
+    assert df['testTimeField'][0] == time(11, 5, 26)
+
+
+def test_convert_objects_to_dataframe_nested_attributes_1_level():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    converter = PandasConverter(settings=converter.settings)
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = 'YKAzZDhhdTXqkD'
+    instance.assetId.toegekendDoor = 'DGcQxwCGiBlR'
+    instance.testComplexType.testBooleanField = True
+    instance.testComplexType.testKwantWrd.waarde = 65.14
+    instance.testComplexType.testKwantWrdMetKard[0].waarde = 10.0
+    instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+    instance.testComplexType.testKwantWrdMetKard[1].waarde = 20.0
+    instance.testComplexType.testStringField = 'KmCtMXM'
+    instance.testComplexType.testStringFieldMetKard = ['string1', 'string2']
+    instance.testEenvoudigType.waarde = 'string1'
+    instance.testEenvoudigTypeMetKard[0].waarde = 'string1'
+    instance._testEenvoudigTypeMetKard.add_empty_value()
+    instance.testEenvoudigTypeMetKard[1].waarde = 'string2'
+    instance.testKwantWrdMetKard[0].waarde = 10.0
+    instance._testKwantWrdMetKard.add_empty_value()
+    instance.testKwantWrdMetKard[1].waarde = 20.0
+    instances = [instance]
+
+    df = converter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    assert df.shape == (1, 11)
+
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == 'YKAzZDhhdTXqkD'
+    assert df['assetId.toegekendDoor'][0] == 'DGcQxwCGiBlR'
+    assert df['testComplexType.testBooleanField'][0] == True
+    assert df['testComplexType.testKwantWrd'][0] == 65.14
+    assert df['testComplexType.testKwantWrdMetKard[]'][0] == [10.0, 20.0]
+    assert df['testComplexType.testStringField'][0] == 'KmCtMXM'
+    assert df['testComplexType.testStringFieldMetKard[]'][0] == ['string1', 'string2']
+    assert df['testEenvoudigType'][0] == 'string1'
+    assert df['testEenvoudigTypeMetKard[]'][0] == ['string1', 'string2']
+    assert df['testKwantWrdMetKard[]'][0] == [10.0, 20.0]
+
+
+def test_convert_objects_to_dataframe_nested_attributes_2_levels():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    converter = PandasConverter(settings=converter.settings)
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
+
+    instance.testComplexType.testComplexType2.testKwantWrd.waarde = 76.8
+    instance.testComplexType.testComplexType2.testStringField = 'GZBzgRhOrQvfZaN'
+    instance.testComplexType._testComplexType2MetKard.add_empty_value()
+    instance.testComplexType._testComplexType2MetKard.add_empty_value()
+    instance.testComplexType.testComplexType2MetKard[0].testKwantWrd.waarde = 10.0
+    instance.testComplexType.testComplexType2MetKard[1].testKwantWrd.waarde = 20.0
+    instance.testComplexType.testComplexType2MetKard[0].testStringField = 'string1'
+    instance.testComplexType.testComplexType2MetKard[1].testStringField = 'string2'
+
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde = 10.0
+    instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde = 20.0
+    instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
+    instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
+
+    instances = [instance]
+
+    df = converter.convert_objects_to_single_dataframe(list_of_objects=instances)
+
+    assert df.shape == (1, 8)
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == '0000'
+
+    assert df['testComplexType.testComplexType2.testKwantWrd'][0] == 76.8
+    assert df['testComplexType.testComplexType2.testStringField'][0] == 'GZBzgRhOrQvfZaN'
+    assert df['testComplexType.testComplexType2MetKard[].testKwantWrd'][0] == [10.0, 20.0]
+    assert df['testComplexType.testComplexType2MetKard[].testStringField'][0] == ['string1', 'string2']
+    assert df['testComplexTypeMetKard[].testComplexType2.testKwantWrd'][0] == [10.0, 20.0]
+    assert df['testComplexTypeMetKard[].testComplexType2.testStringField'][0] == ['string1', 'string2']
+
+
+@unittest.skip("failing unittest")
+def test_convert_dataframe_to_dict_list_unnested_attributes():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    importer = PandasConverter(settings=converter.settings)
+    exporter = PandasConverter(settings=converter.settings)
+
+    orig_dict_list = [{
+        'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+        'testBooleanField': False,
+        'testDateField': date(2019, 9, 20),
+        'testDateTimeField': datetime(2001, 12, 15, 22, 22, 15),
+        'testDecimalField': 79.07,
+        'testDecimalFieldMetKard': [10.0, 20.0],
+        'testIntegerField': -55,
+        'testIntegerFieldMetKard': [76, 2],
+        'testKeuzelijst': 'waarde-4',
+        'testKeuzelijstMetKard': ['waarde-4', 'waarde-3'],
+        'testStringField': 'oFfeDLp',
+        'testStringFieldMetKard': ['string1', 'string2'],
+        'testTimeField': time(11, 5, 26),
+        'toestand': 'in-gebruik'
+    }, {
+        'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
+        'deprecatedString': 'deprecated',
+        'toestand': 'in-gebruik'
+    }]
+
+    df = importer.convert_dict_list_to_dataframe(dict_list=orig_dict_list)
+    assert df.shape == (2, 15)
+
+    dict_list = exporter.convert_dataframe_to_dict_list(data_frame=df)
+    assert dict_list == orig_dict_list
+
+
+def test_convert_dataframe_to_objects_unnested_attributes(caplog):
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    converter = PandasConverter(settings=converter.settings)
+
+    columns = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testBooleanField',
+               'testDateField', 'testDateTimeField', 'testDecimalField', 'testDecimalFieldMetKard[]',
+               'testEenvoudigType', 'testEenvoudigTypeMetKard[]', 'testIntegerField',
+               'testIntegerFieldMetKard[]', 'testKeuzelijst', 'testKeuzelijstMetKard[]',
+               'testKwantWrd', 'testKwantWrdMetKard[]', 'testStringField', 'testStringFieldMetKard[]',
+               'testTimeField']
+
+    data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', None, False,
+             date(2019, 9, 20), datetime(2001, 12, 15, 22, 22, 15),
+             79.07, [10.0, 20.0], 'string1', ['string1', 'string2'], -55,
+             [76, 2], 'waarde-4', ['waarde-4', 'waarde-3'], 98.21, [10.0, 20.0], 'oFfeDLp', ['string1', 'string2'],
+             time(11, 5, 26)]]
+
+    df = DataFrame(data, columns=columns)
+
+    caplog.clear()
+    created_objects = converter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    for record in caplog.records:
+        print(record.message)
+    assert len(caplog.records) == 0
+
+    assert len(created_objects) == 1
+
+    instance = created_objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert not instance.testBooleanField
+    assert instance.assetId.identificator == '0000'
+    assert instance.testDateField == date(2019, 9, 20)
+    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDecimalField == 79.07
+    assert instance.testDecimalFieldMetKard == [10.0, 20.0]
+    assert instance.testIntegerField == -55
+    assert instance.testIntegerFieldMetKard == [76, 2]
+    assert instance.testKeuzelijst == 'waarde-4'
+    assert instance.testKeuzelijstMetKard == ['waarde-4', 'waarde-3']
+    assert instance.testStringField == 'oFfeDLp'
+    assert instance.testStringFieldMetKard == ['string1', 'string2']
+    assert instance.testTimeField == time(11, 5, 26)
+
+
+@unittest.skip("failing unittest")
+def test_convert_dataframe_to_dict_list_nested_attributes_1_level():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    importer = PandasConverter(settings=converter.settings)
+    exporter = PandasConverter(settings=converter.settings)
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = 'YKAzZDhhdTXqkD'
+    instance.assetId.toegekendDoor = 'DGcQxwCGiBlR'
+    instance.testComplexType.testBooleanField = True
+    instance.testComplexType.testKwantWrd.waarde = 65.14
+    instance.testComplexType.testKwantWrdMetKard[0].waarde = 10.0
+    instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+    instance.testComplexType.testKwantWrdMetKard[1].waarde = 20.0
+    instance.testComplexType.testStringField = 'KmCtMXM'
+    instance.testComplexType.testStringFieldMetKard = ['string1', 'string2']
+    instance.testEenvoudigType.waarde = 'string1'
+    instance.testEenvoudigTypeMetKard[0].waarde = 'string1'
+    instance._testEenvoudigTypeMetKard.add_empty_value()
+    instance.testEenvoudigTypeMetKard[1].waarde = 'string2'
+    instance.testKwantWrdMetKard[0].waarde = 10.0
+    instance._testKwantWrdMetKard.add_empty_value()
+    instance.testKwantWrdMetKard[1].waarde = 20.0
+    instance.toestand = 'in-gebruik'
+
+    instance_2 = AnotherTestClass()
+    instance_2.assetId.identificator = 'asset_2'
+    instance_2.assetId.toegekendDoor = 'partij_2'
+    instance_2.deprecatedString = 'deprecated'
+    instance.toestand = 'in-gebruik'
+
+    instances = [instance, instance_2]
+
+    df = importer.convert_objects_to_single_dataframe(objects=instances, waarde_shortcut=False)
+    assert df.shape == (2, 13)
+
+    dict_list = exporter.convert_dataframe_to_dict_list(data_frame=df)
+    assert dict_list == [
+        {'assetId': {'identificator': 'YKAzZDhhdTXqkD',
+                     'toegekendDoor': 'DGcQxwCGiBlR'},
+         'testComplexType': {'testBooleanField': True,
+                             'testKwantWrd': {'waarde': 65.14},
+                             'testKwantWrdMetKard': [{'waarde': 10.0}, {'waarde': 20.0}],
+                             'testStringField': 'KmCtMXM',
+                             'testStringFieldMetKard': ['string1', 'string2']},
+         'testComplexTypeMetKard': [{'testBooleanField': True,
+                                     'testKwantWrd': {'waarde': 10.0},
+                                     'testStringField': 'string1'},
+                                    {'testBooleanField': None,
+                                     'testKwantWrd': {'waarde': 20.0},
+                                     'testStringField': 'string2'}],
+         'testEenvoudigType': {'waarde': 'string1'},
+         'testEenvoudigTypeMetKard': [{'waarde': 'string1'}, {'waarde': 'string2'}],
+         'testKwantWrdMetKard': [{'waarde': 10.0}, {'waarde': 20.0}],
+         'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'}]
+
+    df = importer.convert_objects_to_single_dataframe(objects=instances, waarde_shortcut=True)
+    assert df.shape == (1, 11)
+
+    dict_list = exporter.convert_dataframe_to_dict_list(data_frame=df, waarde_shortcut=True)
+    assert dict_list == [
+        {'assetId': {'identificator': 'YKAzZDhhdTXqkD',
+                     'toegekendDoor': 'DGcQxwCGiBlR'},
+         'testComplexType': {'testBooleanField': True,
+                             'testKwantWrd': {'waarde': 65.14},
+                             'testKwantWrdMetKard': [{'waarde': 10.0}, {'waarde': 20.0}],
+                             'testStringField': 'KmCtMXM',
+                             'testStringFieldMetKard': ['string1', 'string2']},
+         'testComplexTypeMetKard': [{'testBooleanField': True,
+                                     'testKwantWrd': {'waarde': 10.0},
+                                     'testStringField': 'string1'},
+                                    {'testBooleanField': None,
+                                     'testKwantWrd': {'waarde': 20.0},
+                                     'testStringField': 'string2'}],
+         'testEenvoudigType': {'waarde': 'string1'},
+         'testEenvoudigTypeMetKard': [{'waarde': 'string1'}, {'waarde': 'string2'}],
+         'testKwantWrdMetKard': [{'waarde': 10.0}, {'waarde': 20.0}],
+         'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'}]
+
+
+@unittest.skip("failing unittest")
+def test_convert_dataframe_to_objects_nested_attributes_1_level():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    importer = PandasConverter(settings=converter.settings)
+    exporter = PandasConverter(settings=converter.settings)
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = 'YKAzZDhhdTXqkD'
+    instance.assetId.toegekendDoor = 'DGcQxwCGiBlR'
+    instance.testComplexType.testBooleanField = True
+    instance.testComplexType.testKwantWrd.waarde = 65.14
+    instance.testComplexType.testKwantWrdMetKard[0].waarde = 10.0
+    instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+    instance.testComplexType.testKwantWrdMetKard[1].waarde = 20.0
+    instance.testComplexType.testStringField = 'KmCtMXM'
+    instance.testComplexType.testStringFieldMetKard = ['string1', 'string2']
+    instance.testEenvoudigType.waarde = 'string1'
+    instance.testEenvoudigTypeMetKard[0].waarde = 'string1'
+    instance._testEenvoudigTypeMetKard.add_empty_value()
+    instance.testEenvoudigTypeMetKard[1].waarde = 'string2'
+    instance.testKwantWrdMetKard[0].waarde = 10.0
+    instance._testKwantWrdMetKard.add_empty_value()
+    instance.testKwantWrdMetKard[1].waarde = 20.0
+    instances = [instance]
+
+    df = importer.convert_objects_to_single_dataframe(objects=instances, waarde_shortcut=False)
+    assert df.shape == (1, 11)
+
+    created_objects = exporter.convert_dataframe_to_objects(data_frame=df, model_directory=model_directory_path,
+                                                            waarde_shortcut=False)
+    assert len(created_objects) == 1
+
+    instance = created_objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.assetId.identificator == 'YKAzZDhhdTXqkD'
+    assert instance.assetId.toegekendDoor == 'DGcQxwCGiBlR'
+    assert instance.testComplexType.testBooleanField
+    assert instance.testComplexType.testKwantWrd.waarde == 65.14
+    assert instance.testComplexType.testKwantWrdMetKard[0].waarde == 10.0
+    assert instance.testComplexType.testKwantWrdMetKard[1].waarde == 20.0
+    assert instance.testComplexType.testStringField == 'KmCtMXM'
+    assert instance.testComplexType.testStringFieldMetKard == ['string1', 'string2']
+    assert instance.testEenvoudigType.waarde == 'string1'
+    assert instance.testEenvoudigTypeMetKard[0].waarde == 'string1'
+    assert instance.testEenvoudigTypeMetKard[1].waarde == 'string2'
+    assert instance.testKwantWrdMetKard[0].waarde == 10.0
+    assert instance.testKwantWrdMetKard[1].waarde == 20.0

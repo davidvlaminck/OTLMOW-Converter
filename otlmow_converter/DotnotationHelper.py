@@ -222,7 +222,8 @@ class DotnotationHelper:
                 if attribute.waarde is None:
                     attribute.add_empty_value()
                 if cardinality:
-                    value = value.split(cardinality_separator)
+                    if not isinstance(value, list) and isinstance(value, str):
+                        value = value.split(cardinality_separator)
                     if convert:
                         value = [attribute.waarde[0]._waarde.field.convert_to_correct_type(v, log_warnings=False)
                                  for v in value]
