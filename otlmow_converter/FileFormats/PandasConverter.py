@@ -1,13 +1,8 @@
-import csv
-import os
-from pathlib import Path
 from typing import List, Dict
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from pandas import DataFrame
 
-from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
-from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 
 

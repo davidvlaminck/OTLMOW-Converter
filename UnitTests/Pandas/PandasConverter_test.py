@@ -277,11 +277,15 @@ def test_convert_dataframe_to_objects_nested_attributes_1_level(caplog):
     assert instance.testComplexType.testKwantWrdMetKard[1].waarde == 20.0
     assert instance.testComplexType.testStringField == 'KmCtMXM'
     assert instance.testComplexType.testStringFieldMetKard == ['string1', 'string2']
-    assert instance.testEenvoudigType.waarde == 'string1'
-    assert instance.testEenvoudigTypeMetKard[0].waarde == 'string1'
-    assert instance.testEenvoudigTypeMetKard[1].waarde == 'string2'
-    assert instance.testKwantWrdMetKard[0].waarde == 10.0
-    assert instance.testKwantWrdMetKard[1].waarde == 20.0
+    assert instance.testComplexTypeMetKard[0].testBooleanField == True
+    assert instance.testComplexTypeMetKard[1].testBooleanField == False
+    assert instance.testComplexTypeMetKard[0].testKwantWrd.waarde == 10.0
+    assert instance.testComplexTypeMetKard[1].testKwantWrd.waarde == 20.0
+    assert instance.testComplexTypeMetKard[0].testStringField == 'string1'
+    assert instance.testComplexTypeMetKard[1].testStringField == 'string2'
+    assert instance.testUnionType.unionString == 'RWKofW'
+    assert instance.testUnionTypeMetKard[0].unionKwantWrd.waarde == 10.0
+    assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
 @unittest.skip("failing unittest")
