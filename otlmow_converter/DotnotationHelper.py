@@ -184,7 +184,9 @@ class DotnotationHelper:
                     attribute.set_waarde(None)
                     return
 
-                for index, v in enumerate(value.split(cardinality_separator)):
+                if not isinstance(value, list) and isinstance(value, str):
+                    value = value.split(cardinality_separator)
+                for index, v in enumerate(value):
                     if attribute.waarde is None or len(attribute.waarde) <= index:
                         attribute.add_empty_value()
                     DotnotationHelper.set_attribute_by_dotnotation(

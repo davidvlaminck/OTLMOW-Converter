@@ -241,8 +241,51 @@ def test_convert_dataframe_to_objects_unnested_attributes(caplog):
     assert instance.testTimeField == time(11, 5, 26)
 
 
+def test_convert_dataframe_to_objects_nested_attributes_1_level(caplog):
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    converter = PandasConverter(settings=converter.settings)
+
+    columns = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testComplexType.testBooleanField',
+               'testComplexType.testKwantWrd', 'testComplexType.testKwantWrdMetKard[]',
+               'testComplexType.testStringField', 'testComplexType.testStringFieldMetKard[]',
+               'testComplexTypeMetKard[].testBooleanField', 'testComplexTypeMetKard[].testKwantWrd',
+               'testComplexTypeMetKard[].testStringField', 'testUnionType.unionString',
+               'testUnionTypeMetKard[].unionKwantWrd']
+
+    data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', 'OTLMOW',
+             True, 65.14, [10.0, 20.0], 'KmCtMXM', ['string1', 'string2'], [True, False], [10.0, 20.0],
+             ['string1', 'string2'], 'RWKofW', [10.0, 20.0]]]
+
+    df = DataFrame(data, columns=columns)
+
+    caplog.clear()
+    created_objects = converter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    for record in caplog.records:
+        print(record.message)
+    assert len(caplog.records) == 0
+
+    assert len(created_objects) == 1
+
+    instance = created_objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.assetId.identificator == '0000'
+    assert instance.assetId.toegekendDoor == 'OTLMOW'
+    assert instance.testComplexType.testBooleanField
+    assert instance.testComplexType.testKwantWrd.waarde == 65.14
+    assert instance.testComplexType.testKwantWrdMetKard[0].waarde == 10.0
+    assert instance.testComplexType.testKwantWrdMetKard[1].waarde == 20.0
+    assert instance.testComplexType.testStringField == 'KmCtMXM'
+    assert instance.testComplexType.testStringFieldMetKard == ['string1', 'string2']
+    assert instance.testEenvoudigType.waarde == 'string1'
+    assert instance.testEenvoudigTypeMetKard[0].waarde == 'string1'
+    assert instance.testEenvoudigTypeMetKard[1].waarde == 'string2'
+    assert instance.testKwantWrdMetKard[0].waarde == 10.0
+    assert instance.testKwantWrdMetKard[1].waarde == 20.0
+
+
 @unittest.skip("failing unittest")
-def test_convert_dataframe_to_dict_list_nested_attributes_1_level():
+def test_convert_dataframe_to_dict_list_nested_attributes_1_level_2():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = PandasConverter(settings=converter.settings)
@@ -323,7 +366,7 @@ def test_convert_dataframe_to_dict_list_nested_attributes_1_level():
 
 
 @unittest.skip("failing unittest")
-def test_convert_dataframe_to_objects_nested_attributes_1_level():
+def test_convert_dataframe_to_objects_nested_attributes_1_level_3():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
     importer = PandasConverter(settings=converter.settings)
