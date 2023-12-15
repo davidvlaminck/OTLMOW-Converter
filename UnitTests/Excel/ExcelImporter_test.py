@@ -38,6 +38,20 @@ def test_init_importer_only_load_with_settings(subtests):
             ExcelImporter(settings={"file_formats": [{}]})
 
 
+def test_convert_to_json_with_date():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.xlsx'
+    assets = converter.create_assets_from_file(filepath=file_location)
+
+    json_file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.json'
+
+    converter.create_file_from_assets(filepath=json_file_location, list_of_objects=assets)
+
+    os.unlink(json_file_location)
+
+
+
 def test_load_test_unnested_attributes(caplog):
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
