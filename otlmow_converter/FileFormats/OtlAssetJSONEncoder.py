@@ -26,17 +26,15 @@ class OtlAssetJSONEncoder(json.JSONEncoder):
                                                   waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
             if hasattr(otl_object, 'typeURI'):
                 d['typeURI'] = otl_object.typeURI
-            od = OrderedDict(sorted(d.items()))
-            return od
+            return OrderedDict(sorted(d.items()))
         return super().default(otl_object)
 
     # no usage?
     @classmethod
     def isEmptyDict(cls, value: dict):
         for v in value.values():
-            if isinstance(v, dict):
-                if cls.isEmptyDict(v):
-                    continue
+            if isinstance(v, dict) and cls.isEmptyDict(v):
+                continue
             if v is not None and v != []:
                 return False
         return True
