@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, time
 from pathlib import Path
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -9,9 +9,8 @@ from otlmow_converter.OtlmowConverter import OtlmowConverter
 def set_up_encoder():
     base_dir = Path(__file__).parent
     settings_file_location = Path(base_dir.parent / 'settings_OTLMOW.json')
-    otl_facility = OtlmowConverter(logfile=None, settings_path=settings_file_location)
-    encoder = OtlAssetJSONEncoder(settings=otl_facility.settings)
-    return encoder
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    return OtlAssetJSONEncoder(settings=converter.settings)
 
 
 def test_init_encoder():
@@ -127,5 +126,29 @@ def test_JsonEncode_DateTimeField():
     json_instance = encoder.encode(instance)
     expected = '{"testDateTimeField": "2022-02-02 22:22:22", ' \
                '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}'
+
+    assert json_instance == expected
+
+
+def test_JsonEncode_DateField():
+    encoder = set_up_encoder()
+
+    instance = AllCasesTestClass()
+    instance.testDateField = date(2022, 2, 2)
+    json_instance = encoder.encode([instance])
+    expected = '[{"testDateField": "2022-02-02", ' \
+               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}]'
+
+    assert json_instance == expected
+
+
+def test_JsonEncode_TimeField():
+    encoder = set_up_encoder()
+
+    instance = AllCasesTestClass()
+    instance.testTimeField = time(22, 22, 22)
+    json_instance = encoder.encode([instance])
+    expected = '[{"testTimeField": "22:22:22", ' \
+               '"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"}]'
 
     assert json_instance == expected
