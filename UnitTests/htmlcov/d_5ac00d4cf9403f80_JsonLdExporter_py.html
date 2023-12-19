@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for /home/runner/work/OTLMOW-Converter/OTLMOW-Converter/otlmow_converter/FileFormats/JsonLdExporter.py: 96%</title>
+    <title>Coverage for /home/runner/work/OTLMOW-Converter/OTLMOW-Converter/otlmow_converter/FileFormats/JsonLdExporter.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>/home/runner/work/OTLMOW-Converter/OTLMOW-Converter/otlmow_converter/FileFormats/JsonLdExporter.py</b>:
-            <span class="pc_cov">96%</span>
+            <span class="pc_cov">100%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -54,9 +54,9 @@
             </div>
         </aside>
         <h2>
-            <span class="text">25 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">24<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">1<span class="text"> missing</span></button>
+            <span class="text">22 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">22<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">0<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_JsonLdImporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.3">coverage.py v7.3.3</a>,
-            created at 2023-12-14 15:26 +0000
+            created at 2023-12-19 22:45 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -91,11 +91,11 @@
     <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">encoder</span> <span class="op">=</span> <span class="nam">OtlAssetJSONLDEncoder</span><span class="op">(</span><span class="nam">indent</span><span class="op">=</span><span class="num">4</span><span class="op">,</span> <span class="nam">settings</span><span class="op">=</span><span class="nam">settings</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">    <span class="key">def</span> <span class="nam">export_to_file</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">filepath</span><span class="op">:</span> <span class="nam">Path</span><span class="op">,</span> <span class="nam">list_of_objects</span><span class="op">:</span> <span class="nam">list</span> <span class="op">=</span> <span class="key">None</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">        <span class="nam">graph_dict</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">        <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">list_of_objects</span><span class="op">,</span> <span class="nam">list</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">            <span class="nam">graph_dict</span><span class="op">[</span><span class="str">'@graph'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">list_of_objects</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">            <span class="nam">graph_dict</span><span class="op">[</span><span class="str">'@graph'</span><span class="op">]</span> <span class="op">=</span> <span class="op">[</span><span class="nam">list_of_objects</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">        <span class="nam">graph_dict</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">            <span class="str">'@graph'</span><span class="op">:</span> <span class="nam">list_of_objects</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">            <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">list_of_objects</span><span class="op">,</span> <span class="nam">list</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">            <span class="key">else</span> <span class="op">[</span><span class="nam">list_of_objects</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">        <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">        <span class="nam">encoded_json</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">encoder</span><span class="op">.</span><span class="nam">encode</span><span class="op">(</span><span class="nam">graph_dict</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">        <span class="nam">encoded_json</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">modify_jsonld_for_context</span><span class="op">(</span><span class="nam">encoded_json</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">encoder</span><span class="op">.</span><span class="nam">write_json_to_file</span><span class="op">(</span><span class="nam">encoded_json</span><span class="op">,</span> <span class="nam">filepath</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -121,7 +121,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_JsonLdImporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.3">coverage.py v7.3.3</a>,
-            created at 2023-12-14 15:26 +0000
+            created at 2023-12-19 22:45 +0000
         </p>
     </div>
 </footer>
