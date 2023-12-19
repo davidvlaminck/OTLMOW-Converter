@@ -1,8 +1,11 @@
 import datetime
+import math
 import warnings
 from pathlib import Path
 from typing import Dict, Any, Iterable, List
 
+import numpy as np
+from numpy import nan, isnan
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
@@ -177,6 +180,8 @@ class DotnotationTableConverter:
             try:
                 value = row.get(header, None)
                 if value is None:
+                    continue
+                if isinstance(value, float) and math.isnan(value):
                     continue
                 if empty_string_equals_none and value == '':
                     continue
