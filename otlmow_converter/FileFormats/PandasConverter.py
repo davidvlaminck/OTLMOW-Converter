@@ -20,18 +20,14 @@ class PandasConverter:
         self.dotnotation_table_converter = DotnotationTableConverter()
         self.dotnotation_table_converter.load_settings(pandas_settings['dotnotation'])
 
-    def convert_objects_to_single_dataframe(self, list_of_objects: List[OTLObject], **kwargs) -> DataFrame:
-        model_directory = None
-        if kwargs is not None and 'model_directory' in kwargs:
-            model_directory = kwargs['model_directory']
-        self.dotnotation_table_converter.model_directory = model_directory
-
+    def convert_objects_to_single_dataframe(self, list_of_objects: List[OTLObject]) -> DataFrame:
         single_table = self.dotnotation_table_converter.get_single_table_from_data(list_of_objects=list_of_objects)
         return DataFrame(data=single_table[1:])
 
-    def convert_objects_to_multiple_dataframes(self, list_of_objects: List[OTLObject], **kwargs
+    def convert_objects_to_multiple_dataframes(self, list_of_objects: List[OTLObject]
                                                ) -> Dict[str, DataFrame]:
-        pass
+        dict_tables = self.dotnotation_table_converter.get_tables_per_type_from_data(list_of_objects=list_of_objects)
+        return {key: DataFrame(data=value[1:]) for key, value in dict_tables.items()}
 
     def convert_dataframe_to_objects(self, dataframe: DataFrame, **kwargs) -> List[OTLObject]:
         model_directory = None

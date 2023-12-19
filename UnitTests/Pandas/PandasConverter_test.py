@@ -77,6 +77,41 @@ def test_convert_objects_to_dataframe_unnested_attributes():
     assert df['testTimeField'][0] == time(11, 5, 26)
 
 
+def test_convert_objects_to_multiple_dataframes_unnested_attributes():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = OtlmowConverter(settings_path=settings_file_location)
+    converter = PandasConverter(settings=converter.settings)
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
+    instance.testStringField = 'string1'
+
+    instance_2 = AnotherTestClass()
+    instance_2.assetId.identificator = '0001'
+    instance_2.toestand = 'in-gebruik'
+
+    instance_3 = AllCasesTestClass()
+    instance_3.assetId.identificator = '0002'
+    instance_3.testStringField = 'string2'
+
+    instances = [instance, instance_2, instance_3]
+
+    df_dict = converter.convert_objects_to_multiple_dataframes(list_of_objects=instances)
+
+    test_class_df = df_dict['onderdeel#AllCasesTestClass']
+    assert test_class_df.shape == (2, 3)
+    assert test_class_df['assetId.identificator'][0] == '0000'
+    assert test_class_df['testStringField'][0] == 'string1'
+    assert test_class_df['assetId.identificator'][1] == '0002'
+    assert test_class_df['testStringField'][1] == 'string2'
+
+    another_test_class_df = df_dict['onderdeel#AnotherTestClass']
+    assert another_test_class_df.shape == (1, 3)
+    assert another_test_class_df['assetId.identificator'][0] == '0001'
+
+    assert list(df_dict.keys()) == ['onderdeel#AllCasesTestClass', 'onderdeel#AnotherTestClass']
+
+
 def test_convert_objects_to_dataframe_nested_attributes_1_level():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)
