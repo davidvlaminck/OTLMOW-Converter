@@ -38,8 +38,9 @@ class JsonLdDecoder:
                 rdf_dict = self.transform_dict_to_rdf(d=obj, context_dict=context_dict)
                 del rdf_dict['@id']
                 del rdf_dict['@type']
-                instance = OTLObject.from_dict(rdf_dict, rdf=True, model_directory=model_directory,
-                                               waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
+                instance = OTLObject.from_dict(
+                    rdf_dict, rdf=True, model_directory=model_directory, datetime_as_string=True,
+                    waarde_shortcut=self.settings['dotnotation']['waarde_shortcut'])
                 lijst.append(instance)
             except Exception as ex:
                 if not ignore_failed_objects:

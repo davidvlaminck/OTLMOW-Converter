@@ -9,11 +9,11 @@ class JsonLdExporter:
         self.encoder = OtlAssetJSONLDEncoder(indent=4, settings=settings)
 
     def export_to_file(self, filepath: Path, list_of_objects: list = None):
-        graph_dict = {}
-        if isinstance(list_of_objects, list):
-            graph_dict['@graph'] = list_of_objects
-        else:
-            graph_dict['@graph'] = [list_of_objects]
+        graph_dict = {
+            '@graph': list_of_objects
+            if isinstance(list_of_objects, list)
+            else [list_of_objects]
+        }
         encoded_json = self.encoder.encode(graph_dict)
         encoded_json = self.modify_jsonld_for_context(encoded_json)
         self.encoder.write_json_to_file(encoded_json, filepath)
