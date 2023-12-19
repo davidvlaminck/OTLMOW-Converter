@@ -1,0 +1,52 @@
+[
+    {
+        "assetId": {
+            "identificator": "0000"
+        },
+        "testComplexType": {
+            "testBooleanField": true,
+            "testKwantWrd": 65.14,
+            "testKwantWrdMetKard": [
+                10.0,
+                20.0
+            ],
+            "testStringField": "KmCtMXM",
+            "testStringFieldMetKard": [
+                "string1",
+                "string2"
+            ]
+        },
+        "testComplexTypeMetKard": [
+            {
+                "testBooleanField": true,
+                "testKwantWrd": 10.0,
+                "testStringField": "string1"
+            },
+            {
+                "testBooleanField": false,
+                "testKwantWrd": 20.0,
+                "testStringField": "string2"
+            }
+        ],
+        "testEenvoudigTypeMetKard": [
+            "string1",
+            "string2"
+        ],
+        "testKwantWrdMetKard": [
+            10.0,
+            20.0
+        ],
+        "testUnionType": {
+            "unionString": "RWKofW"
+        },
+        "testUnionTypeMetKard": [
+            {
+                "unionKwantWrd": 10.0
+            },
+            {
+                "unionKwantWrd": 20.0
+            }
+        ],
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+    }
+]

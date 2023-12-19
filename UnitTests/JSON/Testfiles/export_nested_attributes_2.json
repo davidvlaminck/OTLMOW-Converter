@@ -1,0 +1,38 @@
+[
+    {
+        "assetId": {
+            "identificator": "0000"
+        },
+        "testComplexType": {
+            "testComplexType2": {
+                "testKwantWrd": 76.8,
+                "testStringField": "GZBzgRhOrQvfZaN"
+            },
+            "testComplexType2MetKard": [
+                {
+                    "testKwantWrd": 10.0,
+                    "testStringField": "string1"
+                },
+                {
+                    "testKwantWrd": 20.0,
+                    "testStringField": "string2"
+                }
+            ]
+        },
+        "testComplexTypeMetKard": [
+            {
+                "testComplexType2": {
+                    "testKwantWrd": 10.0,
+                    "testStringField": "string1"
+                }
+            },
+            {
+                "testComplexType2": {
+                    "testKwantWrd": 20.0,
+                    "testStringField": "string2"
+                }
+            }
+        ],
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+    }
+]
