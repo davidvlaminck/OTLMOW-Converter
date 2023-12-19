@@ -26,12 +26,11 @@ class PandasConverter:
             model_directory = kwargs['model_directory']
         self.dotnotation_table_converter.model_directory = model_directory
 
-        single_table = self.dotnotation_table_converter.get_single_table_from_data(
-            list_of_objects=list_of_objects, values_as_string=False)
-        df = DataFrame(data=single_table[1:])
-        return df
+        single_table = self.dotnotation_table_converter.get_single_table_from_data(list_of_objects=list_of_objects)
+        return DataFrame(data=single_table[1:])
 
-    def convert_objects_to_multiple_dataframes(self, list_of_objects: List[OTLObject], **kwargs) -> Dict[str, DataFrame]:
+    def convert_objects_to_multiple_dataframes(self, list_of_objects: List[OTLObject], **kwargs
+                                               ) -> Dict[str, DataFrame]:
         pass
 
     def convert_dataframe_to_objects(self, dataframe: DataFrame, **kwargs) -> List[OTLObject]:
@@ -41,13 +40,9 @@ class PandasConverter:
         self.dotnotation_table_converter.model_directory = model_directory
 
         headers = list(dataframe)
-        d = {}
-        for index, header in enumerate(headers):
-            d[header] = index
-
+        d = {header: index for index, header in enumerate(headers)}
         dict_list = [d]
         dict_list.extend(dataframe.to_dict('records'))
 
-        objects = self.dotnotation_table_converter.get_data_from_table(
-            table_data=dict_list, convert_strings_to_types=False)
-        return objects
+        return self.dotnotation_table_converter.get_data_from_table(table_data=dict_list)
+    
