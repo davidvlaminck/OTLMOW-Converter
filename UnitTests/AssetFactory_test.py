@@ -10,7 +10,7 @@ def test_create_otl_object_using_other_otl_object_as_template_using_attribute_li
     another_test_class.notitie = 'notitie'
     another_test_class.datumOprichtingObject = '2020-01-01'
 
-    attribute_list = {a.naam for a in another_test_class} # TODO refactor to use sets
+    attribute_list = {a.naam for a in another_test_class}
     attribute_list.remove('deprecatedString')
 
     result_asset = AssetFactory.create_otl_object_using_other_otl_object_as_template(
