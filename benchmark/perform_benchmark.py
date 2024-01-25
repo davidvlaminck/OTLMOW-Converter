@@ -69,7 +69,7 @@ if __name__ == '__main__':
     FormatDetails = namedtuple('FormatDetails', ['Extension', 'Label', 'WriteArguments'])
 
     tb = prettytable.PrettyTable()
-    tb.field_names = ['Format', 'Read all classes', 'Write all classes', 'Size all classes',
+    tb.field_names = ['Format', 'Read 500 classes', 'Write 500 classes', 'Size 500 classes',
                       'Read 10 random classes', 'Write 10 random classes', 'Size 10 random classes']
 
     formats = [
@@ -78,7 +78,8 @@ if __name__ == '__main__':
         FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
         FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={}),
         FormatDetails(Extension='geojson', Label='GeoJSON', WriteArguments={}),
-        FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})]
+        # FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})
+    ]
 
     for format_details in formats:
         results_dict = {}
