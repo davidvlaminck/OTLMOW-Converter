@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 
