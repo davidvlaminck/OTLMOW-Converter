@@ -1,4 +1,5 @@
-﻿from pathlib import Path
+﻿import datetime
+from pathlib import Path
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
@@ -8,7 +9,7 @@ from otlmow_converter.AssetFactory import AssetFactory
 def test_create_otl_object_using_other_otl_object_as_template_using_attribute_list():
     another_test_class = AnotherTestClass()
     another_test_class.notitie = 'notitie'
-    another_test_class.datumOprichtingObject = '2020-01-01'
+    another_test_class.datumOprichtingObject = datetime.date(2020, 1, 1)
 
     attribute_list = {a.naam for a in another_test_class}
     attribute_list.remove('deprecatedString')
