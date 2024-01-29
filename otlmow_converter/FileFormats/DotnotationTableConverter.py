@@ -4,11 +4,8 @@ import warnings
 from pathlib import Path
 from typing import Dict, Any, Iterable, List
 
-import numpy as np
-from numpy import nan, isnan
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, dynamic_create_instance_from_uri
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 
 from otlmow_converter.DotnotationHelper import DotnotationHelper

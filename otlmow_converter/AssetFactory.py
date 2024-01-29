@@ -1,17 +1,17 @@
 ﻿from pathlib import Path
-from typing import Union, List
+from typing import Union, Set
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem, OTLObject
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem, OTLObject, \
+    dynamic_create_instance_from_uri
 from otlmow_model.OtlmowModel.Classes.ImplementatieElement.AIMObject import AIMObject
 from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
-from otlmow_model.OtlmowModel.Helpers.AssetCreator import dynamic_create_instance_from_uri
 
 
 class AssetFactory:
     @staticmethod
-    def create_otl_object_using_other_otl_object_as_template(orig_otl_object: OTLObject,
-                                                             typeURI: str = '', fields_to_copy: [str] = None,
-                                                             model_directory: Path = None) -> OTLObject:
+    def create_otl_object_using_other_otl_object_as_template(
+            orig_otl_object: OTLObject, typeURI: str = '', fields_to_copy: Set[str] = None,
+            model_directory: Path = None) -> OTLObject:
         """Creates an OTLObject, using another OTLObject as template.
         The parameter typeURI defines the type of the new OTLObject that is created.
         If omitted, it is assumed the same type as the given aimObject
@@ -31,7 +31,8 @@ class AssetFactory:
 
         if typeURI != '':
             if typeURI != orig_otl_object.typeURI and (fields_to_copy == [] or fields_to_copy is None):
-                raise ValueError("parameter typeURI is different from orig_otl_object. parameter fields_to_copy cannot be empty")
+                raise ValueError("parameter typeURI is different from orig_otl_object. "
+                                 "Parameter fields_to_copy cannot be empty")
 
         if typeURI == '':
             typeURI = orig_otl_object.typeURI

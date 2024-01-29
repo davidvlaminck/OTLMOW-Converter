@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
 from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 
@@ -98,7 +99,7 @@ def test_convert_list_of_objects_to_list_of_geodicts_bool():
 def test_convert_list_of_objects_to_list_of_geodicts_with_geom():
     exporter = set_up_exporter()
 
-    test_object = AllCasesTestClass()
+    test_object = AnotherTestClass()
     test_object.assetId.identificator = '00000000-0000-0000-0000-000000000000-b25kZXJkZWVsI0hlZWZ0QWFudnVsbGVuZGVHZW9tZXRyaWU'
     test_object.assetId.toegekendDoor = 'AWV'
     test_object.geometry = 'LINESTRING Z (200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.6 0, 200000.7 200000.8 0)'
@@ -109,7 +110,7 @@ def test_convert_list_of_objects_to_list_of_geodicts_with_geom():
             {
                 "assetId.toegekendDoor": "AWV",
                 "assetId.identificator": "00000000-0000-0000-0000-000000000000-b25kZXJkZWVsI0hlZWZ0QWFudnVsbGVuZGVHZW9tZXRyaWU",
-                "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
+                "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass",
             },
         "type": "Feature",
         "geometry":
