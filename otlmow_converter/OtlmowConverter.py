@@ -1,33 +1,37 @@
-import logging
 from pathlib import Path
+from typing import Iterable
+
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 
 from otlmow_converter.FileExporter import FileExporter
 from otlmow_converter.FileImporter import FileImporter
+import otlmow_converter.SettingsManager
 from otlmow_converter.SettingsManager import load_settings
 
+load_settings()
+global OTLMOW_CONVERTER_SETTINGS
+settings = OTLMOW_CONVERTER_SETTINGS
 
 class OtlmowConverter:
-    def __init__(self,
-                 settings_path: Path = None,
-                 logging_level: int = logging.WARNING,
-                 logfile: Path = None):
-        """Main utility class for creating a model, importing and exporting assets from files and enabling validation features
+    """
+    Main utility class for converting OTLMOW objects to and from formats, such as files, dictionaries and dataframes.
+    To change the settings, use the SettingsManager.load_settings() method before using this class
+    The converter uses the point of view of the OTLMOW model objects.
+    For example, when using the to_file() method, it converts the OTLMOW model objects (in memory) to a file.
+    When using the from_file() method, it converts the file to OTLMOW model objects (in memory).
+    """
 
-        :param settings_path: specifies the location of the settings file this library loads. Defaults to the example that is supplied with the library ('./settings_otlmow_converter.json')
-        :type settings_path: Path
-        :param logging_level: specifies the level of logging that is used for actions with this class
-        :type logging_level: int
-        :param logfile: specifies the path to the logfile.
-        :type logfile: Path
+    @classmethod
+    def to_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[dict]:
         """
-        self.settings: dict = load_settings(settings_path)
+        Converts a sequence of OTLObject objects to a sequence of dictionaries.
+        This conversion uses the OTLMOW settings.
+        See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
+        """
+        datetime_as_string = settings['formats']['OTLMOW']['datetime_as_string']
+        for obj in sequence_of_objects:
+            yield create_dict_from_asset(obj, datetime_as_string=datetime_as_string, **kwargs)
 
-        if logging_level != 0 and logfile is not None and str(logfile) != '':
-            logging.basicConfig(filename=str(logfile),
-                                filemode='a',
-                                format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                                datefmt='%H:%M:%S',
-                                level=logging_level)
 
     def create_assets_from_file(self, filepath: Path = None, **kwargs) -> list:
         """Creates asset objects in memory from a file. Supports csv and json files.

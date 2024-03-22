@@ -1,25 +1,25 @@
 import json
-import os
 from pathlib import Path
 from typing import Dict
 
+CURRENT_DIR = Path(__file__).parent
 
-def _check_settings_with_default(settings_path: Path) -> Path:
-    if settings_path is None:
-        current_file_path = Path(__file__)
-        settings_path = Path(current_file_path.parent / 'settings_otlmow_converter.json')
+OTLMOW_CONVERTER_SETTINGS: Dict = {}
 
-    if not os.path.isfile(settings_path):
+def _load_settings_by_dict(settings_dict: Dict) -> None:
+    global OTLMOW_CONVERTER_SETTINGS
+    OTLMOW_CONVERTER_SETTINGS = settings_dict
+
+
+def load_settings(settings_path: Path = CURRENT_DIR / 'settings_otlmow_converter.json') -> None:
+    if not settings_path.exists():
         raise FileNotFoundError(f'{settings_path} is not a valid path. File does not exist.')
-
-    return settings_path
-
-
-def load_settings(settings_path: Path) -> Dict:
-    settings_path = _check_settings_with_default(settings_path=settings_path)
 
     try:
         with open(settings_path) as settings_file:
-            return json.load(settings_file)
-    except OSError:
-        raise ImportError(f'Could not open the settings file at {settings_path}')
+            settings_dict = json.load(settings_file)
+            _load_settings_by_dict(settings_dict)
+    except OSError as e:
+        raise ImportError(
+            f'Could not open the settings file at {settings_path}'
+        ) from e
