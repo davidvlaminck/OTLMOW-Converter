@@ -5,12 +5,9 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dic
 
 from otlmow_converter.FileExporter import FileExporter
 from otlmow_converter.FileImporter import FileImporter
-import otlmow_converter.SettingsManager
-from otlmow_converter.SettingsManager import load_settings
+from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 load_settings()
-global OTLMOW_CONVERTER_SETTINGS
-settings = OTLMOW_CONVERTER_SETTINGS
 
 class OtlmowConverter:
     """
@@ -28,10 +25,14 @@ class OtlmowConverter:
         This conversion uses the OTLMOW settings.
         See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
         """
-        datetime_as_string = settings['formats']['OTLMOW']['datetime_as_string']
-        for obj in sequence_of_objects:
-            yield create_dict_from_asset(obj, datetime_as_string=datetime_as_string, **kwargs)
+        rdf = kwargs.get('rdf',  GlobalVariables.settings['formats']['OTLMOW']['rdf'])
+        waarde_shortcut = kwargs.get('waarde_shortcut', GlobalVariables.settings['formats']['OTLMOW']['waarde_shortcut'])
+        datetime_as_string = kwargs.get('datetime_as_string',
+                                        GlobalVariables.settings['formats']['OTLMOW']['datetime_as_string'])
 
+        for obj in sequence_of_objects:
+            yield create_dict_from_asset(obj, rdf=rdf, waarde_shortcut=waarde_shortcut,
+                                         datetime_as_string=datetime_as_string, **kwargs)
 
     def create_assets_from_file(self, filepath: Path = None, **kwargs) -> list:
         """Creates asset objects in memory from a file. Supports csv and json files.

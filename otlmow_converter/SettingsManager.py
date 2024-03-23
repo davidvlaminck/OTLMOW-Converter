@@ -4,11 +4,12 @@ from typing import Dict
 
 CURRENT_DIR = Path(__file__).parent
 
-OTLMOW_CONVERTER_SETTINGS: Dict = {}
+
+class GlobalVariables:
+    settings = {}
 
 def _load_settings_by_dict(settings_dict: Dict) -> None:
-    global OTLMOW_CONVERTER_SETTINGS
-    OTLMOW_CONVERTER_SETTINGS = settings_dict
+    GlobalVariables.settings = settings_dict
 
 
 def load_settings(settings_path: Path = CURRENT_DIR / 'settings_otlmow_converter.json') -> None:

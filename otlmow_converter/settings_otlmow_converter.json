@@ -1,7 +1,9 @@
 {
     "formats": {
         "OTLMOW": {
-            "datetime_as_string": false
+            "datetime_as_string": false,
+            "rdf": false,
+            "waarde_shortcut": false
         }
     }
 }

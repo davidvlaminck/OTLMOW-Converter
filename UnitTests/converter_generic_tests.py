@@ -35,7 +35,9 @@ def test_using_to_dicts_with_altered_settings():
     settings = {
         "formats": {
             "OTLMOW": {
-                "datetime_as_string": True
+                "datetime_as_string": True,
+                "rdf": False,
+                "waarde_shortcut": False
             }
         }
     }
