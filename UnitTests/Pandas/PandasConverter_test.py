@@ -77,6 +77,26 @@ def test_convert_objects_to_dataframe_unnested_attributes():
     assert df['testTimeField'][0] == time(11, 5, 26)
 
 
+
+
+def test_convert_objects_to_dataframe_unnested_attributes():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    converter = PandasConverter()
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
+    instance.testBooleanField = False
+    instances = [instance]
+
+    df = converter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    assert df.shape == (1, 3)
+
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == '0000'
+    assert df['testBooleanField'][0] == False
+
+
+
 def test_convert_objects_to_multiple_dataframes_unnested_attributes():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     converter = OtlmowConverter(settings_path=settings_file_location)

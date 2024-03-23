@@ -24,3 +24,16 @@ def load_settings(settings_path: Path = CURRENT_DIR / 'settings_otlmow_converter
         raise ImportError(
             f'Could not open the settings file at {settings_path}'
         ) from e
+
+
+def _update_dict(orig_dict: Dict, extra_dict: Dict) -> None:
+    for k, v in extra_dict.items():
+        if isinstance(v, dict):
+            _update_dict(orig_dict[k], v)
+        else:
+            orig_dict[k] = v
+
+
+def update_settings_by_dict(settings_dict: Dict) -> None:
+    _update_dict(GlobalVariables.settings, settings_dict)
+    print(GlobalVariables.settings)

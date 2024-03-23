@@ -3,7 +3,9 @@
         "OTLMOW": {
             "datetime_as_string": false,
             "rdf": false,
-            "waarde_shortcut": false
+            "waarde_shortcut": false,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true
         }
     }
 }

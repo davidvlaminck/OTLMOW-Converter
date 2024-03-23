@@ -1,9 +1,13 @@
 from datetime import date
+from pathlib import Path
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.OtlmowConverter import OtlmowConverter
-from otlmow_converter.SettingsManager import _load_settings_by_dict
+from otlmow_converter.SettingsManager import _load_settings_by_dict, update_settings_by_dict
+
+
+model_directory_path = Path(__file__).parent / 'TestModel'
 
 
 def test_generic_use_of_to_dicts():
@@ -35,9 +39,7 @@ def test_using_to_dicts_with_altered_settings():
     settings = {
         "formats": {
             "OTLMOW": {
-                "datetime_as_string": True,
-                "rdf": False,
-                "waarde_shortcut": False
+                "datetime_as_string": True
             }
         }
     }
@@ -46,7 +48,21 @@ def test_using_to_dicts_with_altered_settings():
     assert list(dicts) == [{'testDateField': date(2020, 1, 1),
                             'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'}]
 
-    _load_settings_by_dict(settings)
+    update_settings_by_dict(settings)
     dicts = OtlmowConverter.to_dicts(sequence_of_objects)
     assert list(dicts) == [{'testDateField': "2020-01-01",
                             'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'}]
+
+
+def test_generic_use_of_from_dicts():
+    dicts = [{'notitie': 'notitie',
+                            'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'},
+                           {'notitie': 'notitie2',
+                            'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'}]
+    objects = OtlmowConverter.from_dicts(dicts, model_directory=model_directory_path)
+    instance1 = AllCasesTestClass()
+    instance1.notitie = 'notitie'
+    instance2 = AnotherTestClass()
+    instance2.notitie = 'notitie2'
+    sequence_of_objects = [instance1, instance2]
+    assert list(objects) == sequence_of_objects
