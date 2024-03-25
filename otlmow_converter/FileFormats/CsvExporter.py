@@ -22,7 +22,8 @@ class CsvExporter:
             model_directory=model_directory, ignore_empty_asset_id=ignore_empty_asset_id)
         self.dotnotation_table_converter.load_settings(csv_settings['dotnotation'])
 
-    def export_to_file(self, filepath: Path, list_of_objects: Iterable, **kwargs) -> None:
+    @classmethod
+    def export_to_file(cls, filepath: Path, list_of_objects: Iterable, **kwargs) -> None:
         delimiter = ';'
         split_per_type = True
         quote_char = '"'

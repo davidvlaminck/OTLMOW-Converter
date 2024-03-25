@@ -13,6 +13,8 @@ def _load_settings_by_dict(settings_dict: Dict) -> None:
 
 
 def load_settings(settings_path: Path = CURRENT_DIR / 'settings_otlmow_converter.json') -> None:
+    if GlobalVariables.settings != {}:
+        return
     if not settings_path.exists():
         raise FileNotFoundError(f'{settings_path} is not a valid path. File does not exist.')
 

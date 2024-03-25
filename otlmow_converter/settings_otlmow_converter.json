@@ -5,7 +5,37 @@
             "rdf": false,
             "waarde_shortcut": false,
             "allow_non_otl_conform_attributes": true,
-            "warn_for_non_otl_conform_attributes": true
+            "warn_for_non_otl_conform_attributes": true,
+            "dotnotation": {
+                "waarde_shortcut": true,
+                "separator": ".",
+                "cardinality_separator": "|",
+                "cardinality_indicator": "[]"
+            }
+        },
+        "xlsx": {
+            "datetime_as_string": false,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
+            "dotnotation": {
+                "waarde_shortcut": true,
+                "separator": ".",
+                "cardinality_separator": "|",
+                "cardinality_indicator": "[]"
+            }
+        },
+        "pandas": {
+            "datetime_as_string": false,
+            "lists_as_string": true,
+            "rdf": false,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
+            "dotnotation": {
+                "waarde_shortcut": true,
+                "separator": ".",
+                "cardinality_separator": "|",
+                "cardinality_indicator": "[]"
+            }
         }
     }
 }

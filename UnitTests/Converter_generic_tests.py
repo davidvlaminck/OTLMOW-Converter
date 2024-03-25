@@ -66,3 +66,23 @@ def test_generic_use_of_from_dicts():
     instance2.notitie = 'notitie2'
     sequence_of_objects = [instance1, instance2]
     assert list(objects) == sequence_of_objects
+
+
+def test_generic_use_of_to_file_excel():
+    instance1 = AllCasesTestClass()
+    instance1.notitie = 'notitie'
+    instance1.assetId.identificator = 'id1'
+    instance2 = AnotherTestClass()
+    instance2.notitie = 'notitie2'
+    instance2.assetId.identificator = 'id2'
+    sequence_of_objects = [instance1, instance2]
+
+    excel_path = Path(__file__).parent / 'test_excel.xlsx'
+
+    OtlmowConverter.to_file(sequence_of_objects=sequence_of_objects, file_path=excel_path)
+    assert excel_path.exists()
+
+    # TODO check contents of excel file
+
+    if excel_path.exists():
+        excel_path.unlink()

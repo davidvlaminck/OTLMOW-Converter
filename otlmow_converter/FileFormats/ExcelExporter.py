@@ -8,28 +8,15 @@ from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTa
 
 class ExcelExporter:
     def __init__(self, settings=None, model_directory: Path = None, ignore_empty_asset_id: bool = False):
-
-        if settings is None:
-            settings = {}
-        self.settings = settings
-
-        if 'file_formats' not in self.settings:
-            raise ValueError("The settings are not loaded or don't contain settings for file formats")
-        xls_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'xls'), None)
-        if xls_settings is None:
-            raise ValueError("Unable to find xls in file formats settings")
-
-        self.settings = xls_settings
-
         self.dotnotation_table_converter = DotnotationTableConverter()
-        self.dotnotation_table_converter.load_settings(xls_settings['dotnotation'])
 
-    def export_to_file(self, filepath: Path = None, list_of_objects: list = None, **kwargs):
+
+    def export_to_file(self, filepath: Path = None, sequence_of_objects: list = None, **kwargs):
         table_dict = self.dotnotation_table_converter.get_tables_per_type_from_data(
-            list_of_objects=list_of_objects, values_as_string=True)
+            list_of_objects=sequence_of_objects, values_as_string=True)
 
         wb = Workbook(write_only=True)
-        if not list_of_objects:
+        if not sequence_of_objects:
             raise ValueError('There are no asset data to export to Excel')
         for class_name in table_dict:
             self._create_sheet_by_name(wb, class_name=class_name, table_data=table_dict[class_name])

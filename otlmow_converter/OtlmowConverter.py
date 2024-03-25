@@ -66,6 +66,31 @@ class OtlmowConverter:
                                       warn_for_non_otl_conform_attributes= warn_for_non_otl_conform_attributes,
                                       datetime_as_string=datetime_as_string, **kwargs)
 
+    @classmethod
+    def to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
+        """Converts a sequence of OTLObject objects to a file.
+        This conversion uses the OTLMOW settings.
+        See the specific Exporter functions for more information on the keyword arguments.
+        """
+        suffix = file_path.suffix[1:]
+        dotnotation_settings = kwargs.get('dotnotation_settings',
+                                          GlobalVariables.settings['formats'][suffix]['dotnotation'])
+        datetime_as_string = kwargs.get('datetime_as_string',
+                                        GlobalVariables.settings['formats'][suffix]['datetime_as_string'])
+        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+                                        GlobalVariables.settings['formats'][suffix]['allow_non_otl_conform_attributes'])
+        warn_for_non_otl_conform_attributes = (
+            kwargs.get('warn_for_non_otl_conform_attributes',
+                       GlobalVariables.settings['formats'][suffix]['warn_for_non_otl_conform_attributes']))
+
+        exporter = FileExporter.get_exporter_from_extension(extension=suffix)
+        exporter.export_to_file(filepath=file_path, sequence_of_objects=sequence_of_objects, **kwargs)
+
+
+
+
+
+
     def to_dataframe(self, sequence_of_objects: Iterable[OTLObject], split_per_type: bool, **kwargs
                      ) -> Union[DataFrame, Dict[str, DataFrame]]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame.

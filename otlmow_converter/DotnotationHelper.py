@@ -4,11 +4,14 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObje
 from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
 
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
-SEPARATOR = '.'
-CARDINALITY_SEPARATOR = '|'
-CARDINALITY_INDICATOR = '[]'
-WAARDE_SHORTCUT = True
+load_settings()
+
+SEPARATOR = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['separator']
+CARDINALITY_SEPARATOR = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['cardinality_separator']
+CARDINALITY_INDICATOR = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['cardinality_indicator']
+WAARDE_SHORTCUT = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['waarde_shortcut']
 
 
 class DotnotationHelper:

@@ -14,10 +14,14 @@ from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationLi
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 
-SEPARATOR = '.'
-CARDINALITY_SEPARATOR = '|'
-CARDINALITY_INDICATOR = '[]'
-WAARDE_SHORTCUT = True
+from otlmow_converter.SettingsManager import load_settings, GlobalVariables
+
+load_settings()
+
+SEPARATOR = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['separator']
+CARDINALITY_SEPARATOR = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['cardinality_separator']
+CARDINALITY_INDICATOR = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['cardinality_indicator']
+WAARDE_SHORTCUT = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['waarde_shortcut']
 
 
 class DotnotationTableConverter:
@@ -175,7 +179,7 @@ class DotnotationTableConverter:
         instance = dynamic_create_instance_from_uri(row['typeURI'], model_directory=self.model_directory)
         for header in headers:
             try:
-                value = row.get(header, None)
+                value = row.get(header)
                 if value is None:
                     continue
                 if isinstance(value, float) and math.isnan(value):
