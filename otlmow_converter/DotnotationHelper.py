@@ -1,4 +1,4 @@
-﻿from typing import Union, Iterable, Tuple, List
+﻿from typing import Union, Iterable, Tuple, List, Any
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
@@ -22,14 +22,21 @@ class DotnotationHelper:
         self.cardinality_indicator: str = cardinality_indicator
         self.waarde_shortcut: bool = waarde_shortcut
 
+    def get_dotnotation_instance(self, attribute: Union[OTLAttribuut, WaardenObject],
+                        separator: str = SEPARATOR,
+                        cardinality_indicator: str = CARDINALITY_INDICATOR,
+                        waarde_shortcut: bool = WAARDE_SHORTCUT) -> str:
+        return self.get_dotnotation(attribute=attribute, separator=separator, 
+                                    cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
+
     @classmethod
     def get_dotnotation(cls, attribute: Union[OTLAttribuut, WaardenObject],
                         separator: str = SEPARATOR,
                         cardinality_indicator: str = CARDINALITY_INDICATOR,
-                        waarde_shortcut: bool = WAARDE_SHORTCUT):
-
+                        waarde_shortcut: bool = WAARDE_SHORTCUT) -> str:
         if waarde_shortcut:
-            if attribute.naam == 'waarde' and attribute.owner._parent is not None and attribute.owner._parent.field.waarde_shortcut_applicable:
+            if (attribute.naam == 'waarde' and attribute.owner._parent is not None and
+                    attribute.owner._parent.field.waarde_shortcut_applicable):
                 return DotnotationHelper.get_dotnotation(
                     attribute=attribute.owner._parent, separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut)
@@ -296,15 +303,11 @@ class DotnotationHelper:
                             cardinality_indicator=cardinality_indicator):
                         yield k1, v1
 
-    @staticmethod
-    def convert_waarde_to_correct_type(waarde, attribuut, log_warnings):
+    @classmethod
+    def convert_waarde_to_correct_type(cls, waarde: Any, attribuut: OTLAttribuut, log_warnings: bool) -> Any:
         field = attribuut.field
         if attribuut.kardinaliteit_max != '1' and isinstance(waarde, list):
-            new_list = []
-            for value_item in waarde:
-                new_list.append(field.convert_to_correct_type(value_item, log_warnings=log_warnings))
-            return new_list
-
+            return [field.convert_to_correct_type(value_item, log_warnings=log_warnings) for value_item in waarde]
         if attribuut.field.waardeObject is not None and attribuut.field.waarde_shortcut:
             if attribuut.waarde is None:
                 attribuut.add_empty_value()
@@ -312,39 +315,24 @@ class DotnotationHelper:
 
         return field.convert_to_correct_type(waarde, log_warnings=log_warnings)
 
-    def flatten_dict(self, input_dict: dict, separator: str = '.', prefix='', affix='', new_dict=None):
+    @classmethod
+    def flatten_dict(cls, input_dict: dict, separator: str = '.', prefix='', affix='', new_dict=None) -> dict:
         if new_dict is None:
             new_dict = {}
         for k, v in input_dict.items():
             if isinstance(v, dict):
-                self.flatten_dict(input_dict=v, prefix=k, new_dict=new_dict)
+                cls.flatten_dict(input_dict=v, prefix=k, new_dict=new_dict)
             elif isinstance(v, list):
-                for i in range(0, len(v)):
+                for i in range(len(v)):
                     if isinstance(v[i], dict):
-                        self.flatten_dict(input_dict=v[i], prefix=k, affix='[' + str(i) + ']', new_dict=new_dict)
+                        cls.flatten_dict(input_dict=v[i], prefix=k, affix=f'[{i}]', new_dict=new_dict)
+                    elif prefix == '':
+                        new_dict[f'{k}[{str(i)}]'] = v[i]
                     else:
-                        if prefix != '':
-                            new_dict[prefix + separator + k + '[' + str(i) + ']'] = v[i]
-                        else:
-                            new_dict[k + '[' + str(i) + ']'] = v[i]
-            else:
-                if prefix != '':
+                        new_dict[prefix + separator + k + '[' + str(i) + ']'] = v[i]
+            elif prefix != '':
                     new_dict[prefix + affix + separator + k] = v
-                else:
-                    new_dict[k] = v
+            else:
+                new_dict[k] = v
 
         return new_dict
-
-# from collections.abc import MutableMapping
-#
-# def _flatten_dict_gen(d, parent_key, sep):
-#     for k, v in d.items():
-#         new_key = parent_key + sep + k if parent_key else k
-#         if isinstance(v, MutableMapping):
-#             yield from flatten_dict(v, new_key, sep=sep).items()
-#         else:
-#             yield new_key, v
-#
-#
-# def flatten_dict(d: MutableMapping, parent_key: str = '', sep: str = '.'):
-#     return dict(_flatten_dict_gen(d, parent_key, sep))
