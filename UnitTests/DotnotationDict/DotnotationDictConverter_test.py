@@ -166,6 +166,21 @@ def test_to_dict_simple_attribute_with_cardinality():
         'testStringFieldMetKard[]': ['a', 'b', 'c']}
 
 
+def test_from_dict_simple_attribute_with_cardinality_convert_lists():
+    expected = AllCasesTestClass()
+    expected.testIntegerFieldMetKard = [1, 2]
+    expected._testKwantWrdMetKard.add_empty_value()
+    expected.testKwantWrdMetKard[0].waarde = 1.0
+    expected._testKwantWrdMetKard.add_empty_value()
+    expected.testKwantWrdMetKard[1].waarde = 2.0
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
+        'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
+        'testKwantWrdMetKard[]': '1.0|2.0'}), list_as_string=True, model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
 def test_to_dict_simple_attribute_with_cardinality_convert_lists():
     instance = AllCasesTestClass()
     instance.testIntegerFieldMetKard = [1, 2]
@@ -174,7 +189,7 @@ def test_to_dict_simple_attribute_with_cardinality_convert_lists():
     instance._testKwantWrdMetKard.add_empty_value()
     instance.testKwantWrdMetKard[1].waarde = 2.0
 
-    assert DotnotationDictConverter.to_dict(instance, list_as_string=True) == {
+    assert DotnotationDictConverter.to_dict(instance, list_as_string=True, waarde_shortcut=True) == {
         'testIntegerFieldMetKard[]': '1|2',
         'testKwantWrdMetKard[]': '1.0|2.0'}
 
@@ -357,3 +372,44 @@ def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd():
         'testComplexType.testComplexType2.testKwantWrd': 5.0,
         'testComplexType.testKwantWrdMetKard[]': [3.0, 4.0],
         'testUnionType.unionKwantWrd': 2.0}
+
+
+def test_from_dict_errors(subtests):
+    with subtests.test("error raised when using dict without typeURI"):
+        with pytest.raises(ValueError):
+            DotnotationDictConverter.from_dict(DotnotationDict(
+                {'complex.attribute': 'complex attributes only valid within OTL'}),
+                model_directory=model_directory_path)
+
+    with subtests.test("error raised when using dict with invalid typeURI"):
+        with pytest.raises(ValueError):
+            DotnotationDictConverter.from_dict(DotnotationDict(
+                {'complex.attribute': 'complex attributes only valid within OTL', 'typeURI': 'not_valid_uri'}),
+                model_directory=model_directory_path)
+
+
+    with subtests.test("error raised when a key starts with '_'"):
+        with pytest.raises(ValueError):
+            DotnotationDictConverter.from_dict(DotnotationDict(
+                {'typeURI' : AllCasesTestClass.typeURI, '_invalid_attribute_key': '_ is not a valid first char'}),
+                model_directory=model_directory_path)
+
+        with pytest.raises(ValueError):
+            DotnotationDictConverter.from_dict(DotnotationDict(
+                {'typeURI': AllCasesTestClass.typeURI, 'complex._invalid_attribute_key': '_ is not a valid first char'}),
+                model_directory=model_directory_path)
+
+    with subtests.test("error raised when trying dotnotation with 2 x cardinality indicator"):
+        with pytest.raises(ValueError):
+            DotnotationDictConverter.from_dict(DotnotationDict(
+                {'typeURI': AllCasesTestClass.typeURI, 'complex[].attribute[]': 'lists of lists are not valid'}),
+                model_directory=model_directory_path)
+
+    with subtests.test("error raised when trying dotnotation with a complex non-conform attribute"):
+        with pytest.raises(ValueError):
+            DotnotationDictConverter.from_dict(DotnotationDict(
+                {'typeURI': AllCasesTestClass.typeURI, 'complex.attribute': 'complex attributes only valid within OTL'}),
+                model_directory=model_directory_path)
+
+
+

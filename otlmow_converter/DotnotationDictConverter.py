@@ -153,10 +153,12 @@ class DotnotationDictConverter:
             if k.startswith('_'):
                 raise ValueError(f'{k} is a non standardized attribute of {o.__class__.__name__}. '
                                  f'While this is supported, the key can not start with "_".')
-            cls.set_attribute_by_dotnotation(o, dotnotation=k, value=v, waarde_shortcut=waarde_shortcut,
-                                             datetime_as_string=datetime_as_string, list_as_string=list_as_string,
-                                             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                                             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            cls.set_attribute_by_dotnotation(
+                o, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                datetime_as_string=datetime_as_string, list_as_string=list_as_string,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
         return o
 
@@ -166,7 +168,6 @@ class DotnotationDictConverter:
                                      separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR,
                                      waarde_shortcut: bool = WAARDE_SHORTCUT,
                                      cardinality_separator: str = CARDINALITY_SEPARATOR,
-                                     convert: bool = True, convert_warnings: bool = True,
                                      datetime_as_string: bool = False,
                                      list_as_string: bool = False,
                                      allow_non_otl_conform_attributes: bool = True,
@@ -202,8 +203,14 @@ class DotnotationDictConverter:
                 value = value.split(cardinality_separator)
 
             if attribute.field.waarde_shortcut_applicable and waarde_shortcut:
-                attribute.add_empty_value()
-                attribute.waarde._waarde.set_waarde(value)
+                if cardinality:
+                    for index, v in enumerate(value):
+                        if attribute.waarde is None or len(attribute.waarde) <= index:
+                            attribute.add_empty_value()
+                        attribute.waarde[index]._waarde.set_waarde(v)
+                else:
+                    attribute.add_empty_value()
+                    attribute.waarde._waarde.set_waarde(value)
             else:
                 attribute.set_waarde(value)
             return
@@ -227,8 +234,7 @@ class DotnotationDictConverter:
                     attribute.waarde[index], dotnotation=rest, value=v,
                     datetime_as_string=datetime_as_string, list_as_string=list_as_string,
                     separator=separator, cardinality_indicator=cardinality_indicator,
-                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                    convert=convert, convert_warnings=convert_warnings)
+                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
             return
 
         if attribute.waarde is None:
@@ -236,7 +242,6 @@ class DotnotationDictConverter:
         cls.set_attribute_by_dotnotation(attribute.waarde, dotnotation=rest, value=value, separator=separator,
                                          datetime_as_string=datetime_as_string, list_as_string=list_as_string,
                                          cardinality_indicator=cardinality_indicator,
-                                         waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                                         convert=convert, convert_warnings=convert_warnings)
+                                         waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
         # if value == '':
         #     value = None
