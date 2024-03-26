@@ -31,7 +31,7 @@ def test_to_dict_simple_attributes():
     assert DotnotationDictConverter.to_dict(instance) == {'testBooleanField': True, 'testKeuzelijst': 'waarde-2'}
 
 
-def test_from_dict_datetimes():
+def test_from_dict_datetimes_convert_true(recwarn):
     expected = AllCasesTestClass()
     expected.testDateField = date(2022, 12, 12)
     expected.testTimeField = time(10, 11, 12)
@@ -43,8 +43,23 @@ def test_from_dict_datetimes():
         model_directory=model_directory_path, datetime_as_string=True)
 
     assert created_instance == expected
+    assert len(recwarn) == 0
 
-    # TODO test with datetime_as_string=False
+def test_from_dict_datetimes_convert_false(recwarn):
+    expected = AllCasesTestClass()
+    expected.testDateField = date(2022, 12, 12)
+    expected.testTimeField = time(10, 11, 12)
+    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI,
+         'testDateField': date(2022, 12, 12),
+         'testTimeField': time(10, 11, 12),
+         'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12)}),
+        model_directory=model_directory_path)
+
+    assert created_instance == expected
+    assert len(recwarn) == 0
 
 
 def test_to_dict_datetimes():
@@ -144,7 +159,7 @@ def test_from_dict_simple_attribute_with_cardinality():
     assert created_instance == expected
 
 
-def test_from_dict_simple_attribute_with_cardinality_converted_lists():
+def test_from_dict_simple_attribute_with_cardinality_converted_lists(recwarn):
     expected = AllCasesTestClass()
     expected.testIntegerFieldMetKard = [1, 2]
     expected.testStringFieldMetKard = ['a', 'b']
@@ -154,6 +169,7 @@ def test_from_dict_simple_attribute_with_cardinality_converted_lists():
         'testStringFieldMetKard[]': 'a|b'}), list_as_string=True, model_directory=model_directory_path)
 
     assert created_instance == expected
+    assert len(recwarn) == 0
 
 
 def test_to_dict_simple_attribute_with_cardinality():
@@ -166,7 +182,7 @@ def test_to_dict_simple_attribute_with_cardinality():
         'testStringFieldMetKard[]': ['a', 'b', 'c']}
 
 
-def test_from_dict_simple_attribute_with_cardinality_convert_lists():
+def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
     expected = AllCasesTestClass()
     expected.testIntegerFieldMetKard = [1, 2]
     expected._testKwantWrdMetKard.add_empty_value()
@@ -179,6 +195,7 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists():
         'testKwantWrdMetKard[]': '1.0|2.0'}), list_as_string=True, model_directory=model_directory_path)
 
     assert created_instance == expected
+    assert len(recwarn) == 0
 
 
 def test_to_dict_simple_attribute_with_cardinality_convert_lists():

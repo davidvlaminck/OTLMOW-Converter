@@ -2,8 +2,11 @@ import inspect
 import warnings
 from pathlib import Path
 
+from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
+from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     set_value_by_dictitem, get_attribute_by_name
+from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from otlmow_converter.DotnotationDict import DotnotationDict
@@ -200,18 +203,23 @@ class DotnotationDictConverter:
                 setattr(object_or_attribute, dotnotation, value)
                 return
             if cardinality and list_as_string:
-                value = value.split(cardinality_separator)
+                value = [attribute.field.convert_to_correct_type(v, log_warnings=False)
+                         for v in value.split(cardinality_separator)]
 
             if attribute.field.waarde_shortcut_applicable and waarde_shortcut:
                 if cardinality:
                     for index, v in enumerate(value):
                         if attribute.waarde is None or len(attribute.waarde) <= index:
                             attribute.add_empty_value()
+                        if list_as_string:
+                            v = attribute.waarde[index]._waarde.field.convert_to_correct_type(v, log_warnings=False)
                         attribute.waarde[index]._waarde.set_waarde(v)
                 else:
                     attribute.add_empty_value()
                     attribute.waarde._waarde.set_waarde(value)
             else:
+                if datetime_as_string and attribute.field in {TimeField, DateField, DateTimeField}:
+                    value = attribute.field.convert_to_correct_type(value, log_warnings=False)
                 attribute.set_waarde(value)
             return
 
