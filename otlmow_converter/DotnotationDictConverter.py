@@ -79,7 +79,7 @@ class DotnotationDictConverter:
                 dotnotation = DotnotationHelper.get_dotnotation(
                     attribute, waarde_shortcut=waarde_shortcut, separator=separator,
                     cardinality_indicator=cardinality_indicator)
-                if list_as_string:
+                if list_as_string and attribute.kardinaliteit_max != '1':
                     yield dotnotation, cardinality_separator.join(str(a) for a in attribute.waarde)
                 elif datetime_as_string:
                     yield dotnotation, attribute.field.value_default(attribute.waarde)

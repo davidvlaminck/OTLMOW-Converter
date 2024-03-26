@@ -11,28 +11,7 @@ from otlmow_converter.SettingsManager import load_settings
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def set_up_converter(class_dir_test_class=True):
-    settings_file_location = get_settings_path_for_unittests()
-    settings = load_settings(settings_file_location)
-    csv_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'csv'), None)
-    if class_dir_test_class:
-        model_directory = model_directory_path
-    else:
-        model_directory = None
-    converter = DotnotationTableConverter(model_directory=model_directory)
-    converter.load_settings(dotnotation_settings=csv_settings['dotnotation'])
-    return converter
-
-
-def test_init_exporter_only_load_with_settings(subtests):
-    with subtests.test(msg='load with correct settings'):
-        exporter = set_up_converter()
-        assert exporter is not None
-
-
 def test_get_data_from_table():
-    importer = set_up_converter()
-
     list_of_dicts_data = [
         {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'testStringField': 3},
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
@@ -40,7 +19,7 @@ def test_get_data_from_table():
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
          'assetId.identificator': '1'}]
 
-    objects = importer.get_data_from_table(list_of_dicts_data)
+    objects = DotnotationTableConverter.get_data_from_table(list_of_dicts_data, model_directory=model_directory_path)
     assert len(objects) == 2
 
     assert objects[0].assetId.identificator == '0'
@@ -54,8 +33,6 @@ def test_get_data_from_table():
 
 
 def test_get_single_table_from_data():
-    importer = set_up_converter()
-
     instance_1 = AllCasesTestClass()
     instance_1.assetId.identificator = '0'
     instance_1.testStringField = 'string1'
@@ -71,13 +48,11 @@ def test_get_single_table_from_data():
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
          'assetId.identificator': '1', 'notitie': 'notitie'}]
 
-    list_of_dicts = importer.get_single_table_from_data([instance_1, instance_2])
+    list_of_dicts = DotnotationTableConverter.get_single_table_from_data([instance_1, instance_2])
     assert list_of_dicts == expected_list_of_dicts_data
 
 
 def test_get_tables_per_type_from_data():
-    importer = set_up_converter()
-
     instance_1 = AllCasesTestClass()
     instance_1.assetId.identificator = '0'
     instance_1.testStringField = 'string1'
@@ -99,13 +74,11 @@ def test_get_tables_per_type_from_data():
         ]
     }
 
-    list_of_dicts = importer.get_tables_per_type_from_data([instance_1, instance_2])
+    list_of_dicts = DotnotationTableConverter.get_tables_per_type_from_data([instance_1, instance_2])
     assert list_of_dicts == expected_list_of_dicts_data
 
 
 def test_transform_list_of_dicts_to_2d_sequence():
-    importer = set_up_converter()
-
     list_of_dicts_data = [
         {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'testStringField': 3},
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
@@ -117,14 +90,12 @@ def test_transform_list_of_dicts_to_2d_sequence():
         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, 'string1'],
         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', None, None]]
 
-    sequence_2d = importer.transform_list_of_dicts_to_2d_sequence(list_of_dicts_data)
+    sequence_2d = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(list_of_dicts_data)
 
     assert sequence_2d == expected_2d_sequence
 
 
 def test_transform_2d_sequence_to_list_of_dicts():
-    importer = set_up_converter()
-
     expected_list_of_dicts = [
         {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'testStringField': 3},
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
@@ -136,7 +107,7 @@ def test_transform_2d_sequence_to_list_of_dicts():
         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, 'string1'],
         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', None, None]]
 
-    list_of_dicts = importer.transform_2d_sequence_to_list_of_dicts(sequence_2d)
+    list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(sequence_2d)
 
     assert list_of_dicts == expected_list_of_dicts
 

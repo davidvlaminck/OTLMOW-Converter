@@ -24,6 +24,19 @@
                 "cardinality_indicator": "[]"
             }
         },
+        "csv": {
+            "list_as_string": true,
+            "datetime_as_string": true,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
+            "delimiter": ";",
+            "dotnotation": {
+                "waarde_shortcut": true,
+                "separator": ".",
+                "cardinality_separator": "|",
+                "cardinality_indicator": "[]"
+            }
+        },
         "pandas": {
             "datetime_as_string": false,
             "lists_as_string": true,

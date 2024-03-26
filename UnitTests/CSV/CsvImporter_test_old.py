@@ -12,17 +12,41 @@ from otlmow_converter.OtlmowConverter import OtlmowConverter
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
+def test_init_importer_only_load_with_settings(subtests):
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    otl_facility = OtlmowConverter(settings_path=settings_file_location)
+
+    with subtests.test(msg='load with correct settings'):
+        importer = CsvImporter(settings=otl_facility.settings)
+        assert importer is not None
+
+    with subtests.test(msg='load without settings'):
+        with pytest.raises(ValueError):
+            CsvImporter()
+
+    with subtests.test(msg='load with incorrect settings (no file_formats)'):
+        with pytest.raises(ValueError):
+            CsvImporter(settings={"auth_options": [{}]})
+
+    with subtests.test(msg='load with incorrect settings (file_formats but no csv)'):
+        with pytest.raises(ValueError):
+            CsvImporter(settings={"file_formats": [{}]})
+
 
 def test_load_test_file_multiple_types():
     settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
     file_location = Path(__file__).parent / 'Testfiles' / 'export_multiple_types.csv'
-    objects = CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    otl_facility = OtlmowConverter(settings_path=settings_file_location)
+    objects = otl_facility.create_assets_from_file(file_location)
     assert len(objects) == 15
 
 
 def test_load_test_file():
+    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
+    otl_facility = OtlmowConverter(settings_path=settings_file_location)
+    importer = CsvImporter(settings=otl_facility.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
-    assets = CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assets = importer.import_file(file_location, model_directory=model_directory_path)
     assert len(assets) == 1
     assert assets[0].assetId.identificator == 'UgVLnoH'
 

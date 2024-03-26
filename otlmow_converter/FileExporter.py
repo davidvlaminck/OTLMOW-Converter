@@ -16,26 +16,23 @@ class FileExporter:
     @classmethod
     def get_exporter_from_extension(cls, extension: str, **kwargs):
         if extension == 'csv':
-            model_directory = None
-            if kwargs is not None and 'model_directory' in kwargs:
-                model_directory = kwargs['model_directory']
             from otlmow_converter.FileFormats.CsvExporter import CsvExporter
-            return CsvExporter(settings=settings, model_directory=model_directory)
+            return CsvExporter()
         elif extension == 'json':
             from otlmow_converter.FileFormats.JsonExporter import JsonExporter
-            return JsonExporter(settings=settings)
+            return JsonExporter()
         elif extension in {'xls', 'xlsx'}:
             from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
             return ExcelExporter()
         elif extension == 'ttl':
             from otlmow_converter.FileFormats.TtlExporter import TtlExporter
-            return TtlExporter(settings=settings)
+            return TtlExporter()
         elif extension == 'jsonld':
             from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
-            return JsonLdExporter(settings=settings)
+            return JsonLdExporter()
         elif extension == 'geojson':
             from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
-            return GeoJSONExporter(settings=settings)
+            return GeoJSONExporter()
         else:
             raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx, xls, ttl, jsonld')
 

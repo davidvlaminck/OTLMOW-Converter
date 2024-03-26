@@ -8,6 +8,7 @@ from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, dynamic_create_instance_from_uri
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 
+from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
@@ -73,11 +74,20 @@ class DotnotationTableConverter:
 
         return sorted_list
 
-    def get_single_table_from_data(self, list_of_objects: Iterable[OTLObject], values_as_string: bool = False
+
+    @classmethod
+    def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject], values_as_string: bool = False,
+                                   separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                   cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                   waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                   list_as_string: bool = False, datetime_as_string: bool = False,
+                                   allow_non_otl_conform_attributes: bool = True,
+                                   warn_for_non_otl_conform_attributes: bool = True,
+                                   allow_empty_asset_id: bool = True
                                    ) -> List[Dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
-        identificator_key = 'assetId.identificator'.replace('.', self.separator)
-        toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.separator)
+        identificator_key = 'assetId.identificator'.replace('.', separator)
+        toegekend_door_key = 'assetId.toegekendDoor'.replace('.', separator)
 
         list_of_dicts = []
         header_dict = {'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}
@@ -89,33 +99,44 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not self.ignore_empty_asset_id and (otl_object.assetId.identificator is None 
+            if not allow_empty_asset_id and (otl_object.assetId.identificator is None
                                                    or otl_object.assetId.identificator == ''):
-                raise ValueError(f'{otl_object} does not have an assetId.')
+                raise ValueError(f'{otl_object} does not have a valid assetId.')
 
-            data_dict = {
-                'typeURI': otl_object.typeURI,
-                identificator_key: otl_object.assetId.identificator
-            }
+            data_dict = DotnotationDictConverter.to_dict(
+                otl_object, separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                list_as_string=list_as_string, datetime_as_string=datetime_as_string,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
-            for k, v in self.dotnotation_helper.list_attributes_and_values_by_dotnotation_instance(
-                    instance_or_attribute=otl_object):
-                if k == identificator_key:
-                    continue
+            data_dict['typeURI'] = otl_object.typeURI
+
+            for k, v in data_dict.items():
                 if k not in header_dict:
                     header_dict[k] = header_count
                     header_count += 1
-                data_dict[k] = self._turn_value_to_string(v) if values_as_string else v
+                if values_as_string and not isinstance(v, str):
+                    data_dict[k] = str(v)
+
             list_of_dicts.append(data_dict)
         list_of_dicts.insert(0, header_dict)
         return list_of_dicts
 
-    def get_tables_per_type_from_data(self, list_of_objects: Iterable[OTLObject], values_as_string: bool = False
+    @classmethod
+    def get_tables_per_type_from_data(cls, list_of_objects: Iterable[OTLObject], values_as_string: bool = False,
+                                      separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                      cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                      waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                      list_as_string: bool = False, datetime_as_string: bool = False,
+                                      allow_non_otl_conform_attributes: bool = True,
+                                      warn_for_non_otl_conform_attributes: bool = True,
+                                      allow_empty_asset_id: bool = True
                                       ) -> Dict[str, List[Dict]]:
         """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
         first row is the header"""
-        identificator_key = 'assetId.identificator'.replace('.', self.separator)
-        toegekend_door_key = 'assetId.toegekendDoor'.replace('.', self.separator)
+        identificator_key = 'assetId.identificator'.replace('.', separator)
+        toegekend_door_key = 'assetId.toegekendDoor'.replace('.', separator)
 
         master_dict = {}
 
@@ -125,35 +146,40 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not self.ignore_empty_asset_id and (otl_object.assetId.identificator is None or 
+            if not allow_empty_asset_id and (otl_object.assetId.identificator is None or
                                                    otl_object.assetId.identificator == ''):
-                raise ValueError(f'{otl_object} does not have an assetId.')
+                raise ValueError(f'{otl_object} does not have a valid assetId.')
 
             short_uri = get_shortened_uri(otl_object.typeURI)
             if short_uri not in master_dict:
                 master_dict[short_uri] = [{'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}]
             header_dict = master_dict[short_uri][0]
             header_count = len(header_dict)
-            data_dict = {
-                'typeURI': otl_object.typeURI,
-                identificator_key: otl_object.assetId.identificator
-            }
 
-            for k, v in self.dotnotation_helper.list_attributes_and_values_by_dotnotation_instance(
-                    instance_or_attribute=otl_object):
-                if k == identificator_key:
-                    continue
+            data_dict = DotnotationDictConverter.to_dict(
+                otl_object, separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                list_as_string=list_as_string, datetime_as_string=datetime_as_string,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+            data_dict['typeURI'] = otl_object.typeURI
+
+            for k, v in data_dict.items():
                 if k not in header_dict:
                     header_dict[k] = header_count
                     header_count += 1
-                data_dict[k] = self._turn_value_to_string(v) if values_as_string else v
+                if values_as_string and not isinstance(v, str):
+                    data_dict[k] = str(v)
+
             master_dict[short_uri].append(data_dict)
 
         return master_dict
 
-    def get_data_from_table(self, table_data: List[Dict], empty_string_equals_none: bool = False,
-                            convert_strings_to_types: bool = False, convert_datetimes_to_dates: bool = False
-                            ) -> List[OTLObject]:
+    @classmethod
+    def get_data_from_table(cls, table_data: List[Dict], empty_string_equals_none: bool = False,
+                            convert_strings_to_types: bool = False, convert_datetimes_to_dates: bool = False,
+                            model_directory: Path = None) -> List[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -166,42 +192,29 @@ class DotnotationTableConverter:
                 raise TypeUriNotInFirstRowError
         headers.pop('typeURI')
         for row in table_data[1:]:
-            instance = self.create_instance_from_row(
-                headers=headers, row=row,  convert_datetimes_to_dates=convert_datetimes_to_dates,
-                convert_strings_to_types=convert_strings_to_types, empty_string_equals_none=empty_string_equals_none)
+            instance = cls.create_instance_from_row(
+                row=row, convert_datetimes_to_dates=convert_datetimes_to_dates,
+                convert_strings_to_types=convert_strings_to_types, empty_string_equals_none=empty_string_equals_none,
+                model_directory=model_directory)
             instances.append(instance)
 
         return instances
 
-    def create_instance_from_row(self, headers: Dict, row: Dict, convert_datetimes_to_dates: bool = False,
-                                 convert_strings_to_types: bool = False, empty_string_equals_none: bool = False
-                                 ) -> OTLObject:
-        instance = dynamic_create_instance_from_uri(row['typeURI'], model_directory=self.model_directory)
-        for header in headers:
-            try:
-                value = row.get(header)
-                if value is None:
-                    continue
-                if isinstance(value, float) and math.isnan(value):
-                    continue
-                if empty_string_equals_none and value == '':
-                    continue
-                if convert_datetimes_to_dates:
-                    attr = self.dotnotation_helper.get_attribute_by_dotnotation_instance(
-                        instance_or_attribute=instance, dotnotation=header)
-                    if attr.field is DateField:
-                        if isinstance(value, datetime.datetime):
-                            value = value.date()
-                        elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], datetime.datetime):
-                            value = [v.date() for v in value]
+    @classmethod
+    def create_instance_from_row(cls,row: Dict, convert_datetimes_to_dates: bool = False,
+                                 convert_strings_to_types: bool = False, empty_string_equals_none: bool = False,
+                                 model_directory: Path = None) -> OTLObject:
+        return DotnotationDictConverter.from_dict(row, model_directory=model_directory)
 
-                self.dotnotation_helper.set_attribute_by_dotnotation_instance(
-                    instance_or_attribute=instance, dotnotation=header, value=value,
-                    convert=convert_strings_to_types)
-            except AttributeError as e:
-                asset_id = row['assetId.identificator']
-                raise AttributeError(f'{header} for asset {asset_id}') from e
-        return instance
+                # if convert_datetimes_to_dates:
+                #     attr = self.dotnotation_helper.get_attribute_by_dotnotation_instance(
+                #         instance_or_attribute=instance, dotnotation=header)
+                #     if attr.field is DateField:
+                #         if isinstance(value, datetime.datetime):
+                #             value = value.date()
+                #         elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], datetime.datetime):
+                #             value = [v.date() for v in value]
+
 
     @classmethod
     def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],
