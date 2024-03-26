@@ -286,6 +286,26 @@ def test_to_dict_with_cardinality():
         'testComplexType.testStringFieldMetKard[]': ['c', 'd'],
         'testStringFieldMetKard[]': ['a', 'b']}
 
+def test_from_dict_with_different_cardinality():
+    expected = AllCasesTestClass()
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[0].testBooleanField = False
+    expected.testComplexTypeMetKard[0].testStringField = '1.1'
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[1].testBooleanField = True
+    expected.testComplexTypeMetKard[1].testKwantWrd.waarde = 2.0
+    expected.testComplexTypeMetKard[1].testStringField = '1.2'
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[2].testStringField = '1.3'
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
+        'typeURI' : AllCasesTestClass.typeURI,
+        'testComplexTypeMetKard[].testBooleanField': [False, True, None],
+        'testComplexTypeMetKard[].testStringField': ['1.1', '1.2', '1.3'],
+        'testComplexTypeMetKard[].testKwantWrd': [None, 2.0, None]}), model_directory=model_directory_path)
+
+    assert created_instance == expected
+
 
 def test_to_dict_with_different_cardinality():
     instance = AllCasesTestClass()
@@ -305,7 +325,26 @@ def test_to_dict_with_different_cardinality():
         'testComplexTypeMetKard[].testStringField': ['1.1', '1.2', '1.3'],
         'testComplexTypeMetKard[].testKwantWrd': [None, 2.0, None]}
 
-def test_list_attributes_and_values_by_dotnotation_waarde_shortcut():
+
+def test_from_dict_complex_attributes_with_cardinality_and_kwant_wrd():
+    expected = AllCasesTestClass()
+    expected.testComplexType._testKwantWrdMetKard.add_empty_value()
+    expected.testComplexType._testKwantWrdMetKard.add_empty_value()
+    expected.testComplexType.testKwantWrdMetKard[0].waarde = 3.0
+    expected.testComplexType.testKwantWrdMetKard[1].waarde = 4.0
+    expected.testComplexType.testComplexType2.testKwantWrd.waarde = 5.0
+    expected.testUnionType.unionKwantWrd.waarde = 2.0
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI' : AllCasesTestClass.typeURI, 'testComplexType.testKwantWrdMetKard[]': [3.0, 4.0],
+            'testComplexType.testComplexType2.testKwantWrd': 5.0, 'testUnionType.unionKwantWrd': 2.0}),
+        model_directory=model_directory_path, waarde_shortcut=True)
+
+    assert created_instance == expected
+
+
+
+def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd():
     instance = AllCasesTestClass()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
