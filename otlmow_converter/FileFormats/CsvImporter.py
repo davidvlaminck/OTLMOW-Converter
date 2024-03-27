@@ -29,19 +29,6 @@ DELIMITER = csv_settings['delimiter']
 
 
 class CsvImporter:
-    def __init__(self, settings=None):
-        if settings is None:
-            settings = {}
-
-        if 'file_formats' not in settings:
-            raise ValueError("The settings are not loaded or don't contain settings for file formats")
-        csv_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'csv'), None)
-        if csv_settings is None:
-            raise ValueError("Unable to find csv in file formats settings")
-
-        self.dotnotation_table_converter = DotnotationTableConverter()
-        self.dotnotation_table_converter.load_settings(csv_settings['dotnotation'])
-
     @classmethod
     def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         delimiter = DELIMITER

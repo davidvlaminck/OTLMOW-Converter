@@ -1,3 +1,6 @@
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import _make_string_version_from_dict
+
+
 class DotnotationDict(dict[str, object]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,7 +24,7 @@ class DotnotationDict(dict[str, object]):
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
     def __str__(self):
-        return str(self.__dict__)
+        return _make_string_version_from_dict(self.__dict__)
 
     def __repr__(self):
         return str(self.__dict__)

@@ -28,22 +28,22 @@ class FileImporter:
 
         return filepath.suffix[1:]
 
-    @staticmethod
-    def get_importer_from_extension(extension: str, settings: dict):
+    @classmethod
+    def get_importer_from_extension(cls, extension: str):
         if extension == 'csv':
             from otlmow_converter.FileFormats.CsvImporter import CsvImporter
-            return CsvImporter(settings=settings)
+            return CsvImporter()
         elif extension == 'json':
             from otlmow_converter.FileFormats.JsonImporter import JsonImporter
-            return JsonImporter(settings=settings)
+            return JsonImporter()
         elif extension == 'geojson':
             from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
-            return GeoJSONImporter(settings=settings)
+            return GeoJSONImporter()
         elif extension == 'jsonld':
             from otlmow_converter.FileFormats.JsonLdImporter import JsonLdImporter
-            return JsonLdImporter(settings=settings)
-        elif extension in ['xls', 'xlsx']:
+            return JsonLdImporter()
+        elif extension in {'xls', 'xlsx'}:
             from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
-            return ExcelImporter(settings=settings)
+            return ExcelImporter()
         else:
             raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx')

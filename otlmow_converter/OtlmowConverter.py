@@ -4,7 +4,10 @@ from typing import Iterable, Dict, Union
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 from pandas import DataFrame
 
+from otlmow_converter.DotnotationDict import DotnotationDict
+from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.FileExporter import FileExporter
+from otlmow_converter.FileFormats.PandasConverter import PandasConverter
 from otlmow_converter.FileImporter import FileImporter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
@@ -27,21 +30,25 @@ class OtlmowConverter:
         This conversion uses the OTLMOW settings.
         See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
         """
-        rdf = kwargs.get('rdf',  GlobalVariables.settings['formats']['OTLMOW']['rdf'])
-        waarde_shortcut = kwargs.get('waarde_shortcut', GlobalVariables.settings['formats']['OTLMOW']['waarde_shortcut'])
-        datetime_as_string = kwargs.get('datetime_as_string',
-                                        GlobalVariables.settings['formats']['OTLMOW']['datetime_as_string'])
-        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
-                                        GlobalVariables.settings['formats']['OTLMOW']['allow_non_otl_conform_attributes'])
-        warn_for_non_otl_conform_attributes = (
-            kwargs.get('warn_for_non_otl_conform_attributes',
-                       GlobalVariables.settings['formats']['OTLMOW']['warn_for_non_otl_conform_attributes']))
-
+        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
+                    {'rdf', 'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                    'warn_for_non_otl_conform_attributes'}}
         for obj in sequence_of_objects:
-            yield create_dict_from_asset(obj, rdf=rdf, waarde_shortcut=waarde_shortcut,
-                                         allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                                         warn_for_non_otl_conform_attributes= warn_for_non_otl_conform_attributes,
-                                         datetime_as_string=datetime_as_string)
+            yield create_dict_from_asset(obj, **arg_dict)
+
+
+    @classmethod
+    def to_dotnotation_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[DotnotationDict]:
+        """
+        Converts a sequence of OTLObject objects to a sequence of dictionaries.
+        This conversion uses the OTLMOW settings.
+        See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
+        """
+        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
+                    {'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                    'warn_for_non_otl_conform_attributes'}}
+        for obj in sequence_of_objects:
+            yield DotnotationDictConverter.to_dict(obj, **arg_dict)
 
     @classmethod
     def from_dicts(cls, sequence_of_dicts: Iterable[Dict], **kwargs) -> Iterable[OTLObject]:
@@ -50,21 +57,27 @@ class OtlmowConverter:
         This conversion uses the OTLMOW settings.
         See the from_dict() method in the OTLObject class for more information on the keyword arguments.
         """
-        rdf = kwargs.get('rdf',  GlobalVariables.settings['formats']['OTLMOW']['rdf'])
-        waarde_shortcut = kwargs.get('waarde_shortcut', GlobalVariables.settings['formats']['OTLMOW']['waarde_shortcut'])
-        datetime_as_string = kwargs.get('datetime_as_string',
-                                        GlobalVariables.settings['formats']['OTLMOW']['datetime_as_string'])
-        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
-                                        GlobalVariables.settings['formats']['OTLMOW']['allow_non_otl_conform_attributes'])
-        warn_for_non_otl_conform_attributes = (
-            kwargs.get('warn_for_non_otl_conform_attributes',
-                       GlobalVariables.settings['formats']['OTLMOW']['warn_for_non_otl_conform_attributes']))
+        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
+                    {'rdf', 'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                    'warn_for_non_otl_conform_attributes'}}
 
         for d in sequence_of_dicts:
-            yield OTLObject.from_dict(input_dict=d, rdf=rdf, waarde_shortcut=waarde_shortcut,
-                                      allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                                      warn_for_non_otl_conform_attributes= warn_for_non_otl_conform_attributes,
-                                      datetime_as_string=datetime_as_string, **kwargs)
+            yield OTLObject.from_dict(input_dict=d, **arg_dict, **kwargs)
+
+    @classmethod
+    def from_file(cls, file_path: Path, **kwargs) -> Iterable[OTLObject]:
+        """Converts a file to a sequence of OTLObject objects.
+        This conversion uses the OTLMOW settings.
+        See the specific Importer functions for more information on the keyword arguments.
+        """
+
+        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
+                    {'rdf', 'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                     'warn_for_non_otl_conform_attributes'}}
+
+        suffix = file_path.suffix[1:]
+        importer = FileImporter.get_importer_from_extension(extension=suffix)
+        return importer.to_objects(filepath=file_path, **arg_dict, **kwargs)
 
     @classmethod
     def to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
@@ -86,15 +99,16 @@ class OtlmowConverter:
         exporter = FileExporter.get_exporter_from_extension(extension=suffix)
         exporter.export_to_file(filepath=file_path, sequence_of_objects=sequence_of_objects, **kwargs)
 
-
-    def to_dataframe(self, sequence_of_objects: Iterable[OTLObject], split_per_type: bool, **kwargs
+    @classmethod
+    def to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False,
                      ) -> Union[DataFrame, Dict[str, DataFrame]]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame.
         This conversion uses the OTLMOW settings.
-        See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
         """
-        #return DataFrame(self.to_dicts(sequence_of_objects, **kwargs)) # TODO: Implement this method
-        pass
+        if split_per_type:
+            return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects)
+        else:
+            return PandasConverter.convert_objects_to_single_dataframe(sequence_of_objects)
 
     #
     #

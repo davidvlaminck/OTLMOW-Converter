@@ -86,3 +86,10 @@ def test_generic_use_of_to_file_excel():
 
     if excel_path.exists():
         excel_path.unlink()
+
+
+def test_generic_use_of_from_file_excel():
+    csv_path = Path(__file__).parent / 'CSV' / 'Testfiles' / 'import_then_export_input.csv'
+
+    assets = list(OtlmowConverter.from_file(file_path=csv_path, model_directory=model_directory_path))
+    assert len(assets) == 1
