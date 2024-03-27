@@ -179,7 +179,7 @@ class DotnotationTableConverter:
     @classmethod
     def get_data_from_table(cls, table_data: List[Dict], empty_string_equals_none: bool = False,
                             convert_strings_to_types: bool = False, convert_datetimes_to_dates: bool = False,
-                            model_directory: Path = None) -> List[OTLObject]:
+                            list_as_string: bool=True, model_directory: Path = None) -> List[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -195,16 +195,18 @@ class DotnotationTableConverter:
             instance = cls.create_instance_from_row(
                 row=row, convert_datetimes_to_dates=convert_datetimes_to_dates,
                 convert_strings_to_types=convert_strings_to_types, empty_string_equals_none=empty_string_equals_none,
-                model_directory=model_directory)
+                model_directory=model_directory, list_as_string=list_as_string)
             instances.append(instance)
 
         return instances
 
     @classmethod
-    def create_instance_from_row(cls,row: Dict, convert_datetimes_to_dates: bool = False,
+    def create_instance_from_row(cls,row: Dict, convert_datetimes_to_dates: bool = False, list_as_string: bool=True,
                                  convert_strings_to_types: bool = False, empty_string_equals_none: bool = False,
                                  model_directory: Path = None) -> OTLObject:
-        return DotnotationDictConverter.from_dict(row, model_directory=model_directory)
+        return DotnotationDictConverter.from_dict(input_dict=row, model_directory=model_directory,
+                                                  all_types_as_string=convert_strings_to_types,
+                                                  list_as_string=list_as_string)
 
                 # if convert_datetimes_to_dates:
                 #     attr = self.dotnotation_helper.get_attribute_by_dotnotation_instance(

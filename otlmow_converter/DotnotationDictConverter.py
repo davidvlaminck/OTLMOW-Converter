@@ -4,9 +4,13 @@ from pathlib import Path
 
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
+from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     set_value_by_dictitem, get_attribute_by_name
+from otlmow_model.OtlmowModel.BaseClasses.StringField import StringField
 from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
+from otlmow_model.OtlmowModel.BaseClasses.URIField import URIField
+from otlmow_model.OtlmowModel.BaseClasses.WKTField import WKTField
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from otlmow_converter.DotnotationDict import DotnotationDict
@@ -129,7 +133,7 @@ class DotnotationDictConverter:
             yield attr_key, attribute
 
     @classmethod
-    def from_dict(cls, input_dict: DotnotationDict, model_directory: Path = None,
+    def from_dict(cls, input_dict: DotnotationDict, model_directory: Path = None, all_types_as_string: bool = False,
                   list_as_string: bool = False, datetime_as_string: bool = False,
                   allow_non_otl_conform_attributes: bool = True, warn_for_non_otl_conform_attributes: bool = True,
                   waarde_shortcut: bool = WAARDE_SHORTCUT,
@@ -160,6 +164,7 @@ class DotnotationDictConverter:
                 o, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
                 waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                 datetime_as_string=datetime_as_string, list_as_string=list_as_string,
+                all_types_as_string=all_types_as_string,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
@@ -173,6 +178,7 @@ class DotnotationDictConverter:
                                      cardinality_separator: str = CARDINALITY_SEPARATOR,
                                      datetime_as_string: bool = False,
                                      list_as_string: bool = False,
+                                     all_types_as_string: bool = False,
                                      allow_non_otl_conform_attributes: bool = True,
                                      warn_for_non_otl_conform_attributes: bool = True):
         if dotnotation.count(cardinality_indicator) > 1:
@@ -213,13 +219,28 @@ class DotnotationDictConverter:
                             attribute.add_empty_value()
                         if list_as_string:
                             v = attribute.waarde[index]._waarde.field.convert_to_correct_type(v, log_warnings=False)
-                        attribute.waarde[index]._waarde.set_waarde(v)
+                        cls.set_attribute_by_dotnotation(
+                            attribute.waarde[index], dotnotation='waarde', value=v,
+                            datetime_as_string=datetime_as_string, list_as_string=list_as_string,
+                            all_types_as_string=all_types_as_string,
+                            separator=separator, cardinality_indicator=cardinality_indicator,
+                            waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
                 else:
                     attribute.add_empty_value()
-                    attribute.waarde._waarde.set_waarde(value)
+                    cls.set_attribute_by_dotnotation(
+                        attribute.waarde, dotnotation='waarde', value=value,
+                        datetime_as_string=datetime_as_string, list_as_string=list_as_string,
+                        all_types_as_string=all_types_as_string,
+                        separator=separator, cardinality_indicator=cardinality_indicator,
+                        waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
             else:
                 if datetime_as_string and attribute.field in {TimeField, DateField, DateTimeField}:
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
+                elif all_types_as_string and attribute.field not in {StringField, URIField, KeuzelijstField, WKTField}:
+                    if cardinality:
+                        value = [attribute.field.convert_to_correct_type(v, log_warnings=False) for v in value]
+                    else:
+                        value = attribute.field.convert_to_correct_type(value, log_warnings=False)
                 attribute.set_waarde(value)
             return
 
@@ -239,7 +260,7 @@ class DotnotationDictConverter:
                 if attribute.waarde is None or len(attribute.waarde) <= index:
                     attribute.add_empty_value()
                 cls.set_attribute_by_dotnotation(
-                    attribute.waarde[index], dotnotation=rest, value=v,
+                    attribute.waarde[index], dotnotation=rest, value=v, all_types_as_string=all_types_as_string,
                     datetime_as_string=datetime_as_string, list_as_string=list_as_string,
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
@@ -250,6 +271,7 @@ class DotnotationDictConverter:
         cls.set_attribute_by_dotnotation(attribute.waarde, dotnotation=rest, value=value, separator=separator,
                                          datetime_as_string=datetime_as_string, list_as_string=list_as_string,
                                          cardinality_indicator=cardinality_indicator,
+                                         all_types_as_string=all_types_as_string,
                                          waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
         # if value == '':
         #     value = None
