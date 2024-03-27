@@ -4,6 +4,7 @@ from typing import Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
+from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
@@ -22,7 +23,7 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = csv_settings['warn_for_non_otl_conform_att
 DELIMITER = csv_settings['delimiter']
 
 
-class CsvExporter:
+class CsvExporter(AbstractExporter):
     @classmethod
     def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
         delimiter = DELIMITER

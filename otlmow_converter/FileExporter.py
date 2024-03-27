@@ -1,20 +1,10 @@
-from pathlib import Path
-
+from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
-from otlmow_converter.FileImporter import FileImporter
 
 
-class FileExporter:
-    def __init__(self, settings: dict):
-        self.settings = settings
-
-    def create_file_from_assets(self, filepath: Path, list_of_objects: list, **kwargs):
-        extension = FileImporter.get_file_extension(filepath, file_must_exist=False)
-        exporter = self.get_exporter_from_extension(extension=extension, settings=self.settings, **kwargs)
-        return exporter.export_to_file(filepath=filepath, list_of_objects=list_of_objects, **kwargs)
-
+class FileExporter():
     @classmethod
-    def get_exporter_from_extension(cls, extension: str, **kwargs):
+    def get_exporter_from_extension(cls, extension: str) -> AbstractExporter:
         if extension == 'csv':
             from otlmow_converter.FileFormats.CsvExporter import CsvExporter
             return CsvExporter()

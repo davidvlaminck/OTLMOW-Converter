@@ -5,6 +5,7 @@ from typing import Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
+from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
@@ -28,7 +29,7 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = csv_settings['warn_for_non_otl_conform_att
 DELIMITER = csv_settings['delimiter']
 
 
-class CsvImporter:
+class CsvImporter(AbstractImporter):
     @classmethod
     def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         delimiter = DELIMITER

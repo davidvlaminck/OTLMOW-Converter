@@ -28,38 +28,6 @@ WAARDE_SHORTCUT = GlobalVariables.settings['formats']['OTLMOW']['dotnotation']['
 class DotnotationTableConverter:
     """Converts a list of OTL objects from and to a table with dotnotation as columns headers"""
 
-    def __init__(self, model_directory: Path = None, ignore_empty_asset_id: bool = False,
-                 dates_as_strings: bool = False,
-                 separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
-                 cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT):
-        self.model_directory: Path = model_directory
-
-        self.ignore_empty_asset_id: bool = ignore_empty_asset_id
-        self.dates_as_strings: bool = dates_as_strings
-
-        self.separator: str = separator
-        self.cardinality_separator: str = cardinality_separator
-        self.cardinality_indicator: str = cardinality_indicator
-        self.waarde_shortcut: bool = waarde_shortcut
-
-        self.dotnotation_helper: DotnotationHelper = self.get_dotnotation_helper()
-
-    def load_settings(self, dotnotation_settings: Dict):
-        if 'separator' in dotnotation_settings:
-            self.separator = dotnotation_settings['separator']
-        if 'cardinality_separator' in dotnotation_settings:
-            self.cardinality_separator = dotnotation_settings['cardinality_separator']
-        if 'cardinality_indicator' in dotnotation_settings:
-            self.cardinality_indicator = dotnotation_settings['cardinality_indicator']
-        if 'waarde_shortcut' in dotnotation_settings:
-            self.waarde_shortcut = dotnotation_settings['waarde_shortcut']
-
-        self.dotnotation_helper: DotnotationHelper = self.get_dotnotation_helper()
-
-    def get_dotnotation_helper(self) -> DotnotationHelper:
-        return DotnotationHelper(separator=self.separator, cardinality_separator=self.cardinality_separator,
-                                 cardinality_indicator=self.cardinality_indicator, waarde_shortcut=self.waarde_shortcut)
-
     @classmethod
     def _sort_headers(cls, headers: dict) -> Iterable[str]:
         if headers is None or not headers:
@@ -207,16 +175,6 @@ class DotnotationTableConverter:
         return DotnotationDictConverter.from_dict(input_dict=row, model_directory=model_directory,
                                                   all_types_as_string=convert_strings_to_types,
                                                   list_as_string=list_as_string)
-
-                # if convert_datetimes_to_dates:
-                #     attr = self.dotnotation_helper.get_attribute_by_dotnotation_instance(
-                #         instance_or_attribute=instance, dotnotation=header)
-                #     if attr.field is DateField:
-                #         if isinstance(value, datetime.datetime):
-                #             value = value.date()
-                #         elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], datetime.datetime):
-                #             value = [v.date() for v in value]
-
 
     @classmethod
     def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],

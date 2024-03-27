@@ -112,31 +112,7 @@ def test_export_unnested_attributes_split_per_type():
 
     shutil.rmtree(temp_dir_path)
 
-#
-# def set_up_converter():
-#     settings_file_location = get_settings_path_for_unittests()
-#     return OtlmowConverter(settings_path=settings_file_location)
-#
-#
-# def test_init_importer_only_load_with_settings(subtests):
-#     converter = set_up_converter()
-#
-#     with subtests.test(msg='load with correct settings'):
-#         exporter = CsvExporter(settings=converter.settings)
-#         assert exporter is not None
-#
-#     with subtests.test(msg='load without settings'):
-#         with pytest.raises(ValueError):
-#             CsvExporter(settings=None)
-#
-#     with subtests.test(msg='load with incorrect settings (no file_formats)'):
-#         with pytest.raises(ValueError):
-#             CsvExporter(settings={"auth_options": [{}]})
-#
-#     with subtests.test(msg='load with incorrect settings (file_formats but no csv)'):
-#         with pytest.raises(ValueError):
-#             CsvExporter(settings={"file_formats": [{}]})
-#
+
 #
 # def test_import_then_export_file():
 #     converter = set_up_converter()
