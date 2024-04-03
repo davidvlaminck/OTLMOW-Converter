@@ -1,20 +1,16 @@
-import datetime
-import math
 import warnings
 from pathlib import Path
 from typing import Dict, Any, Iterable, List
 
-from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 
+from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
-from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
-
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 load_settings()
@@ -44,11 +40,11 @@ class DotnotationTableConverter:
 
 
     @classmethod
-    def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject], values_as_string: bool = False,
+    def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject],
                                    separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                                    cardinality_indicator: str = CARDINALITY_INDICATOR,
                                    waarde_shortcut: bool = WAARDE_SHORTCUT,
-                                   list_as_string: bool = False, datetime_as_string: bool = False,
+                                   cast_list: bool = False, cast_datetime: bool = False,
                                    allow_non_otl_conform_attributes: bool = True,
                                    warn_for_non_otl_conform_attributes: bool = True,
                                    allow_empty_asset_id: bool = True
@@ -74,7 +70,7 @@ class DotnotationTableConverter:
             data_dict = DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                cast_list=list_as_string, cast_datetime=datetime_as_string,
+                cast_list=cast_list, cast_datetime=cast_datetime,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
@@ -84,8 +80,6 @@ class DotnotationTableConverter:
                 if k not in header_dict:
                     header_dict[k] = header_count
                     header_count += 1
-                if values_as_string and not isinstance(v, str):
-                    data_dict[k] = str(v)
 
             list_of_dicts.append(data_dict)
         list_of_dicts.insert(0, header_dict)
@@ -96,7 +90,7 @@ class DotnotationTableConverter:
                                       separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                                       cardinality_indicator: str = CARDINALITY_INDICATOR,
                                       waarde_shortcut: bool = WAARDE_SHORTCUT,
-                                      list_as_string: bool = False, datetime_as_string: bool = False,
+                                      cast_list: bool = False, cast_datetime: bool = False,
                                       allow_non_otl_conform_attributes: bool = True,
                                       warn_for_non_otl_conform_attributes: bool = True,
                                       allow_empty_asset_id: bool = True
@@ -127,7 +121,7 @@ class DotnotationTableConverter:
             data_dict = DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                cast_list=list_as_string, cast_datetime=datetime_as_string,
+                cast_list=cast_list, cast_datetime=cast_datetime,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
@@ -145,9 +139,8 @@ class DotnotationTableConverter:
         return master_dict
 
     @classmethod
-    def get_data_from_table(cls, table_data: List[Dict], empty_string_equals_none: bool = False,
-                            convert_strings_to_types: bool = False, convert_datetimes_to_dates: bool = False,
-                            list_as_string: bool=True, model_directory: Path = None) -> List[OTLObject]:
+    def get_data_from_table(cls, table_data: List[Dict], cast_list: bool=True, model_directory: Path = None
+                            ) -> List[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -161,20 +154,15 @@ class DotnotationTableConverter:
         headers.pop('typeURI')
         for row in table_data[1:]:
             instance = cls.create_instance_from_row(
-                row=row, convert_datetimes_to_dates=convert_datetimes_to_dates,
-                convert_strings_to_types=convert_strings_to_types, empty_string_equals_none=empty_string_equals_none,
-                model_directory=model_directory, list_as_string=list_as_string)
+                row=row, model_directory=model_directory, cast_list=cast_list)
             instances.append(instance)
 
         return instances
 
     @classmethod
-    def create_instance_from_row(cls,row: Dict, convert_datetimes_to_dates: bool = False, list_as_string: bool=True,
-                                 convert_strings_to_types: bool = False, empty_string_equals_none: bool = False,
-                                 model_directory: Path = None) -> OTLObject:
+    def create_instance_from_row(cls, row: DotnotationDict, cast_list: bool=True, model_directory: Path = None) -> OTLObject:
         return DotnotationDictConverter.from_dict(input_dict=row, model_directory=model_directory,
-                                                  all_types_as_string=convert_strings_to_types,
-                                                  cast_list=list_as_string)
+                                                  cast_list=cast_list)
 
     @classmethod
     def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],

@@ -30,5 +30,5 @@ class PandasConverter:
         dict_list.extend(dataframe.to_dict('records'))
 
         return DotnotationTableConverter.get_data_from_table(table_data=dict_list, model_directory=model_directory,
-                                                             list_as_string=False)
+                                                             cast_list=False)
     
