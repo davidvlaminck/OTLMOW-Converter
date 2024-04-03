@@ -16,8 +16,8 @@ SEPARATOR = xlsx_dotnotation_settings['separator']
 CARDINALITY_SEPARATOR = xlsx_dotnotation_settings['cardinality_separator']
 CARDINALITY_INDICATOR = xlsx_dotnotation_settings['cardinality_indicator']
 WAARDE_SHORTCUT = xlsx_dotnotation_settings['waarde_shortcut']
-LIST_AS_STRING = xlsx_settings['list_as_string']
-DATETIME_AS_STRING = xlsx_settings['datetime_as_string']
+LIST_AS_STRING = xlsx_settings['cast_list']
+DATETIME_AS_STRING = xlsx_settings['cast_datetime']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['warn_for_non_otl_conform_attributes']
 
@@ -27,8 +27,8 @@ class ExcelExporter(AbstractExporter):
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
-        list_as_string = kwargs.get('list_as_string', LIST_AS_STRING)
-        datetime_as_string = kwargs.get('datetime_as_string', DATETIME_AS_STRING)
+        list_as_string = kwargs.get('cast_list', LIST_AS_STRING)
+        datetime_as_string = kwargs.get('cast_datetime', DATETIME_AS_STRING)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                         ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',

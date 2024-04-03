@@ -40,7 +40,7 @@ def test_from_dict_datetimes_convert_true(recwarn):
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI' : AllCasesTestClass.typeURI, 'testDateField': '2022-12-12', 'testTimeField': '10:11:12',
             'testDateTimeField': '2022-12-12 10:11:12'}),
-        model_directory=model_directory_path, datetime_as_string=True)
+        model_directory=model_directory_path, cast_datetime=True)
 
     assert created_instance == expected
     assert len(recwarn) == 0
@@ -73,7 +73,7 @@ def test_to_dict_datetimes():
         'testTimeField': time(10, 11, 12),
         'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12)}
 
-    assert DotnotationDictConverter.to_dict(instance, datetime_as_string=True) == {
+    assert DotnotationDictConverter.to_dict(instance, cast_datetime=True) == {
         'testDateField': '2022-12-12',
         'testTimeField': '10:11:12',
         'testDateTimeField': '2022-12-12 10:11:12'}
@@ -166,7 +166,7 @@ def test_from_dict_simple_attribute_with_cardinality_converted_lists(recwarn):
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
         'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
-        'testStringFieldMetKard[]': 'a|b'}), list_as_string=True, model_directory=model_directory_path)
+        'testStringFieldMetKard[]': 'a|b'}), cast_list=True, model_directory=model_directory_path)
 
     assert created_instance == expected
     assert len(recwarn) == 0
@@ -192,7 +192,7 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
         'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
-        'testKwantWrdMetKard[]': '1.0|2.0'}), list_as_string=True, model_directory=model_directory_path)
+        'testKwantWrdMetKard[]': '1.0|2.0'}), cast_list=True, model_directory=model_directory_path)
 
     assert created_instance == expected
     assert len(recwarn) == 0
@@ -206,7 +206,7 @@ def test_to_dict_simple_attribute_with_cardinality_convert_lists():
     instance._testKwantWrdMetKard.add_empty_value()
     instance.testKwantWrdMetKard[1].waarde = 2.0
 
-    assert DotnotationDictConverter.to_dict(instance, list_as_string=True, waarde_shortcut=True) == {
+    assert DotnotationDictConverter.to_dict(instance, cast_list=True, waarde_shortcut=True) == {
         'testIntegerFieldMetKard[]': '1|2',
         'testKwantWrdMetKard[]': '1.0|2.0'}
 
@@ -298,7 +298,7 @@ def test_from_dict_complex_attributes_with_cardinality():
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI' : AllCasesTestClass.typeURI, 'testComplexTypeMetKard[].testStringField': 'e|f',
-         'testComplexType.testStringFieldMetKard[]': 'c|d'}), list_as_string=True,
+         'testComplexType.testStringFieldMetKard[]': 'c|d'}), cast_list=True,
         model_directory=model_directory_path)
 
     assert created_instance == expected

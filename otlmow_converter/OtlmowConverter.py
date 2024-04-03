@@ -31,7 +31,7 @@ class OtlmowConverter:
         See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
         """
         arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'rdf', 'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                    {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
                     'warn_for_non_otl_conform_attributes'}}
         for obj in sequence_of_objects:
             yield create_dict_from_asset(obj, **arg_dict)
@@ -45,7 +45,7 @@ class OtlmowConverter:
         See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
         """
         arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                    {'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
                     'warn_for_non_otl_conform_attributes'}}
         for obj in sequence_of_objects:
             yield DotnotationDictConverter.to_dict(obj, **arg_dict)
@@ -58,7 +58,7 @@ class OtlmowConverter:
         See the from_dict() method in the OTLObject class for more information on the keyword arguments.
         """
         arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'rdf', 'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                    {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
                     'warn_for_non_otl_conform_attributes'}}
 
         for d in sequence_of_dicts:
@@ -72,7 +72,7 @@ class OtlmowConverter:
         """
 
         arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'rdf', 'waarde_shortcut', 'datetime_as_string', 'allow_non_otl_conform_attributes',
+                    {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
                      'warn_for_non_otl_conform_attributes'}}
 
         suffix = file_path.suffix[1:]
@@ -88,8 +88,8 @@ class OtlmowConverter:
         suffix = file_path.suffix[1:]
         dotnotation_settings = kwargs.get('dotnotation_settings',
                                           GlobalVariables.settings['formats'][suffix]['dotnotation'])
-        datetime_as_string = kwargs.get('datetime_as_string',
-                                        GlobalVariables.settings['formats'][suffix]['datetime_as_string'])
+        datetime_as_string = kwargs.get('cast_datetime',
+                                        GlobalVariables.settings['formats'][suffix]['cast_datetime'])
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                         GlobalVariables.settings['formats'][suffix]['allow_non_otl_conform_attributes'])
         warn_for_non_otl_conform_attributes = (

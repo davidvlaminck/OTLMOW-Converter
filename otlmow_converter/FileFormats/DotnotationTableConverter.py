@@ -74,7 +74,7 @@ class DotnotationTableConverter:
             data_dict = DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                list_as_string=list_as_string, datetime_as_string=datetime_as_string,
+                cast_list=list_as_string, cast_datetime=datetime_as_string,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
@@ -127,7 +127,7 @@ class DotnotationTableConverter:
             data_dict = DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                list_as_string=list_as_string, datetime_as_string=datetime_as_string,
+                cast_list=list_as_string, cast_datetime=datetime_as_string,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
@@ -174,7 +174,7 @@ class DotnotationTableConverter:
                                  model_directory: Path = None) -> OTLObject:
         return DotnotationDictConverter.from_dict(input_dict=row, model_directory=model_directory,
                                                   all_types_as_string=convert_strings_to_types,
-                                                  list_as_string=list_as_string)
+                                                  cast_list=list_as_string)
 
     @classmethod
     def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],
