@@ -14,6 +14,7 @@
             }
         },
         "xlsx": {
+            "list_as_string": true,
             "datetime_as_string": false,
             "allow_non_otl_conform_attributes": true,
             "warn_for_non_otl_conform_attributes": true,

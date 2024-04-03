@@ -185,7 +185,7 @@ class DotnotationTableConverter:
         sorted_headers = cls._sort_headers(list_of_dicts[0])
         matrix = [[cls._get_item_from_dict(input_dict=d, item=header, empty_string_equals_none=empty_string_equals_none)
                    for header in sorted_headers] for d in list_of_dicts[1:]]
-        matrix.insert(0, sorted_headers)
+        matrix.insert(0, list(sorted_headers))
         return matrix
 
     @classmethod

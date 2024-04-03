@@ -97,7 +97,7 @@ class OtlmowConverter:
                        GlobalVariables.settings['formats'][suffix]['warn_for_non_otl_conform_attributes']))
 
         exporter = FileExporter.get_exporter_from_extension(extension=suffix)
-        exporter.export_to_file(filepath=file_path, sequence_of_objects=sequence_of_objects, **kwargs)
+        exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
 
     @classmethod
     def to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False,

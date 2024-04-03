@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from pandas import DataFrame
@@ -8,18 +8,18 @@ from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTa
 
 class PandasConverter:
     @classmethod
-    def convert_objects_to_single_dataframe(cls, list_of_objects: List[OTLObject]) -> DataFrame:
+    def convert_objects_to_single_dataframe(cls, list_of_objects: Iterable[OTLObject]) -> DataFrame:
         single_table = DotnotationTableConverter.get_single_table_from_data(list_of_objects=list_of_objects)
         return DataFrame(data=single_table[1:])
 
     @classmethod
-    def convert_objects_to_multiple_dataframes(cls, list_of_objects: List[OTLObject]
+    def convert_objects_to_multiple_dataframes(cls, list_of_objects: Iterable[OTLObject]
                                                ) -> Dict[str, DataFrame]:
         dict_tables = DotnotationTableConverter.get_tables_per_type_from_data(list_of_objects=list_of_objects)
         return {key: DataFrame(data=value[1:]) for key, value in dict_tables.items()}
 
     @classmethod
-    def convert_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> List[OTLObject]:
+    def convert_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
         model_directory = None
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']

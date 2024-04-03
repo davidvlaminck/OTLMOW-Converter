@@ -10,3 +10,5 @@ class AbstractExporter(abc.ABC):
     @abc.abstractmethod
     def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
         pass
+
+

@@ -2,7 +2,7 @@ from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
 
 
-class FileExporter():
+class FileExporter:
     @classmethod
     def get_exporter_from_extension(cls, extension: str) -> AbstractExporter:
         if extension == 'csv':
