@@ -1,6 +1,5 @@
 import ast
 import csv
-import os
 from pathlib import Path
 from typing import Iterable
 
@@ -34,14 +33,11 @@ class CsvImporter(AbstractImporter):
     @classmethod
     def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         delimiter = DELIMITER
-        split_per_type = True
         quote_char = '"'
 
         if kwargs is not None:
             if 'delimiter' in kwargs:
                 delimiter = kwargs['delimiter']
-            if 'split_per_type' in kwargs:
-                split_per_type = kwargs['split_per_type']
             if 'quote_char' in kwargs:
                 quote_char = kwargs['quote_char']
         else:
@@ -83,8 +79,13 @@ class CsvImporter(AbstractImporter):
 
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=data, empty_string_equals_none=True)
-                return DotnotationTableConverter.get_data_from_table(cast_list=cast_list, cast_datetime=cast_datetime,
-                    table_data=list_of_dicts, model_directory=model_directory)
+                return DotnotationTableConverter.get_data_from_table(
+                    table_data=list_of_dicts, model_directory=model_directory,
+                    separator=separator, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                    cast_datetime=cast_datetime, cast_list=cast_list,
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
         except TypeUriNotInFirstRowError as e:
             raise TypeUriNotInFirstRowError(
                 message=f'The typeURI is not in the first row in file {filepath.name}.'

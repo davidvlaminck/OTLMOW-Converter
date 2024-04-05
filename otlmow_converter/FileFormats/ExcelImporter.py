@@ -1,3 +1,4 @@
+import ast
 import os
 from pathlib import Path
 from typing import Dict, List
@@ -25,8 +26,8 @@ SEPARATOR = xlsx_dotnotation_settings['separator']
 CARDINALITY_SEPARATOR = xlsx_dotnotation_settings['cardinality_separator']
 CARDINALITY_INDICATOR = xlsx_dotnotation_settings['cardinality_indicator']
 WAARDE_SHORTCUT = xlsx_dotnotation_settings['waarde_shortcut']
-LIST_AS_STRING = xlsx_settings['cast_list']
-DATETIME_AS_STRING = xlsx_settings['cast_datetime']
+CAST_LIST = xlsx_settings['cast_list']
+CAST_DATETIME = xlsx_settings['cast_datetime']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['warn_for_non_otl_conform_attributes']
 
@@ -39,9 +40,10 @@ class ExcelImporter(AbstractImporter):
 
         separator = kwargs.get('separator', SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
+        cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
-        list_as_string = kwargs.get('cast_list', LIST_AS_STRING)
-        datetime_as_string = kwargs.get('cast_datetime', DATETIME_AS_STRING)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
@@ -72,8 +74,12 @@ class ExcelImporter(AbstractImporter):
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
                 list_of_objects.extend(DotnotationTableConverter.get_data_from_table(
-                    table_data=list_of_dicts,
-                    cast_list=list_as_string, model_directory=model_directory))
+                    table_data=list_of_dicts, model_directory=model_directory,
+                    separator=separator, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                    cast_datetime=cast_datetime, cast_list=cast_list,
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes))
             except TypeUriNotInFirstRowError :
                 exception_group.add_exception(TypeUriNotInFirstRowError(
                     message=f'The typeURI is not in the first row in file {filepath.name}.'
@@ -99,8 +105,16 @@ class ExcelImporter(AbstractImporter):
         book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
 
         for sheet in book.worksheets:
-            sheet_name = str(sheet)[12:-2]
-            data[sheet_name] = [[cell.value for cell in row] for row in sheet.rows]
+            sheet_name = sheet.title
+            data[sheet_name] = []
+            for row in sheet.rows:
+                row_data = []
+                for cell in row:
+                    if cell.value in {'True', 'TRUE', 'False', 'FALSE'}:
+                        row_data.append(cell.value.lower() == 'true')
+                    else:
+                        row_data.append(cell.value)
+                data[sheet_name].append(row_data)
 
         book.close()
         return data
@@ -132,7 +146,8 @@ class ExcelImporter(AbstractImporter):
 
     @staticmethod
     def check_headers(headers: List[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
-                      cardinality_indicator: str, waarde_shortcut: bool, separator: str) -> None:
+                      cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT,
+                      separator: str = SEPARATOR) -> None:
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
         error = InvalidColumnNamesInExcelTabError(
             message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '

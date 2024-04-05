@@ -139,8 +139,14 @@ class DotnotationTableConverter:
         return master_dict
 
     @classmethod
-    def get_data_from_table(cls, table_data: List[Dict], cast_list: bool=True, model_directory: Path = None,
-                            cast_datetime: bool=True) -> List[OTLObject]:
+    def get_data_from_table(cls, table_data: List[Dict], model_directory: Path = None,
+                            cast_list: bool = False, cast_datetime: bool = False,
+                            allow_non_otl_conform_attributes: bool = True,
+                            warn_for_non_otl_conform_attributes: bool = True,
+                            waarde_shortcut: bool = WAARDE_SHORTCUT,
+                            separator: str = SEPARATOR,
+                            cardinality_indicator: str = CARDINALITY_INDICATOR,
+                            cardinality_separator: str = CARDINALITY_SEPARATOR) -> List[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -154,16 +160,30 @@ class DotnotationTableConverter:
         headers.pop('typeURI')
         for row in table_data[1:]:
             instance = cls.create_instance_from_row(
-                row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime)
+                row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
+                separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             instances.append(instance)
 
         return instances
 
     @classmethod
-    def create_instance_from_row(cls, row: DotnotationDict, cast_list: bool=True, model_directory: Path = None,
-                                 cast_datetime: bool=True) -> OTLObject:
-        return DotnotationDictConverter.from_dict(input_dict=row, model_directory=model_directory,
-                                                  cast_list=cast_list, cast_datetime=cast_datetime)
+    def create_instance_from_row(cls, row: DotnotationDict, model_directory: Path = None,
+                                 cast_list: bool = False, cast_datetime: bool = False,
+                                 allow_non_otl_conform_attributes: bool = True,
+                                 warn_for_non_otl_conform_attributes: bool = True,
+                                 waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                 separator: str = SEPARATOR,
+                                 cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                 cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
+        return DotnotationDictConverter.from_dict(
+            input_dict=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
+            separator=separator, cardinality_indicator=cardinality_indicator,
+            waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
     def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],

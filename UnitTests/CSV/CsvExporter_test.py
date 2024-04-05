@@ -6,13 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
-from otlmow_converter.FileFormats.CsvImporter import CsvImporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 

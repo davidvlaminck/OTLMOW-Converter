@@ -241,8 +241,6 @@ class DotnotationDictConverter:
                 attribute.set_waarde(value)
             return
 
-
-
         first, rest = dotnotation.split(separator, 1)
         cardinality = False
         if first.endswith(cardinality_indicator):

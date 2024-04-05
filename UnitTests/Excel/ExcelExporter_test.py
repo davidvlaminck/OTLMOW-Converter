@@ -13,7 +13,7 @@ from otlmow_converter.OtlmowConverter import OtlmowConverter
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_export_and_then_import_unnested_attributes(caplog):
+def test_export_and_then_import_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes_generated.xlsx'
     instance = AllCasesTestClass()
     instance.geometry = 'POINT Z (200000 200000 0)'
@@ -33,10 +33,8 @@ def test_export_and_then_import_unnested_attributes(caplog):
     instance.testStringFieldMetKard = ['string1', 'string2']
     instance.testTimeField = time(11, 5, 26)
 
-    caplog.records.clear()
-
     ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    assert recwarn.list == []
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
@@ -65,7 +63,7 @@ def test_export_and_then_import_unnested_attributes(caplog):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_1(caplog):
+def test_export_and_then_import_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -103,9 +101,8 @@ def test_export_and_then_import_nested_attributes_level_1(caplog):
     instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
-    caplog.records.clear()
     ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    assert recwarn.list == []
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
@@ -139,7 +136,7 @@ def test_export_and_then_import_nested_attributes_level_1(caplog):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_2(caplog):
+def test_export_and_then_import_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_2_generated.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -160,9 +157,8 @@ def test_export_and_then_import_nested_attributes_level_2(caplog):
     instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
-    caplog.records.clear()
     ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    assert recwarn.list == []
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1

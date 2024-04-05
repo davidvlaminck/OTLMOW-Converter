@@ -9,7 +9,6 @@ from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import Invali
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,50 +16,11 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_init_importer_only_load_with_settings(subtests):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-
-    with subtests.test(msg='load with correct settings'):
-        importer = ExcelImporter(settings=converter.settings)
-        assert importer is not None
-
-    with subtests.test(msg='load without settings'):
-        with pytest.raises(ValueError):
-            ExcelImporter()
-
-    with subtests.test(msg='load with incorrect settings (no file_formats)'):
-        with pytest.raises(ValueError):
-            ExcelImporter(settings={"auth_options": [{}]})
-
-    with subtests.test(msg='load with incorrect settings (file_formats but no xls)'):
-        with pytest.raises(ValueError):
-            ExcelImporter(settings={"file_formats": [{}]})
-
-
-def test_convert_to_json_with_date():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.xlsx'
-    assets = converter.create_assets_from_file(filepath=file_location)
-
-    json_file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.json'
-
-    converter.create_file_from_assets(filepath=json_file_location, list_of_objects=assets)
-
-    os.unlink(json_file_location)
-
-
-
-def test_load_test_unnested_attributes(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
+def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.xlsx'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assert recwarn.list == []
 
     assert len(objects) == 1
 
@@ -85,15 +45,11 @@ def test_load_test_unnested_attributes(caplog):
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
-def test_load_test_nested_attributes_1_level(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
+def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.xlsx'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assert recwarn.list == []
 
     assert len(objects) == 1
 
@@ -122,15 +78,11 @@ def test_load_test_nested_attributes_1_level(caplog):
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-def test_load_test_nested_attributes_2_levels(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
+def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.xlsx'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assert recwarn.list == []
 
     assert len(objects) == 1
 
@@ -151,13 +103,10 @@ def test_load_test_nested_attributes_2_levels(caplog):
 
 
 def test_get_index_of_typeURI_column_in_sheet():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 
     with pytest.raises(ExceptionsGroup) as ex:
-        importer.import_file(filepath=file_location, model_directory=model_directory_path)
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
 
         assert isinstance(ex, ExceptionsGroup)
         assert len(ex.exceptions) == 3
@@ -179,13 +128,10 @@ def test_get_index_of_typeURI_column_in_sheet():
 
 
 def test_check_headers():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 
     try:
-        importer.check_headers(
+        ExcelImporter.check_headers(
             filepath=file_location, model_directory=model_directory_path, sheet='<Worksheet "correct_sheet">',
             headers=['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
             type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass')
