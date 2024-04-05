@@ -1,7 +1,7 @@
 {
     "formats": {
         "OTLMOW": {
-            "datetime_as_string": false,
+            "cast_datetime": false,
             "rdf": false,
             "waarde_shortcut": false,
             "allow_non_otl_conform_attributes": true,
@@ -14,8 +14,8 @@
             }
         },
         "xlsx": {
-            "list_as_string": true,
-            "datetime_as_string": false,
+            "cast_list": true,
+            "cast_datetime": true,
             "allow_non_otl_conform_attributes": true,
             "warn_for_non_otl_conform_attributes": true,
             "dotnotation": {
@@ -26,8 +26,8 @@
             }
         },
         "csv": {
-            "list_as_string": true,
-            "datetime_as_string": true,
+            "cast_list": true,
+            "cast_datetime": true,
             "allow_non_otl_conform_attributes": true,
             "warn_for_non_otl_conform_attributes": true,
             "delimiter": ";",
@@ -39,8 +39,8 @@
             }
         },
         "pandas": {
-            "datetime_as_string": false,
-            "lists_as_string": true,
+            "cast_list": false,
+            "cast_datetime": false,
             "rdf": false,
             "allow_non_otl_conform_attributes": true,
             "warn_for_non_otl_conform_attributes": true,

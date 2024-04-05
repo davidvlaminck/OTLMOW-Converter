@@ -16,8 +16,8 @@ SEPARATOR = csv_dotnotation_settings['separator']
 CARDINALITY_SEPARATOR = csv_dotnotation_settings['cardinality_separator']
 CARDINALITY_INDICATOR = csv_dotnotation_settings['cardinality_indicator']
 WAARDE_SHORTCUT = csv_dotnotation_settings['waarde_shortcut']
-LIST_AS_STRING = csv_settings['cast_list']
-DATETIME_AS_STRING = csv_settings['cast_datetime']
+CAST_LIST = csv_settings['cast_list']
+CAST_DATETIME = csv_settings['cast_datetime']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = csv_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = csv_settings['warn_for_non_otl_conform_attributes']
 DELIMITER = csv_settings['delimiter']
@@ -44,8 +44,8 @@ class CsvExporter(AbstractExporter):
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
-        list_as_string = kwargs.get('cast_list', LIST_AS_STRING)
-        datetime_as_string = kwargs.get('cast_datetime', DATETIME_AS_STRING)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                         ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
@@ -59,10 +59,10 @@ class CsvExporter(AbstractExporter):
 
         if not split_per_type:
             single_table = DotnotationTableConverter.get_single_table_from_data(
-                list_of_objects=sequence_of_objects, values_as_string=True,
+                list_of_objects=sequence_of_objects,
                 separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                cast_list=list_as_string, cast_datetime=datetime_as_string,
+                cast_list=cast_list, cast_datetime=cast_datetime,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
@@ -73,10 +73,10 @@ class CsvExporter(AbstractExporter):
 
 
         multi_table_dict = DotnotationTableConverter.get_tables_per_type_from_data(
-            list_of_objects=sequence_of_objects, values_as_string=True,
+            list_of_objects=sequence_of_objects,
             separator=separator, cardinality_separator=cardinality_separator,
             cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-            cast_list=list_as_string, cast_datetime=datetime_as_string,
+            cast_list=cast_list, cast_datetime=cast_datetime,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 

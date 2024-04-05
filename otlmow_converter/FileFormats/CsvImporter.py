@@ -1,3 +1,4 @@
+import ast
 import csv
 import os
 from pathlib import Path
@@ -22,8 +23,8 @@ SEPARATOR = csv_dotnotation_settings['separator']
 CARDINALITY_SEPARATOR = csv_dotnotation_settings['cardinality_separator']
 CARDINALITY_INDICATOR = csv_dotnotation_settings['cardinality_indicator']
 WAARDE_SHORTCUT = csv_dotnotation_settings['waarde_shortcut']
-LIST_AS_STRING = csv_settings['cast_list']
-DATETIME_AS_STRING = csv_settings['cast_datetime']
+CAST_LIST = csv_settings['cast_list']
+CAST_DATETIME = csv_settings['cast_datetime']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = csv_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = csv_settings['warn_for_non_otl_conform_attributes']
 DELIMITER = csv_settings['delimiter']
@@ -50,8 +51,8 @@ class CsvImporter(AbstractImporter):
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
-        list_as_string = kwargs.get('cast_list', LIST_AS_STRING)
-        datetime_as_string = kwargs.get('cast_datetime', DATETIME_AS_STRING)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
@@ -70,12 +71,20 @@ class CsvImporter(AbstractImporter):
         try:
             with open(filepath, encoding='utf-8') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
-                data = list(csv_reader)
+                data = [next(csv_reader)]
+                for row in csv_reader:
+                    r = []
+                    for d in row:
+                        try:
+                            r.append(ast.literal_eval(d))
+                        except (SyntaxError, ValueError):
+                            r.append(str(d))
+                    data.append(r)
 
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=data, empty_string_equals_none=True)
-                return DotnotationTableConverter.get_data_from_table(
-                    table_data=list_of_dicts, convert_strings_to_types=True, model_directory=model_directory)
+                return DotnotationTableConverter.get_data_from_table(cast_list=cast_list, cast_datetime=cast_datetime,
+                    table_data=list_of_dicts, model_directory=model_directory)
         except TypeUriNotInFirstRowError as e:
             raise TypeUriNotInFirstRowError(
                 message=f'The typeURI is not in the first row in file {filepath.name}.'

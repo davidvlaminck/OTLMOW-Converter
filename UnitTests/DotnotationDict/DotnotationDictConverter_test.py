@@ -7,7 +7,7 @@ from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonS
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
-
+from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
@@ -29,6 +29,30 @@ def test_to_dict_simple_attributes():
     instance.testBooleanField = True
 
     assert DotnotationDictConverter.to_dict(instance) == {'testBooleanField': True, 'testKeuzelijst': 'waarde-2'}
+
+
+def test_from_dict_convert_types_without_warnings(recwarn):
+    expected = AllCasesTestClass()
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[0].testBooleanField = True
+    expected.testComplexTypeMetKard[1].testBooleanField = False
+    expected.testComplexType._testKwantWrdMetKard.add_empty_value()
+    expected.testComplexType._testKwantWrdMetKard.add_empty_value()
+    expected.testComplexType.testKwantWrdMetKard[0].waarde = 3.0
+    expected.testComplexType.testKwantWrdMetKard[1].waarde = 4.0
+    expected.testDecimalFieldMetKard = [1.0, 2.0]
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI' : AllCasesTestClass.typeURI,
+         'testComplexTypeMetKard[].testBooleanField': 'True|False',
+         'testComplexType.testKwantWrdMetKard[]': '3.0|4.0',
+         'testDecimalFieldMetKard[]': '1.0|2.0'
+         }),
+        model_directory=model_directory_path, cast_list=True, waarde_shortcut=True)
+
+    assert created_instance == expected
+    assert len(recwarn) == 0
 
 
 def test_from_dict_datetimes_convert_true(recwarn):
@@ -376,7 +400,7 @@ def test_from_dict_complex_attributes_with_cardinality_and_kwant_wrd():
 
 
 
-def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd():
+def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_False():
     instance = AllCasesTestClass()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
@@ -390,6 +414,29 @@ def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd():
         'testComplexType.testKwantWrdMetKard[]': [3.0, 4.0],
         'testUnionType.unionKwantWrd': 2.0}
 
+
+def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_True():
+    instance = AllCasesTestClass()
+    instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+    instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+    instance.testComplexType.testKwantWrdMetKard[0].waarde = 3.0
+    instance.testComplexType.testKwantWrdMetKard[1].waarde = 4.0
+    instance.testComplexType.testComplexType2.testKwantWrd.waarde = 5.0
+    instance.testUnionType.unionKwantWrd.waarde = 2.0
+
+    assert DotnotationDictConverter.to_dict(instance, cast_list=True) == {
+        'testComplexType.testComplexType2.testKwantWrd': 5.0,
+        'testComplexType.testKwantWrdMetKard[]': '3.0|4.0',
+        'testUnionType.unionKwantWrd': 2.0}
+
+
+def test_to_dict_errors(subtests):
+    instance = AllCasesTestClass()
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[0].testStringFieldMetKard = ['test']
+    with subtests.test("error raised when using list of lists"):
+        with pytest.raises(DotnotationListOfListError):
+            DotnotationDictConverter.to_dict(instance)
 
 def test_from_dict_errors(subtests):
     with subtests.test("error raised when using dict without typeURI"):

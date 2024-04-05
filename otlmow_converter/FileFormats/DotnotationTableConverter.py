@@ -139,8 +139,8 @@ class DotnotationTableConverter:
         return master_dict
 
     @classmethod
-    def get_data_from_table(cls, table_data: List[Dict], cast_list: bool=True, model_directory: Path = None
-                            ) -> List[OTLObject]:
+    def get_data_from_table(cls, table_data: List[Dict], cast_list: bool=True, model_directory: Path = None,
+                            cast_datetime: bool=True) -> List[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -154,15 +154,16 @@ class DotnotationTableConverter:
         headers.pop('typeURI')
         for row in table_data[1:]:
             instance = cls.create_instance_from_row(
-                row=row, model_directory=model_directory, cast_list=cast_list)
+                row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime)
             instances.append(instance)
 
         return instances
 
     @classmethod
-    def create_instance_from_row(cls, row: DotnotationDict, cast_list: bool=True, model_directory: Path = None) -> OTLObject:
+    def create_instance_from_row(cls, row: DotnotationDict, cast_list: bool=True, model_directory: Path = None,
+                                 cast_datetime: bool=True) -> OTLObject:
         return DotnotationDictConverter.from_dict(input_dict=row, model_directory=model_directory,
-                                                  cast_list=cast_list)
+                                                  cast_list=cast_list, cast_datetime=cast_datetime)
 
     @classmethod
     def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],

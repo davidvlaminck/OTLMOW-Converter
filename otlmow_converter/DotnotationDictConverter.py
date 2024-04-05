@@ -1,5 +1,6 @@
 import inspect
 import warnings
+from itertools import count
 from pathlib import Path
 
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
@@ -11,6 +12,7 @@ from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonS
 
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 load_settings()
@@ -79,6 +81,9 @@ class DotnotationDictConverter:
                 dotnotation = DotnotationHelper.get_dotnotation(
                     attribute, waarde_shortcut=waarde_shortcut, separator=separator,
                     cardinality_indicator=cardinality_indicator)
+                if dotnotation.count(cardinality_indicator) > 1:
+                    raise DotnotationListOfListError(f'Can not use dotnotation for lists of lists. '
+                                                     f'Dotnotation: {dotnotation}')
                 if cast_list and attribute.kardinaliteit_max != '1':
                     yield dotnotation, cardinality_separator.join(str(a) for a in attribute.waarde)
                 elif cast_datetime:
@@ -90,7 +95,10 @@ class DotnotationDictConverter:
                 for index, lijst_item in enumerate(attribute.waarde):
                     for k1, v1 in cls._iterate_over_attributes_and_values_by_dotnotation(
                             object_or_attribute=lijst_item, waarde_shortcut=waarde_shortcut, separator=separator,
-                            cardinality_indicator=cardinality_indicator):
+                            cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
+                            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                            cast_list=cast_list, cast_datetime=cast_datetime):
                         if k1 not in combined_dict:
                             combined_dict[k1] = [None for _ in range(index)]
                         combined_dict[k1].append(v1)
@@ -105,11 +113,11 @@ class DotnotationDictConverter:
                     yield from combined_dict.items()
             else:
                 yield from cls._iterate_over_attributes_and_values_by_dotnotation(
-                    object_or_attribute=attribute.waarde,
-                    waarde_shortcut=waarde_shortcut,
-                    separator=separator,
-                    cardinality_indicator=cardinality_indicator,
-                )
+                    object_or_attribute=attribute.waarde, waarde_shortcut=waarde_shortcut, separator=separator,
+                    cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                    cast_list=cast_list, cast_datetime=cast_datetime)
 
     @classmethod
     def handle_non_conform_attribute(cls, allow_non_otl_conform_attributes, attr_key, attribute, object_or_attribute,
@@ -176,7 +184,7 @@ class DotnotationDictConverter:
                                      allow_non_otl_conform_attributes: bool = True,
                                      warn_for_non_otl_conform_attributes: bool = True):
         if dotnotation.count(cardinality_indicator) > 1:
-            raise ValueError("can't use dotnotation for lists of lists")
+            raise DotnotationListOfListError("can't use dotnotation for lists of lists")
 
         if dotnotation.startswith('_'):
             raise ValueError(
@@ -220,7 +228,8 @@ class DotnotationDictConverter:
                             separator=separator, cardinality_indicator=cardinality_indicator,
                             waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
                 else:
-                    attribute.add_empty_value()
+                    if attribute.waarde is None:
+                        attribute.add_empty_value()
                     cls.set_attribute_by_dotnotation(
                         attribute.waarde, dotnotation='waarde', value=value,
                         cast_datetime=cast_datetime, cast_list=cast_list,
@@ -231,6 +240,8 @@ class DotnotationDictConverter:
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
                 attribute.set_waarde(value)
             return
+
+
 
         first, rest = dotnotation.split(separator, 1)
         cardinality = False
@@ -243,7 +254,11 @@ class DotnotationDictConverter:
 
         if cardinality:
             if cast_list:
-                value = str(value).split(cardinality_separator)
+                last_attribute = DotnotationHelper.get_attribute_by_dotnotation(
+                    instance_or_attribute=object_or_attribute, dotnotation=dotnotation, separator=separator,
+                    waarde_shortcut=waarde_shortcut, cardinality_indicator=cardinality_indicator)
+                value = [last_attribute.field.convert_to_correct_type(v, log_warnings=False)
+                         for v in str(value).split(cardinality_separator)]
             for index, v in enumerate(value):
                 if attribute.waarde is None or len(attribute.waarde) <= index:
                     attribute.add_empty_value()

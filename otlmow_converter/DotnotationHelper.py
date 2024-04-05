@@ -34,12 +34,11 @@ class DotnotationHelper:
                         separator: str = SEPARATOR,
                         cardinality_indicator: str = CARDINALITY_INDICATOR,
                         waarde_shortcut: bool = WAARDE_SHORTCUT) -> str:
-        if waarde_shortcut:
-            if (attribute.naam == 'waarde' and attribute.owner._parent is not None and
-                    attribute.owner._parent.field.waarde_shortcut_applicable):
-                return DotnotationHelper.get_dotnotation(
-                    attribute=attribute.owner._parent, separator=separator, cardinality_indicator=cardinality_indicator,
-                    waarde_shortcut=waarde_shortcut)
+        if waarde_shortcut and (attribute.naam == 'waarde' and attribute.owner._parent is not None and
+                            attribute.owner._parent.field.waarde_shortcut_applicable):
+            return DotnotationHelper.get_dotnotation(
+                attribute=attribute.owner._parent, separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut)
 
         dotnotation = attribute.naam
         if attribute.kardinaliteit_max != '1':
@@ -157,9 +156,7 @@ class DotnotationHelper:
             if attribute.field.waarde_shortcut_applicable and waarde_shortcut:
                 if attribute.waarde is None:
                     attribute.add_empty_value()
-                if cardinality:
-                    return attribute.waarde[0]._waarde
-                return attribute.waarde._waarde
+                return attribute.waarde[0]._waarde if cardinality else attribute.waarde._waarde
             return attribute
 
     def set_attribute_by_dotnotation_instance(
