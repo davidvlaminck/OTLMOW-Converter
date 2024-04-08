@@ -8,8 +8,8 @@ from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTa
 
 class PandasConverter:
     @classmethod
-    def convert_objects_to_single_dataframe(cls, list_of_objects: Iterable[OTLObject]) -> DataFrame:
-        single_table = DotnotationTableConverter.get_single_table_from_data(list_of_objects=list_of_objects)
+    def convert_objects_to_single_dataframe(cls, list_of_objects: Iterable[OTLObject], **kwargs) -> DataFrame:
+        single_table = DotnotationTableConverter.get_single_table_from_data(list_of_objects=list_of_objects, **kwargs)
         return DataFrame(data=single_table[1:])
 
     @classmethod
@@ -22,7 +22,7 @@ class PandasConverter:
     def convert_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
         model_directory = None
         if kwargs is not None and 'model_directory' in kwargs:
-            model_directory = kwargs['model_directory']
+            model_directory = kwargs.pop('model_directory')
 
         headers = list(dataframe)
         d = {header: index for index, header in enumerate(headers)}
@@ -30,5 +30,5 @@ class PandasConverter:
         dict_list.extend(dataframe.to_dict('records'))
 
         return DotnotationTableConverter.get_data_from_table(table_data=dict_list, model_directory=model_directory,
-                                                             cast_list=False)
+                                                             **kwargs)
     
