@@ -62,13 +62,14 @@ class GeoJSONExporter:
 
         return l
 
-    def convert_wkt_string_to_geojson(self, wkt_string):
+    @classmethod
+    def convert_wkt_string_to_geojson(cls, wkt_string):
         geom_type, coords_str = wkt_string.split('(', 1)
         coords_str = coords_str[:-1].replace(', ', ',').replace(' ,', ',')
 
         coords_list = []
 
-        self.split_and_add_to_list(coords_list, coords_str)
+        cls.split_and_add_to_list(coords_list, coords_str)
 
         geom_type = geom_type.lower()
         if geom_type.startswith('point'):
@@ -88,7 +89,7 @@ class GeoJSONExporter:
 
         g = geojson.dumps(geom, sort_keys=True)
         return {
-            'bbox': self.get_bounding_box(geom),
+            'bbox': cls.get_bounding_box(geom),
             'type': geom['type'],
             'coordinates': geom["coordinates"],
             'crs': {'properties': {'name': 'EPSG:31370'}, 'type': 'name'}}
@@ -102,12 +103,13 @@ class GeoJSONExporter:
         else:
             return [[coords[:, 0].min(), coords[:, 1].min()], [coords[:, 0].max(), coords[:, 1].max()]]
 
-    def split_and_add_to_list(self, coords_list: list, coords_str: str):
+    @classmethod
+    def split_and_add_to_list(cls, coords_list: list, coords_str: str):
         if coords_str.startswith('('):
             coords_str = coords_str[1:-1]
             for new_coords_str in coords_str.split('),('):
                 new_list = []
-                self.split_and_add_to_list(coords_list=new_list, coords_str=new_coords_str)
+                cls.split_and_add_to_list(coords_list=new_list, coords_str=new_coords_str)
                 coords_list.append(new_list)
         else:
             for c in coords_str.split(','):

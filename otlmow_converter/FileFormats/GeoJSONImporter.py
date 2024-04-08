@@ -22,11 +22,10 @@ class GeoJSONImporter:
 
         ignore_failed_objects = False
 
-        if kwargs is not None:
-            if 'ignore_failed_objects' in kwargs:
-                ignore_failed_objects = kwargs['ignore_failed_objects']
+        if kwargs is not None and 'ignore_failed_objects' in kwargs:
+            ignore_failed_objects = kwargs['ignore_failed_objects']
 
-        with open(filepath, 'r') as file:
+        with open(filepath) as file:
             data = json.load(file)
 
         return self.decode_objects(data, ignore_failed_objects=ignore_failed_objects)
@@ -56,7 +55,8 @@ class GeoJSONImporter:
             list_of_objects.append(asset)
         return list_of_objects
 
-    def construct_wkt_string_from_geojson(self, geom):
+    @classmethod
+    def construct_wkt_string_from_geojson(cls, geom):
         geo_type = geom['type']
         coords = geom['coordinates']
 
@@ -64,26 +64,22 @@ class GeoJSONImporter:
         while isinstance(first_coord[0], list):
             first_coord = first_coord[0]
 
-        z_part = ''
-        if len(first_coord) == 3:
-            z_part = ' Z'
-        
-        wkt = geo_type.upper() + z_part + ' ' + self.construct_wkt_string_from_coords(coords)
-        return wkt
+        z_part = ' Z' if len(first_coord) == 3 else ''
+        return geo_type.upper() + z_part + ' ' + cls.construct_wkt_string_from_coords(coords)
 
-    def construct_wkt_string_from_coords(self, coords):
+    @classmethod
+    def construct_wkt_string_from_coords(cls, coords):
         wkt = ''
         if not isinstance(coords[0], list):
-            return '(' + self.construct_wkt_string_from_coord(coords) + ')'
+            return f'({cls.construct_wkt_string_from_coord(coords)})'
         for coord in coords:
             if isinstance(coords[0][0], list):
-                wkt += self.construct_wkt_string_from_coords(coord) + ', '
+                wkt += f'{cls.construct_wkt_string_from_coords(coord)}, '
             else:
-                wkt += self.construct_wkt_string_from_coord(coord) + ', '
-        return '(' + wkt[:-2] + ')'
+                wkt += f'{cls.construct_wkt_string_from_coord(coord)}, '
+        return f'({wkt[:-2]})'
 
-    def construct_wkt_string_from_coord(self, coord):
-        wkt = ''
-        for c in coord:
-            wkt += str(c) + ' '
+    @classmethod
+    def construct_wkt_string_from_coord(cls, coord):
+        wkt = ''.join(f'{str(c)} ' for c in coord)
         return wkt[:-1]
