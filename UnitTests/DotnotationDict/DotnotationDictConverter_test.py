@@ -493,10 +493,14 @@ def test_from_dict_instance_version():
     expected = AllCasesTestClass()
     expected.testKeuzelijst = 'waarde-2'
     expected.testBooleanField = True
+    expected.testComplexTypeMetKard[0].testKwantWrd.waarde = 10.0
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[1].testKwantWrd.waarde = 20.0
 
     created_instance = converter.from_dict_instance(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2'}),
-        model_directory=model_directory_path)
+        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
+         'testComplexTypeMetKard()+testKwantWrd+waarde': '10.0*20.0'}),
+        model_directory=model_directory_path, cast_list=True)
 
     assert created_instance == expected
 
@@ -506,13 +510,17 @@ def test_to_dict_instance_version():
         separator='+', waarde_shortcut=False, cardinality_indicator='()', cardinality_separator='*')
 
     expected_dict = DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2'})
+        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
+         'testComplexTypeMetKard()+testKwantWrd+waarde': '10.0*20.0'})
 
     instance = AllCasesTestClass()
     instance.testKeuzelijst = 'waarde-2'
     instance.testBooleanField = True
+    instance.testComplexTypeMetKard[0].testKwantWrd.waarde = 10.0
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[1].testKwantWrd.waarde = 20.0
 
-    created_dict = converter.to_dict_instance(instance)
+    created_dict = converter.to_dict_instance(instance, cast_list=True)
 
     assert created_dict == expected_dict
 
