@@ -3,49 +3,20 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+import pytest_subtests
 
-from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
-from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
-from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
-from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.JsonImporter import JsonImporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_init_importer_only_load_with_settings(subtests):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-
-    with subtests.test(msg='load with correct settings'):
-        importer = JsonImporter(settings=converter.settings)
-        assert importer is not None
-
-    with subtests.test(msg='load without settings'):
-        with pytest.raises(ValueError):
-            JsonImporter(settings=None)
-
-    with subtests.test(msg='load with incorrect settings (no file_formats)'):
-        with pytest.raises(ValueError):
-            JsonImporter(settings={"auth_options": [{}]})
-
-    with subtests.test(msg='load with incorrect settings (file_formats but no xls)'):
-        with pytest.raises(ValueError):
-            JsonImporter(settings={"file_formats": [{}]})
-
-
-def test_load_test_unnested_attributes(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = JsonImporter(settings=converter.settings)
+def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.json'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assert len(recwarn.list) == 0
 
     assert len(objects) == 1
 
@@ -70,15 +41,11 @@ def test_load_test_unnested_attributes(caplog):
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
-def test_load_test_nested_attributes_1_level(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = JsonImporter(settings=converter.settings)
+def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.json'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assert len(recwarn.list) == 0
 
     assert len(objects) == 1
 
@@ -106,15 +73,11 @@ def test_load_test_nested_attributes_1_level(caplog):
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-def test_load_test_nested_attributes_2_levels(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = JsonImporter(settings=converter.settings)
+def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.json'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assert len(recwarn.list) == 0
 
     assert len(objects) == 1
 
@@ -132,3 +95,39 @@ def test_load_test_nested_attributes_2_levels(caplog):
     assert instance.testComplexTypeMetKard[1].testComplexType2.testStringField == 'string2'
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testKwantWrd.waarde is None
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
+
+
+def test_load_test_non_conform(recwarn, subtests):
+    file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attributes.json'
+
+    with subtests.test(msg="default behaviour"):
+        recwarn.clear()
+        objects = JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+        assert len(recwarn.list) == 1
+
+        assert len(objects) == 1
+
+        instance = objects[0]
+        assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+        assert instance.assetId.identificator == '0000-0000'
+        assert not instance.testBooleanField
+        assert instance.non_conform_attribute == 'non_conform_value'
+
+    with subtests.test(msg='non conform not allowed'):
+        with pytest.raises(ValueError):
+            JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                    allow_non_otl_conform_attributes=False)
+
+    with subtests.test(msg="allowed, no warnings"):
+        recwarn.clear()
+        objects = JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                          warn_for_non_otl_conform_attributes=False)
+        assert len(recwarn.list) == 0
+
+        assert len(objects) == 1
+
+        instance = objects[0]
+        assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+        assert instance.assetId.identificator == '0000-0000'
+        assert not instance.testBooleanField
+        assert instance.non_conform_attribute == 'non_conform_value'
