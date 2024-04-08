@@ -18,6 +18,37 @@ def set_up_importer():
         }}]})
 
 
+def test_load_test_unnested_attributes(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.geojson'
+
+    importer = set_up_importer()
+    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    assert len(recwarn.list) == 0
+
+    assert len(objects) == 1
+
+    instance = objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.assetId.identificator == '0000-0000'
+    assert not instance.testBooleanField
+    assert instance.testDateField == date(2019, 9, 20)
+    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDecimalField == 79.07
+    assert instance.testDecimalFieldMetKard == [10.0, 20.0]
+    assert instance.testEenvoudigType.waarde == 'string1'
+    assert instance.testIntegerField == -55
+    assert instance.testIntegerFieldMetKard == [76, 2]
+    assert instance.testKeuzelijst == 'waarde-4'
+    assert instance.testKeuzelijstMetKard == ['waarde-4', 'waarde-3']
+    assert instance.testKwantWrd.waarde == 98.21
+    assert instance.testStringField == 'oFfeDLp'
+    assert instance.testStringFieldMetKard[0] == 'string1'
+    assert instance.testStringFieldMetKard[1] == 'string2'
+    assert instance.testTimeField == time(11, 5, 26)
+    assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
+
+
+
 def test_invalid_typeURI():
     importer = set_up_importer()
     with pytest.raises(ValueError):

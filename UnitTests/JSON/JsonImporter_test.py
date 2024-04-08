@@ -3,7 +3,6 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
-import pytest_subtests
 
 from otlmow_converter.FileFormats.JsonImporter import JsonImporter
 
