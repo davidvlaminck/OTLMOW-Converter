@@ -28,7 +28,8 @@ def test_to_dict_simple_attributes():
     instance.testKeuzelijst = 'waarde-2'
     instance.testBooleanField = True
 
-    assert DotnotationDictConverter.to_dict(instance) == {'testBooleanField': True, 'testKeuzelijst': 'waarde-2'}
+    assert DotnotationDictConverter.to_dict(instance) == {'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_convert_types_without_warnings(recwarn):
@@ -95,12 +96,14 @@ def test_to_dict_datetimes():
     assert DotnotationDictConverter.to_dict(instance) == {
         'testDateField': date(2022, 12, 12),
         'testTimeField': time(10, 11, 12),
-        'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12)}
+        'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12),
+        'typeURI': AllCasesTestClass.typeURI}
 
     assert DotnotationDictConverter.to_dict(instance, cast_datetime=True) == {
         'testDateField': '2022-12-12',
         'testTimeField': '10:11:12',
-        'testDateTimeField': '2022-12-12 10:11:12'}
+        'testDateTimeField': '2022-12-12 10:11:12',
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_with_non_conform_otl_attributes(subtests, recwarn):
@@ -143,7 +146,7 @@ def test_to_dict_with_non_conform_otl_attributes(subtests, recwarn):
         instance.non_conform_attribute = 'non-conform'
 
         assert DotnotationDictConverter.to_dict(instance, warn_for_non_otl_conform_attributes=False) == {
-            'testBooleanField': True, 'non_conform_attribute': 'non-conform'}
+            'testBooleanField': True, 'non_conform_attribute': 'non-conform', 'typeURI': AllCasesTestClass.typeURI}
         assert len(recwarn) == 0
 
     with subtests.test('Test with allow_non_otl_conform_attributes set to True'):
@@ -152,8 +155,8 @@ def test_to_dict_with_non_conform_otl_attributes(subtests, recwarn):
             instance.testBooleanField = True
             instance.non_conform_attribute = 'non-conform'
 
-            assert DotnotationDictConverter.to_dict(instance) == {'testBooleanField': True,
-                                                                  'non_conform_attribute': 'non-conform'}
+            assert DotnotationDictConverter.to_dict(instance) == {
+                'testBooleanField': True, 'non_conform_attribute': 'non-conform', 'typeURI': AllCasesTestClass.typeURI}
 
     with subtests.test('Test with allow_non_otl_conform_attributes set to False'):
         with pytest.raises(ValueError):
@@ -203,7 +206,8 @@ def test_to_dict_simple_attribute_with_cardinality():
 
     assert DotnotationDictConverter.to_dict(instance) == {
         'testIntegerFieldMetKard[]': [1, 2, 3],
-        'testStringFieldMetKard[]': ['a', 'b', 'c']}
+        'testStringFieldMetKard[]': ['a', 'b', 'c'],
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
@@ -232,7 +236,8 @@ def test_to_dict_simple_attribute_with_cardinality_convert_lists():
 
     assert DotnotationDictConverter.to_dict(instance, cast_list=True, waarde_shortcut=True) == {
         'testIntegerFieldMetKard[]': '1|2',
-        'testKwantWrdMetKard[]': '1.0|2.0'}
+        'testKwantWrdMetKard[]': '1.0|2.0',
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_simple_attributes_waarde_shortcut():
@@ -264,7 +269,8 @@ def test_to_dict_simple_attributes_waarde_shortcut():
     instance.testEenvoudigType.waarde = 'A.B.C.D'
     instance.testKwantWrd.waarde = 2.0
 
-    assert DotnotationDictConverter.to_dict(instance) == {'testEenvoudigType': 'A.B.C.D', 'testKwantWrd': 2.0}
+    assert DotnotationDictConverter.to_dict(instance) == {'testEenvoudigType': 'A.B.C.D', 'testKwantWrd': 2.0,
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_to_dict_simple_attributes_waarde_shortcut_set_to_false():
@@ -272,8 +278,8 @@ def test_to_dict_simple_attributes_waarde_shortcut_set_to_false():
     instance.testEenvoudigType.waarde = 'A.B.C.D'
     instance.testKwantWrd.waarde = 2.0
 
-    assert DotnotationDictConverter.to_dict(instance, waarde_shortcut=False) == {'testEenvoudigType.waarde': 'A.B.C.D',
-                                                                                 'testKwantWrd.waarde': 2.0}
+    assert DotnotationDictConverter.to_dict(instance, waarde_shortcut=False) == {
+        'testEenvoudigType.waarde': 'A.B.C.D', 'testKwantWrd.waarde': 2.0, 'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_complex_attributes():
@@ -309,7 +315,8 @@ def test_to_dict_complex_attributes():
     assert DotnotationDictConverter.to_dict(instance) == {
         'testComplexType.testComplexType2.testStringField': 'string 2',
         'testComplexType.testStringField': 'string 1',
-        'testUnionType.unionKwantWrd': 2.0}
+        'testUnionType.unionKwantWrd': 2.0,
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_complex_attributes_with_cardinality():
@@ -340,7 +347,8 @@ def test_to_dict_with_cardinality():
     assert DotnotationDictConverter.to_dict(instance) == {
         'testComplexTypeMetKard[].testStringField': ['e', 'f'],
         'testComplexType.testStringFieldMetKard[]': ['c', 'd'],
-        'testStringFieldMetKard[]': ['a', 'b']}
+        'testStringFieldMetKard[]': ['a', 'b'],
+        'typeURI': AllCasesTestClass.typeURI}
 
 def test_from_dict_with_different_cardinality():
     expected = AllCasesTestClass()
@@ -379,7 +387,8 @@ def test_to_dict_with_different_cardinality():
     assert DotnotationDictConverter.to_dict(instance) == {
         'testComplexTypeMetKard[].testBooleanField': [False, True, None],
         'testComplexTypeMetKard[].testStringField': ['1.1', '1.2', '1.3'],
-        'testComplexTypeMetKard[].testKwantWrd': [None, 2.0, None]}
+        'testComplexTypeMetKard[].testKwantWrd': [None, 2.0, None],
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_complex_attributes_with_cardinality_and_kwant_wrd():
@@ -412,7 +421,8 @@ def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_Fal
     assert DotnotationDictConverter.to_dict(instance) == {
         'testComplexType.testComplexType2.testKwantWrd': 5.0,
         'testComplexType.testKwantWrdMetKard[]': [3.0, 4.0],
-        'testUnionType.unionKwantWrd': 2.0}
+        'testUnionType.unionKwantWrd': 2.0,
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_True():
@@ -427,7 +437,8 @@ def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_Tru
     assert DotnotationDictConverter.to_dict(instance, cast_list=True) == {
         'testComplexType.testComplexType2.testKwantWrd': 5.0,
         'testComplexType.testKwantWrdMetKard[]': '3.0|4.0',
-        'testUnionType.unionKwantWrd': 2.0}
+        'testUnionType.unionKwantWrd': 2.0,
+        'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_to_dict_errors(subtests):
@@ -476,4 +487,32 @@ def test_from_dict_errors(subtests):
                 model_directory=model_directory_path)
 
 
+def test_from_dict_instance_version():
+    converter = DotnotationDictConverter(
+        separator='+', waarde_shortcut=False, cardinality_indicator='()', cardinality_separator='*')
+    expected = AllCasesTestClass()
+    expected.testKeuzelijst = 'waarde-2'
+    expected.testBooleanField = True
+
+    created_instance = converter.from_dict_instance(DotnotationDict(
+        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2'}),
+        model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
+def test_to_dict_instance_version():
+    converter = DotnotationDictConverter(
+        separator='+', waarde_shortcut=False, cardinality_indicator='()', cardinality_separator='*')
+
+    expected_dict = DotnotationDict(
+        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2'})
+
+    instance = AllCasesTestClass()
+    instance.testKeuzelijst = 'waarde-2'
+    instance.testBooleanField = True
+
+    created_dict = converter.to_dict_instance(instance)
+
+    assert created_dict == expected_dict
 

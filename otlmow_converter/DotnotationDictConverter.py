@@ -31,18 +31,27 @@ class DotnotationDictConverter:
         self.cardinality_indicator: str = cardinality_indicator
         self.waarde_shortcut: bool = waarde_shortcut
 
-    def to_dict_instance(self, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT,
-                         separator: str = SEPARATOR,
-                         cardinality_indicator: str = CARDINALITY_INDICATOR,
-                         cardinality_separator: str = CARDINALITY_SEPARATOR,
-                         datetime_as_string: bool = False, allow_non_otl_conform_attributes: bool = True,
-                         warn_for_non_otl_conform_attributes: bool = True, list_as_string: bool = False
+    def to_dict_instance(self, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
+                         cardinality_indicator: str = CARDINALITY_SEPARATOR,
+                         cardinality_separator: str = CARDINALITY_INDICATOR,
+                         cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
+                         warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
                          ) -> DotnotationDict[str, object]:
+        if self.separator is not None:
+            separator = self.separator
+        if self.waarde_shortcut is not None:
+            waarde_shortcut = self.waarde_shortcut
+        if self.cardinality_indicator is not None:
+            cardinality_indicator = self.cardinality_indicator
+        if self.cardinality_separator is not None:
+            cardinality_separator = self.cardinality_separator
+
+
         return self.to_dict(otl_object=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
                             cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
                             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
-                            cast_list=list_as_string, cast_datetime=datetime_as_string)
+                            cast_list=cast_list, cast_datetime=cast_datetime)
 
     @classmethod
     def to_dict(cls, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
@@ -50,12 +59,18 @@ class DotnotationDictConverter:
                 cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
                 warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
                 ) -> DotnotationDict[str, object]:
-        return DotnotationDict(cls._iterate_over_attributes_and_values_by_dotnotation(
+        typeURI = getattr(otl_object, 'typeURI', None)
+        if typeURI is None:
+            raise ValueError('typeURI is None. The object must have an attribute typeURI.')
+
+        d = DotnotationDict(cls._iterate_over_attributes_and_values_by_dotnotation(
             object_or_attribute=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
             cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
             cast_list=cast_list, cast_datetime=cast_datetime))
+        d['typeURI'] = typeURI
+        return DotnotationDict(d)
 
     @classmethod
     def _iterate_over_attributes_and_values_by_dotnotation(cls, object_or_attribute: OTLObject | OTLAttribuut,
@@ -135,6 +150,29 @@ class DotnotationDictConverter:
                 category=NonStandardAttributeWarning)
         if attribute is not None:
             yield attr_key, attribute
+
+
+    def from_dict_instance(self, input_dict: DotnotationDict, model_directory: Path = None,
+                           waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
+                           cardinality_indicator: str = CARDINALITY_SEPARATOR,
+                           cardinality_separator: str = CARDINALITY_INDICATOR,
+                           cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
+                           warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
+                  ) -> OTLObject:
+        if self.separator is not None:
+            separator = self.separator
+        if self.waarde_shortcut is not None:
+            waarde_shortcut = self.waarde_shortcut
+        if self.cardinality_indicator is not None:
+            cardinality_indicator = self.cardinality_indicator
+        if self.cardinality_separator is not None:
+            cardinality_separator = self.cardinality_separator
+
+        return self.from_dict(input_dict=input_dict, model_directory=model_directory, waarde_shortcut=waarde_shortcut,
+                              separator=separator, cardinality_indicator=cardinality_indicator, cast_list=cast_list,
+                              cardinality_separator=cardinality_separator, cast_datetime=cast_datetime,
+                              allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                              warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
     def from_dict(cls, input_dict: DotnotationDict, model_directory: Path = None,

@@ -1,12 +1,10 @@
 from pathlib import Path
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+import pytest
 
-from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
-from otlmow_converter.SettingsManager import load_settings
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
@@ -50,6 +48,23 @@ def test_get_single_table_from_data():
 
     list_of_dicts = DotnotationTableConverter.get_single_table_from_data([instance_1, instance_2])
     assert list_of_dicts == expected_list_of_dicts_data
+
+
+def test_get_single_table_from_data_errors():
+    with pytest.raises(ValueError):
+        instance_1 = AllCasesTestClass()
+        instance_1.testStringField = 'string1'
+        DotnotationTableConverter.get_single_table_from_data([instance_1], allow_empty_asset_id=False)
+
+    with pytest.raises(ValueError):
+        instance_1 = AllCasesTestClass()
+        instance_1.testStringField = 'string1'
+        instance_1.assetId.identificator = ''
+        DotnotationTableConverter.get_single_table_from_data([instance_1], allow_empty_asset_id=False)
+
+def test_get_single_table_from_data_empty():
+    objects = DotnotationTableConverter.get_single_table_from_data([])
+    assert objects == [{'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'typeURI': 0}]
 
 
 def test_get_tables_per_type_from_data():
@@ -123,18 +138,7 @@ def test_transform_2d_sequence_to_list_of_dicts():
 #
 #
 # def test_fill_master_dict_edge_cases(subtests):
-#     with subtests.test(msg='empty list of objects'):
-#         exporter = set_up_importer()
-#         list_of_objects = []
-#         exporter.fill_master_dict(list_of_objects)
-#         assert len(exporter.master.items()) == 0
-#
-#     with subtests.test(msg='object in list without valid assetId'):
-#         exporter = set_up_importer()
-#         with pytest.raises(ValueError):
-#             list_of_objects = [AllCasesTestClass()]
-#             exporter.fill_master_dict(list_of_objects)
-#
+
 #     with subtests.test(msg='object in list without valid assetId and ignore True'):
 #         exporter = set_up_importer()
 #         exporter.ignore_empty_asset_id = True
@@ -143,26 +147,6 @@ def test_transform_2d_sequence_to_list_of_dicts():
 #         tabular_data = exporter.master['onderdeel#AllCasesTestClass']
 #         assert None == tabular_data['data'][0]['assetId.identificator']
 #
-#     with subtests.test(msg='object in list without valid assetId -> empty string'):
-#         exporter = set_up_importer()
-#         with pytest.raises(ValueError):
-#             list_of_objects = [AllCasesTestClass()]
-#             list_of_objects[0].assetId.identificator = ''
-#             exporter.fill_master_dict(list_of_objects)
-#
-#     with (subtests.test(msg='object in list with valid assetId -> string')):
-#         exporter = set_up_importer()
-#         list_of_objects = [AllCasesTestClass()]
-#         list_of_objects[0].assetId.identificator = '0'
-#         exporter.fill_master_dict(list_of_objects)
-#         tabular_data = exporter.master['onderdeel#AllCasesTestClass']
-#
-#         assert 'typeURI' == tabular_data['headers'][0]
-#         assert 'assetId.identificator' == tabular_data['headers'][1]
-#         assert 'assetId.toegekendDoor' == tabular_data['headers'][2]
-#         assert 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass' == tabular_data['data'][0]['typeURI']
-#         assert '0' == tabular_data['data'][0]['assetId.identificator']
-#         assert None == tabular_data['data'][0]['assetId.toegekendDoor']
 #
 #
 # def test_get_data_as_table_basic_functionality(subtests):

@@ -54,7 +54,7 @@ def test_convert_objects_to_dataframe_unnested_attributes():
 
 
 
-def test_convert_objects_to_dataframe_unnested_attributes():
+def test_convert_objects_to_dataframe_minimal_test():
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
     instance.testBooleanField = False
@@ -190,8 +190,8 @@ def test_convert_dataframe_to_objects_unnested_attributes(caplog):
 
     caplog.clear()
     created_objects = PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
-    for record in caplog.records:
-        print(record.message)
+    created_objects = list(created_objects)
+
     assert len(caplog.records) == 0
 
     assert len(created_objects) == 1
@@ -229,6 +229,7 @@ def test_convert_dataframe_to_objects_nested_attributes_1_level(caplog):
 
     caplog.clear()
     created_objects = PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    created_objects = list(created_objects)
     assert len(caplog.records) == 0
 
     assert len(created_objects) == 1
@@ -269,6 +270,7 @@ def test_convert_dataframe_to_objects_nested_attributes_2_level(caplog):
 
     caplog.clear()
     created_objects = PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    created_objects = list(created_objects)
     assert len(caplog.records) == 0
 
     assert len(created_objects) == 1
