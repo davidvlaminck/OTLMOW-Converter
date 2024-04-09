@@ -1,9 +1,5 @@
-import os
-from pathlib import Path
-
 import pytest
 
-from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter

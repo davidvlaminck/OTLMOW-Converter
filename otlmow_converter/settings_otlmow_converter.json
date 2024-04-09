@@ -14,8 +14,12 @@
             }
         },
         "JSON": {
-            "rdf": false,
             "waarde_shortcut": true,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true
+        },
+        "JSON-LD": {
+            "waarde_shortcut": false,
             "allow_non_otl_conform_attributes": true,
             "warn_for_non_otl_conform_attributes": true
         },

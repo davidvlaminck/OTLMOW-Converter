@@ -71,13 +71,13 @@ class OtlmowConverter:
         See the specific Importer functions for more information on the keyword arguments.
         """
 
-        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
-                     'warn_for_non_otl_conform_attributes'}}
+        # arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
+        #             {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
+        #              'warn_for_non_otl_conform_attributes'}}
 
         suffix = file_path.suffix[1:]
         importer = FileImporter.get_importer_from_extension(extension=suffix)
-        return importer.to_objects(filepath=file_path, **arg_dict, **kwargs)
+        return importer.to_objects(filepath=file_path, **kwargs)
 
     @classmethod
     def to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
