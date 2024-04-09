@@ -10,32 +10,20 @@ from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 from otlmow_converter.FileFormats.TtlExporter import TtlExporter
 
 
-def test_return_Exporter_correct_type(subtests):
-    with subtests.test(msg='returning GeoJsonExporter'):
-        exporter = FileExporter.get_exporter_from_extension('geojson')
-        assert isinstance(exporter, GeoJSONExporter)
-
-    with subtests.test(msg='returning JsonExporter'):
-        exporter = FileExporter.get_exporter_from_extension('json')
-        assert isinstance(exporter, JsonExporter)
-
-    with subtests.test(msg='returning JsonLdExporter'):
-        exporter = FileExporter.get_exporter_from_extension('jsonld')
-        assert isinstance(exporter, JsonLdExporter)
-
-    with subtests.test(msg='returning ExcelExporter'):
-        for extension in ['xls', 'xlsx']:
+@pytest.mark.parametrize("extension, expected_exporter",
+                         [('geojson', GeoJSONExporter),
+                          ('json', JsonExporter),
+                          ('jsonld', JsonLdExporter),
+                          ('xls', ExcelExporter),
+                          ('xlsx', ExcelExporter),
+                          ('csv', CsvExporter),
+                          ('ttl', TtlExporter),
+                          ('dwg', None)])  # None represents the expected result when an InvalidExtensionError is raised
+def test_return_Exporter_correct_type(subtests, extension, expected_exporter):
+    with subtests.test(msg=f'returning {expected_exporter.__name__}'):
+        if expected_exporter is not None:
             exporter = FileExporter.get_exporter_from_extension(extension)
-            assert isinstance(exporter, ExcelExporter)
-
-    with subtests.test(msg='returning CsvExporter'):
-        exporter = FileExporter.get_exporter_from_extension('csv')
-        assert isinstance(exporter, CsvExporter)
-
-    with subtests.test(msg='returning TtlExporter'):
-        exporter = FileExporter.get_exporter_from_extension('ttl')
-        assert isinstance(exporter, TtlExporter)
-
-    with subtests.test(msg='invalid extension'):
-        with pytest.raises(InvalidExtensionError):
-            FileExporter.get_exporter_from_extension('dwg')
+            assert isinstance(exporter, expected_exporter)
+        else:
+            with pytest.raises(InvalidExtensionError):
+                FileExporter.get_exporter_from_extension(extension)

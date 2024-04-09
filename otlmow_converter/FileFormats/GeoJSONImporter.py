@@ -1,18 +1,31 @@
 import json
 from pathlib import Path
+from typing import Iterable, List
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
-from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.AbstractImporter import AbstractImporter
+from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
+from otlmow_converter.SettingsManager import load_settings, GlobalVariables
+
+load_settings()
+
+geojson_settings = GlobalVariables.settings['formats']['GeoJSON']
+geojson_dotnotation_settings = geojson_settings['dotnotation']
+SEPARATOR = geojson_dotnotation_settings['separator']
+CARDINALITY_SEPARATOR = geojson_dotnotation_settings['cardinality_separator']
+CARDINALITY_INDICATOR = geojson_dotnotation_settings['cardinality_indicator']
+WAARDE_SHORTCUT = geojson_dotnotation_settings['waarde_shortcut']
+CAST_LIST = geojson_settings['cast_list']
+CAST_DATETIME = geojson_settings['cast_datetime']
+ALLOW_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['allow_non_otl_conform_attributes']
+WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['warn_for_non_otl_conform_attributes']
 
 
-class GeoJSONImporter:
-    def __init__(self, settings):
-        self.settings = next(s for s in settings['file_formats'] if s['name'] == 'geojson')
-        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
-
-    def import_file(self, filepath: Path = None, **kwargs) -> list:
-        """Imports a json file created with Davie and decodes it to OTL objects
+class GeoJSONImporter(AbstractImporter):
+    @classmethod
+    def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
+        """Imports a geojson file created with DAVIE and decodes it to OTL objects
 
         :param filepath: location of the file, defaults to ''
         :type: Path
@@ -25,6 +38,17 @@ class GeoJSONImporter:
         if kwargs is not None and 'ignore_failed_objects' in kwargs:
             ignore_failed_objects = kwargs['ignore_failed_objects']
 
+        separator = kwargs.get('separator', SEPARATOR)
+        cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
+        cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
+        waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
+        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
+        warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
+                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+
         with open(filepath) as file:
             data = json.load(file)
 
@@ -32,9 +56,22 @@ class GeoJSONImporter:
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
 
-        return self.decode_objects(data, ignore_failed_objects=ignore_failed_objects, model_directory=model_directory)
+        return cls.decode_objects(data, ignore_failed_objects=ignore_failed_objects, model_directory=model_directory,
+                                  separator=separator, cardinality_indicator=cardinality_indicator,
+                                  waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                                  cast_datetime=cast_datetime, cast_list=cast_list,
+                                  allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                                  warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
-    def decode_objects(self, data, ignore_failed_objects: bool = False, model_directory: Path = None):
+    @classmethod
+    def decode_objects(cls, data, ignore_failed_objects: bool = False, model_directory: Path = None,
+                       cast_list: bool = False, cast_datetime: bool = False,
+                       allow_non_otl_conform_attributes: bool = True,
+                       warn_for_non_otl_conform_attributes: bool = True,
+                       waarde_shortcut: bool = WAARDE_SHORTCUT,
+                       separator: str = SEPARATOR,
+                       cardinality_indicator: str = CARDINALITY_INDICATOR,
+                       cardinality_separator: str = CARDINALITY_SEPARATOR) -> List[OTLObject]:
         list_of_objects = []
 
         for data_object in data['features']:
@@ -44,17 +81,16 @@ class GeoJSONImporter:
                     continue
                 raise ValueError('typeURI not found in properties')
 
-            asset = dynamic_create_instance_from_uri(props['typeURI'], model_directory=model_directory)
-            for dotnotation in props:
-                if dotnotation == 'typeURI':
-                    continue
-
-                self.dotnotation_helper.set_attribute_by_dotnotation_instance(
-                    instance_or_attribute=asset, dotnotation=dotnotation, value=props[dotnotation])
+            asset = DotnotationDictConverter.from_dict(
+                input_dict=props, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
+                separator=separator, cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cardinality_separator=cardinality_separator,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
             if 'geometry' in data_object:
                 geom = data_object['geometry']
-                asset.geometry = self.construct_wkt_string_from_geojson(geom)
+                asset.geometry = cls.construct_wkt_string_from_geojson(geom)
 
             list_of_objects.append(asset)
         return list_of_objects

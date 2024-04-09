@@ -9,20 +9,11 @@ from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def set_up_importer():
-    return GeoJSONImporter(
-        settings={'file_formats': [{"name": "geojson", "dotnotation": {
-            "waarde_shortcut": True,
-            "separator": '.',
-            'cardinality_indicator': '[]'
-        }}]})
-
-
 def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.geojson'
 
-    importer = set_up_importer()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+
+    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -51,8 +42,8 @@ def test_load_test_unnested_attributes(recwarn):
 def test_load_test_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.geojson'
 
-    importer = set_up_importer()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+
+    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -85,8 +76,8 @@ def test_load_test_nested_attributes_level_1(recwarn):
 def test_load_test_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.geojson'
 
-    importer = set_up_importer()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+
+    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -108,43 +99,53 @@ def test_load_test_nested_attributes_level_2(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-
 def test_invalid_typeURI():
-    importer = set_up_importer()
     with pytest.raises(ValueError):
-        importer.decode_objects({"type": "FeatureCollection", "features": [{
+        GeoJSONImporter.decode_objects({"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {}}]})
 
 
-def test_decode_invalid_attribute():
-    importer = set_up_importer()
-    with pytest.raises(AttributeError):
-        importer.decode_objects(
-            model_directory=model_directory_path, data=
-            {"type": "FeatureCollection", "features": [{
-                "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
-                "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-                               "invalid_attribute": "some value"}}]})
+def test_load_test_non_conform(recwarn, subtests):
+    file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attributes.geojson'
 
+    with subtests.test(msg="default behaviour"):
+        recwarn.clear()
+        objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+        assert len(recwarn.list) == 1
 
-def test_decode_empty_value():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
-        model_directory=model_directory_path, data=
-        {"type": "FeatureCollection", "features": [{
-            "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
-            "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-                           "toestand": None}}]})
+        assert len(objects) == 1
 
-    assert AllCasesTestClass.typeURI == lijst_objecten[0].typeURI
-    assert lijst_objecten[0].is_instance_of(AllCasesTestClass, model_directory=model_directory_path, dynamic_created=True)
-    assert lijst_objecten[0].toestand is None
+        instance = objects[0]
+        assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+        assert instance.assetId.identificator == '0000'
+        assert not instance.testBooleanField
+        assert instance.non_conform_attribute == 'non_conform_value'
+
+    with subtests.test(msg='non conform not allowed'):
+        with pytest.raises(ValueError):
+            GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                    allow_non_otl_conform_attributes=False)
+
+    with subtests.test(msg="allowed, no warnings"):
+        recwarn.clear()
+        objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                          warn_for_non_otl_conform_attributes=False)
+        assert len(recwarn.list) == 0
+
+        assert len(objects) == 1
+
+        instance = objects[0]
+        assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+        assert instance.assetId.identificator == '0000'
+        assert not instance.testBooleanField
+        assert instance.non_conform_attribute == 'non_conform_value'
+
 
 
 def test_decode_Stringfield():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -156,9 +157,9 @@ def test_decode_Stringfield():
 
 
 def test_decode_StringfieldMetKard():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
-        model_directory=model_directory_path, data=
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
+        model_directory=model_directory_path, cast_list=True, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
@@ -168,8 +169,8 @@ def test_decode_StringfieldMetKard():
 
 
 def test_decode_DecimalNumberField():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -180,8 +181,8 @@ def test_decode_DecimalNumberField():
 
 
 def test_decode_TimeField():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -192,8 +193,8 @@ def test_decode_TimeField():
 
 
 def test_decode_DateTimeField():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -204,8 +205,8 @@ def test_decode_DateTimeField():
 
 
 def test_decode_DateField():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -216,8 +217,8 @@ def test_decode_DateField():
 
 
 def test_decode_testKwantWrd():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -228,22 +229,21 @@ def test_decode_testKwantWrd():
 
 
 def test_decode_testKwantWrd_waarde_shortcut_false():
-    importer = set_up_importer()
-    importer.settings['dotnotation']['waarde_shortcut_applicable'] = False
-    lijst_objecten = importer.decode_objects(
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
-                           "testKwantWrd.waarde": 3.5}}]})
+                           "testKwantWrd.waarde": 3.5}}]},
+    waarde_shortcut=False)
 
     assert lijst_objecten[0].testKwantWrd.waarde == 3.5
 
 
 def test_decode_testKwantWrdMetKard():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
-        model_directory=model_directory_path, data=
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
+        model_directory=model_directory_path, cast_list=True, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
@@ -254,8 +254,8 @@ def test_decode_testKwantWrdMetKard():
 
 
 def test_decode_UnionType():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -266,8 +266,8 @@ def test_decode_UnionType():
 
 
 def test_decode_ComplexType():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -278,22 +278,21 @@ def test_decode_ComplexType():
 
 
 def test_decode_ComplexTypeMetKard():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
-        model_directory=model_directory_path, data=
+    lijst_objecten = GeoJSONImporter.decode_objects(
+        model_directory=model_directory_path, cast_list=True, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {"typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
                            "testComplexTypeMetKard[].testStringField": "string",
-                           "testComplexTypeMetKard[].testBooleanField": 'true'}}]})
+                           "testComplexTypeMetKard[].testBooleanField": 'True'}}]})
 
     assert lijst_objecten[0].testComplexTypeMetKard[0].testStringField == 'string'
     assert lijst_objecten[0].testComplexTypeMetKard[0].testBooleanField
 
 
 def test_decode_ComplexType2():
-    importer = set_up_importer()
-    lijst_objecten = importer.decode_objects(
+
+    lijst_objecten = GeoJSONImporter.decode_objects(
         model_directory=model_directory_path, data=
         {"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
@@ -304,35 +303,35 @@ def test_decode_ComplexType2():
 
 
 def test_construct_wkt_string_from_geojson_point():
-    importer = set_up_importer()
 
-    point = importer.construct_wkt_string_from_geojson(
+
+    point = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "Point", "coordinates": [200000.1, 200000.2, 0]})
     assert point == 'POINT Z (200000.1 200000.2 0)'
 
 
 def test_construct_wkt_string_from_geojson_line():
-    importer = set_up_importer()
 
-    line = importer.construct_wkt_string_from_geojson(
+
+    line = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "LineString", "coordinates": [[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.6, 0],
                                                [200000.7, 200000.8, 0]]})
     assert line == 'LINESTRING Z (200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.6 0, 200000.7 200000.8 0)'
 
 
 def test_construct_wkt_string_from_geojson_polygon():
-    importer = set_up_importer()
 
-    polygon = importer.construct_wkt_string_from_geojson(
+
+    polygon = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "Polygon", "coordinates": [[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
                                                 [200000.1, 200000.2, 0]]]})
     assert polygon == 'POLYGON Z ((200000.1 200000.2 0, 200000.3 200000.4 0, 200000.5 200000.8 0, 200000.1 200000.2 0))'
 
 
 def test_construct_wkt_string_from_geojson_multipolygon():
-    importer = set_up_importer()
 
-    multipolygon = importer.construct_wkt_string_from_geojson(
+
+    multipolygon = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "MultiPolygon", "coordinates": [[[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
                                                 [200000.1, 200000.2, 0]]],
                                                 [[[200002.1, 200002.2, 0], [200002.3, 200002.4, 0], [200002.5, 200002.8, 0],

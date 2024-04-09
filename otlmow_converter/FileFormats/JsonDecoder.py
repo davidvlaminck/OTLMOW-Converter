@@ -14,8 +14,8 @@ class JsonDecoder:
         object_list = []
         for index, obj in enumerate(dict_list):
             try:
-                typeURI = obj.get('typeURI', None)
-                if typeURI is None:
+                type_uri = obj.get('typeURI', None)
+                if type_uri is None:
                     raise ValueError(f"No typeURI found in json object {index}. Unable to create object.")
 
                 instance = OTLObject.from_dict(obj, model_directory=model_directory, waarde_shortcut=waarde_shortcut,

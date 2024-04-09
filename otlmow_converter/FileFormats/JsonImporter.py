@@ -16,9 +16,6 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = json_settings['warn_for_non_otl_conform_at
 
 
 class JsonImporter(AbstractImporter):
-    def __init__(self, settings):
-        self.decoder = JsonDecoder(settings=settings)
-
     @classmethod
     def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         """Imports a json file created with Davie and decodes it to OTL objects
