@@ -1,0 +1,49 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "0000-0000",
+            "properties": {
+                "assetId.identificator": "0000",
+                "testComplexType.testBooleanField": true,
+                "testComplexType.testKwantWrd": 65.14,
+                "testComplexType.testKwantWrdMetKard[]": "10.0|20.0",
+                "testComplexType.testStringField": "KmCtMXM",
+                "testComplexType.testStringFieldMetKard[]": "string1|string2",
+                "testComplexTypeMetKard[].testBooleanField": "True|False",
+                "testComplexTypeMetKard[].testKwantWrd": "10.0|20.0",
+                "testComplexTypeMetKard[].testStringField": "string1|string2",
+                "testEenvoudigTypeMetKard[]": "string1|string2",
+                "testKwantWrdMetKard[]": "10.0|20.0",
+                "testUnionType.unionString": "RWKofW",
+                "testUnionTypeMetKard[].unionKwantWrd": "10.0|20.0",
+                "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+            },
+            "type": "Feature",
+            "geometry": {
+                "bbox": [
+                    200000.0,
+                    200000.0,
+                    0.0,
+                    200000.0,
+                    200000.0,
+                    0.0
+                ],
+                "type": "Point",
+                "coordinates": [
+                    [
+                        200000.0,
+                        200000.0,
+                        0.0
+                    ]
+                ],
+                "crs": {
+                    "properties": {
+                        "name": "EPSG:31370"
+                    },
+                    "type": "name"
+                }
+            }
+        }
+    ]
+}

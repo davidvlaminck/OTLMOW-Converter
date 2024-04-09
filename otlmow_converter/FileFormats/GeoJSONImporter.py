@@ -28,7 +28,11 @@ class GeoJSONImporter:
         with open(filepath) as file:
             data = json.load(file)
 
-        return self.decode_objects(data, ignore_failed_objects=ignore_failed_objects)
+        model_directory = None
+        if kwargs is not None and 'model_directory' in kwargs:
+            model_directory = kwargs['model_directory']
+
+        return self.decode_objects(data, ignore_failed_objects=ignore_failed_objects, model_directory=model_directory)
 
     def decode_objects(self, data, ignore_failed_objects: bool = False, model_directory: Path = None):
         list_of_objects = []
