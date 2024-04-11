@@ -1,7 +1,9 @@
+from typing import Dict
+
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import _make_string_version_from_dict
 
 
-class DotnotationDict(dict[str, object]):
+class DotnotationDict(Dict[str, object]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

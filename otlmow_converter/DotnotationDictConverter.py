@@ -1,8 +1,7 @@
 import inspect
 import warnings
-from itertools import count
 from pathlib import Path
-from typing import Union
+from typing import Union, Dict
 
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
@@ -108,7 +107,7 @@ class DotnotationDictConverter:
                 else:
                     yield dotnotation, attribute.waarde
             elif attribute.kardinaliteit_max != '1':
-                combined_dict: dict[str, list] = {}
+                combined_dict: Dict[str, list] = {}
                 for index, lijst_item in enumerate(attribute.waarde):
                     for k1, v1 in cls._iterate_over_attributes_and_values_by_dotnotation(
                             object_or_attribute=lijst_item, waarde_shortcut=waarde_shortcut, separator=separator,
