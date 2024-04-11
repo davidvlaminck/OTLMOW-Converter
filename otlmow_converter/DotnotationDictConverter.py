@@ -2,6 +2,7 @@ import inspect
 import warnings
 from itertools import count
 from pathlib import Path
+from typing import Union
 
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
@@ -74,7 +75,7 @@ class DotnotationDictConverter:
         return DotnotationDict(d)
 
     @classmethod
-    def _iterate_over_attributes_and_values_by_dotnotation(cls, object_or_attribute: OTLObject | OTLAttribuut,
+    def _iterate_over_attributes_and_values_by_dotnotation(cls, object_or_attribute: Union[OTLObject, OTLAttribuut],
                                                            waarde_shortcut: bool = WAARDE_SHORTCUT,
                                                            separator: str = SEPARATOR,
                                                            cardinality_indicator: str = CARDINALITY_INDICATOR,
@@ -213,7 +214,7 @@ class DotnotationDictConverter:
         return o
 
     @classmethod
-    def set_attribute_by_dotnotation(cls, object_or_attribute: OTLObject | OTLAttribuut,
+    def set_attribute_by_dotnotation(cls, object_or_attribute: Union[OTLObject, OTLAttribuut],
                                      dotnotation: str, value: object,
                                      separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR,
                                      waarde_shortcut: bool = WAARDE_SHORTCUT,
