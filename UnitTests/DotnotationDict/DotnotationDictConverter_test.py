@@ -179,36 +179,26 @@ def test_from_dict_simple_attribute_with_cardinality():
     expected = AllCasesTestClass()
     expected.testIntegerFieldMetKard = [1, 2, 3]
     expected.testStringFieldMetKard = ['a', 'b', 'c']
+    expected.testKeuzelijstMetKard = ['waarde-1', 'waarde-2', 'waarde-3']
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
         'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': [1, 2, 3],
-        'testStringFieldMetKard[]': ['a', 'b', 'c']
+        'testStringFieldMetKard[]': ['a', 'b', 'c'],
+        'testKeuzelijstMetKard[]': ['waarde-1', 'waarde-2', 'waarde-3']
     }), model_directory=model_directory_path)
 
     assert created_instance == expected
-
-
-def test_from_dict_simple_attribute_with_cardinality_converted_lists(recwarn):
-    expected = AllCasesTestClass()
-    expected.testIntegerFieldMetKard = [1, 2]
-    expected.testStringFieldMetKard = ['a', 'b']
-
-    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
-        'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
-        'testStringFieldMetKard[]': 'a|b'}), cast_list=True, model_directory=model_directory_path)
-
-    assert created_instance == expected
-    assert len(recwarn) == 0
-
 
 def test_to_dict_simple_attribute_with_cardinality():
     instance = AllCasesTestClass()
     instance.testIntegerFieldMetKard = [1, 2, 3]
     instance.testStringFieldMetKard = ['a', 'b', 'c']
+    instance.testKeuzelijstMetKard = ['waarde-1', 'waarde-2', 'waarde-3']
 
     assert DotnotationDictConverter.to_dict(instance) == {
         'testIntegerFieldMetKard[]': [1, 2, 3],
         'testStringFieldMetKard[]': ['a', 'b', 'c'],
+        'testKeuzelijstMetKard[]': ['waarde-1', 'waarde-2', 'waarde-3'],
         'typeURI': AllCasesTestClass.typeURI}
 
 
@@ -219,9 +209,12 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
     expected.testKwantWrdMetKard[0].waarde = 1.0
     expected._testKwantWrdMetKard.add_empty_value()
     expected.testKwantWrdMetKard[1].waarde = 2.0
+    expected.testStringFieldMetKard = ['a', 'b']
+    expected.testKeuzelijstMetKard = ['waarde-1', 'waarde-2']
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
         'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
+        'testStringFieldMetKard[]': 'a|b', 'testKeuzelijstMetKard[]': 'waarde-1|waarde-2',
         'testKwantWrdMetKard[]': '1.0|2.0'}), cast_list=True, model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -235,10 +228,12 @@ def test_to_dict_simple_attribute_with_cardinality_convert_lists():
     instance.testKwantWrdMetKard[0].waarde = 1.0
     instance._testKwantWrdMetKard.add_empty_value()
     instance.testKwantWrdMetKard[1].waarde = 2.0
+    instance.testKeuzelijstMetKard = ['waarde-1', 'waarde-2']
 
     assert DotnotationDictConverter.to_dict(instance, cast_list=True, waarde_shortcut=True) == {
         'testIntegerFieldMetKard[]': '1|2',
         'testKwantWrdMetKard[]': '1.0|2.0',
+        'testKeuzelijstMetKard[]': 'waarde-1|waarde-2',
         'typeURI': AllCasesTestClass.typeURI}
 
 

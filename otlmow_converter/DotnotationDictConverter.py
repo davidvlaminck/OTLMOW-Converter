@@ -5,6 +5,7 @@ from pathlib import Path
 
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
+from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
@@ -276,7 +277,15 @@ class DotnotationDictConverter:
             else:
                 if cast_datetime and attribute.field in {TimeField, DateField, DateTimeField}:
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
-                attribute.set_waarde(value)
+                elif issubclass(attribute.field, KeuzelijstField):
+                    if cardinality:
+                        value = [str(v) for v in value]
+                    else:
+                        value = str(value)
+                try:
+                    attribute.set_waarde(value)
+                except Exception as exc:
+                    print(exc)
             return
 
         first, rest = dotnotation.split(separator, 1)
