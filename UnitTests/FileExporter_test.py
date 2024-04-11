@@ -17,10 +17,10 @@ from otlmow_converter.FileFormats.TtlExporter import TtlExporter
                           ('xls', ExcelExporter),
                           ('xlsx', ExcelExporter),
                           ('csv', CsvExporter),
-                          ('ttl', TtlExporter),
+                          #('ttl', TtlExporter),
                           ('dwg', None)])  # None represents the expected result when an InvalidExtensionError is raised
 def test_return_Exporter_correct_type(subtests, extension, expected_exporter):
-    with subtests.test(msg=f'returning {expected_exporter.__name__}'):
+    with subtests.test(msg=f'returning {expected_exporter.__name__ if expected_exporter is not None else "InvalidExtensionError"} for extension {extension}'):
         if expected_exporter is not None:
             exporter = FileExporter.get_exporter_from_extension(extension)
             assert isinstance(exporter, expected_exporter)

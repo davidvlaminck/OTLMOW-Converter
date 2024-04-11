@@ -14,9 +14,9 @@ class FileExporter:
         elif extension in {'xls', 'xlsx'}:
             from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
             return ExcelExporter()
-        elif extension == 'ttl':
-            from otlmow_converter.FileFormats.TtlExporter import TtlExporter
-            return TtlExporter()
+        # elif extension == 'ttl':
+        #     from otlmow_converter.FileFormats.TtlExporter import TtlExporter
+        #     return TtlExporter()
         elif extension == 'jsonld':
             from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
             return JsonLdExporter()
