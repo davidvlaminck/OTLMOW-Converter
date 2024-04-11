@@ -37,7 +37,7 @@ class DotnotationDictConverter:
                          cardinality_separator: str = CARDINALITY_INDICATOR,
                          cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
                          warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
-                         ) -> DotnotationDict[str, object]:
+                         ) -> DotnotationDict:
         if self.separator is not None:
             separator = self.separator
         if self.waarde_shortcut is not None:
@@ -59,7 +59,7 @@ class DotnotationDictConverter:
                 cardinality_indicator: str = CARDINALITY_INDICATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                 cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
                 warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
-                ) -> DotnotationDict[str, object]:
+                ) -> DotnotationDict:
         typeURI = getattr(otl_object, 'typeURI', None)
         if typeURI is None:
             raise ValueError('typeURI is None. The object must have an attribute typeURI.')
@@ -71,7 +71,7 @@ class DotnotationDictConverter:
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
             cast_list=cast_list, cast_datetime=cast_datetime))
         d['typeURI'] = typeURI
-        return DotnotationDict(d)
+        return d
 
     @classmethod
     def _iterate_over_attributes_and_values_by_dotnotation(cls, object_or_attribute: Union[OTLObject, OTLAttribuut],
