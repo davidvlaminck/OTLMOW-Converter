@@ -67,7 +67,7 @@ if __name__ == '__main__':
     FormatDetails = namedtuple('FormatDetails', ['Extension', 'Label', 'WriteArguments'])
 
     tb = prettytable.PrettyTable()
-    tb.field_names = ['Format', 'Read 500 classes', 'Write 500 classes', 'Size 500 classes',
+    tb.field_names = ['Format', 'Read all classes', 'Write all classes', 'Size all classes',
                       'Read 10 random classes', 'Write 10 random classes', 'Size 10 random classes']
 
     formats = [
