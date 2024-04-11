@@ -2,6 +2,7 @@ from datetime import date, time, datetime
 from pathlib import Path
 
 import pytest
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -114,11 +115,12 @@ def test_from_dict_with_non_conform_otl_attributes(subtests, recwarn):
     input_dict = DotnotationDict({'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True,
                                   'non_conform_attribute': 'non-conform'})
 
-    with subtests.test('Test with warn_for_non_otl_conform_attributes set to False'):
+    with (subtests.test('Test with warn_for_non_otl_conform_attributes set to False')):
         created_instance = DotnotationDictConverter.from_dict(input_dict, model_directory=model_directory_path,
             warn_for_non_otl_conform_attributes=False)
 
-        assert created_instance == expected
+        assert create_dict_from_asset(created_instance, warn_for_non_otl_conform_attributes=False
+                                      ) == create_dict_from_asset(expected, warn_for_non_otl_conform_attributes=False)
         assert len(recwarn) == 0
 
     with subtests.test('Test with allow_non_otl_conform_attributes set to True'):
