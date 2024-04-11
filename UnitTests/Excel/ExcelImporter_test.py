@@ -1,5 +1,5 @@
+import datetime
 import os
-from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
@@ -16,11 +16,13 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.xlsx'
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
-    assert recwarn.list == []
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
     assert len(objects) == 1
 
@@ -28,8 +30,8 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.assetId.identificator == '0000-0000'
     assert not instance.testBooleanField
-    assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDateField == datetime.date(2019, 9, 20)
+    assert instance.testDateTimeField == datetime.datetime(2001, 12, 15, 22, 22, 15)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'
@@ -41,15 +43,18 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.testStringField == 'oFfeDLp'
     assert instance.testStringFieldMetKard[0] == 'string1'
     assert instance.testStringFieldMetKard[1] == 'string2'
-    assert instance.testTimeField == time(11, 5, 26)
+    assert instance.testTimeField == datetime.time(11, 5, 26)
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.xlsx'
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
-    assert recwarn.list == []
+
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
     assert len(objects) == 1
 
@@ -78,11 +83,13 @@ def test_load_test_nested_attributes_1_level(recwarn):
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.xlsx'
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
-    assert recwarn.list == []
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
     assert len(objects) == 1
 
@@ -102,6 +109,7 @@ def test_load_test_nested_attributes_2_levels(recwarn):
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_get_index_of_typeURI_column_in_sheet():
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 

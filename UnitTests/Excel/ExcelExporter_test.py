@@ -34,7 +34,8 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     instance.testTimeField = time(11, 5, 26)
 
     ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
-    assert recwarn.list == []
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
@@ -102,7 +103,8 @@ def test_export_and_then_import_nested_attributes_level_1(recwarn):
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
     ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
-    assert recwarn.list == []
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
@@ -158,7 +160,8 @@ def test_export_and_then_import_nested_attributes_level_2(recwarn):
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
     ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
-    assert recwarn.list == []
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1

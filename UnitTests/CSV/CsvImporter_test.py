@@ -10,7 +10,6 @@ from otlmow_converter.FileFormats.CsvImporter import CsvImporter
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-
 def test_load_test_file_multiple_types():
     file_location = Path(__file__).parent / 'Testfiles' / 'export_multiple_types.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location))
