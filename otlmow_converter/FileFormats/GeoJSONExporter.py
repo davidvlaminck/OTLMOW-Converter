@@ -52,7 +52,8 @@ class GeoJSONExporter(AbstractExporter):
                 'properties': d,
                 'type': 'Feature'}
 
-            if d["geometry"] is not None:
+            geometry = d.get('geometry', None)
+            if geometry is not None:
                 geom = cls.convert_wkt_string_to_geojson(d.pop("geometry"))
                 feature_dict['geometry'] = geom
 

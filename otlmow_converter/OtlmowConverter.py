@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Iterable, Dict, Union
 
@@ -85,18 +86,18 @@ class OtlmowConverter:
         This conversion uses the OTLMOW settings.
         See the specific Exporter functions for more information on the keyword arguments.
         """
-        suffix = file_path.suffix[1:]
-        dotnotation_settings = kwargs.get('dotnotation_settings',
-                                          GlobalVariables.settings['formats'][suffix]['dotnotation'])
-        datetime_as_string = kwargs.get('cast_datetime',
-                                        GlobalVariables.settings['formats'][suffix]['cast_datetime'])
-        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
-                                        GlobalVariables.settings['formats'][suffix]['allow_non_otl_conform_attributes'])
-        warn_for_non_otl_conform_attributes = (
-            kwargs.get('warn_for_non_otl_conform_attributes',
-                       GlobalVariables.settings['formats'][suffix]['warn_for_non_otl_conform_attributes']))
+        altered_suffix = cls.get_mapped_setting_name_from_file_path(file_path)
+        # dotnotation_settings = kwargs.get('dotnotation_settings',
+        #                                   GlobalVariables.settings['formats'][suffix]['dotnotation'])
+        # datetime_as_string = kwargs.get('cast_datetime',
+        #                                 GlobalVariables.settings['formats'][suffix]['cast_datetime'])
+        # allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+        #                                 GlobalVariables.settings['formats'][suffix]['allow_non_otl_conform_attributes'])
+        # warn_for_non_otl_conform_attributes = (
+        #     kwargs.get('warn_for_non_otl_conform_attributes',
+        #                GlobalVariables.settings['formats'][suffix]['warn_for_non_otl_conform_attributes']))
 
-        exporter = FileExporter.get_exporter_from_extension(extension=suffix)
+        exporter = FileExporter.get_exporter_from_extension(extension=file_path.suffix[1:])
         exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
 
     @classmethod
@@ -153,3 +154,19 @@ class OtlmowConverter:
     #     """
     #     file_exporter = FileExporter(settings=self.settings)
     #     return file_exporter.create_file_from_assets(filepath=filepath, list_of_objects=list_of_objects, **kwargs)
+
+    suffix_mapping_table = {
+        'json': 'JSON',
+        'csv': 'csv',
+        'xlsx': 'xlsx',
+        'xls': 'xlsx',
+        'geojson': 'GeoJSON',
+        'ttl': 'ttl',
+        'jsonld': 'JSON-LD',
+    }
+
+    @classmethod
+    def get_mapped_setting_name_from_file_path(cls, file_path: Path):
+        suffix = file_path.suffix[1:]
+        return cls.suffix_mapping_table.get(suffix)
+
