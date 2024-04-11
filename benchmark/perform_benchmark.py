@@ -21,13 +21,11 @@ csv_data = None
 
 
 def read_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
-    converter = OtlmowConverter()
-    results_dict[read_data_key] = converter.from_file(filepath, **kwargs)
+    results_dict[read_data_key] = OtlmowConverter.from_file(filepath, **kwargs)
 
 
 def write_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
-    converter = OtlmowConverter()
-    converter.to_file(filepath, list_of_objects=results_dict[read_data_key], **kwargs)
+    OtlmowConverter.to_file(file_path=filepath, sequence_of_objects=results_dict[read_data_key], **kwargs)
 
 
 def time_read_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
