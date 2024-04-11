@@ -38,8 +38,8 @@
         ],
         "onderdeel:AllCasesTestClass.testKeuzelijst": "waarde-4",
         "onderdeel:AllCasesTestClass.testKeuzelijstMetKard": [
-            "waarde-4",
-            "waarde-3"
+            "https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-4",
+            "https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-3"
         ],
         "onderdeel:AllCasesTestClass.testKwantWrd": {
             "imel:KwantWrdTest.waarde": 98.21
