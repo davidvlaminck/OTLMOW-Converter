@@ -3,11 +3,11 @@ import os
 import shutil
 import sys
 import timeit
+from collections import namedtuple
 from pathlib import Path
 from statistics import mean, stdev
-from collections import namedtuple
 from typing import Dict
-import logging
+
 from prettytable import prettytable
 
 # allow relative import of otlmow_converter
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
         FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
         FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
-        # FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={}),
+        FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={}),
         FormatDetails(Extension='geojson', Label='GeoJSON', WriteArguments={}),
         # FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})
     ]

@@ -5,10 +5,8 @@ import time
 from os.path import isfile
 from pathlib import Path
 
-import cachetools
 import pytest
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_type_from_ns_and_name, \
-    dynamic_create_instance_from_ns_and_name
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_ns_and_name
 
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
@@ -68,7 +66,9 @@ def instantiate_all():
                             file_path=(Path(base_dir) / 'files/all_classes.xlsx'))
     OtlmowConverter.to_file(sequence_of_objects=all_instances_list,
                             file_path=(Path(base_dir) / 'files/all_classes.geojson'))
-    #jsonld, ttl
+    OtlmowConverter.to_file(sequence_of_objects=all_instances_list,
+                            file_path=(Path(base_dir) / 'files/all_classes.jsonld'))
+    # ttl
     OtlmowConverter.to_file(sequence_of_objects=random_10_class,
                             file_path=(Path(base_dir) / 'files/ten_random_classes.csv'), split_per_type=False)
     OtlmowConverter.to_file(sequence_of_objects=random_10_class,
@@ -77,6 +77,8 @@ def instantiate_all():
                             file_path=(Path(base_dir) / 'files/ten_random_classes.xlsx'))
     OtlmowConverter.to_file(sequence_of_objects=random_10_class,
                             file_path=(Path(base_dir) / 'files/ten_random_classes.geojson'))
+    OtlmowConverter.to_file(sequence_of_objects=random_10_class,
+                            file_path=(Path(base_dir) / 'files/ten_random_classes.jsonld'))
 
     end = time.time()
     print(f'Time: {round(end - start, 2)}')
@@ -86,35 +88,6 @@ def create_dummy_instance(namespace: str, class_name: str):
     instance = dynamic_create_instance_from_ns_and_name(namespace, class_name)
     instance.fill_with_dummy_data()
     return instance
-
-
-def create_dummy_instance_old(class_name, file_path):
-    try:
-        import_path = f'{file_path.parts[-3]}.{file_path.parts[-2]}.{file_path.parts[-1]}'
-        if 'otlmow_model' not in import_path:
-            import_path = 'otlmow_model.OtlmowModel.' + import_path
-        import_path = import_path.replace('otlmow_model.OtlmowModel.OtlmowModel', 'otlmow_model.OtlmowModel')
-        py_mod = __import__(name=import_path, fromlist=f'{class_name}')
-    except ModuleNotFoundError:
-        raise ModuleNotFoundError(f'Could not import the module for {import_path}')
-    class_ = getattr(py_mod, class_name)
-    instance = class_()
-    assert instance is not None
-    instance.fill_with_dummy_data()
-    return instance
-
-
-@cachetools.cached(cache={})
-def get_class_from_fp_and_name(class_name, file_path):
-    try:
-        import_path = f'{file_path.parts[-3]}.{file_path.parts[-2]}.{file_path.parts[-1]}'
-        if 'otlmow_model' not in import_path:
-            import_path = 'otlmow_model.' + import_path
-        py_mod = __import__(name=import_path, fromlist=f'{class_name}')
-    except ModuleNotFoundError:
-        raise ModuleNotFoundError(f'Could not import the module for {import_path}')
-    class_ = getattr(py_mod, class_name)
-    return class_
 
 
 if __name__ == '__main__':
