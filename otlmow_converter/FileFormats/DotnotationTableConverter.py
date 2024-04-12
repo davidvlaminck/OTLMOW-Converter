@@ -8,7 +8,6 @@ from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
-from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -38,7 +37,6 @@ class DotnotationTableConverter:
 
         return sorted_list
 
-
     @classmethod
     def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject],
                                    separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
@@ -64,7 +62,7 @@ class DotnotationTableConverter:
                 continue
 
             if not allow_empty_asset_id and (otl_object.assetId.identificator is None
-                                                   or otl_object.assetId.identificator == ''):
+                                             or otl_object.assetId.identificator == ''):
                 raise ValueError(f'{otl_object} does not have a valid assetId.')
 
             data_dict = DotnotationDictConverter.to_dict(
@@ -109,7 +107,7 @@ class DotnotationTableConverter:
                 continue
 
             if not allow_empty_asset_id and (otl_object.assetId.identificator is None or
-                                                   otl_object.assetId.identificator == ''):
+                                             otl_object.assetId.identificator == ''):
                 raise ValueError(f'{otl_object} does not have a valid assetId.')
 
             short_uri = get_shortened_uri(otl_object.typeURI)
@@ -223,12 +221,3 @@ class DotnotationTableConverter:
     def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool) -> Any:
         value = input_dict.get(item)
         return '' if empty_string_equals_none and value is None else value
-
-    def _turn_value_to_string(self, value: Any) -> str:
-        if isinstance(value, list):
-            if isinstance(value[0], list):
-                raise DotnotationListOfListError('Not possible to turn a list of a list into a string')
-
-            str_list = [(str(item) if item is not None else '') for item in value]
-            return self.cardinality_separator.join(str_list)
-        return value if isinstance(value, str) else str(value)

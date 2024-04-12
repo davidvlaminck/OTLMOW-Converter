@@ -47,9 +47,9 @@ class CsvExporter(AbstractExporter):
         cast_list = kwargs.get('cast_list', CAST_LIST)
         cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
-                                                        ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
+                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
-                                                            WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
 
         if filepath is None:
             raise ValueError(f'Can not write a file to: {filepath}')
@@ -71,7 +71,6 @@ class CsvExporter(AbstractExporter):
             cls._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
             return
 
-
         multi_table_dict = DotnotationTableConverter.get_tables_per_type_from_data(
             list_of_objects=sequence_of_objects,
             separator=separator, cardinality_separator=cardinality_separator,
@@ -86,7 +85,7 @@ class CsvExporter(AbstractExporter):
             specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
 
             cls._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
-                             delimiter=delimiter, quote_char=quote_char)
+                            delimiter=delimiter, quote_char=quote_char)
 
     @classmethod
     def _write_file(cls, file_location: Path, data: Iterable[Iterable], delimiter: str, quote_char: str) -> None:

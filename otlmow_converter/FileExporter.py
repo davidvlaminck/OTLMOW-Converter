@@ -24,5 +24,6 @@ class FileExporter:
             from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
             return GeoJSONExporter()
         else:
-            raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx, xls, ttl, jsonld')
+            raise InvalidExtensionError('This file has an invalid extension. '
+                                        'Supported file formats are: csv, json, xlsx, xls, geojson, jsonld')
 

@@ -26,7 +26,7 @@ class JsonDecoder:
 
             except Exception as ex:
                 if not ignore_failed_objects:
-                    raise ex
+                    raise ex from ex
         return object_list
 
 

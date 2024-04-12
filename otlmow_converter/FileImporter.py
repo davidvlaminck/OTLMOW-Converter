@@ -21,4 +21,5 @@ class FileImporter:
             from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
             return ExcelImporter()
         else:
-            raise InvalidExtensionError('This file has an invalid extension. Supported file formats are: csv, json, xlsx')
+            raise InvalidExtensionError('This file has an invalid extension. '
+                                        'Supported file formats are: csv, json, xlsx, xls, geojson, jsonld')

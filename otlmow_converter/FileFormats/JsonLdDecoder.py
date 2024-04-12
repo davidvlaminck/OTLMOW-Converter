@@ -30,7 +30,7 @@ class JsonLdDecoder:
                 lijst.append(instance)
             except Exception as ex:
                 if not ignore_failed_objects:
-                    raise ex
+                    raise ex from ex
         return lijst
 
     @classmethod

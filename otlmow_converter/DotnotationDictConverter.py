@@ -47,7 +47,6 @@ class DotnotationDictConverter:
         if self.cardinality_separator is not None:
             cardinality_separator = self.cardinality_separator
 
-
         return self.to_dict(otl_object=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
                             cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
                             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
@@ -60,8 +59,8 @@ class DotnotationDictConverter:
                 cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
                 warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
                 ) -> DotnotationDict:
-        typeURI = getattr(otl_object, 'typeURI', None)
-        if typeURI is None:
+        type_uri = getattr(otl_object, 'typeURI', None)
+        if type_uri is None:
             raise ValueError('typeURI is None. The object must have an attribute typeURI.')
 
         d = DotnotationDict(cls._iterate_over_attributes_and_values_by_dotnotation(
@@ -70,7 +69,7 @@ class DotnotationDictConverter:
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
             cast_list=cast_list, cast_datetime=cast_datetime))
-        d['typeURI'] = typeURI
+        d['typeURI'] = type_uri
         return d
 
     @classmethod
@@ -140,18 +139,20 @@ class DotnotationDictConverter:
                                      warn_for_non_otl_conform_attributes):
         if attr_key.startswith('_'):
             raise ValueError(
-                f'{attr_key} is a non standardized attribute of {object_or_attribute.__class__.__name__}. While this is supported, the key can not start with "_".')
+                f'{attr_key} is a non standardized attribute of {object_or_attribute.__class__.__name__}. '
+                f'While this is supported, the key can not start with "_".')
         if not allow_non_otl_conform_attributes:
             raise ValueError(
-                f'{attr_key} is a non standardized attribute of {object_or_attribute.__class__.__name__}. If you want to allow this, set allow_non_otl_conform_attributes to True.')
+                f'{attr_key} is a non standardized attribute of {object_or_attribute.__class__.__name__}. '
+                f'If you want to allow this, set allow_non_otl_conform_attributes to True.')
         if warn_for_non_otl_conform_attributes:
             warnings.warn(
-                message=f'{attr_key} is a non standardized attribute of {object_or_attribute.__class__.__name__}. The attribute will be added on the instance.',
+                message=f'{attr_key} is a non standardized attribute of {object_or_attribute.__class__.__name__}. '
+                        f'The attribute will be added on the instance.',
                 stacklevel=2,
                 category=NonStandardAttributeWarning)
         if attribute is not None:
             yield attr_key, attribute
-
 
     def from_dict_instance(self, input_dict: DotnotationDict, model_directory: Path = None,
                            waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,

@@ -10,11 +10,11 @@ class DotnotationDict(Dict[str, object]):
     def __getattr__(self, item):
         try:
             return self[item]
-        except KeyError:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        except KeyError as e:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'") from e
 
     def __setattr__(self, key, value):
-        if key.startswith('_') :
+        if key.startswith('_'):
             raise ValueError(f'{key} is a non standardized attribute of {self.__class__.__name__}. '
                              f'While this is supported, the key can not start with "_".')
         self[key] = value
@@ -22,8 +22,8 @@ class DotnotationDict(Dict[str, object]):
     def __delattr__(self, item):
         try:
             del self[item]
-        except KeyError:
-            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+        except KeyError as e:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'") from e
 
     def __str__(self):
         return _make_string_version_from_dict(self.__dict__)
