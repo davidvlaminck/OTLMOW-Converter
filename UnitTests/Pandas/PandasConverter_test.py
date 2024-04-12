@@ -4,6 +4,7 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+from numpy import nan, isnan
 from pandas import DataFrame
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -52,8 +53,6 @@ def test_convert_objects_to_dataframe_unnested_attributes():
     assert df['testTimeField'][0] == time(11, 5, 26)
 
 
-
-
 def test_convert_objects_to_dataframe_minimal_test():
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -66,7 +65,6 @@ def test_convert_objects_to_dataframe_minimal_test():
     assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert df['assetId.identificator'][0] == '0000'
     assert df['testBooleanField'][0] == False
-
 
 
 def test_convert_objects_to_multiple_dataframes_unnested_attributes():
@@ -291,7 +289,6 @@ def test_convert_dataframe_to_objects_nested_attributes_1_level(caplog):
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-
 def test_convert_dataframe_to_objects_nested_attributes_1_level_cast_list(caplog):
     columns = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testComplexType.testBooleanField',
                'testComplexType.testKwantWrd', 'testComplexType.testKwantWrdMetKard[]',
@@ -367,3 +364,39 @@ def test_convert_dataframe_to_objects_nested_attributes_2_level(caplog):
     assert instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde == 20.0
     assert instance.testComplexTypeMetKard[0].testComplexType2.testStringField == 'string1'
     assert instance.testComplexTypeMetKard[1].testComplexType2.testStringField == 'string2'
+
+
+def test_convert_dataframe_to_objects_nan_values(caplog):
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '01'
+    instance.testBooleanField = True
+    instance2 = AnotherTestClass()
+    instance2.assetId.identificator = '02'
+    instance2.notitie = 'random note'
+
+    instances = [instance, instance2]
+
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    assert df.shape == (2, 4)
+
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == '01'
+    assert df['testBooleanField'][0]
+    assert isnan(df['notitie'][0])
+
+    assert df['typeURI'][1] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
+    assert df['assetId.identificator'][1] == '02'
+    assert df['notitie'][1] == 'random note'
+    assert isnan(df['testBooleanField'][1])
+
+    objects = list(PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path))
+    assert len(objects) == 2
+    assert objects[0].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert objects[0].assetId.identificator == '01'
+    assert objects[0].testBooleanField
+    assert objects[0].notitie is None
+
+    assert objects[1].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
+    assert objects[1].assetId.identificator == '02'
+    assert objects[1].notitie == 'random note'
+    assert objects[1].testBooleanField is None

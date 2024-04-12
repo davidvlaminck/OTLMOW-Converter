@@ -1,5 +1,7 @@
+from pathlib import Path
 from typing import List, Dict, Iterable
 
+from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from pandas import DataFrame
 
@@ -19,11 +21,9 @@ class PandasConverter:
         return {key: DataFrame(data=value[1:]) for key, value in dict_tables.items()}
 
     @classmethod
-    def convert_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
-        model_directory = None
-        if kwargs is not None and 'model_directory' in kwargs:
-            model_directory = kwargs.pop('model_directory')
-
+    def convert_dataframe_to_objects(cls, dataframe: DataFrame, model_directory: Path = None, **kwargs
+                                     ) -> Iterable[OTLObject]:
+        dataframe = dataframe.replace({nan: None})
         headers = list(dataframe)
         d = {header: index for index, header in enumerate(headers)}
         dict_list = [d]
