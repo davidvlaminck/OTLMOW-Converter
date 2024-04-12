@@ -24,6 +24,7 @@ CAST_DATETIME = geojson_settings['cast_datetime']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['warn_for_non_otl_conform_attributes']
 
+
 class GeoJSONExporter(AbstractExporter):
 
     @classmethod
@@ -41,11 +42,11 @@ class GeoJSONExporter(AbstractExporter):
 
         list_of_objects = []
         for asset in sequence_of_objects:
-            d = DotnotationDictConverter.to_dict(asset, separator=separator, cardinality_indicator=cardinality_indicator,
-                                  waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                                  cast_datetime=cast_datetime, cast_list=cast_list,
-                                  allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                                  warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            d = DotnotationDictConverter.to_dict(
+                asset, separator=separator,cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cardinality_separator=cardinality_separator, cast_datetime=cast_datetime, cast_list=cast_list,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
             feature_dict = {
                 'id': d['assetId.identificator'],
@@ -92,6 +93,8 @@ class GeoJSONExporter(AbstractExporter):
             geom = MultiPolygon(tuple(coords_list))
         elif geom_type.startswith('geometrycollection'):
             geom = GeometryCollection(tuple(coords_list))
+        else:
+            raise NotImplementedError(f'Geometry type {geom_type} not implemented')
 
         return {
             'bbox': cls.get_bounding_box(geom),

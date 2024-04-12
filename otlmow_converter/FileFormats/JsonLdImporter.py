@@ -3,6 +3,7 @@ from typing import Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
+from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.FileFormats.JsonLdDecoder import JsonLdDecoder
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
@@ -14,7 +15,7 @@ ALLOW_NON_OTL_CONFORM_ATTRIBUTES = jsonld_settings['allow_non_otl_conform_attrib
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = jsonld_settings['warn_for_non_otl_conform_attributes']
 
 
-class JsonLdImporter:
+class JsonLdImporter(AbstractImporter):
     @classmethod
     def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         """Imports a json file created with Davie and decodes it to OTL objects

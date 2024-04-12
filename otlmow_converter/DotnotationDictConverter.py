@@ -32,8 +32,8 @@ class DotnotationDictConverter:
         self.cardinality_indicator: str = cardinality_indicator
         self.waarde_shortcut: bool = waarde_shortcut
 
-    def to_dict_instance(self, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
-                         cardinality_indicator: str = CARDINALITY_SEPARATOR,
+    def to_dict_instance(self, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT,
+                         separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_SEPARATOR,
                          cardinality_separator: str = CARDINALITY_INDICATOR,
                          cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
                          warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False

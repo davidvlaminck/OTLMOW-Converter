@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 from typing import Iterable, Dict, Union
 
@@ -13,6 +12,7 @@ from otlmow_converter.FileImporter import FileImporter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 load_settings()
+
 
 class OtlmowConverter:
     """
@@ -36,7 +36,6 @@ class OtlmowConverter:
                     'warn_for_non_otl_conform_attributes'}}
         for obj in sequence_of_objects:
             yield create_dict_from_asset(obj, **arg_dict)
-
 
     @classmethod
     def to_dotnotation_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[DotnotationDict]:

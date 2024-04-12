@@ -9,9 +9,10 @@ from otlmow_converter.FileFormats.JsonLdContext import JsonLdContext
 
 class JsonLdDecoder:
     @classmethod
-    def decode_json_string(cls, json_string: str, ignore_failed_objects: bool=False, model_directory: Path=None,
-                           allow_non_otl_conform_attributes: bool=True, warn_for_non_otl_conform_attributes: bool=True,
-                           waarde_shortcut: bool=True) -> Iterable[OTLObject]:
+    def decode_json_string(cls, json_string: str, ignore_failed_objects: bool = False, model_directory: Path = None,
+                           allow_non_otl_conform_attributes: bool = True,
+                           warn_for_non_otl_conform_attributes: bool = True,
+                           waarde_shortcut: bool = True) -> Iterable[OTLObject]:
         dict_list = json.loads(json_string)
         context_dict = dict_list['@context'] if '@context' in dict_list else {}
         lijst = []
@@ -21,7 +22,8 @@ class JsonLdDecoder:
                 rdf_dict = cls.transform_dict_to_rdf_dict(input_dict=obj, context_dict=context_dict)
                 del rdf_dict['@id']
                 del rdf_dict['@type']
-                instance = OTLObject.from_dict(rdf_dict, model_directory=model_directory, waarde_shortcut=waarde_shortcut,
+                instance = OTLObject.from_dict(rdf_dict, model_directory=model_directory,
+                                               waarde_shortcut=waarde_shortcut,
                                                datetime_as_string=True, rdf=True,
                                                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
@@ -54,6 +56,3 @@ class JsonLdDecoder:
                 v = value_list
             new_dict[k] = v
         return new_dict
-
-
-
