@@ -20,88 +20,74 @@ class OtlmowConverter:
     To change the settings, use the load_settings() or update_settings_by_dict() functions from SettingsManager
     before using this class.
     The converter uses the point of view of the OTLMOW model objects.
-    For example, when using the to_file() method, it converts the OTLMOW model objects (in memory) to a file.
-    When using the from_file() method, it converts the file to OTLMOW model objects (in memory).
+    For example, when using the from_objects_to_file() method, it converts the OTLMOW model objects (in memory) to a file.
+    When using the from_file_to_objects() method, it converts the file to OTLMOW model objects (in memory).
     """
 
     @classmethod
-    def to_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[Dict]:
+    def from_objects_to_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[Dict]:
         """
         Converts a sequence of OTLObject objects to a sequence of dictionaries.
         This conversion uses the OTLMOW settings.
         See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
         """
-        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
-                    'warn_for_non_otl_conform_attributes'}}
         for obj in sequence_of_objects:
-            yield create_dict_from_asset(obj, **arg_dict)
+            yield create_dict_from_asset(obj, **kwargs)
 
     @classmethod
-    def to_dotnotation_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[DotnotationDict]:
-        """
-        Converts a sequence of OTLObject objects to a sequence of dictionaries.
-        This conversion uses the OTLMOW settings.
-        See the create_dict_from_asset() method in the OTLObject class for more information on the keyword arguments.
-        """
-        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
-                    'warn_for_non_otl_conform_attributes'}}
-        for obj in sequence_of_objects:
-            yield DotnotationDictConverter.to_dict(obj, **arg_dict)
-
-    @classmethod
-    def from_dicts(cls, sequence_of_dicts: Iterable[Dict], **kwargs) -> Iterable[OTLObject]:
+    def from_dicts_to_objects(cls, sequence_of_dicts: Iterable[Dict], **kwargs) -> Iterable[OTLObject]:
         """
         Converts a sequence of dictionaries to a sequence of OTLObject objects.
         This conversion uses the OTLMOW settings.
         See the from_dict() method in the OTLObject class for more information on the keyword arguments.
         """
-        arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-                    {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
-                    'warn_for_non_otl_conform_attributes'}}
 
         for d in sequence_of_dicts:
-            yield OTLObject.from_dict(input_dict=d, **arg_dict, **kwargs)
+            yield OTLObject.from_dict(input_dict=d, **kwargs)
 
     @classmethod
-    def from_file(cls, file_path: Path, **kwargs) -> Iterable[OTLObject]:
+    def from_objects_to_dotnotation_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs
+                                          ) -> Iterable[DotnotationDict]:
+        """
+        Converts a sequence of OTLObject objects to a sequence of dictionaries.
+        This conversion uses the OTLMOW settings.
+        See the to_dict() method in the DotnotationDictConverter class for more information on the keyword arguments.
+        """
+        for obj in sequence_of_objects:
+            yield DotnotationDictConverter.to_dict(obj, **kwargs)
+
+    @classmethod
+    def from_dotnotation_dicts_to_objects(cls, sequence_of_dotnotation_dicts: Iterable[DotnotationDict], **kwargs
+                                          ) -> Iterable[OTLObject]:
+        """
+        Converts a sequence of OTLObject objects to a sequence of dictionaries.
+        This conversion uses the OTLMOW settings.
+        See the from_dict() method in the DotnotationDictConverter class for more information on the keyword arguments.
+        """
+        for obj in sequence_of_dotnotation_dicts:
+            yield DotnotationDictConverter.from_dict(obj, **kwargs)
+
+    @classmethod
+    def from_file_to_objects(cls, file_path: Path, **kwargs) -> Iterable[OTLObject]:
         """Converts a file to a sequence of OTLObject objects.
         This conversion uses the OTLMOW settings.
         See the specific Importer functions for more information on the keyword arguments.
         """
-
-        # arg_dict = {arg: kwargs.get(arg, GlobalVariables.settings['formats']['OTLMOW'][arg]) for arg in
-        #             {'rdf', 'waarde_shortcut', 'cast_datetime', 'allow_non_otl_conform_attributes',
-        #              'warn_for_non_otl_conform_attributes'}}
-
-        suffix = file_path.suffix[1:]
-        importer = FileImporter.get_importer_from_extension(extension=suffix)
+        importer = FileImporter.get_importer_from_extension(extension=file_path.suffix[1:])
         return importer.to_objects(filepath=file_path, **kwargs)
 
     @classmethod
-    def to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
+    def from_objects_to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
         """Converts a sequence of OTLObject objects to a file.
         This conversion uses the OTLMOW settings.
         See the specific Exporter functions for more information on the keyword arguments.
         """
-        altered_suffix = cls.get_mapped_setting_name_from_file_path(file_path)
-        # dotnotation_settings = kwargs.get('dotnotation_settings',
-        #                                   GlobalVariables.settings['formats'][suffix]['dotnotation'])
-        # datetime_as_string = kwargs.get('cast_datetime',
-        #                                 GlobalVariables.settings['formats'][suffix]['cast_datetime'])
-        # allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
-        #                                 GlobalVariables.settings['formats'][suffix]['allow_non_otl_conform_attributes'])
-        # warn_for_non_otl_conform_attributes = (
-        #     kwargs.get('warn_for_non_otl_conform_attributes',
-        #                GlobalVariables.settings['formats'][suffix]['warn_for_non_otl_conform_attributes']))
-
         exporter = FileExporter.get_exporter_from_extension(extension=file_path.suffix[1:])
         exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
 
     @classmethod
-    def to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False,
-                     ) -> Union[DataFrame, Dict[str, DataFrame]]:
+    def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False
+                                  ) -> Union[DataFrame, Dict[str, DataFrame]]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame.
         This conversion uses the OTLMOW settings.
         """
@@ -109,6 +95,14 @@ class OtlmowConverter:
             return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects)
         else:
             return PandasConverter.convert_objects_to_single_dataframe(sequence_of_objects)
+
+    @classmethod
+    def from_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
+        """Converts a pandas DataFrame to a sequence of OTLObject objects.
+        This method can be used when you have a single dataframe to convert.
+        This conversion uses the OTLMOW settings.
+        """
+        return PandasConverter.convert_dataframe_to_objects(dataframe, **kwargs)
 
     #
     #

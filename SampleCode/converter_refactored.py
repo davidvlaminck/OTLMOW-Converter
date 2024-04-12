@@ -12,15 +12,15 @@ if __name__ == '__main__':
 
     print(f'boom:\n{boom}\n')
 
-    boom_dicts = OtlmowConverter.to_dicts([boom])
+    boom_dicts = OtlmowConverter.from_objects_to_dicts([boom])
     print(f'boom_dict:\n{next(boom_dicts)}\n')
 
     print('boom_dotnotation_dict:\n')
-    boom_dotnotation_dicts = OtlmowConverter.to_dotnotation_dicts([boom])
+    boom_dotnotation_dicts = OtlmowConverter.from_objects_to_dotnotation_dicts([boom])
     for k, v in next(boom_dotnotation_dicts).items():
         print(f'{k}: {v}')
 
     print('\nDataframe:\n')
-    boom_dataframe = OtlmowConverter.to_dataframe([boom])
+    boom_dataframe = OtlmowConverter.from_objects_to_dataframe([boom])
     print(boom_dataframe.to_string())
 

@@ -58,27 +58,27 @@ def instantiate_all():
         instance = create_dummy_instance(class_tuple[0], class_tuple[1])
         random_10_class.append(instance)
 
-    OtlmowConverter.to_file(sequence_of_objects=all_instances_list,
-                            file_path=(Path(base_dir) / 'files/all_classes.csv'), split_per_type=False)
-    OtlmowConverter.to_file(sequence_of_objects=all_instances_list,
-                            file_path=(Path(base_dir) / 'files/all_classes.json'))
-    OtlmowConverter.to_file(sequence_of_objects=all_instances_list,
-                            file_path=(Path(base_dir) / 'files/all_classes.xlsx'))
-    OtlmowConverter.to_file(sequence_of_objects=all_instances_list,
-                            file_path=(Path(base_dir) / 'files/all_classes.geojson'))
-    OtlmowConverter.to_file(sequence_of_objects=all_instances_list,
-                            file_path=(Path(base_dir) / 'files/all_classes.jsonld'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.csv'), split_per_type=False)
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.json'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.xlsx'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.geojson'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.jsonld'))
     # ttl
-    OtlmowConverter.to_file(sequence_of_objects=random_10_class,
-                            file_path=(Path(base_dir) / 'files/ten_random_classes.csv'), split_per_type=False)
-    OtlmowConverter.to_file(sequence_of_objects=random_10_class,
-                            file_path=(Path(base_dir) / 'files/ten_random_classes.json'))
-    OtlmowConverter.to_file(sequence_of_objects=random_10_class,
-                            file_path=(Path(base_dir) / 'files/ten_random_classes.xlsx'))
-    OtlmowConverter.to_file(sequence_of_objects=random_10_class,
-                            file_path=(Path(base_dir) / 'files/ten_random_classes.geojson'))
-    OtlmowConverter.to_file(sequence_of_objects=random_10_class,
-                            file_path=(Path(base_dir) / 'files/ten_random_classes.jsonld'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.csv'), split_per_type=False)
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.json'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.xlsx'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.geojson'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.jsonld'))
 
     end = time.time()
     print(f'Time: {round(end - start, 2)}')
