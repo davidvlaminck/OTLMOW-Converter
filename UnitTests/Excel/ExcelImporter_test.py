@@ -142,7 +142,8 @@ def test_check_headers():
         ExcelImporter.check_headers(
             filepath=file_location, model_directory=model_directory_path, sheet='<Worksheet "correct_sheet">',
             headers=['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
-            type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass')
+            type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+            allow_non_otl_conform_attributes=False)
         assert False
     except InvalidColumnNamesInExcelTabError as ex:
         assert ex.bad_columns == ['bad_name_field', '[DEPRECATED] d_a', 'list[].list[]']

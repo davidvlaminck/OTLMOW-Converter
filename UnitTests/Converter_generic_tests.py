@@ -70,7 +70,7 @@ def test_generic_use_of_from_dicts():
     assert list(objects) == sequence_of_objects
 
 
-def test_generic_file_uses():
+def test_generic_uses():
     orig_list_of_dicts = [{
         'typeURI': AllCasesTestClass.typeURI,
         'assetId': {'identificator': 'id1'},
@@ -100,43 +100,13 @@ def test_generic_file_uses():
     new_list_of_dicts = list(OtlmowConverter.from_objects_to_dicts(list_of_objects_3))
     assert orig_list_of_dicts == new_list_of_dicts
 
-    os.unlink(excel_file_path)
-    os.unlink(json_file_path)
-
-
-@pytest.mark.skip(reason="Not implemented yet")
-def test_generic_dataframe_uses():
-    orig_list_of_dicts = [{
-        'typeURI': AllCasesTestClass.typeURI,
-        'assetId': {'identificator': 'id1'},
-        'testBooleanField': True,
-        'testDateField': date(2020, 1, 1),
-        'testStringFieldMetKard': ['test1', 'test2']
-    }, {
-        'typeURI': AnotherTestClass.typeURI,
-        'assetId': {'identificator': 'id2'},
-        'notitie': 'note',
-        #'non_conform_attribute': 'non conform value'
-    }]
-    excel_file_path = Path(__file__).parent / 'test_excel.xlsx'
-    json_file_path = Path(__file__).parent / 'test_excel.json'
-
-    list_of_objects_1 = OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts,
-                                                              model_directory=model_directory_path)
-    OtlmowConverter.from_objects_to_file(sequence_of_objects=list_of_objects_1, file_path=excel_file_path)
-    list_of_objects_2 = OtlmowConverter.from_file_to_objects(file_path=excel_file_path,
-                                                             model_directory=model_directory_path)
-    new_list_of_dicts = list(OtlmowConverter.from_objects_to_dicts(list_of_objects_2))
-    assert orig_list_of_dicts == new_list_of_dicts
-
-    OtlmowConverter.from_objects_to_file(sequence_of_objects=list_of_objects_2, file_path=json_file_path)
-    list_of_objects_3 = OtlmowConverter.from_file_to_objects(file_path=json_file_path,
-                                                             model_directory=model_directory_path)
-    new_list_of_dicts = list(OtlmowConverter.from_objects_to_dicts(list_of_objects_3))
-    assert orig_list_of_dicts == new_list_of_dicts
-
     dataframe = OtlmowConverter.from_objects_to_dataframe(sequence_of_objects=list_of_objects_3)
     list_of_objects_4 = OtlmowConverter.from_dataframe_to_objects(dataframe, model_directory=model_directory_path)
     new_list_of_dicts = list(OtlmowConverter.from_objects_to_dicts(list_of_objects_4))
 
     assert orig_list_of_dicts == new_list_of_dicts
+
+    if excel_file_path.exists():
+        os.unlink(excel_file_path)
+    if json_file_path.exists():
+        os.unlink(json_file_path)

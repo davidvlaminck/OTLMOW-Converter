@@ -399,4 +399,3 @@ def test_convert_dataframe_to_objects_nan_values(caplog):
     assert objects[1].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
     assert objects[1].assetId.identificator == '02'
     assert objects[1].notitie == 'random note'
-    assert objects[1].testBooleanField is None

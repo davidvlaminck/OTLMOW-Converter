@@ -28,4 +28,4 @@ if __name__ == '__main__':
         df['geometry'] = df.geometry.apply(wkt.loads)  # load the wkt string as a geometry in the same column
         gdf = GeoDataFrame(df, geometry='geometry')  # load the DataFrame as a GeoDataFrame
         gdf = gdf[:0]  # remove the dummy row
-        gdf.to_file('Output/lijnvormige_elementen.gpkg', driver='GPKG', layer=uri.split('#')[-1])
+        gdf.from_objects_to_file('Output/lijnvormige_elementen.gpkg', driver='GPKG', layer=uri.split('#')[-1])

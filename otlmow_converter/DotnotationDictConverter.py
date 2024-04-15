@@ -199,6 +199,8 @@ class DotnotationDictConverter:
             raise ValueError('typeURI is invalid. Add a valid typeURI to the input dictionary.') from e
 
         for k, v in input_dict.items():
+            if v is None:
+                continue
             if k == 'typeURI':
                 continue
             if k.startswith('_'):

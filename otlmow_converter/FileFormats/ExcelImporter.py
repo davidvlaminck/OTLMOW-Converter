@@ -168,13 +168,13 @@ class ExcelImporter(AbstractImporter):
             try:
                 DotnotationHelper.get_attribute_by_dotnotation(
                     instance_or_attribute=instance, dotnotation=header, separator=separator,
-                    cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,)
+                    cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
             except DotnotationListOfListError:
                 error.bad_columns.append(header)
             except AttributeError:
                 if not allow_non_otl_conform_attributes:
                     error.bad_columns.append(header)
-                if warn_for_non_otl_conform_attributes:
+                elif warn_for_non_otl_conform_attributes:
                     warnings.warn(
                         message=f'{header} is a non standardized attribute of {type_uri}. '
                                 f'The attribute will be added on the instance.',
