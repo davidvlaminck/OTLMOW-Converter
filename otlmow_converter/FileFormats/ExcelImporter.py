@@ -1,10 +1,12 @@
 import ast
 import os
+import warnings
 from pathlib import Path
 from typing import Dict, List
 
 import openpyxl
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
@@ -69,7 +71,8 @@ class ExcelImporter(AbstractImporter):
                 cls.check_headers(headers=headers, sheet=sheet, filepath=filepath,
                                   type_uri=sheet_data[1][type_uri_index], model_directory=model_directory,
                                   cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                                  separator=separator)
+                                  separator=separator, allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                                  warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
@@ -147,7 +150,9 @@ class ExcelImporter(AbstractImporter):
     @staticmethod
     def check_headers(headers: List[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
                       cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT,
-                      separator: str = SEPARATOR) -> None:
+                      separator: str = SEPARATOR,
+                      allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
+                      warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
         error = InvalidColumnNamesInExcelTabError(
             message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '
@@ -164,8 +169,17 @@ class ExcelImporter(AbstractImporter):
                 DotnotationHelper.get_attribute_by_dotnotation(
                     instance_or_attribute=instance, dotnotation=header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,)
-            except (AttributeError, DotnotationListOfListError):
+            except DotnotationListOfListError:
                 error.bad_columns.append(header)
+            except AttributeError:
+                if not allow_non_otl_conform_attributes:
+                    error.bad_columns.append(header)
+                if warn_for_non_otl_conform_attributes:
+                    warnings.warn(
+                        message=f'{header} is a non standardized attribute of {type_uri}. '
+                                f'The attribute will be added on the instance.',
+                        stacklevel=2,
+                        category=NonStandardAttributeWarning)
 
         if len(error.bad_columns) > 0:
             raise error

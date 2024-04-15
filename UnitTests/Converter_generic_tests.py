@@ -81,7 +81,7 @@ def test_generic_file_uses():
         'typeURI': AnotherTestClass.typeURI,
         'assetId': {'identificator': 'id2'},
         'notitie': 'note',
-        #'non_conform_attribute': 'non conform value' # TODO fix this for non_conform_attributes
+        'non_conform_attribute': 'non conform value'
     }]
     excel_file_path = Path(__file__).parent / 'test_excel.xlsx'
     json_file_path = Path(__file__).parent / 'test_excel.json'

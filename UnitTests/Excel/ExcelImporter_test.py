@@ -148,3 +148,16 @@ def test_check_headers():
         assert ex.bad_columns == ['bad_name_field', '[DEPRECATED] d_a', 'list[].list[]']
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_non_conform_attributes(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attribute.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                       warn_for_non_otl_conform_attributes=False)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+
+    instance = objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.testBooleanField
+    assert instance.non_conform_attribute == 'value'
