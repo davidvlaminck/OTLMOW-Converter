@@ -148,15 +148,15 @@ class DotnotationTableConverter:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
-        headers = table_data[0]
+        headers, *rows = table_data
         if 'typeURI' not in headers:
-            type_uri_in_first_rows = any('typeURI' in row.values() for row in table_data[1:5])
+            type_uri_in_first_rows = any('typeURI' in row.values() for row in rows)
             if not type_uri_in_first_rows:
                 raise NoTypeUriInTableError
             else:
                 raise TypeUriNotInFirstRowError
         headers.pop('typeURI')
-        for row in table_data[1:]:
+        for row in rows:
             instance = cls.create_instance_from_row(
                 row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
                 separator=separator, cardinality_indicator=cardinality_indicator,
@@ -189,9 +189,10 @@ class DotnotationTableConverter:
         """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
 
-        sorted_headers = cls._sort_headers(list_of_dicts[0])
+        header_dict, *data_dicts = list_of_dicts
+        sorted_headers = cls._sort_headers(header_dict)
         matrix = [[cls._get_item_from_dict(input_dict=d, item=header, empty_string_equals_none=empty_string_equals_none)
-                   for header in sorted_headers] for d in list_of_dicts[1:]]
+                   for header in sorted_headers] for d in data_dicts]
         matrix.insert(0, list(sorted_headers))
         return matrix
 
@@ -200,11 +201,11 @@ class DotnotationTableConverter:
                                                empty_string_equals_none: bool = False) -> List[Dict]:
         """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
-        header_row = two_d_sequence[0]
+        header_row, *data_rows = two_d_sequence
         header_dict = {header: index for index, header in enumerate(header_row)}
 
         list_of_dicts = [header_dict]
-        for row in two_d_sequence[1:]:
+        for row in data_rows:
             data_dict = {}
             for header, index in header_dict.items():
                 value = row[index]
