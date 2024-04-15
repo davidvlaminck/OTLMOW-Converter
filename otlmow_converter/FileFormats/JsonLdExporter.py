@@ -33,7 +33,7 @@ class JsonLdExporter(AbstractExporter):
 
         list_of_objects = []
         for asset in sequence_of_objects:
-            d = create_dict_from_asset(asset, rdf=True, datetime_as_string=True, waarde_shortcut=waarde_shortcut,
+            d = create_dict_from_asset(asset, rdf=True, cast_datetime=True, waarde_shortcut=waarde_shortcut,
                                        allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             d['@type'] = asset.typeURI

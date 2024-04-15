@@ -24,7 +24,7 @@ class JsonLdDecoder:
                 del rdf_dict['@type']
                 instance = OTLObject.from_dict(rdf_dict, model_directory=model_directory,
                                                waarde_shortcut=waarde_shortcut,
-                                               datetime_as_string=True, rdf=True,
+                                               cast_datetime=True, rdf=True,
                                                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
                 lijst.append(instance)

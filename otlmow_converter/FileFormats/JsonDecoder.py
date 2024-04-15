@@ -19,7 +19,7 @@ class JsonDecoder:
                     raise ValueError(f"No typeURI found in json object {index}. Unable to create object.")
 
                 instance = OTLObject.from_dict(obj, model_directory=model_directory, waarde_shortcut=waarde_shortcut,
-                                               datetime_as_string=True,
+                                               cast_datetime=True,
                                                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
                 object_list.append(instance)
