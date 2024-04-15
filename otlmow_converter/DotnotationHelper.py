@@ -301,18 +301,6 @@ class DotnotationHelper:
                         yield k1, v1
 
     @classmethod
-    def convert_waarde_to_correct_type(cls, waarde: Any, attribuut: OTLAttribuut, log_warnings: bool) -> Any:
-        field = attribuut.field
-        if attribuut.kardinaliteit_max != '1' and isinstance(waarde, list):
-            return [field.convert_to_correct_type(value_item, log_warnings=log_warnings) for value_item in waarde]
-        if attribuut.field.waardeObject is not None and attribuut.field.waarde_shortcut:
-            if attribuut.waarde is None:
-                attribuut.add_empty_value()
-            field = attribuut.waarde._waarde.field
-
-        return field.convert_to_correct_type(waarde, log_warnings=log_warnings)
-
-    @classmethod
     def flatten_dict(cls, input_dict: dict, separator: str = '.', prefix='', affix='', new_dict=None) -> dict:
         if new_dict is None:
             new_dict = {}
