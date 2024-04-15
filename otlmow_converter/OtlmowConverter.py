@@ -1,5 +1,6 @@
+from itertools import chain
 from pathlib import Path
-from typing import Iterable, Dict, Union
+from typing import Iterable, Dict, Union, Any
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 from pandas import DataFrame
@@ -9,7 +10,7 @@ from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.FileExporter import FileExporter
 from otlmow_converter.FileFormats.PandasConverter import PandasConverter
 from otlmow_converter.FileImporter import FileImporter
-from otlmow_converter.SettingsManager import load_settings, GlobalVariables
+from otlmow_converter.SettingsManager import load_settings
 
 load_settings()
 
@@ -23,6 +24,36 @@ class OtlmowConverter:
     For example, when using the from_objects_to_file() method, it converts the OTLMOW model objects (in memory) to a file.
     When using the from_file_to_objects() method, it converts the file to OTLMOW model objects (in memory).
     """
+
+    @classmethod
+    def to_objects(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
+        """Converts any subject to a sequence of OTLObject objects.
+        This conversion uses the OTLMOW settings.
+        """
+        if isinstance(subject, Path):
+            yield from cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+        elif isinstance(subject, DataFrame):
+            yield from cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
+        elif isinstance(subject, Iterable):
+            try:
+                generator = iter(subject)
+                first_element = next(generator)
+                if first_element is None:
+                    yield from []
+                else:
+                    new_generator = iter(chain([first_element], generator))
+                    if isinstance(first_element, DotnotationDict):
+                        yield from cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                         model_directory=model_directory, **kwargs)
+                    elif isinstance(first_element, dict):
+                        yield from cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                             model_directory=model_directory, **kwargs)
+                    else:
+                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+            except StopIteration:
+                yield from []
+        else:
+            raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
     def from_objects_to_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[Dict]:
@@ -68,13 +99,13 @@ class OtlmowConverter:
             yield DotnotationDictConverter.from_dict(obj, **kwargs)
 
     @classmethod
-    def from_file_to_objects(cls, file_path: Path, **kwargs) -> Iterable[OTLObject]:
+    def from_file_to_objects(cls, file_path: Path, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
         """Converts a file to a sequence of OTLObject objects.
         This conversion uses the OTLMOW settings.
         See the specific Importer functions for more information on the keyword arguments.
         """
         importer = FileImporter.get_importer_from_extension(extension=file_path.suffix[1:])
-        return importer.to_objects(filepath=file_path, **kwargs)
+        return importer.to_objects(filepath=file_path, model_directory=model_directory, **kwargs)
 
     @classmethod
     def from_objects_to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
@@ -86,15 +117,15 @@ class OtlmowConverter:
         exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
 
     @classmethod
-    def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False
+    def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False, **kwargs
                                   ) -> Union[DataFrame, Dict[str, DataFrame]]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame.
         This conversion uses the OTLMOW settings.
         """
         if split_per_type:
-            return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects)
+            return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects, **kwargs)
         else:
-            return PandasConverter.convert_objects_to_single_dataframe(sequence_of_objects)
+            return PandasConverter.convert_objects_to_single_dataframe(sequence_of_objects, **kwargs)
 
     @classmethod
     def from_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
@@ -163,3 +194,6 @@ class OtlmowConverter:
         suffix = file_path.suffix[1:]
         return cls.suffix_mapping_table.get(suffix)
 
+
+def to_objects(subject: Any, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
+    return OtlmowConverter.to_objects(subject=subject, model_directory=model_directory, **kwargs)

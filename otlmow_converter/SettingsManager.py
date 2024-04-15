@@ -37,4 +37,3 @@ def _update_dict(orig_dict: Dict, extra_dict: Dict) -> None:
 
 def update_settings_by_dict(settings_dict: Dict) -> None:
     _update_dict(GlobalVariables.settings, settings_dict)
-    print(GlobalVariables.settings)
