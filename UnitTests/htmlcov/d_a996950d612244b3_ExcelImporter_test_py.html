@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for Excel/ExcelImporter_test.py: 87%</title>
+    <title>Coverage for Excel/ExcelImporter_test.py: 88%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>Excel/ExcelImporter_test.py</b>:
-            <span class="pc_cov">87%</span>
+            <span class="pc_cov">88%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -54,8 +54,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">114 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">99<span class="text"> run</span></button>
+            <span class="text">124 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">109<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">15<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_a996950d612244b3___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-11 22:58 +0000
+            created at 2024-04-15 09:20 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -224,12 +224,26 @@
     <p class="run"><span class="n"><a id="t142" href="#t142">142</a></span><span class="t">        <span class="nam">ExcelImporter</span><span class="op">.</span><span class="nam">check_headers</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t143" href="#t143">143</a></span><span class="t">            <span class="nam">filepath</span><span class="op">=</span><span class="nam">file_location</span><span class="op">,</span> <span class="nam">model_directory</span><span class="op">=</span><span class="nam">model_directory_path</span><span class="op">,</span> <span class="nam">sheet</span><span class="op">=</span><span class="str">'&lt;Worksheet "correct_sheet">'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t144" href="#t144">144</a></span><span class="t">            <span class="nam">headers</span><span class="op">=</span><span class="op">[</span><span class="str">'typeURI'</span><span class="op">,</span> <span class="str">'testStringField'</span><span class="op">,</span> <span class="str">'bad_name_field'</span><span class="op">,</span> <span class="str">'[DEPRECATED] d_a'</span><span class="op">,</span> <span class="str">'list[].list[]'</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">            <span class="nam">type_uri</span><span class="op">=</span><span class="str">'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">        <span class="key">assert</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">    <span class="key">except</span> <span class="nam">InvalidColumnNamesInExcelTabError</span> <span class="key">as</span> <span class="nam">ex</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">        <span class="key">assert</span> <span class="nam">ex</span><span class="op">.</span><span class="nam">bad_columns</span> <span class="op">==</span> <span class="op">[</span><span class="str">'bad_name_field'</span><span class="op">,</span> <span class="str">'[DEPRECATED] d_a'</span><span class="op">,</span> <span class="str">'list[].list[]'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t145" href="#t145">145</a></span><span class="t">            <span class="nam">type_uri</span><span class="op">=</span><span class="str">'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t146" href="#t146">146</a></span><span class="t">            <span class="nam">allow_non_otl_conform_attributes</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t147" href="#t147">147</a></span><span class="t">        <span class="key">assert</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t148" href="#t148">148</a></span><span class="t">    <span class="key">except</span> <span class="nam">InvalidColumnNamesInExcelTabError</span> <span class="key">as</span> <span class="nam">ex</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t149" href="#t149">149</a></span><span class="t">        <span class="key">assert</span> <span class="nam">ex</span><span class="op">.</span><span class="nam">bad_columns</span> <span class="op">==</span> <span class="op">[</span><span class="str">'bad_name_field'</span><span class="op">,</span> <span class="str">'[DEPRECATED] d_a'</span><span class="op">,</span> <span class="str">'list[].list[]'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t150" href="#t150">150</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t151" href="#t151">151</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t152" href="#t152">152</a></span><span class="t"><span class="op">@</span><span class="nam">pytest</span><span class="op">.</span><span class="nam">mark</span><span class="op">.</span><span class="nam">filterwarnings</span><span class="op">(</span><span class="str">"ignore::DeprecationWarning"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t153" href="#t153">153</a></span><span class="t"><span class="key">def</span> <span class="nam">test_load_non_conform_attributes</span><span class="op">(</span><span class="nam">recwarn</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t154" href="#t154">154</a></span><span class="t">    <span class="nam">file_location</span> <span class="op">=</span> <span class="nam">Path</span><span class="op">(</span><span class="nam">__file__</span><span class="op">)</span><span class="op">.</span><span class="nam">parent</span> <span class="op">/</span> <span class="str">'Testfiles'</span> <span class="op">/</span> <span class="str">'non_conform_attribute.xlsx'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t155" href="#t155">155</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t156" href="#t156">156</a></span><span class="t">    <span class="nam">objects</span> <span class="op">=</span> <span class="nam">ExcelImporter</span><span class="op">.</span><span class="nam">to_objects</span><span class="op">(</span><span class="nam">filepath</span><span class="op">=</span><span class="nam">file_location</span><span class="op">,</span> <span class="nam">model_directory</span><span class="op">=</span><span class="nam">model_directory_path</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t157" href="#t157">157</a></span><span class="t">                                       <span class="nam">warn_for_non_otl_conform_attributes</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t158" href="#t158">158</a></span><span class="t">    <span class="nam">warns</span> <span class="op">=</span> <span class="op">[</span><span class="nam">w</span> <span class="key">for</span> <span class="nam">w</span> <span class="key">in</span> <span class="nam">recwarn</span><span class="op">.</span><span class="nam">list</span> <span class="key">if</span> <span class="nam">w</span><span class="op">.</span><span class="nam">category</span> <span class="key">is</span> <span class="key">not</span> <span class="nam">DeprecationWarning</span><span class="op">]</span>  <span class="com"># remove deprecation warnings</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t159" href="#t159">159</a></span><span class="t">    <span class="key">assert</span> <span class="key">not</span> <span class="nam">warns</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t160" href="#t160">160</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t161" href="#t161">161</a></span><span class="t">    <span class="nam">instance</span> <span class="op">=</span> <span class="nam">objects</span><span class="op">[</span><span class="num">0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t162" href="#t162">162</a></span><span class="t">    <span class="key">assert</span> <span class="nam">instance</span><span class="op">.</span><span class="nam">typeURI</span> <span class="op">==</span> <span class="str">'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t163" href="#t163">163</a></span><span class="t">    <span class="key">assert</span> <span class="nam">instance</span><span class="op">.</span><span class="nam">testBooleanField</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t164" href="#t164">164</a></span><span class="t">    <span class="key">assert</span> <span class="nam">instance</span><span class="op">.</span><span class="nam">non_conform_attribute</span> <span class="op">==</span> <span class="str">'value'</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -239,7 +253,7 @@
             <a id="nextFileLink" class="nav" href="d_a996950d612244b3___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-11 22:58 +0000
+            created at 2024-04-15 09:20 +0000
         </p>
     </div>
 </footer>
