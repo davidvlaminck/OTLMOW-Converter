@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import date
 from pathlib import Path
@@ -153,3 +154,29 @@ def test_generic_to_objects():
 
     if json_file_path.exists():
         os.unlink(json_file_path)
+
+
+def test_generic_to_file():
+    orig_list_of_dicts = [{
+        'typeURI': AllCasesTestClass.typeURI,
+        'assetId': {'identificator': 'id1'},
+        'testBooleanField': True,
+        'testDateField': date(2020, 1, 1),
+        'testStringFieldMetKard': ['test1', 'test2']
+    }, {
+        'typeURI': AnotherTestClass.typeURI,
+        'assetId': {'identificator': 'id2'},
+        'notitie': 'note',
+        'non_conform_attribute': 'non conform value'
+    }]
+    input_file_path = Path(__file__).parent / 'test_generic_input_file.json'
+    json_file_path = Path(__file__).parent / 'test_generic_to_file.json'
+
+    orig_list_of_objects = list(OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts,
+                                                                      model_directory=model_directory_path))
+
+    OtlmowConverter.to_file(subject=orig_list_of_objects, file_path=json_file_path)
+
+    assert json.load(json_file_path.open()) == json.load(input_file_path.open())
+
+

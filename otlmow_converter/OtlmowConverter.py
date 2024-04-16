@@ -56,6 +56,42 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
+    def to_file(cls, subject: Any, file_path: Path, model_directory: Path = None, **kwargs) -> None:
+        """Converts any subject (including another file) to a file.
+        This conversion uses the OTLMOW settings.
+        """
+        if isinstance(subject, Path):
+            objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+            cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+        elif isinstance(subject, DataFrame):
+            objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
+            cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+        elif isinstance(subject, Iterable):
+            try:
+                generator = iter(subject)
+                first_element = next(generator)
+                if first_element is None:
+                    return
+                else:
+                    new_generator = iter(chain([first_element], generator))
+                    if isinstance(first_element, DotnotationDict):
+                        objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                        model_directory=model_directory, **kwargs)
+                        cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+                    elif isinstance(first_element, dict):
+                        objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                            model_directory=model_directory, **kwargs)
+                        cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+                    elif isinstance(first_element, OTLObject):
+                        cls.from_objects_to_file(file_path=file_path, sequence_of_objects=new_generator, **kwargs)
+                    else:
+                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+            except StopIteration:
+                return
+        else:
+            raise ValueError(f"Unsupported subject type: {type(subject)}")
+
+    @classmethod
     def from_objects_to_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[Dict]:
         """
         Converts a sequence of OTLObject objects to a sequence of dictionaries.
