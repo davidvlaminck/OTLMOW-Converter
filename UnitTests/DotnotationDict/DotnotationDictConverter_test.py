@@ -19,10 +19,11 @@ def test_from_dict_simple_attributes():
     expected.testBooleanField = True
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2'}),
+        {'typeURI': AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2'}),
         model_directory=model_directory_path)
 
     assert created_instance == expected
+
 
 def test_to_dict_simple_attributes():
     instance = AllCasesTestClass()
@@ -30,7 +31,7 @@ def test_to_dict_simple_attributes():
     instance.testBooleanField = True
 
     assert DotnotationDictConverter.to_dict(instance) == {'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
-        'typeURI': AllCasesTestClass.typeURI}
+                                                          'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_from_dict_convert_types_without_warnings(recwarn):
@@ -46,7 +47,7 @@ def test_from_dict_convert_types_without_warnings(recwarn):
     expected.testDecimalFieldMetKard = [1.0, 2.0]
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI,
+        {'typeURI': AllCasesTestClass.typeURI,
          'testComplexTypeMetKard[].testBooleanField': 'True|False',
          'testComplexType.testKwantWrdMetKard[]': '3.0|4.0',
          'testDecimalFieldMetKard[]': '1.0|2.0'
@@ -64,12 +65,13 @@ def test_from_dict_datetimes_convert_true(recwarn):
     expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testDateField': '2022-12-12', 'testTimeField': '10:11:12',
-            'testDateTimeField': '2022-12-12 10:11:12'}),
+        {'typeURI': AllCasesTestClass.typeURI, 'testDateField': '2022-12-12', 'testTimeField': '10:11:12',
+         'testDateTimeField': '2022-12-12 10:11:12'}),
         model_directory=model_directory_path, cast_datetime=True)
 
     assert created_instance == expected
     assert len(recwarn) == 0
+
 
 def test_from_dict_datetimes_convert_false(recwarn):
     expected = AllCasesTestClass()
@@ -112,12 +114,12 @@ def test_from_dict_with_non_conform_otl_attributes(subtests, recwarn):
     expected.non_conform_attribute = 'non-conform'
     expected.testBooleanField = True
 
-    input_dict = DotnotationDict({'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True,
+    input_dict = DotnotationDict({'typeURI': AllCasesTestClass.typeURI, 'testBooleanField': True,
                                   'non_conform_attribute': 'non-conform'})
 
     with (subtests.test('Test with warn_for_non_otl_conform_attributes set to False')):
         created_instance = DotnotationDictConverter.from_dict(input_dict, model_directory=model_directory_path,
-            warn_for_non_otl_conform_attributes=False)
+                                                              warn_for_non_otl_conform_attributes=False)
 
         assert create_dict_from_asset(created_instance, warn_for_non_otl_conform_attributes=False
                                       ) == create_dict_from_asset(expected, warn_for_non_otl_conform_attributes=False)
@@ -132,14 +134,16 @@ def test_from_dict_with_non_conform_otl_attributes(subtests, recwarn):
     with subtests.test('Test with allow_non_otl_conform_attributes set to False'):
         with pytest.raises(ValueError):
             DotnotationDictConverter.from_dict(input_dict,
-                model_directory=model_directory_path, allow_non_otl_conform_attributes=False)
+                                               model_directory=model_directory_path,
+                                               allow_non_otl_conform_attributes=False)
 
     with subtests.test('Test with allow_non_otl_conform_attributes with bad key'):
         with pytest.raises(ValueError):
             DotnotationDictConverter.from_dict(
-                DotnotationDict({'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True,
+                DotnotationDict({'typeURI': AllCasesTestClass.typeURI, 'testBooleanField': True,
                                  '_non_conform_attribute': 'not a valid key name'}),
                 model_directory=model_directory_path)
+
 
 def test_to_dict_with_non_conform_otl_attributes(subtests, recwarn):
     with subtests.test('Test with warn_for_non_otl_conform_attributes set to False'):
@@ -182,12 +186,13 @@ def test_from_dict_simple_attribute_with_cardinality():
     expected.testKeuzelijstMetKard = ['waarde-1', 'waarde-2', 'waarde-3']
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
-        'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': [1, 2, 3],
+        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': [1, 2, 3],
         'testStringFieldMetKard[]': ['a', 'b', 'c'],
         'testKeuzelijstMetKard[]': ['waarde-1', 'waarde-2', 'waarde-3']
     }), model_directory=model_directory_path)
 
     assert created_instance == expected
+
 
 def test_to_dict_simple_attribute_with_cardinality():
     instance = AllCasesTestClass()
@@ -213,7 +218,7 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
     expected.testKeuzelijstMetKard = ['waarde-1', 'waarde-2']
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
-        'typeURI' : AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
+        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
         'testStringFieldMetKard[]': 'a|b', 'testKeuzelijstMetKard[]': 'waarde-1|waarde-2',
         'testKwantWrdMetKard[]': '1.0|2.0'}), cast_list=True, model_directory=model_directory_path)
 
@@ -243,7 +248,7 @@ def test_from_dict_simple_attributes_waarde_shortcut():
     expected.testKwantWrd.waarde = 2.0
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testEenvoudigType': 'A.B.C.D', 'testKwantWrd': 2.0}),
+        {'typeURI': AllCasesTestClass.typeURI, 'testEenvoudigType': 'A.B.C.D', 'testKwantWrd': 2.0}),
         waarde_shortcut=True, model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -255,7 +260,7 @@ def test_from_dict_simple_attributes_waarde_shortcut_set_to_false():
     expected.testKwantWrd.waarde = 2.0
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testEenvoudigType.waarde': 'A.B.C.D', 'testKwantWrd.waarde': 2.0}),
+        {'typeURI': AllCasesTestClass.typeURI, 'testEenvoudigType.waarde': 'A.B.C.D', 'testKwantWrd.waarde': 2.0}),
         model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -267,7 +272,7 @@ def test_to_dict_simple_attributes_waarde_shortcut():
     instance.testKwantWrd.waarde = 2.0
 
     assert DotnotationDictConverter.to_dict(instance) == {'testEenvoudigType': 'A.B.C.D', 'testKwantWrd': 2.0,
-        'typeURI': AllCasesTestClass.typeURI}
+                                                          'typeURI': AllCasesTestClass.typeURI}
 
 
 def test_to_dict_simple_attributes_waarde_shortcut_set_to_false():
@@ -285,7 +290,7 @@ def test_from_dict_complex_attributes():
     expected.testComplexType.testComplexType2.testStringField = 'string 2'
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testComplexType.testStringField': 'string 1',
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexType.testStringField': 'string 1',
          'testComplexType.testComplexType2.testStringField': 'string 2'}),
         model_directory=model_directory_path)
 
@@ -297,7 +302,7 @@ def test_from_dict_complex_attributes_with_kwant_wrd():
     expected.testUnionType.unionKwantWrd.waarde = 2.0
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testUnionType.unionKwantWrd': 2.0}),
+        {'typeURI': AllCasesTestClass.typeURI, 'testUnionType.unionKwantWrd': 2.0}),
         waarde_shortcut=True, model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -325,7 +330,7 @@ def test_from_dict_complex_attributes_with_cardinality():
     expected.testComplexType.testStringFieldMetKard = ['c', 'd']
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testComplexTypeMetKard[].testStringField': 'e|f',
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexTypeMetKard[].testStringField': 'e|f',
          'testComplexType.testStringFieldMetKard[]': 'c|d'}), cast_list=True,
         model_directory=model_directory_path)
 
@@ -347,6 +352,7 @@ def test_to_dict_with_cardinality():
         'testStringFieldMetKard[]': ['a', 'b'],
         'typeURI': AllCasesTestClass.typeURI}
 
+
 def test_from_dict_with_different_cardinality():
     expected = AllCasesTestClass()
     expected._testComplexTypeMetKard.add_empty_value()
@@ -360,7 +366,7 @@ def test_from_dict_with_different_cardinality():
     expected.testComplexTypeMetKard[2].testStringField = '1.3'
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
-        'typeURI' : AllCasesTestClass.typeURI,
+        'typeURI': AllCasesTestClass.typeURI,
         'testComplexTypeMetKard[].testBooleanField': [False, True, None],
         'testComplexTypeMetKard[].testStringField': ['1.1', '1.2', '1.3'],
         'testComplexTypeMetKard[].testKwantWrd': [None, 2.0, None]}), model_directory=model_directory_path)
@@ -398,12 +404,11 @@ def test_from_dict_complex_attributes_with_cardinality_and_kwant_wrd():
     expected.testUnionType.unionKwantWrd.waarde = 2.0
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testComplexType.testKwantWrdMetKard[]': [3.0, 4.0],
-            'testComplexType.testComplexType2.testKwantWrd': 5.0, 'testUnionType.unionKwantWrd': 2.0}),
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexType.testKwantWrdMetKard[]': [3.0, 4.0],
+         'testComplexType.testComplexType2.testKwantWrd': 5.0, 'testUnionType.unionKwantWrd': 2.0}),
         model_directory=model_directory_path, waarde_shortcut=True)
 
     assert created_instance == expected
-
 
 
 def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_False():
@@ -446,6 +451,7 @@ def test_to_dict_errors(subtests):
         with pytest.raises(DotnotationListOfListError):
             DotnotationDictConverter.to_dict(instance)
 
+
 def test_from_dict_errors(subtests):
     with subtests.test("error raised when using dict without typeURI"):
         with pytest.raises(ValueError):
@@ -459,16 +465,16 @@ def test_from_dict_errors(subtests):
                 {'complex.attribute': 'complex attributes only valid within OTL', 'typeURI': 'not_valid_uri'}),
                 model_directory=model_directory_path)
 
-
     with subtests.test("error raised when a key starts with '_'"):
         with pytest.raises(ValueError):
             DotnotationDictConverter.from_dict(DotnotationDict(
-                {'typeURI' : AllCasesTestClass.typeURI, '_invalid_attribute_key': '_ is not a valid first char'}),
+                {'typeURI': AllCasesTestClass.typeURI, '_invalid_attribute_key': '_ is not a valid first char'}),
                 model_directory=model_directory_path)
 
         with pytest.raises(ValueError):
             DotnotationDictConverter.from_dict(DotnotationDict(
-                {'typeURI': AllCasesTestClass.typeURI, 'complex._invalid_attribute_key': '_ is not a valid first char'}),
+                {'typeURI': AllCasesTestClass.typeURI,
+                 'complex._invalid_attribute_key': '_ is not a valid first char'}),
                 model_directory=model_directory_path)
 
     with subtests.test("error raised when trying dotnotation with 2 x cardinality indicator"):
@@ -480,7 +486,8 @@ def test_from_dict_errors(subtests):
     with subtests.test("error raised when trying dotnotation with a complex non-conform attribute"):
         with pytest.raises(ValueError):
             DotnotationDictConverter.from_dict(DotnotationDict(
-                {'typeURI': AllCasesTestClass.typeURI, 'complex.attribute': 'complex attributes only valid within OTL'}),
+                {'typeURI': AllCasesTestClass.typeURI,
+                 'complex.attribute': 'complex attributes only valid within OTL'}),
                 model_directory=model_directory_path)
 
 
@@ -495,7 +502,7 @@ def test_from_dict_instance_version():
     expected.testComplexTypeMetKard[1].testKwantWrd.waarde = 20.0
 
     created_instance = converter.from_dict_instance(DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
+        {'typeURI': AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
          'testComplexTypeMetKard()+testKwantWrd+waarde': '10.0*20.0'}),
         model_directory=model_directory_path, cast_list=True)
 
@@ -507,7 +514,7 @@ def test_to_dict_instance_version():
         separator='+', waarde_shortcut=False, cardinality_indicator='()', cardinality_separator='*')
 
     expected_dict = DotnotationDict(
-        {'typeURI' : AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
+        {'typeURI': AllCasesTestClass.typeURI, 'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
          'testComplexTypeMetKard()+testKwantWrd+waarde': '10.0*20.0'})
 
     instance = AllCasesTestClass()
@@ -520,4 +527,3 @@ def test_to_dict_instance_version():
     created_dict = converter.to_dict_instance(instance, cast_list=True)
 
     assert created_dict == expected_dict
-
