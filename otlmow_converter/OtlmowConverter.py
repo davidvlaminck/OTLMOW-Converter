@@ -3,6 +3,7 @@ from itertools import chain
 from pathlib import Path
 from typing import Iterable, Dict, Union, Any
 
+from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 from pandas import DataFrame
@@ -196,8 +197,9 @@ class OtlmowConverter:
             objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
             yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, DataFrame):
-            objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
-            yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
+            subject = subject.replace({nan: None})
+            yield from [DotnotationDict({k: v for k, v in d.items() if v is not None})
+                        for d in subject.to_dict('records')]
         elif isinstance(subject, Iterable):
             try:
                 generator = iter(subject)
