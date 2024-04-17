@@ -90,8 +90,8 @@ class ExcelImporter(AbstractImporter):
                     file_path=filepath, tab=sheet
                 ))
             except NoTypeUriInTableError:
-                exception_group.add_exception(NoTypeUriInTableError(
-                    message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
+                exception_group.add_exception(NoTypeUriInExcelTabError(
+                    message=f'Could not find typeURI within 5 rows in the file {filepath.name}',
                     file_path=filepath, tab=sheet
                 ))
             except BaseException as ex:
