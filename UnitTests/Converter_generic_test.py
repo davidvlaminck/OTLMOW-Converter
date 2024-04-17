@@ -345,14 +345,25 @@ def test_generic_to_dataframe(subtests):
         orig_objects = list(OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts,
                                                                   model_directory=model_directory_path))
         orig_df = OtlmowConverter.from_objects_to_dataframe(sequence_of_objects=orig_objects)
+        types_df_dict = OtlmowConverter.from_objects_to_dataframe(sequence_of_objects=orig_objects,
+                                                                  split_per_type=True)
 
         with subtests.test(msg="dataframe to_dataframe"):
             result_df = to_dataframe(subject=orig_df, model_directory=model_directory_path)
             assert_frame_equal(result_df, orig_df)
+            result_types_df = OtlmowConverter.to_dataframe(subject=orig_df, model_directory=model_directory_path,
+                                                           split_per_type=True)
+            for key in types_df_dict:
+                assert_frame_equal(result_types_df[key], types_df_dict[key])
 
         with subtests.test(msg="objects to_dataframe"):
             result_df = OtlmowConverter.to_dataframe(subject=orig_objects, model_directory=model_directory_path)
             assert_frame_equal(result_df, orig_df)
+
+            result_types_df = OtlmowConverter.to_dataframe(subject=orig_objects, model_directory=model_directory_path,
+                                                           split_per_type=True)
+            for key in types_df_dict:
+                assert_frame_equal(result_types_df[key], types_df_dict[key])
 
         with subtests.test(msg="file to_dataframe"):
             output_file_path = Path(__file__).parent / 'test_generic_to_dataframe.json'
@@ -361,14 +372,26 @@ def test_generic_to_dataframe(subtests):
 
             result_df = OtlmowConverter.to_dataframe(subject=output_file_path, model_directory=model_directory_path)
             assert_frame_equal(result_df, orig_df)
+            result_types_df = OtlmowConverter.to_dataframe(subject=output_file_path,
+                                                           model_directory=model_directory_path, split_per_type=True)
+            for key in types_df_dict:
+                assert_frame_equal(result_types_df[key], types_df_dict[key])
 
             os.unlink(output_file_path)
 
         with subtests.test(msg="dotnotation_dicts to_dataframe"):
-            d_dicts = OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_objects)
+            d_dicts = list(OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_objects))
             result_df = OtlmowConverter.to_dataframe(subject=d_dicts, model_directory=model_directory_path)
             assert_frame_equal(result_df, orig_df)
+            result_types_df = OtlmowConverter.to_dataframe(subject=d_dicts, model_directory=model_directory_path,
+                                                           split_per_type=True)
+            for key in types_df_dict:
+                assert_frame_equal(result_types_df[key], types_df_dict[key])
 
         with subtests.test(msg="dicts to_dataframe"):
             result_df = OtlmowConverter.to_dataframe(subject=orig_list_of_dicts, model_directory=model_directory_path)
             assert_frame_equal(result_df, orig_df)
+            result_types_df = OtlmowConverter.to_dataframe(subject=orig_list_of_dicts, model_directory=model_directory_path,
+                                                           split_per_type=True)
+            for key in types_df_dict:
+                assert_frame_equal(result_types_df[key], types_df_dict[key])

@@ -84,7 +84,7 @@ class DotnotationTableConverter:
         return list_of_dicts
 
     @classmethod
-    def get_tables_per_type_from_data(cls, list_of_objects: Iterable[OTLObject], values_as_string: bool = False,
+    def get_tables_per_type_from_data(cls, sequence_of_objects: Iterable[OTLObject], values_as_string: bool = False,
                                       separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                                       cardinality_indicator: str = CARDINALITY_INDICATOR,
                                       waarde_shortcut: bool = WAARDE_SHORTCUT,
@@ -100,7 +100,7 @@ class DotnotationTableConverter:
 
         master_dict = {}
 
-        for otl_object in list_of_objects:
+        for otl_object in sequence_of_objects:
             if not hasattr(otl_object, 'typeURI'):
                 warnings.warn(BadTypeWarning(f'{otl_object} does not have a typeURI so this can not be instantiated. '
                                              f'Ignoring this object'))

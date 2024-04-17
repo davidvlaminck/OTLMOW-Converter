@@ -72,7 +72,7 @@ class CsvExporter(AbstractExporter):
             return
 
         multi_table_dict = DotnotationTableConverter.get_tables_per_type_from_data(
-            list_of_objects=sequence_of_objects,
+            sequence_of_objects=sequence_of_objects,
             separator=separator, cardinality_separator=cardinality_separator,
             cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
             cast_list=cast_list, cast_datetime=cast_datetime,

@@ -82,7 +82,7 @@ def test_convert_objects_to_multiple_dataframes_unnested_attributes():
 
     instances = [instance, instance_2, instance_3]
 
-    df_dict = PandasConverter.convert_objects_to_multiple_dataframes(list_of_objects=instances)
+    df_dict = PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=instances)
 
     test_class_df = df_dict['onderdeel#AllCasesTestClass']
     assert test_class_df.shape == (2, 3)

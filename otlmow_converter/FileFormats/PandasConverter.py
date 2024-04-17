@@ -15,9 +15,10 @@ class PandasConverter:
         return DataFrame(data=single_table[1:])
 
     @classmethod
-    def convert_objects_to_multiple_dataframes(cls, list_of_objects: Iterable[OTLObject], **kwargs
+    def convert_objects_to_multiple_dataframes(cls, sequence_of_objects: Iterable[OTLObject], **kwargs
                                                ) -> Dict[str, DataFrame]:
-        dict_tables = DotnotationTableConverter.get_tables_per_type_from_data(list_of_objects=list_of_objects, **kwargs)
+        dict_tables = DotnotationTableConverter.get_tables_per_type_from_data(sequence_of_objects=sequence_of_objects,
+                                                                              **kwargs)
         return {key: DataFrame(data=value[1:]) for key, value in dict_tables.items()}
 
     @classmethod

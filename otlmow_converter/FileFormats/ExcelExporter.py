@@ -39,7 +39,7 @@ class ExcelExporter(AbstractExporter):
             waarde_shortcut=waarde_shortcut, cast_list=list_as_string, cast_datetime=datetime_as_string,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
-            list_of_objects=sequence_of_objects, values_as_string=True)
+            sequence_of_objects=sequence_of_objects, values_as_string=True)
 
         wb = Workbook(write_only=True)
         if not sequence_of_objects:

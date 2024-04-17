@@ -116,9 +116,8 @@ class OtlmowConverter:
             return cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type, **kwargs)
         elif isinstance(subject, DataFrame):
             if split_per_type:
-                objects = cls.from_dataframe_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
-                return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=objects,
-                                                                              split_per_type=split_per_type, **kwargs)
+                objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
+                return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=objects, **kwargs)
             return subject
         elif isinstance(subject, Iterable):
             try:
@@ -129,10 +128,13 @@ class OtlmowConverter:
                 else:
                     new_generator = iter(chain([first_element], generator))
                     if isinstance(first_element, DotnotationDict):
-                        objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
-                                                                        model_directory=model_directory, **kwargs)
-                        return cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type,
-                                                             **kwargs)
+                        if split_per_type:
+                            objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                            model_directory=model_directory, **kwargs)
+                            return cls.from_objects_to_dataframe(sequence_of_objects=objects,
+                                                                 split_per_type=split_per_type, **kwargs)
+                        else:
+                            return DataFrame(new_generator)
                     elif isinstance(first_element, dict):
                         objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
                                                             model_directory=model_directory, **kwargs)
