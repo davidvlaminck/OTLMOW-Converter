@@ -1,8 +1,10 @@
+from collections import defaultdict
 from itertools import chain
 from pathlib import Path
 from typing import Iterable, Dict, Union, Any
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
+from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 from pandas import DataFrame
 
 from otlmow_converter.DotnotationDict import DotnotationDict
@@ -129,10 +131,11 @@ class OtlmowConverter:
                     new_generator = iter(chain([first_element], generator))
                     if isinstance(first_element, DotnotationDict):
                         if split_per_type:
-                            objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
-                                                                            model_directory=model_directory, **kwargs)
-                            return cls.from_objects_to_dataframe(sequence_of_objects=objects,
-                                                                 split_per_type=split_per_type, **kwargs)
+                            master_dict = defaultdict(list)
+                            for d in new_generator:
+                                master_dict[get_shortened_uri(d['typeURI'])].append(d)
+
+                            return {key: DataFrame(data=value) for key, value in master_dict.items()}
                         else:
                             return DataFrame(new_generator)
                     elif isinstance(first_element, dict):
