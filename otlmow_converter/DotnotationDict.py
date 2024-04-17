@@ -26,7 +26,7 @@ class DotnotationDict(Dict[str, object]):
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'") from e
 
     def __str__(self):
-        return _make_string_version_from_dict(self.__dict__)
+        return super().__str__()
 
     def __repr__(self):
-        return str(self.__dict__)
+        return super().__repr__()
