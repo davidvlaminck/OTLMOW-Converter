@@ -114,10 +114,8 @@ def test_generic_uses():
 
     assert orig_list_of_dicts == new_list_of_dicts
 
-    if excel_file_path.exists():
-        os.unlink(excel_file_path)
-    if json_file_path.exists():
-        os.unlink(json_file_path)
+    os.unlink(excel_file_path)
+    os.unlink(json_file_path)
 
 
 def test_generic_to_objects(subtests):
@@ -147,8 +145,7 @@ def test_generic_to_objects(subtests):
         generic_objects_2 = list(OtlmowConverter.to_objects(json_file_path, model_directory=model_directory_path))
         assert generic_objects_2 == orig_list_of_objects
 
-        if json_file_path.exists():
-            os.unlink(json_file_path)
+        os.unlink(json_file_path)
 
     with subtests.test(msg="dataframe to_objects"):
         df = OtlmowConverter.from_objects_to_dataframe(sequence_of_objects=orig_list_of_objects)
@@ -207,9 +204,52 @@ def test_generic_to_file(subtests):
         OtlmowConverter.to_file(subject=df, file_path=output_file_path)
         assert json.load(output_file_path.open()) == json.load(expected_file_path.open())
 
-    if expected_file_path.exists():
-        os.unlink(expected_file_path)
-    if output_file_path.exists():
+    os.unlink(expected_file_path)
+    os.unlink(output_file_path)
+
+
+def test_generic_to_dicts(subtests):
+    orig_list_of_dicts = [{
+        'typeURI': AllCasesTestClass.typeURI,
+        'assetId': {'identificator': 'id1'},
+        'testBooleanField': True,
+        'testDateField': date(2020, 1, 1),
+        'testStringFieldMetKard': ['test1', 'test2']
+    }, {
+        'typeURI': AnotherTestClass.typeURI,
+        'assetId': {'identificator': 'id2'},
+        'notitie': 'note',
+        'non_conform_attribute': 'non conform value'
+    }]
+
+    with subtests.test(msg="dicts to_dicts"):
+        result_dicts = list(OtlmowConverter.to_dicts(subject=orig_list_of_dicts, model_directory=model_directory_path))
+        assert result_dicts == orig_list_of_dicts
+
+    with subtests.test(msg="objects to_dicts"):
+        objects = list(OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts, model_directory=model_directory_path))
+        result_dicts = list(OtlmowConverter.to_dicts(subject=objects, model_directory=model_directory_path))
+        assert result_dicts == orig_list_of_dicts
+
+    with subtests.test(msg="file to_dicts"):
+        output_file_path = Path(__file__).parent / 'test_generic_to_dicts.json'
+        objects = list(OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts, model_directory=model_directory_path))
+        OtlmowConverter.from_objects_to_file(sequence_of_objects=objects, file_path=output_file_path)
+
+        result_dicts = list(OtlmowConverter.to_dicts(subject=output_file_path, model_directory=model_directory_path))
+        assert result_dicts == orig_list_of_dicts
+
         os.unlink(output_file_path)
 
+    with subtests.test(msg="dotnotation_dicts to_dicts"):
+        objects = list(OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts, model_directory=model_directory_path))
+        dd_list = OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=objects)
+        result_dicts = list(OtlmowConverter.to_dicts(subject=dd_list, model_directory=model_directory_path))
+        assert result_dicts == orig_list_of_dicts
+
+    with subtests.test(msg="dataframe to_dicts"):
+        objects = list(OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts, model_directory=model_directory_path))
+        df = OtlmowConverter.from_objects_to_dataframe(sequence_of_objects=objects)
+        result_dicts = list(OtlmowConverter.to_dicts(subject=df, model_directory=model_directory_path))
+        assert result_dicts == orig_list_of_dicts
 
