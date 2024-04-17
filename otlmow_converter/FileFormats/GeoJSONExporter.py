@@ -64,34 +64,14 @@ class GeoJSONExporter(AbstractExporter):
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
 
-        list_of_objects = []
-        for asset in sequence_of_objects:
-            d = DotnotationDictConverter.to_dict(
-                asset, separator=separator,cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                cardinality_separator=cardinality_separator, cast_datetime=cast_datetime, cast_list=cast_list,
+        cls.from_dotnotation_dicts(
+            [DotnotationDictConverter.to_dict(
+                asset, separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                cast_datetime=cast_datetime, cast_list=cast_list,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
-
-            feature_dict = {
-                'id': d['assetId.identificator'],
-                'properties': d,
-                'type': 'Feature'}
-
-            geometry = d.get('geometry', None)
-            if geometry is not None:
-                geom = cls.convert_wkt_string_to_geojson(d.pop("geometry"))
-                feature_dict['geometry'] = geom
-
-            list_of_objects.append(feature_dict)
-
-        fc = {
-            'type': 'FeatureCollection',
-            'features': list_of_objects
-        }
-        encoded_json = JSONEncoder(indent=4).encode(fc)
-
-        with open(filepath, "w") as file:
-            file.write(encoded_json)
+                for asset in sequence_of_objects], filepath=filepath)
 
     @classmethod
     def convert_wkt_string_to_geojson(cls, wkt_string: str):
