@@ -26,40 +26,6 @@ class OtlmowConverter:
     """
 
     @classmethod
-    def to_dicts(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[Dict]:
-        """Converts any subject to a sequence of OTLObject objects.
-        This conversion uses the OTLMOW settings.
-        """
-        if isinstance(subject, Path):
-            objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
-            yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
-        elif isinstance(subject, DataFrame):
-            objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
-            yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
-        elif isinstance(subject, Iterable):
-            try:
-                generator = iter(subject)
-                first_element = next(generator)
-                if first_element is None:
-                    yield from []
-                else:
-                    new_generator = iter(chain([first_element], generator))
-                    if isinstance(first_element, DotnotationDict):
-                        objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
-                                                                        model_directory=model_directory, **kwargs)
-                        yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
-                    elif isinstance(first_element, dict):
-                        yield from new_generator
-                    elif isinstance(first_element, OTLObject):
-                        yield from cls.from_objects_to_dicts(sequence_of_objects=new_generator, **kwargs)
-                    else:
-                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
-            except StopIteration:
-                yield from []
-        else:
-            raise ValueError(f"Unsupported subject type: {type(subject)}")
-
-    @classmethod
     def to_objects(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
         """Converts any subject to a sequence of OTLObject objects.
         This conversion uses the OTLMOW settings.
@@ -124,6 +90,117 @@ class OtlmowConverter:
                         raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
                 return
+        else:
+            raise ValueError(f"Unsupported subject type: {type(subject)}")
+
+    @classmethod
+    def to_dataframe(cls, subject: Any, split_per_type: bool = False, model_directory: Path = None, **kwargs
+                     ) -> Union[DataFrame, Dict[str, DataFrame]]:
+        """Converts any subject to a pandas Dataframe.
+        This conversion uses the OTLMOW settings.
+        """
+        if isinstance(subject, Path):
+            objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+            return cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type, **kwargs)
+        elif isinstance(subject, DataFrame):
+            if split_per_type:
+                objects = cls.from_dataframe_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+                return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=objects,
+                                                                              split_per_type=split_per_type, **kwargs)
+            return subject
+        elif isinstance(subject, Iterable):
+            try:
+                generator = iter(subject)
+                first_element = next(generator)
+                if first_element is None:
+                    return DataFrame()
+                else:
+                    new_generator = iter(chain([first_element], generator))
+                    if isinstance(first_element, DotnotationDict):
+                        objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                        model_directory=model_directory, **kwargs)
+                        return cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type,
+                                                             **kwargs)
+                    elif isinstance(first_element, dict):
+                        objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                            model_directory=model_directory, **kwargs)
+                        return cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type,
+                                                             **kwargs)
+                    elif isinstance(first_element, OTLObject):
+                        return cls.from_objects_to_dataframe(sequence_of_objects=new_generator,
+                                                             split_per_type=split_per_type, **kwargs)
+                    else:
+                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+            except StopIteration:
+                return DataFrame()
+        else:
+            raise ValueError(f"Unsupported subject type: {type(subject)}")
+
+    @classmethod
+    def to_dicts(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[Dict]:
+        """Converts any subject to a sequence of dictionaries.
+        This conversion uses the OTLMOW settings.
+        """
+        if isinstance(subject, Path):
+            objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+            yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
+        elif isinstance(subject, DataFrame):
+            objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
+            yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
+        elif isinstance(subject, Iterable):
+            try:
+                generator = iter(subject)
+                first_element = next(generator)
+                if first_element is None:
+                    yield from []
+                else:
+                    new_generator = iter(chain([first_element], generator))
+                    if isinstance(first_element, DotnotationDict):
+                        objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                        model_directory=model_directory, **kwargs)
+                        yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
+                    elif isinstance(first_element, dict):
+                        yield from new_generator
+                    elif isinstance(first_element, OTLObject):
+                        yield from cls.from_objects_to_dicts(sequence_of_objects=new_generator, **kwargs)
+                    else:
+                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+            except StopIteration:
+                yield from []
+        else:
+            raise ValueError(f"Unsupported subject type: {type(subject)}")
+
+    @classmethod
+    def to_dotnotation_dicts(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[DotnotationDict]:
+        """Converts any subject to a sequence of DotnotationDict objects.
+        This conversion uses the OTLMOW settings.
+        """
+        if isinstance(subject, Path):
+            objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+            yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
+        elif isinstance(subject, DataFrame):
+            objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
+            yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
+        elif isinstance(subject, Iterable):
+            try:
+                generator = iter(subject)
+                first_element = next(generator)
+                if first_element is None:
+                    yield from []
+                else:
+                    new_generator = iter(chain([first_element], generator))
+                    if isinstance(first_element, DotnotationDict):
+                        yield from new_generator
+                    elif isinstance(first_element, dict):
+                        objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                            model_directory=model_directory, **kwargs)
+                        yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
+                    elif isinstance(first_element, OTLObject):
+                        yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=new_generator, **kwargs)
+                    else:
+                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+            except StopIteration:
+                yield from []
         else:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
@@ -275,5 +352,15 @@ def to_dicts(subject: Any, model_directory: Path = None, **kwargs) -> Iterable[D
     return OtlmowConverter.to_dicts(subject=subject, model_directory=model_directory, **kwargs)
 
 
-def file(subject: Any, model_directory: Path = None, **kwargs) -> None:
-    OtlmowConverter.to_file(subject=subject, model_directory=model_directory, **kwargs)
+def to_dotnotation_dicts(subject: Any, model_directory: Path = None, **kwargs) -> Iterable[DotnotationDict]:
+    return OtlmowConverter.to_dotnotation_dicts(subject=subject, model_directory=model_directory, **kwargs)
+
+
+def to_file(subject: Any, file_path: Path, model_directory: Path = None, **kwargs) -> None:
+    OtlmowConverter.to_file(subject=subject, file_path=file_path, model_directory=model_directory, **kwargs)
+
+
+def to_dataframe(subject: Any, split_per_type: bool = False, model_directory: Path = None, **kwargs
+                 ) -> Union[DataFrame, Dict[str, DataFrame]]:
+    return OtlmowConverter.to_dataframe(subject=subject, split_per_type=split_per_type,
+                                        model_directory=model_directory, **kwargs)
