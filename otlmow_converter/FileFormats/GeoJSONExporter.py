@@ -26,6 +26,30 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['warn_for_non_otl_conform
 
 
 class GeoJSONExporter(AbstractExporter):
+    @classmethod
+    def from_dotnotation_dicts(cls, sequence_of_dotnotation_dicts: Iterable[dict], filepath: Path) -> None:
+        list_of_objects = []
+        for d in sequence_of_dotnotation_dicts:
+            feature_dict = {
+                'id': d['assetId.identificator'],
+                'properties': d,
+                'type': 'Feature'}
+
+            geometry = d.get('geometry', None)
+            if geometry is not None:
+                geom = cls.convert_wkt_string_to_geojson(d.pop("geometry"))
+                feature_dict['geometry'] = geom
+
+            list_of_objects.append(feature_dict)
+
+        fc = {
+            'type': 'FeatureCollection',
+            'features': list_of_objects
+        }
+        encoded_json = JSONEncoder(indent=4).encode(fc)
+
+        with open(filepath, "w") as file:
+            file.write(encoded_json)
 
     @classmethod
     def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:

@@ -1,17 +1,14 @@
 import json
 import os
-import unittest
 from datetime import time, date, datetime
 from pathlib import Path
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
+from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
-from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 
 base_dir = Path(__file__).parent
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
-
 
 
 def test_export_and_then_import_unnested_attributes(recwarn):
@@ -37,6 +34,92 @@ def test_export_and_then_import_unnested_attributes(recwarn):
 
     recwarn.clear()
     GeoJSONExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    assert len(recwarn.list) == 0
+
+    # read json file at file_location
+    with open(file_location) as file:
+        json_data = json.load(file)
+
+    assert json_data == {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "id": "0000-0000",
+                "properties": {
+                    "assetId.identificator": "0000-0000",
+                    "testBooleanField": False,
+                    "testDateField": "2019-09-20",
+                    "testDateTimeField": "2001-12-15 22:22:15",
+                    "testDecimalField": 79.07,
+                    "testDecimalFieldMetKard[]": "10.0|20.0",
+                    "testEenvoudigType": "string1",
+                    "testIntegerField": -55,
+                    "testIntegerFieldMetKard[]": "76|2",
+                    "testKeuzelijst": "waarde-4",
+                    "testKeuzelijstMetKard[]": "waarde-4|waarde-3",
+                    "testKwantWrd": 98.21,
+                    "testStringField": "oFfeDLp",
+                    "testStringFieldMetKard[]": "string1|string2",
+                    "testTimeField": "11:05:26",
+                    "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+                },
+                "type": "Feature",
+                "geometry": {
+                    "bbox": [
+                        200000.0,
+                        200000.0,
+                        0.0,
+                        200000.0,
+                        200000.0,
+                        0.0
+                    ],
+                    "type": "Point",
+                    "coordinates": [
+                        [
+                            200000.0,
+                            200000.0,
+                            0.0
+                        ]
+                    ],
+                    "crs": {
+                        "properties": {
+                            "name": "EPSG:31370"
+                        },
+                        "type": "name"
+                    }
+                }
+            }
+        ]
+    }
+
+    os.unlink(file_location)
+
+
+def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.geojson'
+
+    instance = AllCasesTestClass()
+    instance.geometry = 'POINT Z (200000 200000 0)'
+    instance.assetId.identificator = '0000-0000'
+    instance.testBooleanField = False
+    instance.testDateField = date(2019, 9, 20)
+    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
+    instance.testDecimalField = 79.07
+    instance.testDecimalFieldMetKard = [10.0, 20.0]
+    instance.testEenvoudigType.waarde = 'string1'
+    instance.testIntegerField = -55
+    instance.testIntegerFieldMetKard = [76, 2]
+    instance.testKeuzelijst = 'waarde-4'
+    instance.testKeuzelijstMetKard = ['waarde-4', 'waarde-3']
+    instance.testKwantWrd.waarde = 98.21
+    instance.testStringField = 'oFfeDLp'
+    instance.testStringFieldMetKard = ['string1', 'string2']
+    instance.testTimeField = time(11, 5, 26)
+
+    recwarn.clear()
+    dotnotation_dicts = [DotnotationDictConverter.to_dict(instance, cast_list=True, cast_datetime=True)]
+
+    GeoJSONExporter.from_dotnotation_dicts(sequence_of_dotnotation_dicts=dotnotation_dicts, filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location
