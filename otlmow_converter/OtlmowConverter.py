@@ -48,6 +48,8 @@ class OtlmowConverter:
                     elif isinstance(first_element, dict):
                         yield from cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
                                                              model_directory=model_directory, **kwargs)
+                    elif isinstance(first_element, OTLObject):
+                        yield from new_generator
                     else:
                         raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
