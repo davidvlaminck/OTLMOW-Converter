@@ -12,7 +12,6 @@ from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
@@ -21,7 +20,7 @@ def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.xlsx'
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
-    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
     assert not warns
 
     assert len(objects) == 1
@@ -53,7 +52,7 @@ def test_load_test_nested_attributes_1_level(recwarn):
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
 
-    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
     assert not warns
 
     assert len(objects) == 1
@@ -88,7 +87,7 @@ def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.xlsx'
 
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
-    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
     assert not warns
 
     assert len(objects) == 1
