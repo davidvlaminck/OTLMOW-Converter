@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Dict, Iterable
+from typing import Dict, Iterable
 
 from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject

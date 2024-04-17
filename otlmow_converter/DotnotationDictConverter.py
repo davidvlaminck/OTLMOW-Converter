@@ -160,7 +160,7 @@ class DotnotationDictConverter:
                            cardinality_separator: str = CARDINALITY_INDICATOR,
                            cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
                            warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
-                  ) -> OTLObject:
+                           ) -> OTLObject:
         if self.separator is not None:
             separator = self.separator
         if self.waarde_shortcut is not None:
@@ -247,8 +247,8 @@ class DotnotationDictConverter:
                         f'If you want to allow this, set allow_non_otl_conform_attributes to True.')
                 if warn_for_non_otl_conform_attributes:
                     warnings.warn(
-                        message=f'{dotnotation} is a non standardized attribute of '
-                                f'{object_or_attribute.__class__.__name__}. The attribute will be added on the instance.',
+                        message=f'{dotnotation} is a non standardized attribute of {
+                            object_or_attribute.__class__.__name__}. The attribute will be added on the instance.',
                         stacklevel=2,
                         category=NonStandardAttributeWarning)
                 setattr(object_or_attribute, dotnotation, value)
