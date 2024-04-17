@@ -19,10 +19,22 @@ class OtlmowConverter:
     """
     Main utility class for converting OTLMOW objects to and from formats, such as files, dictionaries and dataframes.
     To change the settings, use the load_settings() or update_settings_by_dict() functions from SettingsManager
-    before using this class.
-    The converter uses the point of view of the OTLMOW model objects.
-    For example, when using the from_objects_to_file() method, it converts the OTLMOW model objects (in memory) to a file.
-    When using the from_file_to_objects() method, it converts the file to OTLMOW model objects (in memory).
+    before using this class. The converter uses the point of view of the OTLMOW model objects by default and thus
+    supports conversion from OTLMOW model objects to and from all other formats. These are:
+
+    - files (Path objects) to convert to and from JSON, CSV, Excel, GeoJSON and JSON-LD files
+
+    - dictionaries, in native OTL terms
+
+    - DotnotationDict objects, which are dictionaries with AWV dotnotation support
+
+    - pandas DataFrames, which are used for tabular data and use the AWV dotnotation
+
+    There are generic functions to convert to any of these formats, which will determine the type of the input(subject)
+    and convert it to the desired output format. The more specific functions are used to convert to and from objects.
+
+    Output in the form of a sequence is always an iterable (generator), which can be used in a for loop or converted to
+    a list or other sequence type.
     """
 
     @classmethod
