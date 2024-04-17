@@ -1,4 +1,3 @@
-import ast
 import os
 import warnings
 from pathlib import Path
@@ -18,7 +17,6 @@ from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableEr
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.SettingsManager import GlobalVariables, load_settings
-
 
 load_settings()
 
@@ -71,7 +69,8 @@ class ExcelImporter(AbstractImporter):
                 cls.check_headers(headers=headers, sheet=sheet, filepath=filepath,
                                   type_uri=sheet_data[1][type_uri_index], model_directory=model_directory,
                                   cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                                  separator=separator, allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                                  separator=separator,
+                                  allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                   warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
@@ -83,7 +82,7 @@ class ExcelImporter(AbstractImporter):
                     cast_datetime=cast_datetime, cast_list=cast_list,
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes))
-            except TypeUriNotInFirstRowError :
+            except TypeUriNotInFirstRowError:
                 exception_group.add_exception(TypeUriNotInFirstRowError(
                     message=f'The typeURI is not in the first row in file {filepath.name}.'
                             f' Please remove the excess rows',
@@ -183,5 +182,3 @@ class ExcelImporter(AbstractImporter):
 
         if len(error.bad_columns) > 0:
             raise error
-
-
