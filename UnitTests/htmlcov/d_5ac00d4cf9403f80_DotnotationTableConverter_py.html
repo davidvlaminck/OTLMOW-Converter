@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_ExcelExporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-15 10:15 +0000
+            created at 2024-04-18 18:29 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -166,7 +166,7 @@
     <p class="run"><span class="n"><a id="t84" href="#t84">84</a></span><span class="t">        <span class="key">return</span> <span class="nam">list_of_dicts</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">    <span class="op">@</span><span class="nam">classmethod</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">    <span class="key">def</span> <span class="nam">get_tables_per_type_from_data</span><span class="op">(</span><span class="nam">cls</span><span class="op">,</span> <span class="nam">list_of_objects</span><span class="op">:</span> <span class="nam">Iterable</span><span class="op">[</span><span class="nam">OTLObject</span><span class="op">]</span><span class="op">,</span> <span class="nam">values_as_string</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">False</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">    <span class="key">def</span> <span class="nam">get_tables_per_type_from_data</span><span class="op">(</span><span class="nam">cls</span><span class="op">,</span> <span class="nam">sequence_of_objects</span><span class="op">:</span> <span class="nam">Iterable</span><span class="op">[</span><span class="nam">OTLObject</span><span class="op">]</span><span class="op">,</span> <span class="nam">values_as_string</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">False</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">                                      <span class="nam">separator</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="nam">SEPARATOR</span><span class="op">,</span> <span class="nam">cardinality_separator</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="nam">CARDINALITY_SEPARATOR</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">                                      <span class="nam">cardinality_indicator</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="nam">CARDINALITY_INDICATOR</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">                                      <span class="nam">waarde_shortcut</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="nam">WAARDE_SHORTCUT</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -182,7 +182,7 @@
     <p class="pln"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t">        <span class="nam">master_dict</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">        <span class="key">for</span> <span class="nam">otl_object</span> <span class="key">in</span> <span class="nam">list_of_objects</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">        <span class="key">for</span> <span class="nam">otl_object</span> <span class="key">in</span> <span class="nam">sequence_of_objects</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">            <span class="key">if</span> <span class="key">not</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">otl_object</span><span class="op">,</span> <span class="str">'typeURI'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t">                <span class="nam">warnings</span><span class="op">.</span><span class="nam">warn</span><span class="op">(</span><span class="nam">BadTypeWarning</span><span class="op">(</span><span class="str">f'{otl_object} does not have a typeURI so this can not be instantiated. '</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t106" href="#t106">106</a></span><span class="t">                                             <span class="str">f'Ignoring this object'</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -313,7 +313,7 @@
             <a id="nextFileLink" class="nav" href="d_5ac00d4cf9403f80_ExcelExporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-04-15 10:15 +0000
+            created at 2024-04-18 18:29 +0000
         </p>
     </div>
 </footer>
