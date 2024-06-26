@@ -44,8 +44,8 @@ Using this library, you can convert between the following objects and formats
    - it uses the dotnotation convention
 
 ### Converter class
-The main class in this library is the OtlmowConverter class. This class has a couple of methods to convert between the 
-different types of objects. The main methods are:
+The main class in this library is the OtlmowConverter class. This class is a facade class and has a couple of methods 
+to convert between the different types of objects. The main methods are:
 * to_objects: converts to instantiated otlmow class objects
 * to_file: converts to a file
 * to_dicts: converts to an iterable of dictionaries
