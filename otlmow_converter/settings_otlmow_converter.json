@@ -1,86 +1,77 @@
 {
-    "file_formats": [
-        {
-            "name": "OTLMOW",
+    "formats": {
+        "OTLMOW": {
+            "cast_datetime": false,
+            "rdf": false,
+            "waarde_shortcut": false,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
             "dotnotation": {
+                "waarde_shortcut": true,
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality_indicator": "[]",
-                "waarde_shortcut": false
+                "cardinality_indicator": "[]"
             }
         },
-        {
-            "name": "dwg property set",
+        "JSON": {
+            "waarde_shortcut": true,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true
+        },
+        "JSON-LD": {
+            "waarde_shortcut": false,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true
+        },
+        "GeoJSON": {
+            "cast_list": true,
+            "cast_datetime": true,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
             "dotnotation": {
+                "waarde_shortcut": true,
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality_indicator": "[]",
-                "waarde_shortcut": true
+                "cardinality_indicator": "[]"
             }
         },
-        {
-            "name": "csv",
+        "xlsx": {
+            "cast_list": true,
+            "cast_datetime": true,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
             "dotnotation": {
+                "waarde_shortcut": true,
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality_indicator": "[]",
-                "waarde_shortcut": true
-            },
-            "delimiter": ";"
+                "cardinality_indicator": "[]"
+            }
         },
-        {
-            "name": "xls",
+        "csv": {
+            "cast_list": true,
+            "cast_datetime": true,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
+            "delimiter": ";",
             "dotnotation": {
+                "waarde_shortcut": true,
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality_indicator": "[]",
-                "waarde_shortcut": true
+                "cardinality_indicator": "[]"
             }
         },
-        {
-            "name": "rvt",
+        "pandas": {
+            "cast_list": false,
+            "cast_datetime": false,
+            "rdf": false,
+            "allow_non_otl_conform_attributes": true,
+            "warn_for_non_otl_conform_attributes": true,
             "dotnotation": {
+                "waarde_shortcut": true,
                 "separator": ".",
                 "cardinality_separator": "|",
-                "cardinality_indicator": "[]",
-                "waarde_shortcut": true
-            }
-        },
-        {
-            "name": "json",
-            "dotnotation": {
-                "waarde_shortcut": true
-            }
-        },
-        {
-            "name": "jsonld",
-            "dotnotation": {
-                "waarde_shortcut": false
-            }
-        },
-        {
-            "name": "ttl",
-            "dotnotation": {
-                "waarde_shortcut": false
-            }
-        },
-        {
-            "name": "geojson",
-            "dotnotation": {
-                "separator": ".",
-                "cardinality_separator": "|",
-                "cardinality_indicator": "[]",
-                "waarde_shortcut": true
-            }
-        },
-        {
-            "name": "pandas",
-            "dotnotation": {
-                "separator": ".",
-                "cardinality_separator": "|",
-                "cardinality_indicator": "[]",
-                "waarde_shortcut": true
+                "cardinality_indicator": "[]"
             }
         }
-    ]
+    }
 }

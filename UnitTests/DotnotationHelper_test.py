@@ -276,7 +276,7 @@ def test_set_attribute_by_dotnotation_complex_value_convert_scenarios(subtests):
         assert instance.testComplexTypeMetKard[0].testStringField == 'value1'
 
 
-def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, caplog):
+def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, recwarn):
     instance = AllCasesTestClass()
 
     with subtests.test(msg='setting None'):
@@ -299,11 +299,10 @@ def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, 
         assert instance.testDecimalField == 4.0
 
     with subtests.test(msg='incorrectly typed and convert=False (converted by set_waarde method on attribute itself)'):
-        caplog.clear()
+        recwarn.clear()
         DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalField', "5.0", convert=False)
         assert instance.testDecimalField == 5.0
-        assert caplog.records[0].levelno == logging.WARNING
-        caplog.clear()
+        assert len(recwarn.list) == 1
 
     with subtests.test(msg='cardinality > 1 and correctly typed and convert=True'):
         DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', [6.0],
@@ -321,11 +320,10 @@ def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, 
 
     with subtests.test(
             msg='cardinality > 1 and incorrectly typed and convert=False (converted by set_waarde method on attribute itself)'):
-        caplog.clear()
+        recwarn.clear()
         DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', ["9.0"], convert=False)
         assert instance.testDecimalFieldMetKard[0] == 9.0
-        assert caplog.records[0].levelno == logging.WARNING
-        caplog.clear()
+        assert len(recwarn.list) == 1
 
 
 def test_set_attributes_by_dotnotation_default_values(subtests):

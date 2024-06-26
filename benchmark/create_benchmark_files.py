@@ -1,16 +1,16 @@
+import itertools
 import os
 import random
 import time
 from os.path import isfile
 from pathlib import Path
 
-import cachetools
 import pytest
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_ns_and_name
 
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
-
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
@@ -18,7 +18,7 @@ def instantiate_all():
     classes_to_instantiate = {}
     start = time.time()
 
-    class_location = Path('../venv/Lib/site-packages/otlmow_model/OtlmowModel/Classes/')
+    class_location = Path('../venv2/lib/python3.11/site-packages/otlmow_model/OtlmowModel/Classes/')
     installatie_location = class_location / 'Installatie'
     onderdeel_location = class_location / 'Onderdeel'
     levenscyclus_location = class_location / 'Levenscyclus'
@@ -26,166 +26,68 @@ def instantiate_all():
 
     for dir_location in [installatie_location, onderdeel_location, levenscyclus_location, proefenmeting_location]:
         for f in os.listdir(dir_location):
-            f = str(f)
             if not isfile(dir_location / f):
                 continue
-            classes_to_instantiate[Path(f).stem] = Path(dir_location / Path(f).stem).resolve()
+            class_name = f[:-3]
+            classes_to_instantiate[class_name] = (dir_location.stem, class_name)
 
-    classes_to_instantiate['ActivityComplex'] = class_location / 'ImplementatieElement' / 'ActivityComplex'
-    classes_to_instantiate[
-        'ElectricityAppurtenance'] = class_location / 'ImplementatieElement' / 'ElectricityAppurtenance'
-    classes_to_instantiate['Derdenobject'] = class_location / 'ImplementatieElement' / 'Derdenobject'
-    classes_to_instantiate['ElectricityCable'] = class_location / 'ImplementatieElement' / 'ElectricityCable'
-    classes_to_instantiate['Pipe'] = class_location / 'ImplementatieElement' / 'Pipe'
-    classes_to_instantiate[
-        'TelecommunicationsAppurtenance'] = class_location / 'ImplementatieElement' / 'TelecommunicationsAppurtenance'
-    classes_to_instantiate[
-        'TelecommunicationsCable'] = class_location / 'ImplementatieElement' / 'TelecommunicationsCable'
+    classes_to_instantiate['ActivityComplex'] = ('ImplementatieElement', 'ActivityComplex')
+    classes_to_instantiate['ElectricityAppurtenance'] = ('ImplementatieElement', 'ElectricityAppurtenance')
+    classes_to_instantiate['Derdenobject'] = ('ImplementatieElement', 'Derdenobject')
+    classes_to_instantiate['ElectricityCable'] = ('ImplementatieElement', 'ElectricityCable')
+    classes_to_instantiate['Pipe'] = ('ImplementatieElement', 'Pipe')
+    classes_to_instantiate['TelecommunicationsAppurtenance'] = ('ImplementatieElement', 'TelecommunicationsAppurtenance')
+    classes_to_instantiate['TelecommunicationsCable'] = ('ImplementatieElement', 'TelecommunicationsCable')
 
     all_instances_list = []
-    for class_name, file_path in classes_to_instantiate.items():
+    for class_name, class_tuple in classes_to_instantiate.items():
         if class_name == 'HeeftBetrokkene':
             continue
-        instance = create_dummy_instance(class_name, file_path)
+        instance = create_dummy_instance(class_tuple[0], class_tuple[1])
         all_instances_list.append(instance)
-    all_instances_list = all_instances_list[0:500]  # TODO removing this line crashes the script due to open file issues
 
     random_10_class_names = []
     while len(random_10_class_names) < 10:
-        class_name = random.choice(list(classes_to_instantiate.keys()))
-        if class_name == 'HeeftBetrokkene':
+        class_tuple = random.choice(list(classes_to_instantiate.values()))
+        if class_tuple[1] == 'HeeftBetrokkene':
             continue
-        random_10_class_names.append(class_name)
+        random_10_class_names.append(class_tuple)
 
     random_10_class = []
-    for class_name in random_10_class_names:
-        for _ in range(1000):
-            instance = create_dummy_instance(class_name, classes_to_instantiate[class_name])
-            random_10_class.append(instance)
+    for class_tuple, _ in itertools.product(random_10_class_names, range(1000)):
+        instance = create_dummy_instance(class_tuple[0], class_tuple[1])
+        random_10_class.append(instance)
 
-    converter = OtlmowConverter()
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.csv'),
-                                      list_of_objects=all_instances_list, split_per_type=False)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.json'),
-                                      list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.xlsx'),
-                                      list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.jsonld'),
-                                      list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.geojson'),
-                                      list_of_objects=all_instances_list)
-    # converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.ttl'),
-    #                                   list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.csv'),
-                                      list_of_objects=random_10_class, split_per_type=False)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.json'),
-                                      list_of_objects=random_10_class)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.xlsx'),
-                                      list_of_objects=random_10_class)
-    # converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.ttl'),
-    #                                   list_of_objects=random_10_class)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.jsonld'),
-                                      list_of_objects=random_10_class)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.geojson'),
-                                      list_of_objects=random_10_class)
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.csv'), split_per_type=False)
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.json'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.xlsx'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.geojson'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
+                                         file_path=(Path(base_dir) / 'files/all_classes.jsonld'))
+    # ttl
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.csv'), split_per_type=False)
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.json'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.xlsx'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.geojson'))
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=random_10_class,
+                                         file_path=(Path(base_dir) / 'files/ten_random_classes.jsonld'))
 
     end = time.time()
     print(f'Time: {round(end - start, 2)}')
 
 
-def instantiate_all_old():
-    start = time.time()
-    classes_to_instantiate = {}
-    class_location = Path('../venv/Lib/site-packages/otlmow_model/OtlmowModel/Classes/')
-    installatie_location = class_location / 'Installatie'
-    onderdeel_location = class_location / 'Onderdeel'
-    levenscyclus_location = class_location / 'Levenscyclus'
-    proefenmeting_location = class_location / 'ProefEnMeting'
-
-    for dir_location in [installatie_location, onderdeel_location, levenscyclus_location, proefenmeting_location]:
-        for f in os.listdir(dir_location):
-            f = str(f)
-            if not isfile(dir_location / f):
-                continue
-            classes_to_instantiate[Path(f).stem] = Path(dir_location / Path(f).stem).resolve()
-
-    classes_to_instantiate['ActivityComplex'] = class_location / 'ImplementatieElement' / 'ActivityComplex'
-    classes_to_instantiate[
-        'ElectricityAppurtenance'] = class_location / 'ImplementatieElement' / 'ElectricityAppurtenance'
-    classes_to_instantiate['Derdenobject'] = class_location / 'ImplementatieElement' / 'Derdenobject'
-    classes_to_instantiate['ElectricityCable'] = class_location / 'ImplementatieElement' / 'ElectricityCable'
-    classes_to_instantiate['Pipe'] = class_location / 'ImplementatieElement' / 'Pipe'
-    classes_to_instantiate[
-        'TelecommunicationsAppurtenance'] = class_location / 'ImplementatieElement' / 'TelecommunicationsAppurtenance'
-    classes_to_instantiate[
-        'TelecommunicationsCable'] = class_location / 'ImplementatieElement' / 'TelecommunicationsCable'
-
-    all_instances_list = []
-    for class_name, file_path in classes_to_instantiate.items():
-        if class_name == 'HeeftBetrokkene':
-            continue
-        instance = create_dummy_instance(class_name, file_path)
-        all_instances_list.append(instance)
-
-    random_10_class_names = []
-    while len(random_10_class_names) < 10:
-        class_name = random.choice(list(classes_to_instantiate.keys()))
-        if class_name == 'HeeftBetrokkene':
-            continue
-        random_10_class_names.append(class_name)
-
-    random_10_class = []
-    for class_name in random_10_class_names:
-        for _ in range(1000):
-            instance = create_dummy_instance(class_name, classes_to_instantiate[class_name])
-            random_10_class.append(instance)
-
-    converter = OtlmowConverter()
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.csv'), list_of_objects=all_instances_list, split_per_type=False)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.json'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.xlsx'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.jsonld'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.geojson'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/all_classes.ttl'), list_of_objects=all_instances_list)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.csv'), list_of_objects=random_10_class,
-                                      split_per_type=False)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.json'), list_of_objects=random_10_class)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.xlsx'), list_of_objects=random_10_class)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.ttl'), list_of_objects=random_10_class)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.jsonld'), list_of_objects=random_10_class)
-    converter.create_file_from_assets((Path(base_dir) / 'files/ten_random_classes.geojson'), list_of_objects=random_10_class)
-
-    end = time.time()
-    print(f'Time: {round(end - start, 2)}')
-
-
-def create_dummy_instance(class_name, file_path):
-    try:
-        import_path = f'{file_path.parts[-3]}.{file_path.parts[-2]}.{file_path.parts[-1]}'
-        if 'otlmow_model' not in import_path:
-            import_path = 'otlmow_model.OtlmowModel.' + import_path
-        import_path = import_path.replace('otlmow_model.OtlmowModel.OtlmowModel', 'otlmow_model.OtlmowModel')
-        py_mod = __import__(name=import_path, fromlist=f'{class_name}')
-    except ModuleNotFoundError:
-        raise ModuleNotFoundError(f'Could not import the module for {import_path}')
-    class_ = getattr(py_mod, class_name)
-    instance = class_()
-    assert instance is not None
+def create_dummy_instance(namespace: str, class_name: str):
+    instance = dynamic_create_instance_from_ns_and_name(namespace, class_name)
     instance.fill_with_dummy_data()
     return instance
-
-
-@cachetools.cached(cache={})
-def get_class_from_fp_and_name(class_name, file_path):
-    try:
-        import_path = f'{file_path.parts[-3]}.{file_path.parts[-2]}.{file_path.parts[-1]}'
-        if 'otlmow_model' not in import_path:
-            import_path = 'otlmow_model.' + import_path
-        py_mod = __import__(name=import_path, fromlist=f'{class_name}')
-    except ModuleNotFoundError:
-        raise ModuleNotFoundError(f'Could not import the module for {import_path}')
-    class_ = getattr(py_mod, class_name)
-    return class_
 
 
 if __name__ == '__main__':

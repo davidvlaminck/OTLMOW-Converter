@@ -1,0 +1,54 @@
+{
+    "@context": {
+        "asset": "https://data.awvvlaanderen.be/id/asset/",
+        "onderdeel": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#",
+        "imel": "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#"
+    },
+    "@graph": [
+        {
+        "@id": "asset:0000-0000",
+        "@type": "onderdeel:AllCasesTestClass",
+        "imel:AIMObject.assetId": {
+                "imel:DtcIdentificator.identificator":  "0000-0000"
+        },
+        "imel:AIMObject.typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass",
+        "onderdeel:AllCasesTestClass.testComplexType": {
+            "imel:DtcTestComplexType.testComplexType2": {
+                "imel:DtcTestComplexType2.testKwantWrd": {
+                    "imel:KwantWrdTest.waarde": 76.8
+                },
+                "imel:DtcTestComplexType2.testStringField": "GZBzgRhOrQvfZaN"
+            },
+            "imel:DtcTestComplexType.testComplexType2MetKard": [
+                {
+                    "imel:DtcTestComplexType2.testKwantWrd": {
+                        "imel:KwantWrdTest.waarde": 10.0
+                    },
+                    "imel:DtcTestComplexType2.testStringField": "string1"
+                },
+                {
+                    "imel:DtcTestComplexType2.testKwantWrd": {
+                        "imel:KwantWrdTest.waarde": 20.0
+                    },
+                    "imel:DtcTestComplexType2.testStringField": "string2"
+                }
+            ]
+        },
+        "onderdeel:AllCasesTestClass.testComplexTypeMetKard": [{
+                "imel:DtcTestComplexType.testComplexType2": {
+                    "imel:DtcTestComplexType2.testKwantWrd": {
+                        "imel:KwantWrdTest.waarde": 10.0
+                    },
+                    "imel:DtcTestComplexType2.testStringField": "string1"
+                }
+            }, {
+                "imel:DtcTestComplexType.testComplexType2": {
+                    "imel:DtcTestComplexType2.testKwantWrd": {
+                        "imel:KwantWrdTest.waarde": 20.0
+                    },
+                    "imel:DtcTestComplexType2.testStringField": "string2"
+                }
+            }]
+        }
+    ]
+}

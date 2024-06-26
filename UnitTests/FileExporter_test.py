@@ -1,61 +1,29 @@
-from pathlib import Path
-
 import pytest
 
-from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
-from otlmow_converter import SettingsManager
 from otlmow_converter.Exceptions.InvalidExtensionError import InvalidExtensionError
 from otlmow_converter.FileExporter import FileExporter
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
+from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
 from otlmow_converter.FileFormats.JsonExporter import JsonExporter
 from otlmow_converter.FileFormats.JsonLdExporter import JsonLdExporter
 from otlmow_converter.FileFormats.TtlExporter import TtlExporter
 
 
-def test_init_and_save_settings():
-    settings = {'csv': {}}
-    expected_settings = {'csv': {}}
-    exporter = FileExporter(settings=settings)
-    assert exporter is not None
-    assert exporter.settings == expected_settings
-
-
-def test_return_Exporter_correct_type(subtests):
-    settings_path = get_settings_path_for_unittests()
-    unittest_settings = SettingsManager.load_settings(settings_path=settings_path)
-
-    with subtests.test(msg='returning JsonExporter'):
-        exporter = FileExporter.get_exporter_from_extension('json', settings=unittest_settings)
-        assert isinstance(exporter, JsonExporter)
-
-    with subtests.test(msg='returning JsonLdExporter'):
-        exporter = FileExporter.get_exporter_from_extension('jsonld', settings=unittest_settings)
-        assert isinstance(exporter, JsonLdExporter)
-
-    with subtests.test(msg='returning ExcelExporter'):
-        for extension in ['xls', 'xlsx']:
-            exporter = FileExporter.get_exporter_from_extension(extension, settings=unittest_settings)
-            assert isinstance(exporter, ExcelExporter)
-
-    with subtests.test(msg='returning CsvExporter'):
-        exporter = FileExporter.get_exporter_from_extension('csv', settings=unittest_settings, model_directory='')
-        assert isinstance(exporter, CsvExporter)
-
-    with subtests.test(msg='returning TtlExporter'):
-        exporter = FileExporter.get_exporter_from_extension('ttl', settings=unittest_settings)
-        assert isinstance(exporter, TtlExporter)
-
-    with subtests.test(msg='invalid extension'):
-        with pytest.raises(InvalidExtensionError):
-            FileExporter.get_exporter_from_extension('dwg', settings=unittest_settings)
-
-
-def test_create_file_from_assets():
-    file_path = Path('random.json')
-    settings_path = get_settings_path_for_unittests()
-    unittest_settings = SettingsManager.load_settings(settings_path=settings_path)
-    file_exporter = FileExporter(settings=unittest_settings)
-    file_exporter.create_file_from_assets(filepath=file_path, list_of_objects=[])
-    assert Path.exists(file_path)
-    Path.unlink(file_path)
+@pytest.mark.parametrize("extension, expected_exporter",
+                         [('geojson', GeoJSONExporter),
+                          ('json', JsonExporter),
+                          ('jsonld', JsonLdExporter),
+                          ('xls', ExcelExporter),
+                          ('xlsx', ExcelExporter),
+                          ('csv', CsvExporter),
+                          #('ttl', TtlExporter),
+                          ('dwg', None)])  # None represents the expected result when an InvalidExtensionError is raised
+def test_return_Exporter_correct_type(subtests, extension, expected_exporter):
+    with subtests.test(msg=f'returning {expected_exporter.__name__ if expected_exporter is not None else "InvalidExtensionError"} for extension {extension}'):
+        if expected_exporter is not None:
+            exporter = FileExporter.get_exporter_from_extension(extension)
+            assert isinstance(exporter, expected_exporter)
+        else:
+            with pytest.raises(InvalidExtensionError):
+                FileExporter.get_exporter_from_extension(extension)

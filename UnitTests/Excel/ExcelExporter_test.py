@@ -2,47 +2,14 @@ import os
 from datetime import date, datetime, time
 from pathlib import Path
 
-import pytest
-
-from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def set_up_converter():
-    settings_file_location = get_settings_path_for_unittests()
-    return OtlmowConverter(settings_path=settings_file_location)
-
-
-def test_init_importer_only_load_with_settings(subtests):
-    otl_converter = set_up_converter()
-
-    with subtests.test(msg='load with correct settings'):
-        exporter = ExcelExporter(settings=otl_converter.settings)
-        assert exporter is not None
-
-    with subtests.test(msg='load without settings'):
-        with pytest.raises(ValueError):
-            ExcelExporter()
-
-    with subtests.test(msg='load with incorrect settings (no file_formats)'):
-        with pytest.raises(ValueError):
-            ExcelExporter(settings={"auth_options": [{}]})
-
-    with subtests.test(msg='load with incorrect settings (file_formats but no xls)'):
-        with pytest.raises(ValueError):
-            ExcelExporter(settings={"file_formats": [{}]})
-
-
-def test_export_and_then_import_unnested_attributes(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
-    exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
+def test_export_and_then_import_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes_generated.xlsx'
     instance = AllCasesTestClass()
     instance.geometry = 'POINT Z (200000 200000 0)'
@@ -62,11 +29,11 @@ def test_export_and_then_import_unnested_attributes(caplog):
     instance.testStringFieldMetKard = ['string1', 'string2']
     instance.testTimeField = time(11, 5, 26)
 
-    caplog.records.clear()
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
 
     instance = objects[0]
@@ -93,11 +60,7 @@ def test_export_and_then_import_unnested_attributes(caplog):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_1(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
-    exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
+def test_export_and_then_import_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -135,11 +98,11 @@ def test_export_and_then_import_nested_attributes_level_1(caplog):
     instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
-    caplog.records.clear()
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
 
     instance = objects[0]
@@ -171,11 +134,7 @@ def test_export_and_then_import_nested_attributes_level_1(caplog):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_2(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
-    exporter = ExcelExporter(settings=converter.settings, model_directory=model_directory_path)
+def test_export_and_then_import_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_2_generated.xlsx'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -196,11 +155,11 @@ def test_export_and_then_import_nested_attributes_level_2(caplog):
     instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
-    caplog.records.clear()
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
 
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
     instance = objects[0]
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'

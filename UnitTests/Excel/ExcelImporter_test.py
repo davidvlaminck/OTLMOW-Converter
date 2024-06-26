@@ -1,5 +1,5 @@
+import datetime
 import os
-from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
@@ -9,58 +9,19 @@ from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import Invali
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_init_importer_only_load_with_settings(subtests):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-
-    with subtests.test(msg='load with correct settings'):
-        importer = ExcelImporter(settings=converter.settings)
-        assert importer is not None
-
-    with subtests.test(msg='load without settings'):
-        with pytest.raises(ValueError):
-            ExcelImporter()
-
-    with subtests.test(msg='load with incorrect settings (no file_formats)'):
-        with pytest.raises(ValueError):
-            ExcelImporter(settings={"auth_options": [{}]})
-
-    with subtests.test(msg='load with incorrect settings (file_formats but no xls)'):
-        with pytest.raises(ValueError):
-            ExcelImporter(settings={"file_formats": [{}]})
-
-
-def test_convert_to_json_with_date():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.xlsx'
-    assets = converter.create_assets_from_file(filepath=file_location)
-
-    json_file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.json'
-
-    converter.create_file_from_assets(filepath=json_file_location, list_of_objects=assets)
-
-    os.unlink(json_file_location)
-
-
-
-def test_load_test_unnested_attributes(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.xlsx'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
 
     assert len(objects) == 1
 
@@ -68,8 +29,8 @@ def test_load_test_unnested_attributes(caplog):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.assetId.identificator == '0000-0000'
     assert not instance.testBooleanField
-    assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDateField == datetime.date(2019, 9, 20)
+    assert instance.testDateTimeField == datetime.datetime(2001, 12, 15, 22, 22, 15)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'
@@ -81,19 +42,18 @@ def test_load_test_unnested_attributes(caplog):
     assert instance.testStringField == 'oFfeDLp'
     assert instance.testStringFieldMetKard[0] == 'string1'
     assert instance.testStringFieldMetKard[1] == 'string2'
-    assert instance.testTimeField == time(11, 5, 26)
+    assert instance.testTimeField == datetime.time(11, 5, 26)
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
-def test_load_test_nested_attributes_1_level(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.xlsx'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
 
     assert len(objects) == 1
 
@@ -122,15 +82,13 @@ def test_load_test_nested_attributes_1_level(caplog):
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-def test_load_test_nested_attributes_2_levels(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.xlsx'
 
-    caplog.records.clear()
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    assert len(caplog.records) == 0
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
 
     assert len(objects) == 1
 
@@ -150,47 +108,56 @@ def test_load_test_nested_attributes_2_levels(caplog):
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_get_index_of_typeURI_column_in_sheet():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 
     with pytest.raises(ExceptionsGroup) as ex:
-        importer.import_file(filepath=file_location, model_directory=model_directory_path)
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
 
-        assert isinstance(ex, ExceptionsGroup)
-        assert len(ex.exceptions) == 3
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.exceptions) == 3
 
-        exception_1 = ex.exceptions[0]
-        assert isinstance(exception_1, TypeUriNotInFirstRowError)
-        assert exception_1.file_path == file_location
-        assert exception_1.tab == 'type_uri_third_row'
+    exception_1 = ex.exceptions[0]
+    assert isinstance(exception_1, TypeUriNotInFirstRowError)
+    assert exception_1.file_path == file_location
+    assert exception_1.tab == 'type_uri_third_row'
 
-        exception_2 = ex.exceptions[1]
-        assert isinstance(exception_2, NoTypeUriInExcelTabError)
-        assert exception_2.file_path == file_location
-        assert exception_2.tab == 'no_type_uri_in_sheet'
+    exception_2 = ex.exceptions[1]
+    assert isinstance(exception_2, NoTypeUriInExcelTabError)
+    assert exception_2.file_path == file_location
+    assert exception_2.tab == 'no_type_uri_in_sheet'
 
-        exception_3 = ex.exceptions[2]
-        assert isinstance(exception_3, NoTypeUriInExcelTabError)
-        assert exception_3.file_path == file_location
-        assert exception_3.tab == 'empty_sheet'
+    exception_3 = ex.exceptions[2]
+    assert isinstance(exception_3, NoTypeUriInExcelTabError)
+    assert exception_3.file_path == file_location
+    assert exception_3.tab == 'empty_sheet'
 
 
 def test_check_headers():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    importer = ExcelImporter(settings=converter.settings)
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 
     try:
-        importer.check_headers(
+        ExcelImporter.check_headers(
             filepath=file_location, model_directory=model_directory_path, sheet='<Worksheet "correct_sheet">',
             headers=['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
-            type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass')
-        assert False
+            type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+            allow_non_otl_conform_attributes=False)
     except InvalidColumnNamesInExcelTabError as ex:
         assert ex.bad_columns == ['bad_name_field', '[DEPRECATED] d_a', 'list[].list[]']
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_non_conform_attributes(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attribute.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                       warn_for_non_otl_conform_attributes=False)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+
+    instance = objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.testBooleanField
+    assert instance.non_conform_attribute == 'value'

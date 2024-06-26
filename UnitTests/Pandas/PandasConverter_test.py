@@ -4,6 +4,7 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+from numpy import nan, isnan
 from pandas import DataFrame
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -16,32 +17,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_init_importer_only_load_with_settings(subtests):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-
-    with subtests.test(msg='load with correct settings'):
-        importer = PandasConverter(settings=converter.settings)
-        assert importer is not None
-
-    with subtests.test(msg='load without settings'):
-        with pytest.raises(ValueError):
-            PandasConverter(settings=None)
-
-    with subtests.test(msg='load with incorrect settings (no file_formats)'):
-        with pytest.raises(ValueError):
-            PandasConverter(settings={"auth_options": [{}]})
-
-    with subtests.test(msg='load with incorrect settings (file_formats but no xls)'):
-        with pytest.raises(ValueError):
-            PandasConverter(settings={"file_formats": [{}]})
-
-
 def test_convert_objects_to_dataframe_unnested_attributes():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    converter = PandasConverter(settings=converter.settings)
-
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
     instance.testBooleanField = False
@@ -58,7 +34,7 @@ def test_convert_objects_to_dataframe_unnested_attributes():
     instance.testTimeField = time(11, 5, 26)
     instances = [instance]
 
-    df = converter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
     assert df.shape == (1, 14)
 
     assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -77,11 +53,21 @@ def test_convert_objects_to_dataframe_unnested_attributes():
     assert df['testTimeField'][0] == time(11, 5, 26)
 
 
-def test_convert_objects_to_multiple_dataframes_unnested_attributes():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    converter = PandasConverter(settings=converter.settings)
+def test_convert_objects_to_dataframe_minimal_test():
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
+    instance.testBooleanField = False
+    instances = [instance]
 
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    assert df.shape == (1, 3)
+
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == '0000'
+    assert df['testBooleanField'][0] == False
+
+
+def test_convert_objects_to_multiple_dataframes_unnested_attributes():
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
     instance.testStringField = 'string1'
@@ -96,7 +82,7 @@ def test_convert_objects_to_multiple_dataframes_unnested_attributes():
 
     instances = [instance, instance_2, instance_3]
 
-    df_dict = converter.convert_objects_to_multiple_dataframes(list_of_objects=instances)
+    df_dict = PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=instances)
 
     test_class_df = df_dict['onderdeel#AllCasesTestClass']
     assert test_class_df.shape == (2, 3)
@@ -112,11 +98,7 @@ def test_convert_objects_to_multiple_dataframes_unnested_attributes():
     assert list(df_dict.keys()) == ['onderdeel#AllCasesTestClass', 'onderdeel#AnotherTestClass']
 
 
-def test_convert_objects_to_dataframe_nested_attributes_1_level():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    converter = PandasConverter(settings=converter.settings)
-
+def test_convert_objects_to_dataframe_nested_attributes_1_level_cast_list():
     instance = AllCasesTestClass()
     instance.assetId.identificator = 'YKAzZDhhdTXqkD'
     instance.assetId.toegekendDoor = 'DGcQxwCGiBlR'
@@ -136,7 +118,43 @@ def test_convert_objects_to_dataframe_nested_attributes_1_level():
     instance.testKwantWrdMetKard[1].waarde = 20.0
     instances = [instance]
 
-    df = converter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances, cast_list=True)
+    assert df.shape == (1, 11)
+
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == 'YKAzZDhhdTXqkD'
+    assert df['assetId.toegekendDoor'][0] == 'DGcQxwCGiBlR'
+    assert df['testComplexType.testBooleanField'][0] == True
+    assert df['testComplexType.testKwantWrd'][0] == 65.14
+    assert df['testComplexType.testKwantWrdMetKard[]'][0] == '10.0|20.0'
+    assert df['testComplexType.testStringField'][0] == 'KmCtMXM'
+    assert df['testComplexType.testStringFieldMetKard[]'][0] == 'string1|string2'
+    assert df['testEenvoudigType'][0] == 'string1'
+    assert df['testEenvoudigTypeMetKard[]'][0] == 'string1|string2'
+    assert df['testKwantWrdMetKard[]'][0] == '10.0|20.0'
+
+
+def test_convert_objects_to_dataframe_nested_attributes_1_level():
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = 'YKAzZDhhdTXqkD'
+    instance.assetId.toegekendDoor = 'DGcQxwCGiBlR'
+    instance.testComplexType.testBooleanField = True
+    instance.testComplexType.testKwantWrd.waarde = 65.14
+    instance.testComplexType.testKwantWrdMetKard[0].waarde = 10.0
+    instance.testComplexType._testKwantWrdMetKard.add_empty_value()
+    instance.testComplexType.testKwantWrdMetKard[1].waarde = 20.0
+    instance.testComplexType.testStringField = 'KmCtMXM'
+    instance.testComplexType.testStringFieldMetKard = ['string1', 'string2']
+    instance.testEenvoudigType.waarde = 'string1'
+    instance.testEenvoudigTypeMetKard[0].waarde = 'string1'
+    instance._testEenvoudigTypeMetKard.add_empty_value()
+    instance.testEenvoudigTypeMetKard[1].waarde = 'string2'
+    instance.testKwantWrdMetKard[0].waarde = 10.0
+    instance._testKwantWrdMetKard.add_empty_value()
+    instance.testKwantWrdMetKard[1].waarde = 20.0
+    instances = [instance]
+
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
     assert df.shape == (1, 11)
 
     assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -153,10 +171,6 @@ def test_convert_objects_to_dataframe_nested_attributes_1_level():
 
 
 def test_convert_objects_to_dataframe_nested_attributes_2_levels():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    converter = PandasConverter(settings=converter.settings)
-
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
 
@@ -178,7 +192,7 @@ def test_convert_objects_to_dataframe_nested_attributes_2_levels():
 
     instances = [instance]
 
-    df = converter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
 
     assert df.shape == (1, 8)
     assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -193,10 +207,6 @@ def test_convert_objects_to_dataframe_nested_attributes_2_levels():
 
 
 def test_convert_dataframe_to_objects_unnested_attributes(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    converter = PandasConverter(settings=converter.settings)
-
     columns = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testBooleanField',
                'testDateField', 'testDateTimeField', 'testDecimalField', 'testDecimalFieldMetKard[]',
                'testEenvoudigType', 'testEenvoudigTypeMetKard[]', 'testIntegerField',
@@ -213,9 +223,9 @@ def test_convert_dataframe_to_objects_unnested_attributes(caplog):
     df = DataFrame(data, columns=columns)
 
     caplog.clear()
-    created_objects = converter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
-    for record in caplog.records:
-        print(record.message)
+    created_objects = PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    created_objects = list(created_objects)
+
     assert len(caplog.records) == 0
 
     assert len(created_objects) == 1
@@ -238,10 +248,6 @@ def test_convert_dataframe_to_objects_unnested_attributes(caplog):
 
 
 def test_convert_dataframe_to_objects_nested_attributes_1_level(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    converter = PandasConverter(settings=converter.settings)
-
     columns = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testComplexType.testBooleanField',
                'testComplexType.testKwantWrd', 'testComplexType.testKwantWrdMetKard[]',
                'testComplexType.testStringField', 'testComplexType.testStringFieldMetKard[]',
@@ -256,7 +262,51 @@ def test_convert_dataframe_to_objects_nested_attributes_1_level(caplog):
     df = DataFrame(data, columns=columns)
 
     caplog.clear()
-    created_objects = converter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    created_objects = PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    created_objects = list(created_objects)
+    assert len(caplog.records) == 0
+
+    assert len(created_objects) == 1
+
+    instance = created_objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.assetId.identificator == '0000'
+    assert instance.assetId.toegekendDoor == 'OTLMOW'
+    assert instance.testComplexType.testBooleanField
+    assert instance.testComplexType.testKwantWrd.waarde == 65.14
+    assert instance.testComplexType.testKwantWrdMetKard[0].waarde == 10.0
+    assert instance.testComplexType.testKwantWrdMetKard[1].waarde == 20.0
+    assert instance.testComplexType.testStringField == 'KmCtMXM'
+    assert instance.testComplexType.testStringFieldMetKard == ['string1', 'string2']
+    assert instance.testComplexTypeMetKard[0].testBooleanField == True
+    assert instance.testComplexTypeMetKard[1].testBooleanField == False
+    assert instance.testComplexTypeMetKard[0].testKwantWrd.waarde == 10.0
+    assert instance.testComplexTypeMetKard[1].testKwantWrd.waarde == 20.0
+    assert instance.testComplexTypeMetKard[0].testStringField == 'string1'
+    assert instance.testComplexTypeMetKard[1].testStringField == 'string2'
+    assert instance.testUnionType.unionString == 'RWKofW'
+    assert instance.testUnionTypeMetKard[0].unionKwantWrd.waarde == 10.0
+    assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
+
+
+def test_convert_dataframe_to_objects_nested_attributes_1_level_cast_list(caplog):
+    columns = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testComplexType.testBooleanField',
+               'testComplexType.testKwantWrd', 'testComplexType.testKwantWrdMetKard[]',
+               'testComplexType.testStringField', 'testComplexType.testStringFieldMetKard[]',
+               'testComplexTypeMetKard[].testBooleanField', 'testComplexTypeMetKard[].testKwantWrd',
+               'testComplexTypeMetKard[].testStringField', 'testUnionType.unionString',
+               'testUnionTypeMetKard[].unionKwantWrd']
+
+    data = [['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', 'OTLMOW',
+             True, 65.14, '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
+             'string1|string2', 'RWKofW', '10.0|20.0']]
+
+    df = DataFrame(data, columns=columns)
+
+    caplog.clear()
+    created_objects = PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path,
+                                                                   cast_list=True)
+    created_objects = list(created_objects)
     assert len(caplog.records) == 0
 
     assert len(created_objects) == 1
@@ -283,10 +333,6 @@ def test_convert_dataframe_to_objects_nested_attributes_1_level(caplog):
 
 
 def test_convert_dataframe_to_objects_nested_attributes_2_level(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    converter = PandasConverter(settings=converter.settings)
-
     columns = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor',
                'testComplexType.testComplexType2.testKwantWrd',
                'testComplexType.testComplexType2.testStringField',
@@ -300,7 +346,8 @@ def test_convert_dataframe_to_objects_nested_attributes_2_level(caplog):
     df = DataFrame(data, columns=columns)
 
     caplog.clear()
-    created_objects = converter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    created_objects = PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path)
+    created_objects = list(created_objects)
     assert len(caplog.records) == 0
 
     assert len(created_objects) == 1
@@ -317,3 +364,38 @@ def test_convert_dataframe_to_objects_nested_attributes_2_level(caplog):
     assert instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde == 20.0
     assert instance.testComplexTypeMetKard[0].testComplexType2.testStringField == 'string1'
     assert instance.testComplexTypeMetKard[1].testComplexType2.testStringField == 'string2'
+
+
+def test_convert_dataframe_to_objects_nan_values(caplog):
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '01'
+    instance.testBooleanField = True
+    instance2 = AnotherTestClass()
+    instance2.assetId.identificator = '02'
+    instance2.notitie = 'random note'
+
+    instances = [instance, instance2]
+
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    assert df.shape == (2, 4)
+
+    assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert df['assetId.identificator'][0] == '01'
+    assert df['testBooleanField'][0]
+    assert isnan(df['notitie'][0])
+
+    assert df['typeURI'][1] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
+    assert df['assetId.identificator'][1] == '02'
+    assert df['notitie'][1] == 'random note'
+    assert isnan(df['testBooleanField'][1])
+
+    objects = list(PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path))
+    assert len(objects) == 2
+    assert objects[0].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert objects[0].assetId.identificator == '01'
+    assert objects[0].testBooleanField
+    assert objects[0].notitie is None
+
+    assert objects[1].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
+    assert objects[1].assetId.identificator == '02'
+    assert objects[1].notitie == 'random note'

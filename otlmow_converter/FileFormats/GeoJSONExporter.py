@@ -1,74 +1,86 @@
+from json import JSONEncoder
 from pathlib import Path
+from typing import Iterable
 
 import geojson
 import numpy as np
-
-from otlmow_converter.DotnotationHelper import DotnotationHelper
-from otlmow_converter.FileFormats.OtlAssetGeoJSONEncoder import OtlAssetGeoJSONEncoder
-from otlmow_converter.FileFormats.DotnotationTableExporter import DotnotationTableExporter
 from geojson import LineString, Point, MultiPoint, MultiLineString, Polygon, MultiPolygon, GeometryCollection
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+
+from otlmow_converter.AbstractExporter import AbstractExporter
+from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
+from otlmow_converter.SettingsManager import load_settings, GlobalVariables
+
+load_settings()
+
+geojson_settings = GlobalVariables.settings['formats']['GeoJSON']
+geojson_dotnotation_settings = geojson_settings['dotnotation']
+SEPARATOR = geojson_dotnotation_settings['separator']
+CARDINALITY_SEPARATOR = geojson_dotnotation_settings['cardinality_separator']
+CARDINALITY_INDICATOR = geojson_dotnotation_settings['cardinality_indicator']
+WAARDE_SHORTCUT = geojson_dotnotation_settings['waarde_shortcut']
+CAST_LIST = geojson_settings['cast_list']
+CAST_DATETIME = geojson_settings['cast_datetime']
+ALLOW_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['allow_non_otl_conform_attributes']
+WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['warn_for_non_otl_conform_attributes']
 
 
-class GeoJSONExporter:
-    def __init__(self, settings, model_directory: Path = None):
-        self.settings = next(s for s in settings['file_formats'] if s['name'] == 'geojson')
-        self.dotnotation_helper = DotnotationHelper(**self.settings['dotnotation'])
-        self.encoder = OtlAssetGeoJSONEncoder(indent=4, settings=settings)
-        if model_directory is None:
-            model_directory = 'otlmow_model'
-        self.table_exporter = DotnotationTableExporter(dotnotation_settings=self.settings['dotnotation'],
-                                                       model_directory=model_directory)
+class GeoJSONExporter(AbstractExporter):
+    @classmethod
+    def from_dotnotation_dicts(cls, sequence_of_dotnotation_dicts: Iterable[dict], filepath: Path) -> None:
+        list_of_objects = []
+        for d in sequence_of_dotnotation_dicts:
+            feature_dict = {
+                'id': d['assetId.identificator'],
+                'properties': d,
+                'type': 'Feature'}
 
-    def export_to_file(self, filepath: Path, list_of_objects: list = None):
-        list_of_dicts = self.convert_list_of_objects_to_list_of_geodicts(list_of_objects)
+            geometry = d.get('geometry', None)
+            if geometry is not None:
+                geom = cls.convert_wkt_string_to_geojson(d.pop("geometry"))
+                feature_dict['geometry'] = geom
+
+            list_of_objects.append(feature_dict)
 
         fc = {
             'type': 'FeatureCollection',
-            'features': list_of_dicts
+            'features': list_of_objects
         }
+        encoded_json = JSONEncoder(indent=4).encode(fc)
 
-        encoded_json = self.encoder.encode(fc)
-        self.encoder.write_json_to_file(encoded_json, filepath)
+        with open(filepath, "w") as file:
+            file.write(encoded_json)
 
-    def convert_list_of_objects_to_list_of_geodicts(self, list_of_objects):
-        self.table_exporter.fill_master_dict(list_of_objects)
+    @classmethod
+    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+        separator = kwargs.get('separator', SEPARATOR)
+        cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
+        cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
+        waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
+        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
+        warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
+                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
 
-        l = []
-        for k, assettype_data in self.table_exporter.master.items():
-            for asset_dict in assettype_data['data']:
-                geom = {}
-                new_asset_dict = {}
-                for k, v in asset_dict.items():
-                    if v is None:
-                        continue
-                    if k == 'geometry':
-                        geom = self.convert_wkt_string_to_geojson(v)
-                        continue
-                    if not isinstance(v, str):
-                        new_asset_dict[k] = self.table_exporter._stringify_value(v)
-                        if new_asset_dict[k] == 'True':
-                            new_asset_dict[k] = 'true'
-                        elif new_asset_dict[k] == 'False':
-                            new_asset_dict[k] = 'false'
-                    else:
-                        new_asset_dict[k] = v
-                asset_converted_dict = {
-                    'id': new_asset_dict['assetId.identificator'],
-                    'properties': new_asset_dict,
-                    'type': 'Feature'}
-                if geom != {}:
-                    asset_converted_dict['geometry'] = geom
-                l.append(asset_converted_dict)
+        cls.from_dotnotation_dicts(
+            [DotnotationDictConverter.to_dict(
+                asset, separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                cast_datetime=cast_datetime, cast_list=cast_list,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                for asset in sequence_of_objects], filepath=filepath)
 
-        return l
-
-    def convert_wkt_string_to_geojson(self, wkt_string):
+    @classmethod
+    def convert_wkt_string_to_geojson(cls, wkt_string: str):
         geom_type, coords_str = wkt_string.split('(', 1)
         coords_str = coords_str[:-1].replace(', ', ',').replace(' ,', ',')
 
         coords_list = []
 
-        self.split_and_add_to_list(coords_list, coords_str)
+        cls.split_and_add_to_list(coords_list, coords_str)
 
         geom_type = geom_type.lower()
         if geom_type.startswith('point'):
@@ -85,16 +97,17 @@ class GeoJSONExporter:
             geom = MultiPolygon(tuple(coords_list))
         elif geom_type.startswith('geometrycollection'):
             geom = GeometryCollection(tuple(coords_list))
+        else:
+            raise NotImplementedError(f'Geometry type {geom_type} not implemented')
 
-        g = geojson.dumps(geom, sort_keys=True)
         return {
-            'bbox': self.get_bounding_box(geom),
+            'bbox': cls.get_bounding_box(geom),
             'type': geom['type'],
             'coordinates': geom["coordinates"],
             'crs': {'properties': {'name': 'EPSG:31370'}, 'type': 'name'}}
 
-    @staticmethod
-    def get_bounding_box(geometry):
+    @classmethod
+    def get_bounding_box(cls, geometry):
         coords = np.array(list(geojson.utils.coords(geometry)))
         if coords.shape[1] == 3:
             return [coords[:, 0].min(), coords[:, 1].min(), coords[:, 2].min(),
@@ -102,12 +115,13 @@ class GeoJSONExporter:
         else:
             return [[coords[:, 0].min(), coords[:, 1].min()], [coords[:, 0].max(), coords[:, 1].max()]]
 
-    def split_and_add_to_list(self, coords_list: list, coords_str: str):
+    @classmethod
+    def split_and_add_to_list(cls, coords_list: list, coords_str: str):
         if coords_str.startswith('('):
             coords_str = coords_str[1:-1]
             for new_coords_str in coords_str.split('),('):
                 new_list = []
-                self.split_and_add_to_list(coords_list=new_list, coords_str=new_coords_str)
+                cls.split_and_add_to_list(coords_list=new_list, coords_str=new_coords_str)
                 coords_list.append(new_list)
         else:
             for c in coords_str.split(','):

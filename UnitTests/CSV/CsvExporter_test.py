@@ -6,67 +6,15 @@ from pathlib import Path
 
 import pytest
 
-from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.FileFormats.CsvExporter import CsvExporter
-from otlmow_converter.FileFormats.CsvImporter import CsvImporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def set_up_converter():
-    settings_file_location = get_settings_path_for_unittests()
-    return OtlmowConverter(settings_path=settings_file_location)
-
-
-def test_init_importer_only_load_with_settings(subtests):
-    converter = set_up_converter()
-
-    with subtests.test(msg='load with correct settings'):
-        exporter = CsvExporter(settings=converter.settings)
-        assert exporter is not None
-
-    with subtests.test(msg='load without settings'):
-        with pytest.raises(ValueError):
-            CsvExporter(settings=None)
-
-    with subtests.test(msg='load with incorrect settings (no file_formats)'):
-        with pytest.raises(ValueError):
-            CsvExporter(settings={"auth_options": [{}]})
-
-    with subtests.test(msg='load with incorrect settings (file_formats but no csv)'):
-        with pytest.raises(ValueError):
-            CsvExporter(settings={"file_formats": [{}]})
-
-
-def test_import_then_export_file():
-    converter = set_up_converter()
-    importer = CsvImporter(settings=converter.settings)
-    file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
-    objects = importer.import_file(filepath=file_location, model_directory=model_directory_path)
-    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
-    new_file_location = Path(__file__).parent / 'import_then_export_output.csv'
-    if os.path.isfile(new_file_location):
-        os.remove(new_file_location)
-    exporter.export_to_file(list_of_objects=objects, filepath=new_file_location, split_per_type=False)
-    assert os.path.isfile(new_file_location)
-
-    with open(file_location) as input_file:
-        input_file_lines = list(input_file)
-    with open(new_file_location) as output_file:
-        output_file_lines = list(output_file)
-    assert input_file_lines == output_file_lines
-
-    os.unlink(new_file_location)
-
-
 def test_export_unnested_attributes():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
     temp_dir_path = Path(__file__).parent / 'remove_after_test'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'unnested.csv'
@@ -96,10 +44,11 @@ def test_export_unnested_attributes():
     instance.testStringFieldMetKard = ['string1', 'string2']
     instance.testTimeField = time(11, 5, 26)
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)
+    CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False,
+                             model_directory=model_directory_path)
 
     with open(file_location, newline='', encoding='utf-8') as file:
-        csv_reader = csv.reader(file, delimiter=';', quotechar='"')
+        csv_reader = csv.reader(file, delimiter=';')
         lines = list(csv_reader)
     assert len(lines) == 2
 
@@ -121,9 +70,6 @@ def test_export_unnested_attributes():
 
 
 def test_export_unnested_attributes_split_per_type():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
     temp_dir_path = Path(__file__).parent / 'remove_after_test'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'unnested.csv'
@@ -136,9 +82,11 @@ def test_export_unnested_attributes_split_per_type():
     instance2.assetId.identificator = '0001'
     instance2.notitie = 'notitie'
 
-    exporter.export_to_file(list_of_objects=[instance, instance2], filepath=file_location, split_per_type=True)
+    CsvExporter.from_objects(sequence_of_objects=[instance, instance2], filepath=file_location, split_per_type=True,
+                             model_directory=model_directory_path)
+
     with open(temp_dir_path / 'unnested_onderdeel_AllCasesTestClass.csv', newline='', encoding='utf-8') as file:
-        csv_reader = csv.reader(file, delimiter=';', quotechar='"')
+        csv_reader = csv.reader(file, delimiter=';')
         lines = list(csv_reader)
     assert len(lines) == 2
 
@@ -163,10 +111,6 @@ def test_export_unnested_attributes_split_per_type():
 
 
 def test_export_and_then_import_nested_attributes_level_1():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
-
     temp_dir_path = Path(__file__).parent / 'remove_after_test'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'nested_level_1.csv'
@@ -198,7 +142,8 @@ def test_export_and_then_import_nested_attributes_level_1():
     instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)
+    CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False,
+                             model_directory=model_directory_path)
 
     with open(file_location, newline='', encoding='utf-8') as file:
         csv_reader = csv.reader(file, delimiter=';', quotechar='"')
@@ -222,10 +167,6 @@ def test_export_and_then_import_nested_attributes_level_1():
 
 
 def test_export_and_then_import_nested_attributes_level_2():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
-
     temp_dir_path = Path(__file__).parent / 'remove_after_test'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'nested_level_2.csv'
@@ -249,7 +190,8 @@ def test_export_and_then_import_nested_attributes_level_2():
     instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)
+    CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False,
+                             model_directory=model_directory_path)
 
     with open(file_location, newline='', encoding='utf-8') as file:
         csv_reader = csv.reader(file, delimiter=';', quotechar='"')
@@ -274,9 +216,6 @@ def test_export_and_then_import_nested_attributes_level_2():
 
 
 def test_export_list_of_lists():
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = CsvExporter(settings=converter.settings, model_directory=model_directory_path)
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_lists.csv'
 
     instance = AllCasesTestClass()
@@ -284,4 +223,4 @@ def test_export_list_of_lists():
     instance.testComplexTypeMetKard[0].testKwantWrdMetKard[0].waarde = 10.0
 
     with pytest.raises(DotnotationListOfListError):
-        exporter.export_to_file(list_of_objects=[instance], filepath=file_location, split_per_type=False)
+        CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False)

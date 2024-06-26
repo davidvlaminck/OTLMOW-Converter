@@ -3,11 +3,11 @@ import os
 import shutil
 import sys
 import timeit
+from collections import namedtuple
 from pathlib import Path
 from statistics import mean, stdev
-from collections import namedtuple
 from typing import Dict
-import logging
+
 from prettytable import prettytable
 
 # allow relative import of otlmow_converter
@@ -21,13 +21,11 @@ csv_data = None
 
 
 def read_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
-    converter = OtlmowConverter()
-    results_dict[read_data_key] = converter.create_assets_from_file(filepath, **kwargs)
+    results_dict[read_data_key] = OtlmowConverter.from_file_to_objects(filepath, **kwargs)
 
 
 def write_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
-    converter = OtlmowConverter()
-    converter.create_file_from_assets(filepath, list_of_objects=results_dict[read_data_key], **kwargs)
+    OtlmowConverter.from_objects_to_file(file_path=filepath, sequence_of_objects=results_dict[read_data_key], **kwargs)
 
 
 def time_read_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
@@ -39,7 +37,7 @@ def time_read_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
         lambda: read_assets(filepath=filepath, results_dict=results_dict, read_data_key=read_data_key, **kwargs),
         repeat=REPEAT_TIMES + 1, number=1)[1:]
     st_dev = stdev(result_times)
-    results_dict[read_data_key + '_row'] = f'{round(mean(result_times), 3)} +/- {round(st_dev, 3)}'
+    results_dict[f'{read_data_key}_row'] = f'{round(mean(result_times), 3)} +/- {round(st_dev, 3)}'
 
 
 def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
@@ -69,7 +67,7 @@ if __name__ == '__main__':
     FormatDetails = namedtuple('FormatDetails', ['Extension', 'Label', 'WriteArguments'])
 
     tb = prettytable.PrettyTable()
-    tb.field_names = ['Format', 'Read 500 classes', 'Write 500 classes', 'Size 500 classes',
+    tb.field_names = ['Format', 'Read all classes', 'Write all classes', 'Size all classes',
                       'Read 10 random classes', 'Write 10 random classes', 'Size 10 random classes']
 
     formats = [

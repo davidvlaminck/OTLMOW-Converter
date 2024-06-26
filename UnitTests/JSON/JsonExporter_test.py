@@ -3,47 +3,15 @@ import os
 from datetime import date, datetime, time
 from pathlib import Path
 
-import pytest
-
-from UnitTests.SettingManagerForUnit_test import get_settings_path_for_unittests
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonExporter import JsonExporter
-from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def set_up_converter():
-    settings_file_location = get_settings_path_for_unittests()
-    return OtlmowConverter(settings_path=settings_file_location)
+def test_export_and_then_import_unnested_attributes(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.json'
 
-
-def test_init_importer_only_load_with_settings(subtests):
-    otl_converter = set_up_converter()
-
-    with subtests.test(msg='load with correct settings'):
-        exporter = JsonExporter(settings=otl_converter.settings)
-        assert exporter is not None
-
-    with subtests.test(msg='load without settings'):
-        with pytest.raises(ValueError):
-            JsonExporter()
-
-    with subtests.test(msg='load with incorrect settings (no file_formats)'):
-        with pytest.raises(ValueError):
-            JsonExporter(settings={"auth_options": [{}]})
-
-    with subtests.test(msg='load with incorrect settings (file_formats but no xls)'):
-        with pytest.raises(ValueError):
-            JsonExporter(settings={"file_formats": [{}]})
-
-
-def test_export_and_then_import_unnested_attributes(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = JsonExporter(settings=converter.settings)
-    file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes_generated.json'
     instance = AllCasesTestClass()
     instance.geometry = 'POINT Z (200000 200000 0)'
     instance.assetId.identificator = '0000-0000'
@@ -62,9 +30,9 @@ def test_export_and_then_import_unnested_attributes(caplog):
     instance.testStringFieldMetKard = ['string1', 'string2']
     instance.testTimeField = time(11, 5, 26)
 
-    caplog.records.clear()
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    recwarn.clear()
+    JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    assert len(recwarn.list) == 0
 
     # read json file at file_location
     with open(file_location) as file:
@@ -107,10 +75,7 @@ def test_export_and_then_import_unnested_attributes(caplog):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_1(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = JsonExporter(settings=converter.settings)
+def test_export_and_then_import_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.json'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -148,9 +113,9 @@ def test_export_and_then_import_nested_attributes_level_1(caplog):
     instance.testUnionTypeMetKard[0].unionKwantWrd.waarde = 10.0
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
-    caplog.records.clear()
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    recwarn.list.clear()
+    JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    assert len(recwarn.list) == 0
 
     with open(file_location) as file:
         json_data = json.load(file)
@@ -189,10 +154,7 @@ def test_export_and_then_import_nested_attributes_level_1(caplog):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_2(caplog):
-    settings_file_location = Path(__file__).parent.parent / 'settings_OTLMOW.json'
-    converter = OtlmowConverter(settings_path=settings_file_location)
-    exporter = JsonExporter(settings=converter.settings)
+def test_export_and_then_import_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_2_generated.json'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -213,9 +175,9 @@ def test_export_and_then_import_nested_attributes_level_2(caplog):
     instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
-    caplog.records.clear()
-    exporter.export_to_file(list_of_objects=[instance], filepath=file_location)
-    assert len(caplog.records) == 0
+    recwarn.list.clear()
+    JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    assert len(recwarn.list) == 0
 
     with open(file_location) as file:
         json_data = json.load(file)

@@ -1,0 +1,62 @@
+{
+    "@context": {
+        "asset": "https://data.awvvlaanderen.be/id/asset/",
+        "onderdeel": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#",
+        "imel": "https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#"
+    },
+    "@graph": [
+        {
+        "@id": "asset:0000-0000",
+        "@type": "onderdeel:AllCasesTestClass",
+        "imel:AIMObject.assetId": {
+                "imel:DtcIdentificator.identificator":  "0000-0000"
+        },
+        "https://loc.data.wegenenverkeer.be/ns/implementatieelement#Locatie.geometrie": "POINT Z (200000 200000 0)",
+        "onderdeel:AllCasesTestClass.testBooleanField": false,
+        "onderdeel:AllCasesTestClass.testDateField": "2019-09-20",
+        "onderdeel:AllCasesTestClass.testDateTimeField": "2001-12-15 22:22:15",
+        "onderdeel:AllCasesTestClass.testDecimalField": 79.07,
+        "onderdeel:AllCasesTestClass.testDecimalFieldMetKard": [
+            10.0,
+            20.0
+        ],
+        "onderdeel:AllCasesTestClass.testEenvoudigType": {
+            "imel:DteTestEenvoudigType.waarde": "string1"
+        },
+        "onderdeel:AllCasesTestClass.testEenvoudigTypeMetKard": [
+            {
+            "imel:DteTestEenvoudigType.waarde": "string1"
+            },
+            {
+            "imel:DteTestEenvoudigType.waarde": "string2"
+            }
+        ],
+        "onderdeel:AllCasesTestClass.testIntegerField": -55,
+        "onderdeel:AllCasesTestClass.testIntegerFieldMetKard": [
+            76,
+            2
+        ],
+        "onderdeel:AllCasesTestClass.testKeuzelijst": "waarde-4",
+        "onderdeel:AllCasesTestClass.testKeuzelijstMetKard": [
+            "https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-4",
+            "https://wegenenverkeer.data.vlaanderen.be/id/concept/KlTestKeuzelijst/waarde-3"
+        ],
+        "onderdeel:AllCasesTestClass.testKwantWrd": {
+            "imel:KwantWrdTest.waarde": 98.21
+        },
+        "onderdeel:AllCasesTestClass.testKwantWrdMetKard": [{
+            "imel:KwantWrdTest.waarde": 10.0
+        },
+        {
+            "imel:KwantWrdTest.waarde": 20.0
+        }],
+        "onderdeel:AllCasesTestClass.testStringField": "oFfeDLp",
+        "onderdeel:AllCasesTestClass.testStringFieldMetKard": [
+            "string1",
+            "string2"
+        ],
+        "onderdeel:AllCasesTestClass.testTimeField": "11:05:26",
+        "imel:AIMObject.typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+    }
+]
+}
