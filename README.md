@@ -21,7 +21,7 @@ It is split into different packages to reduce compatibility issues
 
 
 ## Installation and requirements
-OTLMOW-Converter has a couple of dependencies besides the standard Python libraries. It depends on another OTLMOW package: otlmow-model. These libraries will be automatically installed when installing this library. Currently, you need at least Python version 3.7 to use this library.
+OTLMOW-Converter has a couple of dependencies besides the standard Python libraries. It depends on another OTLMOW package: otlmow-model. These libraries will be automatically installed when installing this library. Currently, you need at least Python version 3.8 to use this library.
 
 To install the OTL MOW project into your Python project, use pip to install it:
 ``` 
