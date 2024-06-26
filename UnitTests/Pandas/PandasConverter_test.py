@@ -1,16 +1,13 @@
 import os
-import unittest
 from datetime import date, datetime, time
 from pathlib import Path
 
-import pytest
-from numpy import nan, isnan
+from numpy import isnan
 from pandas import DataFrame
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.FileFormats.PandasConverter import PandasConverter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
