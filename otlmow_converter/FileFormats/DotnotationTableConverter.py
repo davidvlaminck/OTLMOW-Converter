@@ -213,6 +213,10 @@ class DotnotationTableConverter:
                     continue
                 if empty_string_equals_none and value == '':
                     continue
+                if value == 'true':
+                    value = True
+                if value == 'false':
+                    value = False
                 data_dict[header] = value
             list_of_dicts.append(data_dict)
 
