@@ -25,6 +25,22 @@ def test_from_dict_simple_attributes():
     assert created_instance == expected
 
 
+def test_from_dict_simple_attributes_clear_values():
+    expected = AllCasesTestClass()
+    expected._testKeuzelijst.clear_value()
+    expected._testBooleanField.clear_value()
+    expected._testDecimalField.clear_value()
+    expected._testDateTimeField.clear_value()
+    expected._testIntegerField.clear_value()
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testBooleanField': '88888888', 'testKeuzelijst': '88888888',
+            'testDecimalField': 88888888.0, 'testDateTimeField': '88888888', 'testIntegerField': 88888888}),
+        model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
 def test_to_dict_simple_attributes():
     instance = AllCasesTestClass()
     instance.testKeuzelijst = 'waarde-2'
@@ -32,6 +48,19 @@ def test_to_dict_simple_attributes():
 
     assert DotnotationDictConverter.to_dict(instance) == {'testBooleanField': True, 'testKeuzelijst': 'waarde-2',
                                                           'typeURI': AllCasesTestClass.typeURI}
+
+
+def test_to_dict_simple_attributes_clear_values():
+    instance = AllCasesTestClass()
+    instance._testKeuzelijst.clear_value()
+    instance._testBooleanField.clear_value()
+    instance._testDecimalField.clear_value()
+    instance._testDateTimeField.clear_value()
+    instance._testIntegerField.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance) == {
+        'typeURI': AllCasesTestClass.typeURI, 'testBooleanField': '88888888', 'testKeuzelijst': '88888888',
+        'testDecimalField': 88888888.0, 'testDateTimeField': '88888888', 'testIntegerField': 88888888}
 
 
 def test_from_dict_convert_types_without_warnings(recwarn):
@@ -58,7 +87,7 @@ def test_from_dict_convert_types_without_warnings(recwarn):
     assert len(recwarn) == 0
 
 
-def test_from_dict_datetimes_convert_true(recwarn):
+def test_from_dict_datetime_convert_true(recwarn):
     expected = AllCasesTestClass()
     expected.testDateField = date(2022, 12, 12)
     expected.testTimeField = time(10, 11, 12)
@@ -73,7 +102,7 @@ def test_from_dict_datetimes_convert_true(recwarn):
     assert len(recwarn) == 0
 
 
-def test_from_dict_datetimes_convert_false(recwarn):
+def test_from_dict_datetime_convert_false(recwarn):
     expected = AllCasesTestClass()
     expected.testDateField = date(2022, 12, 12)
     expected.testTimeField = time(10, 11, 12)
@@ -90,7 +119,7 @@ def test_from_dict_datetimes_convert_false(recwarn):
     assert len(recwarn) == 0
 
 
-def test_to_dict_datetimes():
+def test_to_dict_datetime():
     instance = AllCasesTestClass()
     instance.testDateField = date(2022, 12, 12)
     instance.testTimeField = time(10, 11, 12)
@@ -194,6 +223,21 @@ def test_from_dict_simple_attribute_with_cardinality():
     assert created_instance == expected
 
 
+def test_from_dict_simple_attribute_with_cardinality_clear_values():
+    expected = AllCasesTestClass()
+    expected.testIntegerFieldMetKard = '88888888'
+    expected.testStringFieldMetKard = '88888888'
+    expected.testKeuzelijstMetKard = '88888888'
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
+        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '88888888',
+        'testStringFieldMetKard[]': '88888888',
+        'testKeuzelijstMetKard[]': '88888888'
+    }), model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
 def test_to_dict_simple_attribute_with_cardinality():
     instance = AllCasesTestClass()
     instance.testIntegerFieldMetKard = [1, 2, 3]
@@ -205,6 +249,20 @@ def test_to_dict_simple_attribute_with_cardinality():
         'testStringFieldMetKard[]': ['a', 'b', 'c'],
         'testKeuzelijstMetKard[]': ['waarde-1', 'waarde-2', 'waarde-3'],
         'typeURI': AllCasesTestClass.typeURI}
+
+
+def test_to_dict_simple_attribute_with_cardinality_clear_values():
+    instance = AllCasesTestClass()
+    instance.testIntegerFieldMetKard = '88888888'
+    instance.testStringFieldMetKard = '88888888'
+    instance.testKeuzelijstMetKard = '88888888'
+
+    assert DotnotationDictConverter.to_dict(instance) == {
+        'typeURI': AllCasesTestClass.typeURI,
+        'testIntegerFieldMetKard[]': '88888888',
+        'testStringFieldMetKard[]': '88888888',
+        'testKeuzelijstMetKard[]': '88888888'
+    }
 
 
 def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
@@ -226,6 +284,22 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
     assert len(recwarn) == 0
 
 
+def test_from_dict_simple_attribute_with_cardinality_convert_lists_clear_values(recwarn):
+    expected = AllCasesTestClass()
+    expected.testIntegerFieldMetKard = '88888888'
+    expected.testKwantWrdMetKard[0].waarde = 88888888.0
+    expected.testStringFieldMetKard = '88888888'
+    expected.testKeuzelijstMetKard = '88888888'
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
+        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '88888888',
+        'testStringFieldMetKard[]': '88888888', 'testKeuzelijstMetKard[]': '88888888',
+        'testKwantWrdMetKard[]': '88888888'}), cast_list=True, model_directory=model_directory_path)
+
+    assert created_instance == expected
+    assert len(recwarn) == 0
+
+
 def test_to_dict_simple_attribute_with_cardinality_convert_lists():
     instance = AllCasesTestClass()
     instance.testIntegerFieldMetKard = [1, 2]
@@ -242,6 +316,34 @@ def test_to_dict_simple_attribute_with_cardinality_convert_lists():
         'typeURI': AllCasesTestClass.typeURI}
 
 
+def test_to_dict_simple_attribute_with_cardinality_convert_lists_clear_values():
+    instance = AllCasesTestClass()
+    instance._testIntegerFieldMetKard.clear_value()
+    instance._testKwantWrdMetKard.add_empty_value()
+    instance.testKwantWrdMetKard[0]._waarde.clear_value()
+    instance._testKeuzelijstMetKard.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance, cast_list=True, waarde_shortcut=False) == {
+        'testIntegerFieldMetKard[]': '88888888',
+        'testKwantWrdMetKard[].waarde': '88888888.0',
+        'testKeuzelijstMetKard[]': '88888888',
+        'typeURI': AllCasesTestClass.typeURI}
+
+
+def test_to_dict_simple_attribute_with_cardinality_convert_lists_waarde_shortcut_clear_values():
+    instance = AllCasesTestClass()
+    instance._testIntegerFieldMetKard.clear_value()
+    instance._testKwantWrdMetKard.add_empty_value()
+    instance.testKwantWrdMetKard[0]._waarde.clear_value()
+    instance._testKeuzelijstMetKard.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance, cast_list=True, waarde_shortcut=True) == {
+        'testIntegerFieldMetKard[]': '88888888',
+        'testKwantWrdMetKard[]': '88888888.0',
+        'testKeuzelijstMetKard[]': '88888888',
+        'typeURI': AllCasesTestClass.typeURI}
+
+
 def test_from_dict_simple_attributes_waarde_shortcut():
     expected = AllCasesTestClass()
     expected.testEenvoudigType.waarde = 'A.B.C.D'
@@ -249,6 +351,18 @@ def test_from_dict_simple_attributes_waarde_shortcut():
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI, 'testEenvoudigType': 'A.B.C.D', 'testKwantWrd': 2.0}),
+        waarde_shortcut=True, model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
+def test_from_dict_simple_attributes_waarde_shortcut_clear_values():
+    expected = AllCasesTestClass()
+    expected._testEenvoudigType.clear_value()
+    expected._testKwantWrd.clear_value()
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testEenvoudigType': '88888888', 'testKwantWrd': 88888888}),
         waarde_shortcut=True, model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -266,12 +380,34 @@ def test_from_dict_simple_attributes_waarde_shortcut_set_to_false():
     assert created_instance == expected
 
 
+def test_from_dict_simple_attributes_waarde_shortcut_set_to_false_clear_values():
+    expected = AllCasesTestClass()
+    expected._testEenvoudigType.clear_value()
+    expected._testKwantWrd.clear_value()
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testEenvoudigType.waarde': '88888888',
+         'testKwantWrd.waarde': 88888888}),
+        model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
 def test_to_dict_simple_attributes_waarde_shortcut():
     instance = AllCasesTestClass()
     instance.testEenvoudigType.waarde = 'A.B.C.D'
     instance.testKwantWrd.waarde = 2.0
 
     assert DotnotationDictConverter.to_dict(instance) == {'testEenvoudigType': 'A.B.C.D', 'testKwantWrd': 2.0,
+                                                          'typeURI': AllCasesTestClass.typeURI}
+
+
+def test_to_dict_simple_attributes_waarde_shortcut_clear_values():
+    instance = AllCasesTestClass()
+    instance._testEenvoudigType.clear_value()
+    instance._testKwantWrd.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance) == {'testEenvoudigType': '88888888', 'testKwantWrd': 88888888.0,
                                                           'typeURI': AllCasesTestClass.typeURI}
 
 
@@ -284,6 +420,15 @@ def test_to_dict_simple_attributes_waarde_shortcut_set_to_false():
         'testEenvoudigType.waarde': 'A.B.C.D', 'testKwantWrd.waarde': 2.0, 'typeURI': AllCasesTestClass.typeURI}
 
 
+def test_to_dict_simple_attributes_waarde_shortcut_set_to_false_clear_values():
+    instance = AllCasesTestClass()
+    instance._testEenvoudigType.clear_value()
+    instance._testKwantWrd.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance, waarde_shortcut=False) == {
+        'testEenvoudigType.waarde': '88888888', 'testKwantWrd.waarde': 88888888.0, 'typeURI': AllCasesTestClass.typeURI}
+
+
 def test_from_dict_complex_attributes():
     expected = AllCasesTestClass()
     expected.testComplexType.testStringField = 'string 1'
@@ -292,6 +437,19 @@ def test_from_dict_complex_attributes():
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI, 'testComplexType.testStringField': 'string 1',
          'testComplexType.testComplexType2.testStringField': 'string 2'}),
+        model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
+def test_from_dict_complex_attributes_clear_values():
+    expected = AllCasesTestClass()
+    expected.testComplexType._testStringField.clear_value()
+    expected.testComplexType.testComplexType2._testStringField.clear_value()
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexType.testStringField': '88888888',
+         'testComplexType.testComplexType2.testStringField': '88888888'}),
         model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -308,6 +466,17 @@ def test_from_dict_complex_attributes_with_kwant_wrd():
     assert created_instance == expected
 
 
+def test_from_dict_complex_attributes_with_kwant_wrd_clear_values():
+    expected = AllCasesTestClass()
+    expected.testUnionType.unionKwantWrd.waarde = 88888888.0
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testUnionType.unionKwantWrd': 88888888.0}),
+        waarde_shortcut=True, model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
 def test_to_dict_complex_attributes():
     instance = AllCasesTestClass()
     instance.testComplexType.testStringField = 'string 1'
@@ -318,6 +487,19 @@ def test_to_dict_complex_attributes():
         'testComplexType.testComplexType2.testStringField': 'string 2',
         'testComplexType.testStringField': 'string 1',
         'testUnionType.unionKwantWrd': 2.0,
+        'typeURI': AllCasesTestClass.typeURI}
+
+
+def test_to_dict_complex_attributes_clear_values():
+    instance = AllCasesTestClass()
+    instance.testComplexType._testStringField.clear_value()
+    instance.testComplexType.testComplexType2._testStringField.clear_value()
+    instance.testUnionType.unionKwantWrd._waarde.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance) == {
+        'testComplexType.testComplexType2.testStringField': '88888888',
+        'testComplexType.testStringField': '88888888',
+        'testUnionType.unionKwantWrd': 88888888.0,
         'typeURI': AllCasesTestClass.typeURI}
 
 
@@ -337,6 +519,21 @@ def test_from_dict_complex_attributes_with_cardinality():
     assert created_instance == expected
 
 
+def test_from_dict_complex_attributes_with_cardinality_clear_values():
+    expected = AllCasesTestClass()
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[0]._testStringField.clear_value()
+    expected.testComplexType._testStringFieldMetKard.clear_value()
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI,
+         'testComplexTypeMetKard[].testStringField': '88888888',
+         'testComplexType.testStringFieldMetKard[]': '88888888'}),
+        cast_list=True, model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
 def test_to_dict_with_cardinality():
     instance = AllCasesTestClass()
     instance.testStringFieldMetKard = ['a', 'b']
@@ -350,6 +547,22 @@ def test_to_dict_with_cardinality():
         'testComplexTypeMetKard[].testStringField': ['e', 'f'],
         'testComplexType.testStringFieldMetKard[]': ['c', 'd'],
         'testStringFieldMetKard[]': ['a', 'b'],
+        'typeURI': AllCasesTestClass.typeURI}
+
+
+def test_to_dict_with_cardinality_clear_values():
+    instance = AllCasesTestClass()
+    instance._testStringFieldMetKard.clear_value()
+    instance.testComplexType._testStringFieldMetKard.clear_value()
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[0]._testStringField.clear_value()
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[1]._testStringField.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance, cast_list=True) == {
+        'testComplexTypeMetKard[].testStringField': '88888888|88888888',
+        'testComplexType.testStringFieldMetKard[]': '88888888',
+        'testStringFieldMetKard[]': '88888888',
         'typeURI': AllCasesTestClass.typeURI}
 
 
@@ -374,6 +587,27 @@ def test_from_dict_with_different_cardinality():
     assert created_instance == expected
 
 
+def test_from_dict_with_different_cardinality_clear_values():
+    expected = AllCasesTestClass()
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[0]._testBooleanField.clear_value()
+    expected.testComplexTypeMetKard[0].testStringField = '1.1'
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[1].testBooleanField = True
+    expected.testComplexTypeMetKard[1].testKwantWrd._waarde.clear_value()
+    expected.testComplexTypeMetKard[1].testStringField = '1.2'
+    expected._testComplexTypeMetKard.add_empty_value()
+    expected.testComplexTypeMetKard[2]._testStringField.clear_value()
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
+        'typeURI': AllCasesTestClass.typeURI,
+        'testComplexTypeMetKard[].testBooleanField': ['88888888', True, None],
+        'testComplexTypeMetKard[].testStringField': ['1.1', '1.2', '88888888'],
+        'testComplexTypeMetKard[].testKwantWrd': [None, 88888888.0, None]}), model_directory=model_directory_path)
+
+    assert created_instance == expected
+
+
 def test_to_dict_with_different_cardinality():
     instance = AllCasesTestClass()
 
@@ -394,6 +628,26 @@ def test_to_dict_with_different_cardinality():
         'typeURI': AllCasesTestClass.typeURI}
 
 
+def test_to_dict_with_different_cardinality_clear_values():
+    instance = AllCasesTestClass()
+
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[0]._testBooleanField.clear_value()
+    instance.testComplexTypeMetKard[0].testStringField = '1.1'
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[1].testBooleanField = True
+    instance.testComplexTypeMetKard[1].testKwantWrd._waarde.clear_value()
+    instance.testComplexTypeMetKard[1].testStringField = '1.2'
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[2]._testStringField.clear_value()
+
+    assert DotnotationDictConverter.to_dict(instance) == {
+        'typeURI': AllCasesTestClass.typeURI,
+        'testComplexTypeMetKard[].testBooleanField': ['88888888', True, None],
+        'testComplexTypeMetKard[].testStringField': ['1.1', '1.2', '88888888'],
+        'testComplexTypeMetKard[].testKwantWrd': [None, 88888888.0, None]}
+
+
 def test_from_dict_complex_attributes_with_cardinality_and_kwant_wrd():
     expected = AllCasesTestClass()
     expected.testComplexType._testKwantWrdMetKard.add_empty_value()
@@ -411,19 +665,36 @@ def test_from_dict_complex_attributes_with_cardinality_and_kwant_wrd():
     assert created_instance == expected
 
 
+def test_from_dict_complex_attributes_with_cardinality_and_kwant_wrd_clear_values():
+    expected = AllCasesTestClass()
+    expected.testComplexType._testKwantWrdMetKard.add_empty_value()
+    expected.testComplexType._testKwantWrdMetKard.add_empty_value()
+    expected.testComplexType.testKwantWrdMetKard[0]._waarde.clear_value()
+    expected.testComplexType.testKwantWrdMetKard[1]._waarde.clear_value()
+    expected.testComplexType.testComplexType2.testKwantWrd._waarde.clear_value()
+    expected.testUnionType.unionKwantWrd._waarde.clear_value()
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexType.testKwantWrdMetKard[]': [88888888.0, 88888888.0],
+         'testComplexType.testComplexType2.testKwantWrd': 88888888.0, 'testUnionType.unionKwantWrd': 88888888.0}),
+        model_directory=model_directory_path, waarde_shortcut=True)
+
+    assert created_instance == expected
+
+
 def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_False():
     instance = AllCasesTestClass()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
-    instance.testComplexType.testKwantWrdMetKard[0].waarde = 3.0
-    instance.testComplexType.testKwantWrdMetKard[1].waarde = 4.0
-    instance.testComplexType.testComplexType2.testKwantWrd.waarde = 5.0
-    instance.testUnionType.unionKwantWrd.waarde = 2.0
+    instance.testComplexType.testKwantWrdMetKard[0]._waarde.clear_value()
+    instance.testComplexType.testKwantWrdMetKard[1]._waarde.clear_value()
+    instance.testComplexType.testComplexType2.testKwantWrd._waarde.clear_value()
+    instance.testUnionType.unionKwantWrd._waarde.clear_value()
 
-    assert DotnotationDictConverter.to_dict(instance) == {
-        'testComplexType.testComplexType2.testKwantWrd': 5.0,
-        'testComplexType.testKwantWrdMetKard[]': [3.0, 4.0],
-        'testUnionType.unionKwantWrd': 2.0,
+    assert DotnotationDictConverter.to_dict(instance, waarde_shortcut=True) == {
+        'testComplexType.testComplexType2.testKwantWrd': 88888888.0,
+        'testComplexType.testKwantWrdMetKard[]': [88888888.0, 88888888.0],
+        'testUnionType.unionKwantWrd': 88888888.0,
         'typeURI': AllCasesTestClass.typeURI}
 
 
@@ -431,15 +702,15 @@ def test_to_dict_complex_attributes_with_cardinality_and_kwant_wrd_cast_list_Tru
     instance = AllCasesTestClass()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
     instance.testComplexType._testKwantWrdMetKard.add_empty_value()
-    instance.testComplexType.testKwantWrdMetKard[0].waarde = 3.0
-    instance.testComplexType.testKwantWrdMetKard[1].waarde = 4.0
-    instance.testComplexType.testComplexType2.testKwantWrd.waarde = 5.0
-    instance.testUnionType.unionKwantWrd.waarde = 2.0
+    instance.testComplexType.testKwantWrdMetKard[0]._waarde.clear_value()
+    instance.testComplexType.testKwantWrdMetKard[1]._waarde.clear_value()
+    instance.testComplexType.testComplexType2.testKwantWrd._waarde.clear_value()
+    instance.testUnionType.unionKwantWrd._waarde.clear_value()
 
     assert DotnotationDictConverter.to_dict(instance, cast_list=True) == {
-        'testComplexType.testComplexType2.testKwantWrd': 5.0,
-        'testComplexType.testKwantWrdMetKard[]': '3.0|4.0',
-        'testUnionType.unionKwantWrd': 2.0,
+        'testComplexType.testComplexType2.testKwantWrd': 88888888.0,
+        'testComplexType.testKwantWrdMetKard[]': '88888888.0|88888888.0',
+        'testUnionType.unionKwantWrd': 88888888.0,
         'typeURI': AllCasesTestClass.typeURI}
 
 

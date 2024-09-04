@@ -90,6 +90,16 @@ class DotnotationDictConverter:
                                                             object_or_attribute, warn_for_non_otl_conform_attributes)
                 continue
             if attribute.waarde is None:
+                if not attribute.mark_to_be_cleared:
+                    continue
+
+                dotnotation = DotnotationHelper.get_dotnotation(
+                    attribute, waarde_shortcut=waarde_shortcut, separator=separator,
+                    cardinality_indicator=cardinality_indicator)
+                if attribute.kardinaliteit_max != '1':
+                    yield dotnotation, '88888888'
+                else:
+                    yield dotnotation, attribute.field.clearing_value
                 continue
 
             if attribute.field.waardeObject is None:
@@ -99,6 +109,9 @@ class DotnotationDictConverter:
                 if dotnotation.count(cardinality_indicator) > 1:
                     raise DotnotationListOfListError(f'Can not use dotnotation for lists of lists. '
                                                      f'Dotnotation: {dotnotation}')
+                if attribute.mark_to_be_cleared:
+                    yield dotnotation, attribute.field.clearing_value
+
                 if cast_list and attribute.kardinaliteit_max != '1':
                     yield dotnotation, cardinality_separator.join(str(a) for a in attribute.waarde)
                 elif cast_datetime:
@@ -255,6 +268,9 @@ class DotnotationDictConverter:
                 setattr(object_or_attribute, dotnotation, value)
                 return
             if cardinality and cast_list:
+                if value == '88888888':
+                    attribute.clear_value()
+                    return
                 value = [attribute.field.convert_to_correct_type(v, log_warnings=False)
                          for v in str(value).split(cardinality_separator)]
 
@@ -282,7 +298,7 @@ class DotnotationDictConverter:
                 if cast_datetime and attribute.field in {TimeField, DateField, DateTimeField}:
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
                 elif issubclass(attribute.field, KeuzelijstField):
-                    if cardinality:
+                    if cardinality and value != '88888888':
                         value = [str(v) for v in value]
                     else:
                         value = str(value)
