@@ -57,7 +57,6 @@ def test_load_test_unnested_attributes(recwarn):
 def test_load_test_unnested_attributes_clear_values(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes_clear_values.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    #assert len(recwarn.list) == 0
 
     assert len(assets) == 1
 
@@ -84,6 +83,8 @@ def test_load_test_unnested_attributes_clear_values(recwarn):
     instance._testTimeField.clear_value()
     instance.assetId.identificator = '0000-0000'
     assert instance == assets[0]
+
+    assert len(recwarn.list) == 0
 
 
 def test_load_test_nested_attributes_1_level(recwarn):
