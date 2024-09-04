@@ -215,10 +215,10 @@ def test_export_and_then_import_nested_attributes_level_2(caplog):
 
     instance._testComplexTypeMetKard.add_empty_value()
     instance._testComplexTypeMetKard.add_empty_value()
-    instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde = 10.0
-    instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde = 20.0
-    instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string1'
-    instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
+    instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde = 30.0
+    instance.testComplexTypeMetKard[1].testComplexType2.testKwantWrd.waarde = 40.0
+    instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'string3'
+    instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string4'
 
     caplog.records.clear()
     JsonLdExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
@@ -247,12 +247,12 @@ def test_export_and_then_import_nested_attributes_level_2(caplog):
                        'imel:DtcTestComplexType2.testStringField': 'string2'}]},
              'onderdeel:AllCasesTestClass.testComplexTypeMetKard': [
                  {'imel:DtcTestComplexType.testComplexType2':
-                      {'imel:DtcTestComplexType2.testKwantWrd': {'imel:KwantWrdTest.waarde': 10.0},
-                       'imel:DtcTestComplexType2.testStringField': 'string1'}},
+                      {'imel:DtcTestComplexType2.testKwantWrd': {'imel:KwantWrdTest.waarde': 30.0},
+                       'imel:DtcTestComplexType2.testStringField': 'string3'}},
                  {'imel:DtcTestComplexType.testComplexType2':
                       {'imel:DtcTestComplexType2.testKwantWrd':
-                           {'imel:KwantWrdTest.waarde': 20.0},
-                       'imel:DtcTestComplexType2.testStringField': 'string2'}}]}]}
+                           {'imel:KwantWrdTest.waarde': 40.0},
+                       'imel:DtcTestComplexType2.testStringField': 'string4'}}]}]}
 
     os.unlink(file_location)
 
