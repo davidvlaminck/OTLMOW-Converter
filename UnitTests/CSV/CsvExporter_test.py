@@ -69,6 +69,62 @@ def test_export_unnested_attributes():
     shutil.rmtree(temp_dir_path)
 
 
+def test_export_unnested_attributes_clear_values():
+    temp_dir_path = Path(__file__).parent / 'remove_after_test'
+    os.mkdir(temp_dir_path)
+    file_location = temp_dir_path / 'unnested.csv'
+
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = '0000'
+    instance._testBooleanField.clear_value()
+    instance._testDateField.clear_value()
+    instance._testDateTimeField.clear_value()
+    instance._testDecimalField.clear_value()
+    instance._testDecimalFieldMetKard.clear_value()
+    instance.testEenvoudigType._waarde.clear_value()
+    instance.testEenvoudigTypeMetKard[0]._waarde.clear_value()
+    instance._testEenvoudigTypeMetKard.add_empty_value()
+    instance.testEenvoudigTypeMetKard[1]._waarde.clear_value()
+    instance._testIntegerField.clear_value()
+    instance._testIntegerFieldMetKard.clear_value()
+    instance._testKeuzelijst.clear_value()
+    instance._testKeuzelijstMetKard.clear_value()
+    instance.testKwantWrd._waarde.clear_value()
+    instance.testKwantWrdMetKard[0]._waarde.clear_value()
+    instance._testKwantWrdMetKard.add_empty_value()
+    instance.testKwantWrdMetKard[1]._waarde.clear_value()
+    instance._testStringField.clear_value()
+    instance._testStringFieldMetKard.clear_value()
+    instance._testTimeField.clear_value()
+
+    CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False,
+                             model_directory=model_directory_path)
+
+    with open(file_location, newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file, delimiter=';')
+        lines = list(csv_reader)
+    assert len(lines) == 2
+
+    line_0 = lines[0]
+    assert line_0 == ['typeURI',
+                      'assetId.identificator', 'assetId.toegekendDoor', 'testBooleanField',
+                      'testDateField', 'testDateTimeField', 'testDecimalField', 'testDecimalFieldMetKard[]',
+                      'testEenvoudigType', 'testEenvoudigTypeMetKard[]', 'testIntegerField',
+                      'testIntegerFieldMetKard[]', 'testKeuzelijst', 'testKeuzelijstMetKard[]',
+                      'testKwantWrd', 'testKwantWrdMetKard[]', 'testStringField', 'testStringFieldMetKard[]',
+                      'testTimeField']
+
+    line_1 = lines[1]
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+                      '0000', '', '88888888',
+                      '88888888', '88888888', '88888888.0', '88888888',
+                      '88888888', '88888888|88888888', '88888888',
+                      '88888888', '88888888', '88888888', '88888888.0', '88888888.0|88888888.0', '88888888', '88888888',
+                      '88888888']
+
+    shutil.rmtree(temp_dir_path)
+
+
 def test_export_unnested_attributes_split_per_type():
     temp_dir_path = Path(__file__).parent / 'remove_after_test'
     os.mkdir(temp_dir_path)
