@@ -2,7 +2,12 @@ import os
 from datetime import date, datetime, time
 from pathlib import Path
 
+from otlmow_model.OtlmowModel.Classes.Installatie.BeweegbareWaterkerendeConstructie import \
+    BeweegbareWaterkerendeConstructie
+from otlmow_model.OtlmowModel.Classes.Installatie.Bochtafbakeningsinstallatie import Bochtafbakeningsinstallatie
+
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.Bevestiging import Bevestiging
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 
@@ -36,26 +41,26 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 1
 
-    instance = objects[0]
-    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
-    assert instance.assetId.identificator == '0000-0000'
+    instanceImported = objects[0]
+    assert instanceImported.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instanceImported.assetId.identificator == '0000-0000'
 
-    assert not instance.testBooleanField
-    assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
-    assert instance.testDecimalField == 79.07
-    assert instance.testDecimalFieldMetKard == [10.0, 20.0]
-    assert instance.testEenvoudigType.waarde == 'string1'
-    assert instance.testIntegerField == -55
-    assert instance.testIntegerFieldMetKard == [76, 2]
-    assert instance.testKeuzelijst == 'waarde-4'
-    assert instance.testKeuzelijstMetKard == ['waarde-4', 'waarde-3']
-    assert instance.testKwantWrd.waarde == 98.21
-    assert instance.testStringField == 'oFfeDLp'
-    assert instance.testStringFieldMetKard[0] == 'string1'
-    assert instance.testStringFieldMetKard[1] == 'string2'
-    assert instance.testTimeField == time(11, 5, 26)
-    assert instance.geometry == 'POINT Z (200000 200000 0)'
+    assert not instanceImported.testBooleanField
+    assert instanceImported.testDateField == date(2019, 9, 20)
+    assert instanceImported.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instanceImported.testDecimalField == 79.07
+    assert instanceImported.testDecimalFieldMetKard == [10.0, 20.0]
+    assert instanceImported.testEenvoudigType.waarde == 'string1'
+    assert instanceImported.testIntegerField == -55
+    assert instanceImported.testIntegerFieldMetKard == [76, 2]
+    assert instanceImported.testKeuzelijst == 'waarde-4'
+    assert instanceImported.testKeuzelijstMetKard == ['waarde-4', 'waarde-3']
+    assert instanceImported.testKwantWrd.waarde == 98.21
+    assert instanceImported.testStringField == 'oFfeDLp'
+    assert instanceImported.testStringFieldMetKard[0] == 'string1'
+    assert instanceImported.testStringFieldMetKard[1] == 'string2'
+    assert instanceImported.testTimeField == time(11, 5, 26)
+    assert instanceImported.geometry == 'POINT Z (200000 200000 0)'
 
     os.unlink(file_location)
 
@@ -175,5 +180,41 @@ def test_export_and_then_import_nested_attributes_level_2(recwarn):
     assert instance.testComplexTypeMetKard[0].testComplexType2.testStringField == 'string1'
     assert instance.testComplexTypeMetKard[1].testComplexType2.testStringField == 'string2'
     assert instance.assetId.identificator == '0000'
+
+    os.unlink(file_location)
+
+
+def test_export_and_then_import_sheetname_abbreviation(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'sheetname_abbreviation_generated.xlsx'
+    instance = Bevestiging()
+    instanceToBeAbbreviated = Bochtafbakeningsinstallatie()
+    instanceToBeAbbreviated2 = BeweegbareWaterkerendeConstructie()
+
+    ExcelExporter.from_objects(sequence_of_objects=[instance,instanceToBeAbbreviated,instanceToBeAbbreviated2], filepath=file_location)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    # if sheetTitle is to long it will trigger UserWarning('Title is more than 31 characters. Some applications may not be able to read the file')
+    assert not warns
+
+    # first load the objects in the template to see it the basics are there
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    assert len(objects) == 3
+
+    instanceImported = objects[0]
+    instanceToBeAbbreviatedImported = objects[1]
+    instanceToBeAbbreviated2Imported = objects[2]
+
+    assert instanceImported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging"
+    assert instanceToBeAbbreviatedImported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#Bochtafbakeningsinstallatie"
+    assert instanceToBeAbbreviated2Imported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#BeweegbareWaterkerendeConstructie"
+
+    # second do a lower level load of the file that includs the sheet titles with ExcelImporter
+    data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
+
+    sheetTitles = list(data.keys())
+    assert len(sheetTitles) == 3
+
+    assert sheetTitles[0] == "ond#Bevestiging"
+    assert sheetTitles[1] == "ins#Bochtafbakeningsinstallatie"
+    assert sheetTitles[2] == "ins#BeweegbareWaterkerendeConst" # installatie#BeweegbareWaterkerendeConstructie
 
     os.unlink(file_location)
