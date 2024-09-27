@@ -17,6 +17,7 @@ class DateTimeField(OTLField):
     definition = 'Beschrijft een datum volgens http://www.w3.org/2001/XMLSchema#dateTime.'
     label = 'Datumtijd'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#dateTime'
+    clearing_value = '88888888'
 
     @classmethod
     def validate(cls, value: Any, attribuut) -> bool:

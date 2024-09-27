@@ -15,6 +15,7 @@ class DateField(OTLField):
     definition = 'Beschrijft een datum volgens http://www.w3.org/2001/XMLSchema#date.'
     label = 'Datum'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#date'
+    clearing_value = '88888888'
 
     @classmethod
     def convert_to_correct_type(cls, value: Any, log_warnings: bool = True) -> Optional[date]:
