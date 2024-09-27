@@ -14,6 +14,42 @@ from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
+def test_export_filled_dummy_data_all_testcasesclass(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'all_dummy_data_generated.xlsx'
+
+    instance = AllCasesTestClass()
+    instance.fill_with_dummy_data()
+    instance.testComplexTypeMetKard[0].testComplexType2MetKard = None
+    instance.testComplexTypeMetKard[0].testKwantWrdMetKard = None
+    instance.testComplexTypeMetKard[0].testStringFieldMetKard = None
+    instance.testUnionType = None
+    instance.testUnionTypeMetKard = None
+    ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
+    assert not warns
+
+    data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
+    first_row = list(data['onderdeel#AllCasesTestClass'][0])
+
+    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'bestekPostNummer[]',
+        'datumOprichtingObject', 'geometry', 'isActief', 'notitie', 'standaardBestekPostNummer[]',
+        'testBooleanField', 'testComplexType.testBooleanField',
+        'testComplexType.testComplexType2.testKwantWrd', 'testComplexType.testComplexType2.testStringField',
+        'testComplexType.testComplexType2MetKard[].testKwantWrd',
+        'testComplexType.testComplexType2MetKard[].testStringField', 'testComplexType.testKwantWrd',
+        'testComplexType.testKwantWrdMetKard[]', 'testComplexType.testStringField',
+        'testComplexType.testStringFieldMetKard[]', 'testComplexTypeMetKard[].testBooleanField',
+        'testComplexTypeMetKard[].testComplexType2.testKwantWrd',
+        'testComplexTypeMetKard[].testComplexType2.testStringField', 'testComplexTypeMetKard[].testKwantWrd',
+        'testComplexTypeMetKard[].testStringField', 'testDateField', 'testDateTimeField',
+        'testDecimalField', 'testDecimalFieldMetKard[]', 'testEenvoudigType', 'testEenvoudigTypeMetKard[]',
+        'testIntegerField', 'testIntegerFieldMetKard[]', 'testKeuzelijst', 'testKeuzelijstMetKard[]',
+        'testKwantWrd', 'testKwantWrdMetKard[]', 'testStringField', 'testStringFieldMetKard[]',
+        'testTimeField', 'theoretischeLevensduur', 'toestand']
+
+    os.unlink(file_location)
+
+
 def test_export_and_then_import_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes_generated.xlsx'
     instance = AllCasesTestClass()
