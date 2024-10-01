@@ -53,30 +53,24 @@ def test_load_test_unnested_attributes_clear_values(recwarn):
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
 
-
     instance = AllCasesTestClass()
+    instance._geometry.clear_value()
     instance._testBooleanField.clear_value()
     instance._testDateField.clear_value()
     instance._testDateTimeField.clear_value()
     instance._testDecimalField.clear_value()
     instance._testDecimalFieldMetKard.clear_value()
     instance.testEenvoudigType._waarde.clear_value()
-    instance.testEenvoudigTypeMetKard[0]._waarde.clear_value()
-    instance._testEenvoudigTypeMetKard.add_empty_value()
-    instance.testEenvoudigTypeMetKard[1]._waarde.clear_value()
     instance._testIntegerField.clear_value()
     instance._testIntegerFieldMetKard.clear_value()
     instance._testKeuzelijst.clear_value()
     instance._testKeuzelijstMetKard.clear_value()
     instance.testKwantWrd._waarde.clear_value()
-    instance.testKwantWrdMetKard[0]._waarde.clear_value()
-    instance._testKwantWrdMetKard.add_empty_value()
-    instance.testKwantWrdMetKard[1]._waarde.clear_value()
     instance._testStringField.clear_value()
     instance._testStringFieldMetKard.clear_value()
     instance._testTimeField.clear_value()
     instance.assetId.identificator = '0000-0000'
-    assert instance == objects[0]
+    assert objects[0] == instance
 
     assert not warns
 

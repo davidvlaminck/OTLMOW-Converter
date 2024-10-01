@@ -292,9 +292,9 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists_clear_values(
     expected.testKeuzelijstMetKard = '88888888'
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
-        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '88888888',
+        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': 88888888,
         'testStringFieldMetKard[]': '88888888', 'testKeuzelijstMetKard[]': '88888888',
-        'testKwantWrdMetKard[]': '88888888'}), cast_list=True, model_directory=model_directory_path)
+        'testKwantWrdMetKard[]': 88888888.0}), cast_list=True, model_directory=model_directory_path)
 
     assert created_instance == expected
     assert len(recwarn) == 0

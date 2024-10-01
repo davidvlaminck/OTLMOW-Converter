@@ -268,7 +268,10 @@ class DotnotationDictConverter:
                 setattr(object_or_attribute, dotnotation, value)
                 return
             if cardinality and cast_list:
-                if value == '88888888':
+                if value == attribute.field.clearing_value:
+                    attribute.clear_value()
+                    return
+                if attribute.field.clearing_value == '88888888' and str(value) == '88888888':
                     attribute.clear_value()
                     return
                 value = [attribute.field.convert_to_correct_type(v, log_warnings=False)
@@ -295,7 +298,7 @@ class DotnotationDictConverter:
                         separator=separator, cardinality_indicator=cardinality_indicator,
                         waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
             else:
-                if cast_datetime and attribute.field in {TimeField, DateField, DateTimeField}:
+                if cast_datetime and attribute.field in {TimeField, DateField, DateTimeField} and str(value) != '88888888':
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
                 elif issubclass(attribute.field, KeuzelijstField):
                     if cardinality and value != '88888888':
@@ -303,7 +306,10 @@ class DotnotationDictConverter:
                     else:
                         value = str(value)
                 try:
-                    attribute.set_waarde(value)
+                    if value in ('88888888', 88888888, 88888888.0):
+                        attribute.clear_value()
+                    else:
+                        attribute.set_waarde(value)
                 except Exception as exc:
                     print(exc)
             return
