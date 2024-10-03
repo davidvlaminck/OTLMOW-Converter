@@ -223,34 +223,33 @@ def test_export_and_then_import_nested_attributes_level_2(recwarn):
 def test_export_and_then_import_sheetname_abbreviation(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'sheetname_abbreviation_generated.xlsx'
     instance = Bevestiging()
-    instanceToBeAbbreviated = Bochtafbakeningsinstallatie()
-    instanceToBeAbbreviated2 = BeweegbareWaterkerendeConstructie()
+    instance_to_be_abbreviated = Bochtafbakeningsinstallatie()
+    instance_to_be_abbreviated2 = BeweegbareWaterkerendeConstructie()
 
-    ExcelExporter.from_objects(sequence_of_objects=[instance,instanceToBeAbbreviated,instanceToBeAbbreviated2], filepath=file_location,abbreviate_excel_sheettitles=True)
+    ExcelExporter.from_objects(sequence_of_objects=[instance,instance_to_be_abbreviated,instance_to_be_abbreviated2],
+                               filepath=file_location,abbreviate_excel_sheettitles=True)
     warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
     # if sheetTitle is to long it will trigger UserWarning('Title is more than 31 characters. Some applications may not be able to read the file')
-    # assert not warns
+    assert not warns
 
     # first load the objects in the template to see it the basics are there
     objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(objects) == 3
 
-    instanceImported = objects[0]
-    instanceToBeAbbreviatedImported = objects[1]
-    instanceToBeAbbreviated2Imported = objects[2]
+    instance_imported, instance_to_be_abbreviated_imported, instance_to_be_abbreviated2_imported = objects
 
-    assert instanceImported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging"
-    assert instanceToBeAbbreviatedImported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#Bochtafbakeningsinstallatie"
-    assert instanceToBeAbbreviated2Imported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#BeweegbareWaterkerendeConstructie"
+    assert instance_imported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging"
+    assert instance_to_be_abbreviated_imported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#Bochtafbakeningsinstallatie"
+    assert instance_to_be_abbreviated2_imported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#BeweegbareWaterkerendeConstructie"
 
     # second do a lower level load of the file that includs the sheet titles with ExcelImporter
     data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
 
-    sheetTitles = list(data.keys())
-    assert len(sheetTitles) == 3
+    sheet_titles = list(data.keys())
+    assert len(sheet_titles) == 3
 
-    assert sheetTitles[0] == "ond#Bevestiging"
-    assert sheetTitles[1] == "ins#Bochtafbakeningsinstallatie"
-    assert sheetTitles[2] == "ins#BeweegbareWaterkerendeConst" # installatie#BeweegbareWaterkerendeConstructie
+    assert sheet_titles[0] == "ond#Bevestiging"
+    assert sheet_titles[1] == "ins#Bochtafbakeningsinstallatie"
+    assert sheet_titles[2] == "ins#BeweegbareWaterkerendeConst" # installatie#BeweegbareWaterkerendeConstructie
 
     os.unlink(file_location)
