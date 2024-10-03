@@ -15,6 +15,7 @@ class TimeField(OTLField):
     definition = 'Beschrijft een datum volgens http://www.w3.org/2001/XMLSchema#time.'
     label = 'Tijd'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#time'
+    clearing_value = '88888888'
 
     @classmethod
     def convert_to_correct_type(cls, value: Any, log_warnings: bool = True) -> Optional[time]:

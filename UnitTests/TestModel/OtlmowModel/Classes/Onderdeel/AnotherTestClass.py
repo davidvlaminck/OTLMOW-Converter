@@ -21,7 +21,7 @@ class AnotherTestClass(AIMObject, LijnGeometrie):
                                               naam='deprecatedString',
                                               label='Deprecated Tekstveld',
                                               objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass.deprecatedString',
-                                              deprecated_version='2.0.0-RC3',
+                                              deprecated_version='2.0.0',
                                               constraints=' ',
                                               definition='Tekstveld dat niet meer gebruikt wordt',
                                               owner=self)

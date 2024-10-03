@@ -2,11 +2,12 @@ import warnings
 from typing import Any
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
+from otlmow_model.OtlmowModel.BaseClasses.StringField import StringField
 from otlmow_model.OtlmowModel.BaseClasses.WKTValidator import WKTValidator
 from otlmow_model.OtlmowModel.Exceptions.WrongGeometryWarning import WrongGeometryWarning
 
 
-class WKTField(OTLField):
+class WKTField(StringField):
     """Een geometrie waarde in WKT-string vorm."""
     naam = 'WKT'
     objectUri = ''

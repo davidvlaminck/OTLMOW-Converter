@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonImporter import JsonImporter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,6 +41,36 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
+def test_load_test_unnested_attributes_clearing_values(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes_clearing_values.json'
+
+    objects = JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+
+    assert len(objects) == 1
+
+    instance = AllCasesTestClass()
+    instance._geometry.clear_value()
+    instance._testBooleanField.clear_value()
+    instance._testDateField.clear_value()
+    instance._testDateTimeField.clear_value()
+    instance._testDecimalField.clear_value()
+    instance._testDecimalFieldMetKard.clear_value()
+    instance.testEenvoudigType._waarde.clear_value()
+    instance._testIntegerField.clear_value()
+    instance._testIntegerFieldMetKard.clear_value()
+    instance._testKeuzelijst.clear_value()
+    instance._testKeuzelijstMetKard.clear_value()
+    instance.testKwantWrd._waarde.clear_value()
+    instance._testStringField.clear_value()
+    instance._testStringFieldMetKard.clear_value()
+    instance._testTimeField.clear_value()
+    instance.assetId.identificator = '0000-0000'
+    assert objects[0] == instance
+
+    assert not warns
+
+
 def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.json'
 
@@ -70,6 +101,40 @@ def test_load_test_nested_attributes_1_level(recwarn):
     assert instance.testUnionType.unionKwantWrd.waarde is None
     assert instance.testUnionTypeMetKard[0].unionKwantWrd.waarde == 10.0
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
+
+
+def test_load_test_nested_attributes_1_level_clearing_values(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1_clearing_values.json'
+
+    objects = JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+
+    assert len(objects) == 1
+
+    instance = AllCasesTestClass()
+    instance.testComplexType._testBooleanField.clear_value()
+    instance.testComplexType._testKwantWrd.clear_value()
+    instance.testComplexType._testKwantWrdMetKard.clear_value()
+    instance.testComplexType._testStringField.clear_value()
+    instance.testComplexType._testStringFieldMetKard.clear_value()
+
+    instance.testComplexTypeMetKard[0].testBooleanField = True
+    instance.testComplexTypeMetKard[0].testKwantWrd.waarde = 10.0
+    instance.testComplexTypeMetKard[0]._testStringField.clear_value()
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[1].testBooleanField = False
+    instance.testComplexTypeMetKard[1]._testKwantWrd.clear_value()
+    instance.testComplexTypeMetKard[1].testStringField = 'string2'
+
+    instance._testEenvoudigTypeMetKard.clear_value()
+    instance._testKwantWrdMetKard.clear_value()
+    instance.testUnionType._unionString.clear_value()
+    instance._testUnionTypeMetKard.clear_value()
+
+    instance.assetId.identificator = '0000-0000'
+    assert objects[0] == instance
+
+    assert not warns
 
 
 def test_load_test_nested_attributes_2_levels(recwarn):
