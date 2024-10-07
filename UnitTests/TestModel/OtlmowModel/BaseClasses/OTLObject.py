@@ -715,6 +715,11 @@ def _make_string_version_from_dict(d, level: int = 0, indent: int = 4, list_inde
         if key == 'typeURI':
             continue
         value = d[key]
+        if isinstance(value, float) and value == 88888888.0:
+            value = '88888888 <value_marked_to_be_cleared>'
+        elif str(value) == '88888888':
+            value = '88888888 <value_marked_to_be_cleared>'
+
         if isinstance(value, dict):
             lines.append(f'{prefix}{key} :')
             lines.extend(_make_string_version_from_dict(value, level=level + 1, indent=indent,
