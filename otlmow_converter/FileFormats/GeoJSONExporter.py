@@ -100,6 +100,13 @@ class GeoJSONExporter(AbstractExporter):
         else:
             raise NotImplementedError(f'Geometry type {geom_type} not implemented')
 
+        if geom_type.startswith('point'):
+            return {
+                'bbox': cls.get_bounding_box(geom),
+                'type': geom['type'],
+                'coordinates': geom["coordinates"][0],
+                'crs': {'properties': {'name': 'EPSG:31370'}, 'type': 'name'}}
+
         return {
             'bbox': cls.get_bounding_box(geom),
             'type': geom['type'],
