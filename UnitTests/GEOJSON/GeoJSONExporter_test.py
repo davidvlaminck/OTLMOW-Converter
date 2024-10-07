@@ -75,11 +75,9 @@ def test_export_and_then_import_unnested_attributes(recwarn):
                     ],
                     "type": "Point",
                     "coordinates": [
-                        [
-                            200000.0,
-                            200000.0,
-                            0.0
-                        ]
+                        200000.0,
+                        200000.0,
+                        0.0
                     ],
                     "crs": {
                         "properties": {
@@ -161,11 +159,9 @@ def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(recwarn
                     ],
                     "type": "Point",
                     "coordinates": [
-                        [
-                            200000.0,
-                            200000.0,
-                            0.0
-                        ]
+                        200000.0,
+                        200000.0,
+                        0.0
                     ],
                     "crs": {
                         "properties": {
@@ -226,7 +222,7 @@ def test_export_and_then_import_nested_attributes_level_1(recwarn):
                                      200000.0,
                                      200000.0,
                                      0.0],
-                            'coordinates': [[200000.0, 200000.0, 0.0]],
+                            'coordinates': [200000.0, 200000.0, 0.0],
                             'crs': {'properties': {'name': 'EPSG:31370'},
                                     'type': 'name'},
                             'type': 'Point'},
@@ -286,7 +282,7 @@ def test_export_and_then_import_nested_attributes_level_2(recwarn):
                                      200000.0,
                                      200000.0,
                                      0.0],
-                            'coordinates': [[200000.0, 200000.0, 0.0]],
+                            'coordinates': [200000.0, 200000.0, 0.0],
                             'crs': {'properties': {'name': 'EPSG:31370'},
                                     'type': 'name'},
                             'type': 'Point'},
@@ -321,8 +317,8 @@ def test_convert_wkt_string_to_geojson_point():
         'POINT Z (200000.1 200000.2 0)')
     assert point == {
         "type": "Point",
-        "coordinates": [[200000.1, 200000.2, 0]],
-        "bbox": [200000.1, 200000.2, 0, 200000.1, 200000.2, 0],
+        "coordinates": [200000.1, 200000.2, 0.0],
+        "bbox": [200000.1, 200000.2, 0.0, 200000.1, 200000.2, 0.0],
         "crs": {"properties": {"name": "EPSG:31370"}, "type": "name"}}
 
 
