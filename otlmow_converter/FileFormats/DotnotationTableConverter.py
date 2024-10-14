@@ -157,6 +157,8 @@ class DotnotationTableConverter:
                 raise TypeUriNotInFirstRowError
         headers.pop('typeURI')
         for row in rows:
+            if row == {}:
+                continue
             instance = cls.create_instance_from_row(
                 row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
                 separator=separator, cardinality_indicator=cardinality_indicator,
@@ -192,7 +194,7 @@ class DotnotationTableConverter:
         header_dict, *data_dicts = list_of_dicts
         sorted_headers = cls._sort_headers(header_dict)
         matrix = [[cls._get_item_from_dict(input_dict=d, item=header, empty_string_equals_none=empty_string_equals_none)
-                   for header in sorted_headers] for d in data_dicts]
+                   for header in sorted_headers] for d in data_dicts if d != {}]
         matrix.insert(0, list(sorted_headers))
         return matrix
 

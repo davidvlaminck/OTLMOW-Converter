@@ -15,7 +15,8 @@ def test_get_data_from_table():
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
          'assetId.identificator': '0', 'testStringField': 'string1'},
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
-         'assetId.identificator': '1'}]
+         'assetId.identificator': '1'},
+        {}]
 
     objects = DotnotationTableConverter.get_data_from_table(list_of_dicts_data, model_directory=model_directory_path)
     assert len(objects) == 2
@@ -99,7 +100,8 @@ def test_transform_list_of_dicts_to_2d_sequence():
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
          'assetId.identificator': '0', 'testStringField': 'string1'},
         {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
-         'assetId.identificator': '1'}]
+         'assetId.identificator': '1'},
+        {}]
     expected_2d_sequence = [
         ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testStringField'],
         ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, 'string1'],
