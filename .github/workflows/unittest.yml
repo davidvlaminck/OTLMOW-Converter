@@ -16,17 +16,21 @@ jobs:
         uses: astral-sh/setup-uv@v3
       - name: Create venv and install Python
         run: uv venv --python ${{ matrix.python-version }}
+      - name: Display Python version for testing purposes
+        run: uv run python --version
       - name: Install packages with uv
         run: uv pip install -r pyproject.toml --all-extras
       - name: Activate venv
-        run: source .venv/bin/activate
+        run: |
+          . .venv/bin/activate
+          echo PATH=$PATH >> $GITHUB_ENV
       - name: Display Python version for testing purposes
         run: python --version
       - name: Run unittests with pytest
-        run: python -m pytest -v
+        run: pytest -v
         working-directory: .
       - name: Install nbmake
         run: uv pip install nbmake
       - name: pytest notebooks
-        run: python -m pytest --nbmake Readme.ipynb
+        run: pytest --nbmake Readme.ipynb
         working-directory: .
