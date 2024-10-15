@@ -14,10 +14,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install uv
         uses: astral-sh/setup-uv@v3
-      - name: Install Python
-        run: uv python install ${{ matrix.python-version }}
+      - name: Create venv and install Python
+        run: uv venv --python ${{ matrix.python-version }}
       - name: Display Python version for testing purposes
-        run: python -c "import sys; print(sys.version)"
+        run: uv run python -c "import sys; print(sys.version)"
       - name: Install packages with uv
         run: uv pip install -r pyproject.toml --system --all-extras
       - name: Run unittests with pytest
