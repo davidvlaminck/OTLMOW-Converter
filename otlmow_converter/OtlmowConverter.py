@@ -1,7 +1,7 @@
 from collections import defaultdict
 from itertools import chain
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Union
 
 from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
@@ -336,6 +336,6 @@ def to_file(subject: object, file_path: Path, model_directory: Path = None, **kw
 
 
 def to_dataframe(subject: object, split_per_type: bool = False, model_directory: Path = None, **kwargs
-                 ) -> DataFrame | dict[str, DataFrame]:
+                 ) -> Union[DataFrame, dict[str, DataFrame]]:
     return OtlmowConverter.to_dataframe(subject=subject, split_per_type=split_per_type,
                                         model_directory=model_directory, **kwargs)

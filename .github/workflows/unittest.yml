@@ -18,10 +18,16 @@ jobs:
         run: uv venv --python ${{ matrix.python-version }}
       - name: Install packages with uv
         run: uv pip install -r pyproject.toml --all-extras
-      - name: Activate venv
+      - name: Activate venv on non-Windows
+        if: ${{ runner.os != 'Windows' }}
         run: |
           . .venv/bin/activate
           echo PATH=$PATH >> $GITHUB_ENV
+      - name: Activate venv on Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          . .venv/bin/activate.ps1
+          "VIRTUAL_ENV=.venv" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Display Python version for testing purposes
         run: python --version
       - name: Run unittests with pytest
