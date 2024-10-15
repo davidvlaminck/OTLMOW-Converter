@@ -110,7 +110,7 @@ class OtlmowConverter:
 
     @classmethod
     def to_dataframe(cls, subject: object, split_per_type: bool = False, model_directory: Path = None, **kwargs
-                     ) -> DataFrame | dict[str, DataFrame]:
+                     ) -> Union[DataFrame, dict[str, DataFrame]]:
         """Converts any subject to a pandas Dataframe.
         This conversion uses the OTLMOW settings.
         """
@@ -286,7 +286,7 @@ class OtlmowConverter:
 
     @classmethod
     def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False, **kwargs
-                                  ) -> DataFrame | dict[str, DataFrame]:
+                                  ) -> Union[DataFrame, dict[str, DataFrame]]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame.
         This conversion uses the OTLMOW settings.
         """
