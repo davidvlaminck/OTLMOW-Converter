@@ -1,7 +1,7 @@
 from collections import defaultdict
 from itertools import chain
 from pathlib import Path
-from typing import Iterable, Dict, Union, Any
+from typing import Iterable
 
 from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
@@ -41,7 +41,7 @@ class OtlmowConverter:
     """
 
     @classmethod
-    def to_objects(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
+    def to_objects(cls, subject: object, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
         """Converts any subject to a sequence of OTLObject objects.
         This conversion uses the OTLMOW settings.
         """
@@ -73,7 +73,7 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    def to_file(cls, subject: Any, file_path: Path, model_directory: Path = None, **kwargs) -> None:
+    def to_file(cls, subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
         """Converts any subject (including another file) to a file.
         This conversion uses the OTLMOW settings.
         """
@@ -109,8 +109,8 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    def to_dataframe(cls, subject: Any, split_per_type: bool = False, model_directory: Path = None, **kwargs
-                     ) -> Union[DataFrame, Dict[str, DataFrame]]:
+    def to_dataframe(cls, subject: object, split_per_type: bool = False, model_directory: Path = None, **kwargs
+                     ) -> DataFrame | dict[str, DataFrame]:
         """Converts any subject to a pandas Dataframe.
         This conversion uses the OTLMOW settings.
         """
@@ -155,7 +155,7 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    def to_dicts(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[Dict]:
+    def to_dicts(cls, subject: object, model_directory: Path = None, **kwargs) -> Iterable[dict]:
         """Converts any subject to a sequence of dictionaries.
         This conversion uses the OTLMOW settings.
         """
@@ -189,7 +189,7 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    def to_dotnotation_dicts(cls, subject: Any, model_directory: Path = None, **kwargs) -> Iterable[DotnotationDict]:
+    def to_dotnotation_dicts(cls, subject: object, model_directory: Path = None, **kwargs) -> Iterable[DotnotationDict]:
         """Converts any subject to a sequence of DotnotationDict objects.
         This conversion uses the OTLMOW settings.
         """
@@ -224,7 +224,7 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    def from_objects_to_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[Dict]:
+    def from_objects_to_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[dict]:
         """
         Converts a sequence of OTLObject objects to a sequence of dictionaries.
         This conversion uses the OTLMOW settings.
@@ -234,7 +234,7 @@ class OtlmowConverter:
             yield create_dict_from_asset(obj, **kwargs)
 
     @classmethod
-    def from_dicts_to_objects(cls, sequence_of_dicts: Iterable[Dict], **kwargs) -> Iterable[OTLObject]:
+    def from_dicts_to_objects(cls, sequence_of_dicts: Iterable[dict], **kwargs) -> Iterable[OTLObject]:
         """
         Converts a sequence of dictionaries to a sequence of OTLObject objects.
         This conversion uses the OTLMOW settings.
@@ -286,7 +286,7 @@ class OtlmowConverter:
 
     @classmethod
     def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False, **kwargs
-                                  ) -> Union[DataFrame, Dict[str, DataFrame]]:
+                                  ) -> DataFrame | dict[str, DataFrame]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame.
         This conversion uses the OTLMOW settings.
         """
@@ -319,23 +319,23 @@ class OtlmowConverter:
         return cls.suffix_mapping_table.get(suffix)
 
 
-def to_objects(subject: Any, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
+def to_objects(subject: object, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
     return OtlmowConverter.to_objects(subject=subject, model_directory=model_directory, **kwargs)
 
 
-def to_dicts(subject: Any, model_directory: Path = None, **kwargs) -> Iterable[Dict]:
+def to_dicts(subject: object, model_directory: Path = None, **kwargs) -> Iterable[dict]:
     return OtlmowConverter.to_dicts(subject=subject, model_directory=model_directory, **kwargs)
 
 
-def to_dotnotation_dicts(subject: Any, model_directory: Path = None, **kwargs) -> Iterable[DotnotationDict]:
+def to_dotnotation_dicts(subject: object, model_directory: Path = None, **kwargs) -> Iterable[DotnotationDict]:
     return OtlmowConverter.to_dotnotation_dicts(subject=subject, model_directory=model_directory, **kwargs)
 
 
-def to_file(subject: Any, file_path: Path, model_directory: Path = None, **kwargs) -> None:
+def to_file(subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
     OtlmowConverter.to_file(subject=subject, file_path=file_path, model_directory=model_directory, **kwargs)
 
 
-def to_dataframe(subject: Any, split_per_type: bool = False, model_directory: Path = None, **kwargs
-                 ) -> Union[DataFrame, Dict[str, DataFrame]]:
+def to_dataframe(subject: object, split_per_type: bool = False, model_directory: Path = None, **kwargs
+                 ) -> DataFrame | dict[str, DataFrame]:
     return OtlmowConverter.to_dataframe(subject=subject, split_per_type=split_per_type,
                                         model_directory=model_directory, **kwargs)

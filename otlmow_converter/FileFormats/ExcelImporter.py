@@ -1,7 +1,6 @@
 import os
 import warnings
 from pathlib import Path
-from typing import Dict, List
 
 import openpyxl
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_uri
@@ -34,7 +33,7 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['warn_for_non_otl_conform_at
 
 class ExcelImporter(AbstractImporter):
     @classmethod
-    def to_objects(cls, filepath: Path = None, **kwargs) -> List:
+    def to_objects(cls, filepath: Path = None, **kwargs) -> list:
         if not os.path.isfile(filepath):
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
@@ -102,7 +101,7 @@ class ExcelImporter(AbstractImporter):
         return list_of_objects
 
     @classmethod
-    def get_data_dict_from_file_path(cls, filepath) -> Dict[str, List[List]]:
+    def get_data_dict_from_file_path(cls, filepath) -> dict[str, list[list]]:
         data = {}
         book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
 
@@ -122,8 +121,8 @@ class ExcelImporter(AbstractImporter):
         return data
 
     @classmethod
-    def get_index_of_typeURI_column_in_sheet(cls, filepath: Path, sheet: str,  headers: List[str],
-                                             data: List[List[str]]) -> int:
+    def get_index_of_typeURI_column_in_sheet(cls, filepath: Path, sheet: str,  headers: list[str],
+                                             data: list[list[str]]) -> int:
         try:
             type_index = headers.index('typeURI')
         except ValueError:
@@ -147,7 +146,7 @@ class ExcelImporter(AbstractImporter):
         return type_index
 
     @staticmethod
-    def check_headers(headers: List[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
+    def check_headers(headers: list[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
                       cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT,
                       separator: str = SEPARATOR,
                       allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,

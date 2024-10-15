@@ -1,7 +1,6 @@
 import inspect
 import warnings
 from pathlib import Path
-from typing import Union, Dict
 
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
@@ -73,7 +72,7 @@ class DotnotationDictConverter:
         return d
 
     @classmethod
-    def _iterate_over_attributes_and_values_by_dotnotation(cls, object_or_attribute: Union[OTLObject, OTLAttribuut],
+    def _iterate_over_attributes_and_values_by_dotnotation(cls, object_or_attribute: OTLObject | OTLAttribuut,
                                                            waarde_shortcut: bool = WAARDE_SHORTCUT,
                                                            separator: str = SEPARATOR,
                                                            cardinality_indicator: str = CARDINALITY_INDICATOR,
@@ -119,7 +118,7 @@ class DotnotationDictConverter:
                 else:
                     yield dotnotation, attribute.waarde
             elif attribute.kardinaliteit_max != '1':
-                combined_dict: Dict[str, list] = {}
+                combined_dict: dict[str, list] = {}
                 for index, lijst_item in enumerate(attribute.waarde):
                     for k1, v1 in cls._iterate_over_attributes_and_values_by_dotnotation(
                             object_or_attribute=lijst_item, waarde_shortcut=waarde_shortcut, separator=separator,
@@ -229,7 +228,7 @@ class DotnotationDictConverter:
         return o
 
     @classmethod
-    def set_attribute_by_dotnotation(cls, object_or_attribute: Union[OTLObject, OTLAttribuut],
+    def set_attribute_by_dotnotation(cls, object_or_attribute: OTLObject | OTLAttribuut,
                                      dotnotation: str, value: object,
                                      separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR,
                                      waarde_shortcut: bool = WAARDE_SHORTCUT,

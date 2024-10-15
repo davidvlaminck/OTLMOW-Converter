@@ -6,7 +6,6 @@ import timeit
 from collections import namedtuple
 from pathlib import Path
 from statistics import mean, stdev
-from typing import Dict
 
 from prettytable import prettytable
 
@@ -20,15 +19,15 @@ logging.getLogger().setLevel(logging.ERROR)
 csv_data = None
 
 
-def read_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
+def read_assets(filepath: Path, results_dict: dict, read_data_key: str, **kwargs):
     results_dict[read_data_key] = OtlmowConverter.from_file_to_objects(filepath, **kwargs)
 
 
-def write_assets(filepath: Path, results_dict: Dict, read_data_key: str, **kwargs):
+def write_assets(filepath: Path, results_dict: dict, read_data_key: str, **kwargs):
     OtlmowConverter.from_objects_to_file(file_path=filepath, sequence_of_objects=results_dict[read_data_key], **kwargs)
 
 
-def time_read_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
+def time_read_assets(filepath: Path, results_dict: dict, **kwargs) -> None:
     read_data_key = 'read_data_ten_classes'
     if 'all_classes' in str(filepath):
         read_data_key = 'read_data_all_classes'
@@ -40,7 +39,7 @@ def time_read_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
     results_dict[f'{read_data_key}_row'] = f'{round(mean(result_times), 3)} +/- {round(st_dev, 3)}'
 
 
-def time_write_assets(filepath: Path, results_dict: Dict, **kwargs) -> None:
+def time_write_assets(filepath: Path, results_dict: dict, **kwargs) -> None:
     read_data_key = 'read_data_ten_classes'
     if 'all_classes' in str(filepath):
         read_data_key = 'read_data_all_classes'

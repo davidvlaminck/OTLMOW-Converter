@@ -1,4 +1,4 @@
-from typing import Dict, Iterable
+from typing import Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.FloatOrDecimalField import FloatOrDecimalField
 from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
@@ -7,7 +7,7 @@ from rdflib import Graph, FOAF, URIRef, BNode, Literal, RDF, XSD
 
 
 class RDFExporter:
-    def __init__(self, dotnotation_settings: Dict = None):
+    def __init__(self, dotnotation_settings: dict = None):
 
         if dotnotation_settings is None:
             dotnotation_settings = {}

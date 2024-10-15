@@ -1,6 +1,6 @@
 import warnings
 from pathlib import Path
-from typing import Dict, Any, Iterable, List
+from typing import Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
@@ -46,7 +46,7 @@ class DotnotationTableConverter:
                                    allow_non_otl_conform_attributes: bool = True,
                                    warn_for_non_otl_conform_attributes: bool = True,
                                    allow_empty_asset_id: bool = True
-                                   ) -> List[Dict]:
+                                   ) -> list[dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', separator)
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', separator)
@@ -92,7 +92,7 @@ class DotnotationTableConverter:
                                       allow_non_otl_conform_attributes: bool = True,
                                       warn_for_non_otl_conform_attributes: bool = True,
                                       allow_empty_asset_id: bool = True
-                                      ) -> Dict[str, List[Dict]]:
+                                      ) -> dict[str, list[dict]]:
         """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
         first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', separator)
@@ -137,14 +137,14 @@ class DotnotationTableConverter:
         return master_dict
 
     @classmethod
-    def get_data_from_table(cls, table_data: List[Dict], model_directory: Path = None,
+    def get_data_from_table(cls, table_data: list[dict], model_directory: Path = None,
                             cast_list: bool = False, cast_datetime: bool = False,
                             allow_non_otl_conform_attributes: bool = True,
                             warn_for_non_otl_conform_attributes: bool = True,
                             waarde_shortcut: bool = WAARDE_SHORTCUT,
                             separator: str = SEPARATOR,
                             cardinality_indicator: str = CARDINALITY_INDICATOR,
-                            cardinality_separator: str = CARDINALITY_SEPARATOR) -> List[OTLObject]:
+                            cardinality_separator: str = CARDINALITY_SEPARATOR) -> list[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -184,8 +184,8 @@ class DotnotationTableConverter:
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
-    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: List[Dict],
-                                               empty_string_equals_none: bool = False) -> List[List]:
+    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: list[dict],
+                                               empty_string_equals_none: bool = False) -> list[list]:
         """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
 
@@ -197,8 +197,8 @@ class DotnotationTableConverter:
         return matrix
 
     @classmethod
-    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: List[List],
-                                               empty_string_equals_none: bool = False) -> List[Dict]:
+    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: list[list],
+                                               empty_string_equals_none: bool = False) -> list[dict]:
         """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
         header_row, *data_rows = two_d_sequence
@@ -223,6 +223,6 @@ class DotnotationTableConverter:
         return list_of_dicts
 
     @classmethod
-    def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool) -> Any:
+    def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool) -> object:
         value = input_dict.get(item)
         return '' if empty_string_equals_none and value is None else value
