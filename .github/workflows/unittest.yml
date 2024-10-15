@@ -17,7 +17,7 @@ jobs:
       - name: Create venv and install Python
         run: uv venv --python ${{ matrix.python-version }} && source .venv/bin/activate
       - name: Display Python version for testing purposes
-        run: uv run python -c "import sys; print(sys.version)"
+        run: python -c "import sys; print(sys.version)"
       - name: Install packages with uv
         run: uv pip install -r pyproject.toml --all-extras
       - name: Run unittests with pytest
