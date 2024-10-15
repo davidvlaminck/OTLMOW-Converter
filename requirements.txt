@@ -1,6 +1,6 @@
 coverage>=3.7.1
 openpyxl>=3.0.10
-otlmow-model>=2.13.4.0
+otlmow-model>=2.12.4.0
 rdflib>=6.0.0
 pytest>=6.2.5
 pytest-cov==4.0.0
