@@ -23,7 +23,6 @@ dependencies = [
     'otlmow-model >= 2.12.4.0',
     'rdflib >= 6.0.0',
     'geojson>=3.0.1',
-    'numpy>=2.0.0',
     'lxml>=4.9.3',
     'pandas>=1.3.5'
 ]
