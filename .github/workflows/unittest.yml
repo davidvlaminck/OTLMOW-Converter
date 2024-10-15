@@ -21,7 +21,7 @@ jobs:
       - name: Activate venv
         run: source .venv/bin/activate
       - name: Display Python version for testing purposes
-        run: python -m "import sys; print(sys.version)"
+        run: python --version
       - name: Run unittests with pytest
         run: python -m pytest -v
         working-directory: .
