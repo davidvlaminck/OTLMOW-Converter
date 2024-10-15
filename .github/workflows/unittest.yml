@@ -19,7 +19,7 @@ jobs:
       - name: Display Python version for testing purposes
         run: python -c "import sys; print(sys.version)"
       - name: Install packages with uv
-        run: uv pip install -r pyproject.toml --all-extras
+        run: uv pip install -r pyproject.toml --system --all-extras
       - name: Run unittests with pytest
         run: uv run pytest -v
         working-directory: .
