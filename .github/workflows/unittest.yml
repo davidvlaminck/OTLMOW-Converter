@@ -30,7 +30,7 @@ jobs:
       - name: Display Python version for testing purposes
         run: python --version
       - name: Display package list for testing purposes
-        run: python -m uv pip list
+        run: python -m pip list
       - name: Run unittests with pytest
         run: python -m pytest -v
         working-directory: .
