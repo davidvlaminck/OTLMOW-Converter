@@ -28,6 +28,7 @@ jobs:
         run: |
           pwsh .venv/Scripts/activate.ps1
           echo "PYTHONPATH=$HOME/.venv/Scripts" >> $GITHUB_ENV
+          echo %PYTHONPATH%
       - name: Display Python version for testing purposes
         run: python --version
       - name: Display package list for testing purposes
