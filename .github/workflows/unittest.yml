@@ -31,7 +31,9 @@ jobs:
         shell: cmd
       - name: Activate venv on Windows
         if: ${{ runner.os == 'Windows' }}
-        run: echo "PYTHONPATH=$HOME/.venv/Scripts" >> $GITHUB_ENV
+        run: |
+          echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
+          echo "$PWD/.venv/Scripts" >> $GITHUB_PATH
       - name: Display Python version for testing purposes
         run: python --version
       - name: Display package list for testing purposes
