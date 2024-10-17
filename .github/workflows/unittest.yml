@@ -17,7 +17,7 @@ jobs:
       - name: Create venv and install Python
         run: uv venv --python ${{ matrix.python-version }}
       - name: Install packages with uv
-        run: uv pip install -r pyproject.toml --all-extras --directory .venv
+        run: uv pip install -r pyproject.toml --all-extras --directory .
       - name: Activate venv on non-Windows
         if: ${{ runner.os != 'Windows' }}
         run: |
