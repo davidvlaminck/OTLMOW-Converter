@@ -25,10 +25,10 @@ jobs:
           echo PATH=$PATH >> $GITHUB_ENV
       - name: Activate venv on Windows
         if: ${{ runner.os == 'Windows' }}
-        run: |
-          pwsh .venv/Scripts/activate.ps1
-          echo "PYTHONPATH=$HOME/.venv/Scripts" >> $GITHUB_ENV
-          echo "%PYTHONPATH%"
+        run: pwsh .venv/Scripts/activate.ps1
+      - name: Activate venv on Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: echo "PYTHONPATH=$HOME/.venv/Scripts" >> $GITHUB_ENV
       - name: Display Python version for testing purposes
         run: python --version
       - name: Display package list for testing purposes
