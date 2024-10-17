@@ -25,7 +25,8 @@ jobs:
           echo PATH=$PATH >> $GITHUB_ENV
       - name: Activate venv on Windows
         if: ${{ runner.os == 'Windows' }}
-        run: pwsh .venv/Scripts/activate.ps1
+        run: .venv/Scripts/activate.bat
+        shell: cmd
       - name: Activate venv on Windows
         if: ${{ runner.os == 'Windows' }}
         run: echo "PYTHONPATH=$HOME/.venv/Scripts" >> $GITHUB_ENV
