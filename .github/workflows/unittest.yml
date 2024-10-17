@@ -20,19 +20,19 @@ jobs:
         run: uv pip install -r pyproject.toml --all-extras --directory .
       - name: Activate venv on non-Windows
         if: ${{ runner.os != 'Windows' }}
-        run:
+        run: |
           . .venv/bin/activate
           echo PATH=$PATH >> $GITHUB_ENV
       - name: Activate venv on Windows
         if: ${{ runner.os == 'Windows' }}
-        run:
+        run: |
           .venv/Scripts/activate.bat
           python -m pip list
           python -m pytest -v
         shell: cmd
       - name: Activate venv on Windows
         if: ${{ runner.os == 'Windows' }}
-        run:
+        run: |
           echo "VIRTUAL_ENV=.venv" >> $GITHUB_ENV
           echo "$PWD/.venv/Scripts" >> $GITHUB_PATH
       - name: Display Python version for testing purposes
