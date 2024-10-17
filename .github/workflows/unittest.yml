@@ -31,10 +31,10 @@ jobs:
       - name: Display Python version for testing purposes
         run: python --version
       - name: Run unittests with pytest
-        run: pytest -v
+        run: python -m pytest -v
         working-directory: .
       - name: Install nbmake
         run: uv pip install nbmake
       - name: pytest notebooks
-        run: pytest --nbmake Readme.ipynb
+        run: python -m pytest --nbmake Readme.ipynb
         working-directory: .
