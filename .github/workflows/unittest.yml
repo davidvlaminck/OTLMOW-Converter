@@ -27,7 +27,6 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         run: |
           pwsh .venv/Scripts/activate.ps1
-          echo "PATH=$PATH" >> $GITHUB_ENV
       - name: Display Python version for testing purposes
         run: python --version
       - name: Run unittests with pytest
