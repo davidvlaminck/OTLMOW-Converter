@@ -29,6 +29,8 @@ jobs:
           pwsh .venv/Scripts/activate.ps1
       - name: Display Python version for testing purposes
         run: python --version
+      - name: Display package list for testing purposes
+        run: python -m pip list
       - name: Run unittests with pytest
         run: python -m pytest -v
         working-directory: .
