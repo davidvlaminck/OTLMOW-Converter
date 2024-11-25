@@ -493,4 +493,25 @@ def test_get_attributes_per_level_by_dotnotation():
     assert attrs[3].objectUri == instance.testComplexType.testComplexType2.testKwantWrd._waarde.objectUri
 
 
+def test_clear_list_of_list_attributes():
+    instance = AllCasesTestClass()
+    instance.testStringField = 'test1'
+    instance.testComplexType.testStringField = 'test2'
+    instance.testDecimalFieldMetKard = [1.1]
+    instance.testKwantWrdMetKard[0].waarde = 1.2
+    instance.testComplexTypeMetKard[0].testStringField = 'test3'
+    instance.testComplexTypeMetKard[0].testComplexType2.testStringField = 'test4'
+    instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField = 'test5'
+    instance.testComplexTypeMetKard[0].testStringFieldMetKard = ['test6']
+
+    DotnotationHelper.clear_list_of_list_attributes(instance)
+
+    assert instance.testStringField == 'test1'
+    assert instance.testComplexType.testStringField == 'test2'
+    assert instance.testDecimalFieldMetKard == [1.1]
+    assert instance.testKwantWrdMetKard[0].waarde == 1.2
+    assert instance.testComplexTypeMetKard[0].testStringField == 'test3'
+    assert instance.testComplexTypeMetKard[0].testComplexType2.testStringField == 'test4'
+    assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
+    assert instance.testComplexTypeMetKard[0].testStringFieldMetKard is None
 
