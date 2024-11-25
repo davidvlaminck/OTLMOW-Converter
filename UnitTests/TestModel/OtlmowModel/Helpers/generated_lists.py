@@ -1,19 +1,37 @@
 import json
 from pathlib import Path
-from typing import Dict
 
-global_relation_dict: Dict = {}
+global_relation_dict: dict = {}
+global_class_dict: dict = {}
 
-ROOT_PATH = Path(__file__).parent
+MODEL_ROOT_PATH = Path(__file__).parent.parent.parent
 
 
-def get_hardcoded_relation_dict(relation_dict: Dict = None):
-    if relation_dict is None:
-        relation_dict = global_relation_dict
+def get_hardcoded_relation_dict(model_directory: Path = None) -> dict:
+    global global_relation_dict
+    if global_relation_dict != {}:
+        return global_relation_dict
 
-    if relation_dict == {}:
-        # open json file
-        with open(ROOT_PATH.parent / 'generated_info.json', 'r') as f:
-            relation_dict = json.load(f)
+    if model_directory is None:
+        model_directory = MODEL_ROOT_PATH
 
-    return relation_dict
+    with open(model_directory / 'OtlmowModel' / 'generated_info.json', 'r') as f:
+        generated_info_dict = json.load(f)
+    global_relation_dict = generated_info_dict['relations']
+
+    return global_relation_dict
+
+
+def get_hardcoded_class_dict(model_directory: Path = None) -> dict:
+    global global_class_dict
+    if global_class_dict != {}:
+        return global_class_dict
+
+    if model_directory is None:
+        model_directory = MODEL_ROOT_PATH
+
+    with open(model_directory / 'OtlmowModel' / 'generated_info.json', 'r') as f:
+        generated_info_dict = json.load(f)
+    global_class_dict = generated_info_dict['classes']
+
+    return global_class_dict
