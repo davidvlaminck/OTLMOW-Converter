@@ -1,8 +1,11 @@
+import base64
 from collections import defaultdict
 from pathlib import Path
 from typing import Iterable, List, Dict
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset, get_attribute_by_name, \
+    dynamic_create_instance_from_ns_and_name
+from otlmow_model.OtlmowModel.Helpers.GenericHelper import validate_guid
 from otlmow_model.OtlmowModel.Helpers.generated_lists import get_hardcoded_relation_dict
 
 
@@ -124,15 +127,101 @@ def verify_asset_id_is_unique_within_list(dict_list: List[Dict]) -> bool:
 
 def is_relation(otl_object: OTLObject, model_directory=Path(__file__).parent.parent.parent) -> bool:
     type_uri = otl_object.typeURI
-    relation_dict = get_hardcoded_relation_dict()
+    relation_dict = get_hardcoded_relation_dict(model_directory=model_directory)
     if type_uri in relation_dict:
         return True
 
 
 def is_directional_relation(otl_object: OTLObject, model_directory=Path(__file__).parent.parent.parent) -> bool:
     type_uri = otl_object.typeURI
-    relation_dict = get_hardcoded_relation_dict()
+    relation_dict = get_hardcoded_relation_dict(model_directory=model_directory)
     relation_info = relation_dict.get(type_uri)
     if relation_info is None:
         return False
     return relation_dict[type_uri]['directional']
+
+
+def combine_two_asset_instances(asset1: OTLObject, asset2: OTLObject, allow_attribute_overrides: bool = True) -> OTLObject:
+    if asset1 is None:
+        raise ValueError('asset1 is None')
+    if asset2 is None:
+        raise ValueError('asset2 is None')
+    if asset1.assetId.identificator is None:
+        raise ValueError('asset1 has no assetId.identificator')
+    if asset2.assetId.identificator is None:
+        raise ValueError('asset2 has no assetId.identificator')
+    if asset1.assetId.identificator != asset2.assetId.identificator:
+        raise ValueError('asset1 and asset2 have different assetId.identificator values')
+
+    for attr in asset2:
+        attribute = get_attribute_by_name(asset1, attr.naam)
+        if attribute is None:
+            raise ValueError(f'attribute {attr.naam} does not exist in asset1')
+        if attribute.objectUri == 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.assetId':
+            continue
+        if attribute.waarde is not None and not allow_attribute_overrides and attribute.waarde != attr.waarde:
+            raise ValueError(f'attribute {attr.naam} already has a value in asset1 that is different {attribute.waarde}')
+        if attr.waarde is None:
+            continue
+        attribute.waarde = attr.waarde
+    return asset1
+
+def combine_assets(asset_list: list[OTLObject], allow_attribute_overrides: bool = True) -> list[OTLObject]:
+    if len(asset_list) < 2:
+        raise ValueError('asset_list has less than 2 assets')
+
+    grouped_list = {}
+    for asset in asset_list:
+        if asset.assetId.identificator not in grouped_list:
+            grouped_list[asset.assetId.identificator] = []
+        grouped_list[asset.assetId.identificator].append(asset)
+
+    combined_list = []
+    for assets in grouped_list.values():
+        asset1 = assets[0]
+        for asset in assets[1:]:
+            asset1 = combine_two_asset_instances(asset1, asset, allow_attribute_overrides)
+        combined_list.append(asset1)
+
+    return combined_list
+
+
+def is_aim_id(aim_id: str, model_directory: Path = None) -> bool:
+    """
+    Checks if the aim_id is valid. An aim_id is valid if it is a valid guid followed by a base64 encoded shortened uri.
+    :param aim_id: the aim_id to be validated
+    :type aim_id: str
+    :param model_directory: directory where the model is located, defaults to otlmow_model's own model
+    :type model_directory: Path
+    :return: 'True' if the aim_id is valid, 'False' otherwise
+    :rtype: bool
+    """
+    if not aim_id:
+        return False
+    if len(aim_id) < 38:
+        return False
+
+    uuid = aim_id[:36]
+    short_uri_encoded = aim_id[37:]
+
+    if not validate_guid(uuid):
+        return False
+    if not short_uri_encoded:
+        return False
+
+    if missing_padding := len(short_uri_encoded) % 4:
+        short_uri_encoded += '=' * (4 - missing_padding)
+
+    short_uri_bytes = base64.b64decode(short_uri_encoded)
+    try:
+        short_uri = short_uri_bytes.decode('ascii')
+    except UnicodeDecodeError:
+        return False
+    try:
+        if short_uri == 'purl:Agent':
+            return True
+        ns, name = short_uri.split('#')
+        instance = dynamic_create_instance_from_ns_and_name(ns, name, model_directory=model_directory)
+        return instance is not None
+    except ValueError:
+        return False
