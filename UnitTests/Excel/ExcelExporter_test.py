@@ -5,6 +5,7 @@ from pathlib import Path
 from otlmow_model.OtlmowModel.Classes.Installatie.BeweegbareWaterkerendeConstructie import \
     BeweegbareWaterkerendeConstructie
 from otlmow_model.OtlmowModel.Classes.Installatie.Bochtafbakeningsinstallatie import Bochtafbakeningsinstallatie
+from otlmow_model.OtlmowModel.Classes.Agent import Agent
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.Bevestiging import Bevestiging
@@ -251,5 +252,49 @@ def test_export_and_then_import_sheetname_abbreviation(recwarn):
     assert sheet_titles[0] == "ond#Bevestiging"
     assert sheet_titles[1] == "ins#Bochtafbakeningsinstallatie"
     assert sheet_titles[2] == "ins#BeweegbareWaterkerendeConst" # installatie#BeweegbareWaterkerendeConstructie
+
+    os.unlink(file_location)
+
+def test_export_agent(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'dummy_data_agent_generated.xlsx'
+
+    agent = Agent()
+    agent.fill_with_dummy_data()
+    print(f'agent: {agent}')
+
+    instance = AllCasesTestClass()
+    instance.fill_with_dummy_data()
+    instance.testComplexTypeMetKard[0].testComplexType2MetKard = None
+    instance.testComplexTypeMetKard[0].testKwantWrdMetKard = None
+    instance.testComplexTypeMetKard[0].testStringFieldMetKard = None
+    instance.testUnionType = None
+    instance.testUnionTypeMetKard = None
+    ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+
+    data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
+    first_row = list(data['onderdeel#AllCasesTestClass'][0])
+
+    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'bestekPostNummer[]',
+                         'datumOprichtingObject', 'geometry', 'isActief', 'notitie', 'standaardBestekPostNummer[]',
+                         'testBooleanField', 'testComplexType.testBooleanField',
+                         'testComplexType.testComplexType2.testKwantWrd',
+                         'testComplexType.testComplexType2.testStringField',
+                         'testComplexType.testComplexType2MetKard[].testKwantWrd',
+                         'testComplexType.testComplexType2MetKard[].testStringField',
+                         'testComplexType.testKwantWrd',
+                         'testComplexType.testKwantWrdMetKard[]', 'testComplexType.testStringField',
+                         'testComplexType.testStringFieldMetKard[]', 'testComplexTypeMetKard[].testBooleanField',
+                         'testComplexTypeMetKard[].testComplexType2.testKwantWrd',
+                         'testComplexTypeMetKard[].testComplexType2.testStringField',
+                         'testComplexTypeMetKard[].testKwantWrd',
+                         'testComplexTypeMetKard[].testStringField', 'testDateField', 'testDateTimeField',
+                         'testDecimalField', 'testDecimalFieldMetKard[]', 'testEenvoudigType',
+                         'testEenvoudigTypeMetKard[]',
+                         'testIntegerField', 'testIntegerFieldMetKard[]', 'testKeuzelijst',
+                         'testKeuzelijstMetKard[]',
+                         'testKwantWrd', 'testKwantWrdMetKard[]', 'testStringField', 'testStringFieldMetKard[]',
+                         'testTimeField', 'theoretischeLevensduur', 'toestand']
 
     os.unlink(file_location)
