@@ -1,4 +1,4 @@
-﻿from typing import Union, Iterable, Tuple, List, Any
+﻿from typing import Union, Iterable, Tuple, List
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
@@ -321,3 +321,24 @@ class DotnotationHelper:
                 new_dict[k] = v
 
         return new_dict
+
+    @classmethod
+    def clear_list_of_list_attributes(cls, instance_or_attribute: Union[OTLObject, OTLAttribuut], cardinality_level: int = 0):
+        for attribute in instance_or_attribute:
+            if attribute.waarde is None or attribute.waarde == []:
+                continue
+
+            if cardinality_level > 1 and attribute.field.waardeObject is None:
+                attribute.set_waarde(None)
+                continue
+
+            if attribute.field.waardeObject is None:
+                if attribute.kardinaliteit_max == '1':
+                    continue
+                if cardinality_level >= 1:
+                    attribute.set_waarde(None)
+            else: # complex attribute
+                if attribute.kardinaliteit_max != '1':
+                    cls.clear_list_of_list_attributes(attribute.waarde[0], cardinality_level + 1)
+                else:
+                    cls.clear_list_of_list_attributes(attribute.waarde, cardinality_level)
