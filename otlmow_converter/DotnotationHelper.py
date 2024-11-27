@@ -1,4 +1,4 @@
-﻿from typing import Union, Iterable, Tuple, List, Any
+﻿from typing import Union, Iterable, Tuple, List
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
