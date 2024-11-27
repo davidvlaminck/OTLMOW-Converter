@@ -1,11 +1,13 @@
 from datetime import date, datetime, time
 
-from otlmow_model.OtlmowModel.Classes.Onderdeel.Bevestiging import Bevestiging
+import pytest
 from otlmow_model.OtlmowModel.Helpers.RelationCreator import create_relation
 from rdflib import RDF, URIRef, Literal
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.Bevestiging import Bevestiging
+from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.Voedt import Voedt
 from otlmow_converter.FileFormats.RDFExporter import RDFExporter
 
 
@@ -19,6 +21,10 @@ def test_export_relation():
     instance2.assetId.identificator = '0001'
 
     relation = create_relation(source=instance, target=instance2, relation_type=Bevestiging)
+
+    with pytest.warns(DeprecationWarning):
+        relation = create_relation(source=instance, target=instance2, relation_type=Voedt)
+
 
     graph = exporter.create_graph([instance, instance2, relation])
     assert len(graph) == 18
