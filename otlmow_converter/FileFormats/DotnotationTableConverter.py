@@ -110,7 +110,11 @@ class DotnotationTableConverter:
                                              otl_object.assetId.identificator == ''):
                 raise ValueError(f'{otl_object} does not have a valid assetId.')
 
-            short_uri = get_shortened_uri(otl_object.typeURI)
+            if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
+                short_uri = 'Agent'
+            else:
+                short_uri = get_shortened_uri(otl_object.typeURI)
+
             if short_uri not in master_dict:
                 master_dict[short_uri] = [{'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}]
             header_dict = master_dict[short_uri][0]
