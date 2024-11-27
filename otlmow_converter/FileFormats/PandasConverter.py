@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Iterable
 
 from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
@@ -16,7 +16,7 @@ class PandasConverter:
 
     @classmethod
     def convert_objects_to_multiple_dataframes(cls, sequence_of_objects: Iterable[OTLObject], **kwargs
-                                               ) -> Dict[str, DataFrame]:
+                                               ) -> dict[str, DataFrame]:
         dict_tables = DotnotationTableConverter.get_tables_per_type_from_data(sequence_of_objects=sequence_of_objects,
                                                                               **kwargs)
         return {key: DataFrame(data=value[1:]) for key, value in dict_tables.items()}

@@ -2,8 +2,7 @@ import os
 from datetime import date, datetime, time
 from pathlib import Path
 
-from numpy import isnan
-from pandas import DataFrame
+from pandas import DataFrame, isna
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
@@ -379,12 +378,12 @@ def test_convert_dataframe_to_objects_nan_values(caplog):
     assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert df['assetId.identificator'][0] == '01'
     assert df['testBooleanField'][0]
-    assert isnan(df['notitie'][0])
+    assert isna(df['notitie'][0])
 
     assert df['typeURI'][1] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
     assert df['assetId.identificator'][1] == '02'
     assert df['notitie'][1] == 'random note'
-    assert isnan(df['testBooleanField'][1])
+    assert isna(df['testBooleanField'][1])
 
     objects = list(PandasConverter.convert_dataframe_to_objects(dataframe=df, model_directory=model_directory_path))
     assert len(objects) == 2

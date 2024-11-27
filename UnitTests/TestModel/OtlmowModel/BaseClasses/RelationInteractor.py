@@ -20,24 +20,3 @@ class RelationInteractor:
         super().__init__()
 
         self._valid_relations = {}
-
-    def _get_all_concrete_relations(self, model_directory: Path = None):
-        class_dict = get_hardcoded_class_dict(model_directory)
-        for relation in self._valid_relations:
-            for target in self._valid_relations[relation]:
-                for direction, deprecated in self._valid_relations[relation][target].items():
-                    if class_dict[target]['abstract']:
-                        for subclass in get_concrete_subclasses_from_class_dict(target, model_directory=model_directory):
-                            if direction == 'o':
-                                yield self.typeURI, relation, subclass, '', deprecated
-                            elif direction == 'i':
-                                yield subclass, relation, self.typeURI, '', deprecated
-                            elif direction == 'u':
-                                yield self.typeURI, relation, subclass, 'Unspecified', deprecated
-                    else:
-                        if direction == 'o':
-                            yield self.typeURI, relation, target, '', deprecated
-                        elif direction == 'i':
-                            yield target, relation, self.typeURI, '', deprecated
-                        elif direction == 'u':
-                            yield self.typeURI, relation, target, 'Unspecified', deprecated
