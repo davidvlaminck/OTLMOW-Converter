@@ -59,6 +59,8 @@ class ExcelImporter(AbstractImporter):
         for sheet, sheet_data in data.items():
             try:
                 if len(sheet_data) == 0:
+                    if sheet_data == []:
+                        continue
                     raise NoTypeUriInExcelTabError(
                         message=f'Could not find typeURI within 5 rows in Excel tab {sheet} in file {filepath.name}',
                         file_path=filepath, tab=sheet)
