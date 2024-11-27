@@ -1,5 +1,6 @@
 import os
 import warnings
+from os import error
 from pathlib import Path
 
 import openpyxl
@@ -9,6 +10,7 @@ from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonS
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+from otlmow_converter.Exceptions.ExceptionsDictGroup import ExceptionsDictGroup
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
@@ -47,6 +49,7 @@ class ExcelImporter(AbstractImporter):
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+        include_tab_info = kwargs.get('include_tab_info' , False)
 
         model_directory = None
         if kwargs is not None and 'model_directory' in kwargs:
@@ -55,7 +58,11 @@ class ExcelImporter(AbstractImporter):
         data = cls.get_data_dict_from_file_path(filepath=filepath)
 
         list_of_objects = []
-        exception_group = ExceptionsGroup(message=f'Failed to create objects from Excel file {filepath}')
+        if include_tab_info:
+            exception_group = ExceptionsDictGroup(message=f'Failed to create objects from Excel file {filepath}')
+        else:
+            exception_group = ExceptionsGroup(message=f'Failed to create objects from Excel file {filepath}')
+
         for sheet, sheet_data in data.items():
             try:
                 if len(sheet_data) == 0:
@@ -93,7 +100,10 @@ class ExcelImporter(AbstractImporter):
                     file_path=filepath, tab=sheet
                 ))
             except BaseException as ex:
-                exception_group.add_exception(ex)
+                if include_tab_info:
+                    exception_group.add_exception(error=ex,cause_tab=sheet)
+                else:
+                    exception_group.add_exception(ex)
 
         if len(exception_group.exceptions) > 0:
             raise exception_group
