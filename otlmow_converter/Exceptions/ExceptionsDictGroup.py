@@ -4,7 +4,7 @@ from typing import Sequence, Optional
 class ExceptionsDictGroup(Exception):
     """
     Provides the same functions a ExceptionGroup.py but instead of a list of Exceptions it returns
-    a dictionary of structur:
+    a dictionary of structure:
      {
         "ex": Exception
         "tab": str
