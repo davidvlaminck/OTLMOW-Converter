@@ -7,7 +7,7 @@ model_directory_path = Path(__file__).parent.parent / 'TestModel'
 DotnotationTableConverter()
 
 def test_get_tables_per_type_from_data(subtests):
-    """Test the function get_tables_per_type_from_data
+    """Test the function get_tables_per_type_from_data conversion
     """
     with subtests.test(msg='Test OTL Asset convertion to DotnotationTable'):
         camera_instance = dynamic_create_instance_from_uri('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera')
