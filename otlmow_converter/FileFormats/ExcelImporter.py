@@ -14,6 +14,7 @@ from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import Invali
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
+from otlmow_converter.Exceptions.UnknownExcelError import UnknownExcelError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.SettingsManager import GlobalVariables, load_settings
 
@@ -93,7 +94,7 @@ class ExcelImporter(AbstractImporter):
                     file_path=filepath, tab=sheet
                 ))
             except BaseException as ex:
-                exception_group.add_exception(ex)
+                exception_group.add_exception(UnknownExcelError(original_exception=ex, tab=sheet))
 
         if len(exception_group.exceptions) > 0:
             raise exception_group
