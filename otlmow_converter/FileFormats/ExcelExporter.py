@@ -50,9 +50,9 @@ class ExcelExporter(AbstractExporter):
 
         created_a_sheet = False
         for class_name in table_dict:
-            created_a_sheet = created_a_sheet or cls._create_sheet_by_name(
+            created_a_sheet = cls._create_sheet_by_name(
                 wb=wb, class_name=class_name, table_data=table_dict[class_name],
-                abbreviate_excel_sheettitles=abbreviate_excel_sheettitles)
+                abbreviate_excel_sheettitles=abbreviate_excel_sheettitles) or created_a_sheet
 
         if created_a_sheet:
             del wb['Sheet']
