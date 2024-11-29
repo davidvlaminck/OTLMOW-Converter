@@ -46,6 +46,15 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
+def test_load_empty_sheet(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'empty_sheet.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+    assert len(objects) == 1
+
+
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.xlsx'

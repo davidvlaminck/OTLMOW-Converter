@@ -44,30 +44,42 @@ class ExcelExporter(AbstractExporter):
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
             sequence_of_objects=sequence_of_objects, values_as_string=True)
 
-        wb = Workbook(write_only=True)
+        wb = Workbook()
         if not sequence_of_objects:
             raise ValueError('There are no asset data to export to Excel')
+
+        created_a_sheet = False
         for class_name in table_dict:
-            cls._create_sheet_by_name(wb, class_name=class_name, table_data=table_dict[class_name],abbreviate_excel_sheettitles=abbreviate_excel_sheettitles)
+            created_a_sheet = created_a_sheet or cls._create_sheet_by_name(
+                wb=wb, class_name=class_name, table_data=table_dict[class_name],
+                abbreviate_excel_sheettitles=abbreviate_excel_sheettitles)
+
+        if created_a_sheet:
+            del wb['Sheet']
+
         wb.save(filepath)
 
+
     @classmethod
-    def _create_sheet_by_name(cls, wb: Workbook, class_name: str, table_data: List[dict], abbreviate_excel_sheettitles:bool = False):
+    def _create_sheet_by_name(cls, wb: Workbook, class_name: str, table_data: List[dict],
+                              abbreviate_excel_sheettitles: bool = False) -> bool:
         if not table_data:
-            return
+            return False
 
         data = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
             list_of_dicts=table_data, empty_string_equals_none=True)
 
-
         if abbreviate_excel_sheettitles:
-            # abbreviates the class_name so it doesn't exceeds the 31 character limit of sheet titles in excel
+            # abbreviates the class_name so it doesn't exceed the 31 character limit of sheet titles in excel
             split_name = class_name.split("#")
             namespace_name = split_name[0]
             subclass_name = split_name[1]
-            class_name = namespace_name[0:3] + "#" + subclass_name
+            class_name = f"{namespace_name[:3]}#{subclass_name}"
             class_name = class_name[:31]
 
         sheet = wb.create_sheet(class_name)
         for row in data:
             sheet.append(row)
+
+        sheet.sheet_format.defaultColWidth = 20
+        return True
