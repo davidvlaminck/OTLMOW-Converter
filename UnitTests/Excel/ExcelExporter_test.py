@@ -227,7 +227,7 @@ def test_export_and_then_import_sheetname_abbreviation(recwarn):
     instance_to_be_abbreviated = Bochtafbakeningsinstallatie()
     instance_to_be_abbreviated2 = BeweegbareWaterkerendeConstructie()
 
-    ExcelExporter.from_objects(sequence_of_objects=[instance,instance_to_be_abbreviated,instance_to_be_abbreviated2],
+    ExcelExporter.from_objects(sequence_of_objects=[instance, instance_to_be_abbreviated, instance_to_be_abbreviated2],
                                filepath=file_location,abbreviate_excel_sheettitles=True)
     warns = [w for w in recwarn.list if w.category is not DeprecationWarning] # remove deprecation warnings
     # if sheetTitle is to long it will trigger UserWarning('Title is more than 31 characters. Some applications may not be able to read the file')

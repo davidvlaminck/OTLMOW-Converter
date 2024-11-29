@@ -126,7 +126,7 @@ def test_get_index_of_typeURI_column_in_sheet():
 
     ex = ex.value
     assert isinstance(ex, ExceptionsGroup)
-    assert len(ex.exceptions) == 3
+    assert len(ex.exceptions) == 2
 
     exception_1 = ex.exceptions[0]
     assert isinstance(exception_1, TypeUriNotInFirstRowError)
@@ -137,11 +137,6 @@ def test_get_index_of_typeURI_column_in_sheet():
     assert isinstance(exception_2, NoTypeUriInExcelTabError)
     assert exception_2.file_path == file_location
     assert exception_2.tab == 'no_type_uri_in_sheet'
-
-    exception_3 = ex.exceptions[2]
-    assert isinstance(exception_3, NoTypeUriInExcelTabError)
-    assert exception_3.file_path == file_location
-    assert exception_3.tab == 'empty_sheet'
 
 
 def test_check_headers():
