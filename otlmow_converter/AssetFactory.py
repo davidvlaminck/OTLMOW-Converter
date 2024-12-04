@@ -1,10 +1,8 @@
 ﻿from pathlib import Path
-from typing import Union, Set
+from typing import Set
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem, OTLObject, \
     dynamic_create_instance_from_uri
-from otlmow_model.OtlmowModel.Classes.ImplementatieElement.AIMObject import AIMObject
-from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
 
 
 class AssetFactory:
@@ -29,12 +27,11 @@ class AssetFactory:
         if not isinstance(orig_otl_object, OTLObject):
             raise ValueError(f'{orig_otl_object} is not an OTLObject, not supported')
 
-        if typeURI != '':
-            if typeURI != orig_otl_object.typeURI and (fields_to_copy == [] or fields_to_copy is None):
-                raise ValueError("parameter typeURI is different from orig_otl_object. "
-                                 "Parameter fields_to_copy cannot be empty")
+        if typeURI != '' and (typeURI != orig_otl_object.typeURI and (fields_to_copy == [] or fields_to_copy is None)):
+            raise ValueError("parameter typeURI is different from orig_otl_object. "
+                             "Parameter fields_to_copy cannot be empty")
 
-        if typeURI == '':
+        if not typeURI:
             typeURI = orig_otl_object.typeURI
         new_asset = dynamic_create_instance_from_uri(typeURI, model_directory=model_directory)
 
@@ -50,8 +47,8 @@ class AssetFactory:
         return new_asset
 
     @staticmethod
-    def copy_fields_from_object_to_new_object(orig_object: Union[AIMObject, RelatieObject],
-                                              new_object: Union[AIMObject, RelatieObject], field_list: [str]):
+    def copy_fields_from_object_to_new_object(orig_object: OTLObject,
+                                              new_object: OTLObject, field_list: [str]):
         if orig_object is None:
             raise ValueError("parameter orig_object is None")
         if new_object is None:
@@ -59,18 +56,18 @@ class AssetFactory:
         if field_list is None or field_list == []:
             raise ValueError("parameter field_list is empty or None")
 
-        distinct_fieldList = list(set(field_list))
-        instance_dict = orig_object.create_dict_from_asset(waarde_shortcut=False)
+        distinct_field_list = list(set(field_list))
+        instance_dict = orig_object.create_dict_from_asset()
         new_instance_dict = {}
 
         if instance_dict is None:
             instance_dict = {}
 
-        for fieldName in distinct_fieldList:
+        for fieldName in distinct_field_list:
             if fieldName not in instance_dict:
                 continue
             dictitem = instance_dict[fieldName]
             new_instance_dict[fieldName] = dictitem
 
         for k, v in new_instance_dict.items():
-            set_value_by_dictitem(new_object, k, v, waarde_shortcut=False)
+            set_value_by_dictitem(new_object, k, v)
