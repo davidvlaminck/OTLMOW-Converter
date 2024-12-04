@@ -1,4 +1,5 @@
 import base64
+import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Iterable, List, Dict
@@ -223,5 +224,8 @@ def is_aim_id(aim_id: str, model_directory: Path = None) -> bool:
         ns, name = short_uri.split('#')
         instance = dynamic_create_instance_from_ns_and_name(ns, name, model_directory=model_directory)
         return instance is not None
+    except ModuleNotFoundError:
+        warnings.warn('Could not import the module for the given aim_id, did you forget the model_directory?', category=ImportWarning)
+        return False
     except ValueError:
         return False
