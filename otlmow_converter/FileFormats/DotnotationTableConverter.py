@@ -222,6 +222,8 @@ class DotnotationTableConverter:
                 if value == 'false':
                     value = False
                 data_dict[header] = value
+            if not data_dict:
+                continue
             list_of_dicts.append(data_dict)
 
         return list_of_dicts

@@ -111,6 +111,23 @@ def test_transform_list_of_dicts_to_2d_sequence():
     assert sequence_2d == expected_2d_sequence
 
 
+def test_transform_2d_sequence_to_list_of_dicts_with_empty_lines():
+    expected_list_of_dicts = [
+        {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'testStringField': 3},
+        {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+         'assetId.identificator': '0', 'testStringField': 'string1'},
+        {'typeURI': 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass',
+         'assetId.identificator': '1'}]
+    sequence_2d = [
+        ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'testStringField'],
+        ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0', None, 'string1'],
+        ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '1', None, None],
+        [None, None, None, None]]
+
+    list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(sequence_2d)
+
+    assert list_of_dicts == expected_list_of_dicts
+
 def test_transform_2d_sequence_to_list_of_dicts():
     expected_list_of_dicts = [
         {'typeURI': 0, 'assetId.identificator': 1, 'assetId.toegekendDoor': 2, 'testStringField': 3},
