@@ -99,6 +99,7 @@ class ExcelImporter(AbstractImporter):
                 exception_group.add_exception(UnknownExcelError(original_exception=ex, tab=sheet))
 
         if len(exception_group.exceptions) > 0:
+            exception_group.objects = list_of_objects
             raise exception_group
 
         return list_of_objects

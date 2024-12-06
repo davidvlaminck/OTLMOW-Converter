@@ -127,6 +127,7 @@ def test_get_index_of_typeURI_column_in_sheet():
     ex = ex.value
     assert isinstance(ex, ExceptionsGroup)
     assert len(ex.exceptions) == 2
+    assert len(ex.objects) == 1
 
     exception_1 = ex.exceptions[0]
     assert isinstance(exception_1, TypeUriNotInFirstRowError)
