@@ -166,3 +166,22 @@ def test_load_non_conform_attributes(recwarn):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.testBooleanField
     assert instance.non_conform_attribute == 'value'
+
+def test_import_agent(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'fietstelinstallatie_original.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location)
+
+    agent = [object for object in objects if object.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#HeeftBetrokkene'][0]
+
+    assert agent.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#HeeftBetrokkene'
+    assert agent.assetId.identificator == '3ac58b25-062f-4639-82fa-4330050918f9-b25kZXJkZWVsI0hlZWZ0QmV0cm9ra2VuZQ'
+    assert agent.assetId.toegekendDoor == 'AWV'
+    assert agent.bron.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/installatie#Fietstelinstallatie'
+    assert agent.bronAssetId.identificator == '6bccfb2d-6d66-437e-a129-d966033b018a-aW5zdGFsbGF0aWUjRmlldHN0ZWxpbnN0YWxsYXRpZQ'
+    assert agent.bronAssetId.toegekendDoor == 'AWV'
+    assert agent.doel.typeURI == 'http://purl.org/dc/terms/Agent'
+    assert agent.doelAssetId.identificator == '472b1bcd-c166-4838-be38-13860ec86e5f-cHVybDpBZ2VudA'
+    assert agent.doelAssetId.toegekendDoor == 'AWV'
+    assert agent.isActief == True
+    assert agent.rol ==	'toezichter'
