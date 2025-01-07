@@ -514,3 +514,30 @@ def test_clear_list_of_list_attributes():
     assert instance.testComplexTypeMetKard[0].testComplexType2.testStringField == 'test4'
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
     assert instance.testComplexTypeMetKard[0].testStringFieldMetKard is None
+
+def test_uniontype_using_dotnotation():
+    instance = AllCasesTestClass()
+    instance.testUnionType.unionString = '1'
+    assert instance.testUnionType.unionString == '1'
+
+    instance.testUnionType.unionKwantWrd.waarde = 1.1
+    assert instance.testUnionType.unionKwantWrd.waarde == 1.1
+    assert instance.testUnionType.unionString is None
+
+def test_uniontype_using_function_1():
+    instance = AllCasesTestClass()
+    DotnotationHelper.set_attribute_by_dotnotation(instance, dotnotation='testUnionType.unionString', value='1')
+    assert instance.testUnionType.unionString == '1'
+
+    DotnotationHelper.set_attribute_by_dotnotation(instance, dotnotation='testUnionType.unionKwantWrd', value=1.1)
+    assert instance.testUnionType.unionKwantWrd.waarde == 1.1
+    assert instance.testUnionType.unionString is None
+
+def test_uniontype_using_function_2():
+    instance = AllCasesTestClass()
+    DotnotationHelper.set_attribute_by_dotnotation(instance, dotnotation='testUnionType.unionKwantWrd', value=1.1)
+    assert instance.testUnionType.unionKwantWrd.waarde == 1.1
+
+    DotnotationHelper.set_attribute_by_dotnotation(instance, dotnotation='testUnionType.unionString', value='1')
+    assert instance.testUnionType.unionString == '1'
+    assert instance.testUnionType.unionKwantWrd.waarde is None
