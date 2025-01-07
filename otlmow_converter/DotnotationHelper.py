@@ -207,9 +207,7 @@ class DotnotationHelper:
                 if attribute.waarde is None:
                     attribute.add_empty_value()
                 else:
-                    # Add empty values for both the unionKwantWrd and the unionString
-                    attribute.waarde.unionKwantWrd.waarde = None
-                    attribute.waarde.unionString = None
+                    attribute.clear_value()
 
                 # Recursive function call
                 DotnotationHelper.set_attribute_by_dotnotation(
