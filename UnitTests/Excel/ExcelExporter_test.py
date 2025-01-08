@@ -12,6 +12,7 @@ from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.Bevestiging import Bevest
 from otlmow_converter.FileFormats.ExcelExporter import ExcelExporter
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 
+
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
@@ -234,7 +235,7 @@ def test_export_and_then_import_sheetname_abbreviation(recwarn):
     assert not warns
 
     # first load the objects in the template to see it the basics are there
-    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = ExcelImporter.to_objects(filepath=file_location)
     assert len(objects) == 3
 
     instance_imported, instance_to_be_abbreviated_imported, instance_to_be_abbreviated2_imported = objects
@@ -243,7 +244,7 @@ def test_export_and_then_import_sheetname_abbreviation(recwarn):
     assert instance_to_be_abbreviated_imported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#Bochtafbakeningsinstallatie"
     assert instance_to_be_abbreviated2_imported.typeURI == "https://wegenenverkeer.data.vlaanderen.be/ns/installatie#BeweegbareWaterkerendeConstructie"
 
-    # second do a lower level load of the file that includs the sheet titles with ExcelImporter
+    # second do a lower level load of the file that includes the sheet titles with ExcelImporter
     data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
 
     sheet_titles = list(data.keys())
@@ -260,41 +261,38 @@ def test_export_agent(recwarn):
 
     agent = Agent()
     agent.fill_with_dummy_data()
-    print(f'agent: {agent}')
+    agent.clear_value('contactinfo')
 
-    instance = AllCasesTestClass()
-    instance.fill_with_dummy_data()
-    instance.testComplexTypeMetKard[0].testComplexType2MetKard = None
-    instance.testComplexTypeMetKard[0].testKwantWrdMetKard = None
-    instance.testComplexTypeMetKard[0].testStringFieldMetKard = None
-    instance.testUnionType = None
-    instance.testUnionTypeMetKard = None
-    ExcelExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    ExcelExporter.from_objects(sequence_of_objects=[agent], filepath=file_location)
     warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
     assert not warns
 
     data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
-    first_row = list(data['onderdeel#AllCasesTestClass'][0])
+    first_row = list(data['Agent'][0])
 
-    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'bestekPostNummer[]',
-                         'datumOprichtingObject', 'geometry', 'isActief', 'notitie', 'standaardBestekPostNummer[]',
-                         'testBooleanField', 'testComplexType.testBooleanField',
-                         'testComplexType.testComplexType2.testKwantWrd',
-                         'testComplexType.testComplexType2.testStringField',
-                         'testComplexType.testComplexType2MetKard[].testKwantWrd',
-                         'testComplexType.testComplexType2MetKard[].testStringField',
-                         'testComplexType.testKwantWrd',
-                         'testComplexType.testKwantWrdMetKard[]', 'testComplexType.testStringField',
-                         'testComplexType.testStringFieldMetKard[]', 'testComplexTypeMetKard[].testBooleanField',
-                         'testComplexTypeMetKard[].testComplexType2.testKwantWrd',
-                         'testComplexTypeMetKard[].testComplexType2.testStringField',
-                         'testComplexTypeMetKard[].testKwantWrd',
-                         'testComplexTypeMetKard[].testStringField', 'testDateField', 'testDateTimeField',
-                         'testDecimalField', 'testDecimalFieldMetKard[]', 'testEenvoudigType',
-                         'testEenvoudigTypeMetKard[]',
-                         'testIntegerField', 'testIntegerFieldMetKard[]', 'testKeuzelijst',
-                         'testKeuzelijstMetKard[]',
-                         'testKwantWrd', 'testKwantWrdMetKard[]', 'testStringField', 'testStringFieldMetKard[]',
-                         'testTimeField', 'theoretischeLevensduur', 'toestand']
+    assert first_row == [
+        'typeURI',
+        'assetId.identificator',
+        'assetId.toegekendDoor',
+        'agentId.identificator',
+        'agentId.toegekendDoor',
+        'contactinfo[].adres.bus',
+        'contactinfo[].adres.gemeente',
+        'contactinfo[].adres.huisnummer',
+        'contactinfo[].adres.postcode',
+        'contactinfo[].adres.provincie',
+        'contactinfo[].adres.straatnaam',
+        'contactinfo[].beschikbaarheid[].openingstijd',
+        'contactinfo[].beschikbaarheid[].sluitingstijd',
+        'contactinfo[].beschikbaarheid[].weekdag',
+        'contactinfo[].contactnaam',
+        'contactinfo[].email',
+        'contactinfo[].fax',
+        'contactinfo[].opmerkingen',
+        'contactinfo[].telefoon',
+        'contactinfo[].website',
+        'isActief',
+        'naam'
+    ]
 
     os.unlink(file_location)
