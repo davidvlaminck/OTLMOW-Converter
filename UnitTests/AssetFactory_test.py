@@ -18,10 +18,10 @@ def test_create_otl_object_using_other_otl_object_as_template_using_attribute_li
         orig_otl_object=another_test_class, typeURI=AllCasesTestClass.typeURI, fields_to_copy=attribute_list,
         model_directory=Path(__file__).parent / 'TestModel')
 
-    input_dict = another_test_class.create_dict_from_asset()
+    input_dict = another_test_class.to_dict()
     input_type_uri = input_dict.pop('typeURI')
 
-    result_dict = result_asset.create_dict_from_asset()
+    result_dict = result_asset.to_dict()
     result_type_uri = result_dict.pop('typeURI')
 
     assert result_type_uri == AllCasesTestClass.typeURI

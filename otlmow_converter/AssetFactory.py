@@ -57,7 +57,7 @@ class AssetFactory:
             raise ValueError("parameter field_list is empty or None")
 
         distinct_field_list = list(set(field_list))
-        instance_dict = orig_object.create_dict_from_asset()
+        instance_dict = orig_object.to_dict()
         new_instance_dict = {}
 
         if instance_dict is None:
