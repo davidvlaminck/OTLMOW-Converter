@@ -304,7 +304,7 @@ class OTLObject(object):
     def create_dict_from_asset(self, waarde_shortcut: bool = False, rdf: bool = False, cast_datetime: bool = False,
                                warn_for_non_otl_conform_attributes: bool = True,
                                allow_non_otl_conform_attributes: bool = True, ) -> Dict:
-        """Converts this asset into a dictionary representation
+        """Converts this asset into a dictionary representation. This is now deprecated, use to_dict instead.
 
         :param waarde_shortcut: whether to use the waarde shortcut when processing the dictionary, defaults to False
         :type: bool
@@ -320,6 +320,8 @@ class OTLObject(object):
 
         :return: returns a dictionary representation of this asset
         :rtype: dict"""
+        warnings.warn(message='create_dict_from_asset is deprecated, use to_dict instead',
+                      category=AttributeDeprecationWarning)
         return create_dict_from_asset(
             otl_object=self, waarde_shortcut=waarde_shortcut, rdf=rdf, cast_datetime=cast_datetime,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
@@ -394,6 +396,9 @@ class OTLObject(object):
             type_uri = input_dict['typeURI']
         elif rdf and 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI' in input_dict:
             type_uri = input_dict['https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI']
+        elif rdf and '@type' in input_dict:
+            type_uri = input_dict['@type']
+            del input_dict['@type']
         else:
             type_uri = cls.typeURI
 
@@ -419,6 +424,29 @@ class OTLObject(object):
                                   allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                   warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
         return o
+
+    def to_dict(self, rdf: bool = False, cast_datetime: bool = False, waarde_shortcut: bool = False,
+                allow_non_otl_conform_attributes: bool = True, warn_for_non_otl_conform_attributes: bool = True) -> Dict:
+        """Converts this asset into a dictionary representation
+
+        :param waarde_shortcut: whether to use the waarde shortcut when processing the dictionary, defaults to False
+        :type: bool
+        :param rdf: whether to generate a dictionary where the keys are the URI's of the attributes
+        rather than the names, defaults to False
+        :type: bool
+        :param cast_datetime: whether to convert dates, times and datetimes to strings, defaults to False
+        :type: bool
+        :param allow_non_otl_conform_attributes: whether to allow non OTL conform attributes. Raising ValueError if not, Defaults to True
+        :type: bool
+        :param warn_for_non_otl_conform_attributes: whether to generate warnings when using non OTL conform attributes. Defaults to True
+        :type: bool
+
+        :return: returns a dictionary representation of this asset
+        :rtype: dict"""
+        return create_dict_from_asset(
+            otl_object=self, waarde_shortcut=waarde_shortcut, rdf=rdf, cast_datetime=cast_datetime,
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes)
 
 
 def create_dict_from_asset(otl_object: OTLObject, waarde_shortcut=False, rdf: bool = False,
