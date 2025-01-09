@@ -541,3 +541,13 @@ def test_set_attribute_by_dotnotation_empty_existing_value_2():
     DotnotationHelper.set_attribute_by_dotnotation(instance, dotnotation='testUnionType.unionString', value='1')
     assert instance.testUnionType.unionString == '1'
     assert instance.testUnionType.unionKwantWrd.waarde is None
+
+
+def test_set_attribute_by_dotnotation_empty_existing_value_2():
+    instance = AllCasesTestClass()
+    DotnotationHelper.set_attribute_by_dotnotation(instance, dotnotation='testComplexType.testStringField', value='string 1')
+    assert instance.testComplexType.testStringField == 'string 1'
+
+    DotnotationHelper.set_attribute_by_dotnotation(instance, dotnotation='testComplexType.testKwantWrd', value=1.1)
+    assert instance.testComplexType.testStringField == 'string 1'
+    assert instance.testComplexType.testKwantWrd.waarde == 1.1
