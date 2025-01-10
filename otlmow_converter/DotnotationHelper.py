@@ -2,6 +2,7 @@
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
+from otlmow_model.OtlmowModel.BaseClasses.UnionWaarden import UnionWaarden
 
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -206,8 +207,8 @@ class DotnotationHelper:
                 attribute = get_attribute_by_name(instance_or_attribute, first_part)
                 if attribute.waarde is None:
                     attribute.add_empty_value()
-                else:
-                    attribute.clear_value()
+                elif isinstance(attribute.waarde, UnionWaarden):
+                    attribute.waarde.clear_other_props(prop_name=rest)
 
                 # Recursive function call
                 DotnotationHelper.set_attribute_by_dotnotation(
