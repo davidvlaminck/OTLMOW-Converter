@@ -20,6 +20,9 @@ class FileImporter:
         elif extension in {'xls', 'xlsx'}:
             from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
             return ExcelImporter()
+        elif extension == 'ifc':
+            from otlmow_converter.FileFormats.IFCImporter import IFCImporter
+            return IFCImporter()
         else:
             raise InvalidExtensionError('This file has an invalid extension. '
-                                        'Supported file formats are: csv, json, xlsx, xls, geojson, jsonld')
+                                        'Supported file formats are: csv, json, xlsx, xls, geojson, jsonld, ifc')
