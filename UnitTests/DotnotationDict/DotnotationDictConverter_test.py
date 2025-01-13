@@ -6,6 +6,7 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asse
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
