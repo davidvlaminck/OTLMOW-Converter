@@ -23,3 +23,31 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.naam == 'LIGGER'
     assert instance.notitie == 'PL35*205'
 
+def test_ifc_to_dict():
+    file_location = Path(__file__).parent / 'Testfiles' / 'Output-IFC-metOTLdata.ifc'
+
+    d = IFCImporter.ifc_to_dict(filepath=file_location)
+
+    assert d == {}
+
+def test_parse_nested_tuples():
+    result = IFCImporter.parse_nested_tuples('(a,b,c)')
+    assert result == ('a', 'b', 'c')
+
+    result = IFCImporter.parse_nested_tuples('(a,b,c,)')
+    assert result == ('a', 'b', 'c', '')
+
+    result = IFCImporter.parse_nested_tuples('((a),b,c,d)')
+    assert result == (tuple('a'), 'b', 'c', 'd')
+
+    result = IFCImporter.parse_nested_tuples('(a,"b,c",)')
+    assert result == ('a', '"b,c"', '')
+
+    result = IFCImporter.parse_nested_tuples("'_UxOpdGmQT6xVz0y_eFnUw',#24,'OTL_voorbeeld',$,(#69,#70,#71,#72)")
+    assert result == (
+        "'_UxOpdGmQT6xVz0y_eFnUw'",
+        '#24',
+        "'OTL_voorbeeld'",
+        '$',
+        ('#69', '#70', '#71', '#72'),
+    )

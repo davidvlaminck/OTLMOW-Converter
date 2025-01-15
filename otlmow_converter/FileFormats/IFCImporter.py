@@ -1,4 +1,5 @@
 import json
+import re
 import warnings
 from pathlib import Path
 from typing import Iterable, List
@@ -6,6 +7,7 @@ from typing import Iterable, List
 import ifcopenshell
 import ifcopenshell.util.element
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+from rdflib.plugins.sparql.parserutils import value
 
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationDict import DotnotationDict
@@ -25,6 +27,8 @@ CAST_LIST = ifc_settings['cast_list']
 CAST_DATETIME = ifc_settings['cast_datetime']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = ifc_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = ifc_settings['warn_for_non_otl_conform_attributes']
+
+
 
 
 class IFCImporter(AbstractImporter):
@@ -101,3 +105,105 @@ class IFCImporter(AbstractImporter):
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             if asset is not None:
                 yield asset
+
+    @classmethod
+    def ifc_to_dict(cls, filepath):
+        d = {}
+        # open and read the file
+        regex = re.compile(r'#(\d+)=([A-Z\d]+)\((.*)\);')
+        regex_2 = re.compile(r'#(\d+)=([A-Z\d]+)\(([A-Z\d]+)\((.*)\)(.*)\);')
+        with open(filepath, 'r') as file:
+            for line in file:
+                if not line.startswith('#'):
+                    continue
+                groups = regex.match(line)
+                if not groups:
+                    continue
+
+                groups_nested = regex_2.match(line)
+                if groups_nested:
+                    cls.parse_nested_dict(groups=groups_nested, master_dict=d)
+                elif groups:
+                    cls.parse_unnested_dict(groups=groups, master_dict=d)
+                else:
+                    continue
+
+                print(line)
+        return d
+
+    @classmethod
+    def parse_nested_dict(cls, groups: re.Match[str], master_dict: dict) -> None:
+        cls.parse_unnested_dict(groups, master_dict, offset=1)
+        _id = groups.group(1)
+        _type = groups.group(2)
+        values = groups.group(5)
+        nested_dict = master_dict[_id]
+        nested_dict['id'] += '.1'
+
+        tuples = cls.parse_nested_tuples(values)
+        values = list(cls.process_values(tuples, master_dict))
+
+        values.insert(0, nested_dict)
+
+        master_dict[_id] = {'ifc_type': _type, 'values': values, 'id': _id}
+
+    @classmethod
+    def parse_unnested_dict(cls, groups: re.Match[str], master_dict: dict, offset: int = 0) -> None:
+        _id = groups.group(1)
+        _type = groups.group(2 + offset)
+        values = groups.group(3 + offset)
+
+        tuples = cls.parse_nested_tuples(values)
+        values = cls.process_values(tuples, master_dict)
+
+        master_dict[_id] = {'ifc_type': _type, 'values': values, 'id': _id}
+
+    @classmethod
+    def process_values(cls, tuples, master_dict):
+        new_list = list(tuples)
+        for i, value in enumerate(new_list):
+            if isinstance(value, tuple):
+                new_list[i] = cls.process_values(value, master_dict)
+            else:
+                if value.startswith('#'):
+                    if value[1:] in master_dict:
+                        new_list[i] = master_dict[value[1:]]
+                    else:
+                        print(value)
+        return tuple(new_list)
+
+    @classmethod
+    def parse_nested_tuples(cls, values_string):
+        if values_string.startswith('(') and values_string.endswith(')'):
+            values_string = values_string[1:-1]
+        values_list = list(cls.split_nested_tuples(values_string, ','))
+        for index, value in enumerate(values_list):
+            if value.startswith('(') and value.endswith(')'):
+                value = cls.parse_nested_tuples(value)
+                values_list[index] = value
+        return tuple(values_list)
+
+    @classmethod
+    def split_nested_tuples(cls, values_string: str, delimiter: str) -> List[str]:
+        single_quotes, double_quotes, brackets = 0,0,0
+        value = ''
+        for char in values_string:
+            value += char
+            if char == '(':
+                brackets += 1
+            elif char == ')':
+                brackets -= 1
+            elif char == "'":
+                if single_quotes:
+                    single_quotes -= 1
+                else:
+                    single_quotes += 1
+            elif char == '"':
+                if double_quotes:
+                    double_quotes -= 1
+                else:
+                    double_quotes += 1
+            elif char == delimiter and not single_quotes and not double_quotes and not brackets:
+                yield value[:-1]
+                value = ''
+        yield value
