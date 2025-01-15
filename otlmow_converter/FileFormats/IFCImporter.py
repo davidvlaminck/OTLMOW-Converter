@@ -1,13 +1,13 @@
-import json
 import re
 import warnings
+from calendar import day_abbr
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List
 
 import ifcopenshell
 import ifcopenshell.util.element
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-from rdflib.plugins.sparql.parserutils import value
 
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationDict import DotnotationDict
@@ -29,6 +29,151 @@ ALLOW_NON_OTL_CONFORM_ATTRIBUTES = ifc_settings['allow_non_otl_conform_attribute
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = ifc_settings['warn_for_non_otl_conform_attributes']
 
 
+
+@dataclass
+class Reference:
+    id: str
+
+
+@dataclass
+class IfcOrganization:
+    identification: str
+    name: str
+    description: str
+    roles: list[dict]
+    addresses: list[dict]
+
+
+@dataclass
+class IfcApplication:
+    application_developer: IfcOrganization
+    version: str
+    application_full_name: str
+    Aapplication_identifier: str
+
+
+@dataclass
+class IfcCartesianPoint:
+    coordinates: list[float]
+
+    @classmethod
+    def convert_to_coords(cls, coords):
+        return [float(c) for c in coords]
+
+
+@dataclass
+class IfcDirection:
+    direction_ratios: list[float]
+
+    @classmethod
+    def convert_to_direction_ratios(cls, ratios):
+        return [float(c) for c in ratios]
+
+
+@dataclass
+class IfcAxis2Placement2D:
+    ref_direction: IfcDirection
+    p: IfcDirection
+
+
+@dataclass
+class IfcAxis2Placement3D:
+    axis: IfcDirection
+    ref_direction: IfcDirection
+    p: IfcDirection
+
+
+@dataclass
+class IfcGeometricRepresentationContext:
+    context_identifier: str
+    context_type: str
+    coordinate_space_dimension: int
+    precision: float
+    world_coordinate_system: IfcAxis2Placement3D
+    true_north: IfcDirection
+
+
+@dataclass
+class IfcGeometricRepresentationSubContext:
+    context_identifier: str
+    context_type: str
+    coordinate_space_dimension: int
+    precision: float
+    world_coordinate_system: IfcAxis2Placement3D
+    true_north: IfcDirection
+    parent_context: IfcGeometricRepresentationContext
+    target_scale: float
+    target_view: str
+    user_defined_target_view: str
+
+
+@dataclass
+class IfcPerson:
+    identification: str
+    family_name: str
+    given_name: str
+    middle_names: list[str]
+    prefix_titles: list[str]
+    suffix_titles: list[str]
+    roles: list[dict]
+    addresses: list[dict]
+
+
+@dataclass
+class IfcPersonAndOrganization:
+    the_person: IfcPerson
+    the_organization: IfcOrganization
+    roles: list[dict]
+
+
+@dataclass
+class IfcOwnerHistory:
+    owning_user: IfcPersonAndOrganization
+    owning_application: IfcApplication
+    state: str
+    change_action: str
+    last_modification_date: str
+    last_modifying_user: IfcPersonAndOrganization
+    last_modifying_application: IfcApplication
+    creation_date: str
+
+
+@dataclass
+class IfcSIUnit:
+    dimensions: str
+    unit_type: str
+    prefix: str
+    name: str
+
+
+@dataclass
+class IfcDimensionalExponents:
+    length_exponent: int
+    mass_exponent: int
+    time_exponent: int
+    electric_current_exponent: int
+    thermodynamic_temperature_exponent: int
+    amount_of_substance_exponent: int
+    luminous_intensity_exponent: int
+
+
+@dataclass
+class IfcMeasureWithUnit:
+    value_component: float
+    unit_component: IfcSIUnit
+
+
+@dataclass
+class IfcConversionBasedUnit:
+    dimensions: str
+    unit_type: str
+    name: str
+    conversion_factor: IfcMeasureWithUnit
+
+
+@dataclass
+class IfcUnitAssignment:
+    units: list[dict]
 
 
 class IFCImporter(AbstractImporter):
@@ -111,25 +256,74 @@ class IFCImporter(AbstractImporter):
         d = {}
         # open and read the file
         regex = re.compile(r'#(\d+)=([A-Z\d]+)\((.*)\);')
-        regex_2 = re.compile(r'#(\d+)=([A-Z\d]+)\(([A-Z\d]+)\((.*)\)(.*)\);')
+
         with open(filepath, 'r') as file:
-            for line in file:
+            for i, line in enumerate(file):
                 if not line.startswith('#'):
                     continue
                 groups = regex.match(line)
                 if not groups:
                     continue
-
-                groups_nested = regex_2.match(line)
-                if groups_nested:
-                    cls.parse_nested_dict(groups=groups_nested, master_dict=d)
-                elif groups:
-                    cls.parse_unnested_dict(groups=groups, master_dict=d)
-                else:
-                    continue
-
-                print(line)
+                cls.parse_groups_to_master_dict(groups=groups, master_dict=d)
+                if i > 50:
+                    break
         return d
+
+
+    @classmethod
+    def parse_groups_to_master_dict(cls, groups, master_dict):
+        _id = groups.group(1)
+        _type = groups.group(2)
+        _args = groups.group(3)
+
+        c = cls.instantiate_ifc_object(ifc_type=_type, id=_id, args=_args)
+        master_dict[_id] = c
+
+
+
+    @classmethod
+    def instantiate_ifc_object(cls, ifc_type, id, args):
+        _args = cls.parse_nested_tuples(args)
+        if ifc_type == 'IFCORGANIZATION':
+            return IfcOrganization(*_args)
+        elif ifc_type == 'IFCAPPLICATION':
+            return IfcApplication(*_args)
+        elif ifc_type == 'IFCCARTESIANPOINT':
+            coords = IfcCartesianPoint.convert_to_coords(_args)
+            return IfcCartesianPoint(list(coords))
+        elif ifc_type == 'IFCDIRECTION':
+            ratios = IfcDirection.convert_to_direction_ratios(_args)
+            return IfcDirection(ratios)
+        elif ifc_type == 'IFCAXIS2PLACEMENT2D':
+            return IfcAxis2Placement2D(*_args)
+        elif ifc_type == 'IFCAXIS2PLACEMENT3D':
+            return IfcAxis2Placement3D(*_args)
+        elif ifc_type == 'IFCGEOMETRICREPRESENTATIONCONTEXT':
+            return IfcGeometricRepresentationContext(*_args)
+        elif ifc_type == 'IFCGEOMETRICREPRESENTATIONSUBCONTEXT':
+            return IfcGeometricRepresentationSubContext(*_args)
+        elif ifc_type == 'IFCPERSON':
+            return IfcPerson(*_args)
+        elif ifc_type == 'IFCPERSONANDORGANIZATION':
+            return IfcPersonAndOrganization(*_args)
+        elif ifc_type == 'IFCOWNERHISTORY':
+            return IfcOwnerHistory(*_args)
+        elif ifc_type == 'IFCSIUNIT':
+            return IfcSIUnit(*_args)
+        elif ifc_type == 'IFCDIMENSIONALEXPONENTS':
+            return IfcDimensionalExponents(*_args)
+        elif ifc_type == 'IFCMEASUREWITHUNIT':
+            return IfcMeasureWithUnit(*_args)
+        elif ifc_type == 'IFCCONVERSIONBASEDUNIT':
+            return IfcConversionBasedUnit(*_args)
+        elif ifc_type == 'IFCUNITASSIGNMENT':
+            return IfcUnitAssignment(*_args)
+        else:
+            # return {'ifc_type': ifc_type, 'id': id, 'values': cls.parse_nested_tuples(args)}
+            raise NotImplementedError(f'IFC type {ifc_type} not implemented')
+
+        return {'ifc_type': ifc_type, 'id': id, 'values': cls.parse_nested_tuples(args)}
+
 
     @classmethod
     def parse_nested_dict(cls, groups: re.Match[str], master_dict: dict) -> None:
@@ -178,6 +372,8 @@ class IFCImporter(AbstractImporter):
             values_string = values_string[1:-1]
         values_list = list(cls.split_nested_tuples(values_string, ','))
         for index, value in enumerate(values_list):
+            if value is None or isinstance(value, Reference):
+                continue
             if value.startswith('(') and value.endswith(')'):
                 value = cls.parse_nested_tuples(value)
                 values_list[index] = value
@@ -186,6 +382,7 @@ class IFCImporter(AbstractImporter):
     @classmethod
     def split_nested_tuples(cls, values_string: str, delimiter: str) -> List[str]:
         single_quotes, double_quotes, brackets = 0,0,0
+        remove_quotes = False
         value = ''
         for char in values_string:
             value += char
@@ -198,12 +395,30 @@ class IFCImporter(AbstractImporter):
                     single_quotes -= 1
                 else:
                     single_quotes += 1
+                    remove_quotes = True
             elif char == '"':
                 if double_quotes:
                     double_quotes -= 1
                 else:
                     double_quotes += 1
+                    remove_quotes = True
             elif char == delimiter and not single_quotes and not double_quotes and not brackets:
-                yield value[:-1]
+                value = value[:-1]
+                yield from cls.sanitize_value(remove_quotes, value)
+                remove_quotes = False
                 value = ''
-        yield value
+        yield from cls.sanitize_value(remove_quotes, value)
+
+    @classmethod
+    def sanitize_value(cls, remove_quotes, value):
+        if remove_quotes:
+            if value.startswith("'") and value.endswith("'"):
+                value = value[1:-1]
+            elif value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+        if value == '$':
+            yield None
+        elif value.startswith('#'):
+            yield Reference(value[1:])
+        else:
+            yield value
