@@ -3,10 +3,8 @@ import warnings
 from calendar import day_abbr
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable, List, Self
 
-import ifcopenshell
-import ifcopenshell.util.element
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
 from otlmow_converter.AbstractImporter import AbstractImporter
@@ -176,6 +174,135 @@ class IfcUnitAssignment:
     units: list[dict]
 
 
+@dataclass
+class IfcProject:
+    global_id: str
+    owner_history: IfcOwnerHistory
+    name: str
+    description: str
+    object_type: str
+    long_name: str
+    phase: str
+    representation_contexts: list[dict]
+    units_in_context: IfcUnitAssignment
+
+
+@dataclass
+class IfcObjectPlacement:
+    placement_rel_to: Self
+
+@dataclass
+class IfcLocalPlacement: # inherits from IfcObjectPlacement
+    placement_rel_to: IfcObjectPlacement
+    relative_placement: IfcAxis2Placement3D
+
+
+@dataclass
+class IfcSite:
+    global_id: str
+    owner_history: IfcOwnerHistory
+    name: str
+    description: str
+    object_type: str
+    object_placement: IfcObjectPlacement
+    representation: str
+    long_name: str
+    composition_type: str
+    ref_latitude: float
+    ref_longitude: float
+    ref_elevation: float
+    land_title_number: str
+    site_address: str
+
+
+@dataclass
+class IfcLoop:
+    pass
+
+
+@dataclass
+class IfcPolyLoop(IfcLoop):
+    polygon: list[IfcCartesianPoint]
+
+    @classmethod
+    def convert_to_points(cls, _args):
+        return [p for p in _args]
+
+
+@dataclass
+class IfcFaceBound:
+    bound: IfcLoop
+    orientation: bool
+
+
+@dataclass
+class IfcFaceOuterBound(IfcFaceBound):
+    bound: IfcLoop
+    orientation: bool
+
+
+@dataclass
+class IfcFace:
+    bound: IfcFaceBound
+
+
+@dataclass
+class IfcClosedShell:
+    cfs_faces: list[IfcFace]
+
+    @classmethod
+    def convert_to_faces(cls, _args):
+        return [f for f in _args]
+
+
+@dataclass
+class IfcFacetedBrep:
+    outer: IfcClosedShell
+
+
+@dataclass
+class IfcColourRgb:
+    name: str
+    red: float
+    green: float
+    blue: float
+
+
+@dataclass
+class IfcSurfaceStyleRendering:
+    surface_colour: IfcColourRgb
+    transparency: float
+    diffuse_colour: object
+    transmission_colour: object
+    diffuse_transmission_colour: object
+    reflection_colour: object
+    specular_colour: object
+    specular_highlight: object
+    reflectance_method: str
+
+
+@dataclass
+class IfcPresentationStyle:
+    name: str
+
+
+@dataclass
+class IfcSurfaceStyle(IfcPresentationStyle):
+    side: str
+    styles: list[IfcSurfaceStyleRendering]
+
+
+@dataclass
+class IfcRepresentationItem:
+    pass
+
+@dataclass
+class IfcStyledItem:
+    item: IfcRepresentationItem
+    styles: list[IfcPresentationStyle]
+    name: str
+
+
 class IFCImporter(AbstractImporter):
     allowed_ifc_types = {'IfcBeam', 'IfcColumn', 'IfcFooting', 'IfcSlab', 'IfcWall', 'IfcWallStandardCase', 'IfcPlate',
                          'IfcDiscreteAccessory', 'IfcMechanicalFastener', 'IfcOpeningElement', 'IfcMember',
@@ -265,7 +392,7 @@ class IFCImporter(AbstractImporter):
                 if not groups:
                     continue
                 cls.parse_groups_to_master_dict(groups=groups, master_dict=d)
-                if i > 50:
+                if i > 100:
                     break
         return d
 
@@ -318,6 +445,36 @@ class IFCImporter(AbstractImporter):
             return IfcConversionBasedUnit(*_args)
         elif ifc_type == 'IFCUNITASSIGNMENT':
             return IfcUnitAssignment(*_args)
+        elif ifc_type == 'IFCPROJECT':
+            return IfcProject(*_args)
+        elif ifc_type == 'IFCOBJECTPLACEMENT':
+            return IfcObjectPlacement(*_args)
+        elif ifc_type == 'IFCLOCALPLACEMENT':
+            return IfcLocalPlacement(*_args)
+        elif ifc_type == 'IFCSITE':
+            return IfcSite(*_args)
+        elif ifc_type == 'IFCPOLYLOOP':
+            points = IfcPolyLoop.convert_to_points(_args)
+            return IfcPolyLoop(points)
+        elif ifc_type == 'IFCFACEOUTERBOUND':
+            return IfcFaceOuterBound(*_args)
+        elif ifc_type == 'IFCFACE':
+            return IfcFace(*_args)
+        elif ifc_type == 'IFCCLOSEDSHELL':
+            faces = IfcClosedShell.convert_to_faces(_args)
+            return IfcClosedShell(faces)
+        elif ifc_type == 'IFCFACETEDBREP':
+            return IfcFacetedBrep(*_args)
+        elif ifc_type == 'IFCCOLOURRGB':
+            return IfcColourRgb(*_args)
+        elif ifc_type == 'IFCSURFACESTYLERENDERING':
+            return IfcSurfaceStyleRendering(*_args)
+        elif ifc_type == 'IFCSURFACESTYLE':
+            return IfcSurfaceStyle(*_args)
+        elif ifc_type == 'IFCREPRESENTATIONITEM':
+            return IfcRepresentationItem(*_args)
+        elif ifc_type == 'IFCSTYLEDITEM':
+            return IfcStyledItem(*_args)
         else:
             # return {'ifc_type': ifc_type, 'id': id, 'values': cls.parse_nested_tuples(args)}
             raise NotImplementedError(f'IFC type {ifc_type} not implemented')
