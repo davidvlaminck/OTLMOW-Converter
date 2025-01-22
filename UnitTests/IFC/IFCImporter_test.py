@@ -26,9 +26,10 @@ def test_load_test_unnested_attributes(recwarn):
 def test_ifc_to_dict():
     file_location = Path(__file__).parent / 'Testfiles' / 'Output-IFC-metOTLdata.ifc'
 
-    d = IFCImporter.ifc_to_ifc_dict(filepath=file_location)
+    objects = IFCImporter.ifc_file_to_objects(filepath=file_location)
 
-    print(d)
+    for otl_ojbect in objects:
+        print(otl_ojbect)
 
 def test_parse_nested_tuples():
     result = IFCImporter.parse_nested_tuples('(a,b,c)')
