@@ -1,3 +1,4 @@
+import logging
 import re
 import warnings
 from calendar import day_abbr
@@ -82,9 +83,13 @@ class IfcAxis2Placement3D:
 
 
 @dataclass
-class IfcGeometricRepresentationContext:
+class IfcRepresentationContext:
     context_identifier: str
     context_type: str
+
+
+@dataclass
+class IfcGeometricRepresentationContext(IfcRepresentationContext):
     coordinate_space_dimension: int
     precision: float
     world_coordinate_system: IfcAxis2Placement3D
@@ -243,8 +248,11 @@ class IfcFaceOuterBound(IfcFaceBound):
 
 @dataclass
 class IfcFace:
-    bound: IfcFaceBound
+    bounds: list[IfcFaceBound]
 
+    @classmethod
+    def convert_to_bounds(cls, _args):
+        return [b for b in _args]
 
 @dataclass
 class IfcClosedShell:
@@ -301,6 +309,134 @@ class IfcStyledItem:
     item: IfcRepresentationItem
     styles: list[IfcPresentationStyle]
     name: str
+
+
+@dataclass
+class IfcShapeRepresentation:
+    context_of_items: IfcGeometricRepresentationContext
+    representation_identifier: str
+    representation_type: str
+    items: list[IfcRepresentationItem]
+
+
+@dataclass
+class IfcProductRepresentation:
+    name: str
+    description: str
+    representations: list[IfcShapeRepresentation]
+
+@dataclass
+class IfcProductDefinitionShape(IfcProductRepresentation):
+    pass
+
+
+@dataclass
+class IfcRoot:
+    global_id: str
+    owner_history: IfcOwnerHistory
+    name: str
+    description: str
+
+
+@dataclass
+class IfcObjectDefinition(IfcRoot):
+    object_type: str
+
+@dataclass
+class IfcObject(IfcObjectDefinition):
+    object_type: str
+
+
+@dataclass
+class IfcProduct(IfcObject):
+    object_placement: IfcObjectPlacement
+    representation: IfcProductRepresentation
+
+@dataclass
+class IfcElement(IfcProduct):
+    tag: str
+
+
+@dataclass
+class IfcBuiltElement(IfcElement):
+    pass
+
+
+@dataclass
+class IfcBuildingElementProxy(IfcBuiltElement):
+    predefined_type: str
+
+
+@dataclass
+class IfcProperty:
+    name: str
+    specification: str
+
+@dataclass
+class IfcSimpleProperty(IfcProperty):
+    pass
+
+@dataclass
+class IfcPropertySingleValue(IfcSimpleProperty):
+    nominal_value: str
+    unit: str
+
+
+@dataclass
+class IfcPropertyDefinition(IfcRoot):
+    pass
+
+@dataclass
+class IfcPropertySetDefinition(IfcPropertyDefinition):
+    pass
+
+@dataclass
+class IfcPropertySet(IfcPropertySetDefinition):
+    properties: list[IfcProperty]
+
+
+@dataclass
+class IfcRelationship(IfcRoot):
+    pass
+
+@dataclass
+class IfcRelDefines(IfcRelationship):
+    pass
+
+@dataclass
+class IfcRelDefinesByProperties(IfcRelDefines):
+    related_objects: list[IfcObjectDefinition]
+    property_definition: IfcPropertySetDefinition
+
+@dataclass
+class IfcRelConnects(IfcRelationship):
+    pass
+
+
+@dataclass
+class IfcSpatialElement(IfcProduct):
+    long_name: str
+
+
+@dataclass
+class IfcSpatialStructureElement(IfcSpatialElement):
+    pass
+
+@dataclass
+class IfcRelContainedInSpatialStructure(IfcRelConnects):
+    related_elements: list[IfcProduct]
+    relating_structure: IfcSpatialElement
+
+
+@dataclass
+class IfcRelDecomposes(IfcRelationship):
+    pass
+
+
+@dataclass
+class IfcRelAggregates(IfcRelDecomposes):
+    relating_object: IfcObjectDefinition
+    related_objects: list[IfcObjectDefinition]
 
 
 class IFCImporter(AbstractImporter):
@@ -379,107 +515,128 @@ class IFCImporter(AbstractImporter):
                 yield asset
 
     @classmethod
-    def ifc_to_dict(cls, filepath):
+    def ifc_to_ifc_dict(cls, filepath):
         d = {}
         # open and read the file
         regex = re.compile(r'#(\d+)=([A-Z\d]+)\((.*)\);')
 
-        with open(filepath, 'r') as file:
+        with open(filepath) as file:
             for i, line in enumerate(file):
                 if not line.startswith('#'):
                     continue
                 groups = regex.match(line)
                 if not groups:
                     continue
-                cls.parse_groups_to_master_dict(groups=groups, master_dict=d)
-                if i > 100:
-                    break
+                last_id = cls.parse_groups_to_master_dict(groups=groups, master_dict=d)
+
+        d['root'] = Reference(last_id)
+
         return d
 
 
     @classmethod
-    def parse_groups_to_master_dict(cls, groups, master_dict):
+    def parse_groups_to_master_dict(cls, groups, master_dict) -> str:
         _id = groups.group(1)
         _type = groups.group(2)
         _args = groups.group(3)
 
         c = cls.instantiate_ifc_object(ifc_type=_type, id=_id, args=_args)
         master_dict[_id] = c
-
-
+        return _id
 
     @classmethod
     def instantiate_ifc_object(cls, ifc_type, id, args):
         _args = cls.parse_nested_tuples(args)
-        if ifc_type == 'IFCORGANIZATION':
-            return IfcOrganization(*_args)
-        elif ifc_type == 'IFCAPPLICATION':
-            return IfcApplication(*_args)
-        elif ifc_type == 'IFCCARTESIANPOINT':
-            coords = IfcCartesianPoint.convert_to_coords(_args)
-            return IfcCartesianPoint(list(coords))
-        elif ifc_type == 'IFCDIRECTION':
-            ratios = IfcDirection.convert_to_direction_ratios(_args)
-            return IfcDirection(ratios)
-        elif ifc_type == 'IFCAXIS2PLACEMENT2D':
-            return IfcAxis2Placement2D(*_args)
-        elif ifc_type == 'IFCAXIS2PLACEMENT3D':
-            return IfcAxis2Placement3D(*_args)
-        elif ifc_type == 'IFCGEOMETRICREPRESENTATIONCONTEXT':
-            return IfcGeometricRepresentationContext(*_args)
-        elif ifc_type == 'IFCGEOMETRICREPRESENTATIONSUBCONTEXT':
-            return IfcGeometricRepresentationSubContext(*_args)
-        elif ifc_type == 'IFCPERSON':
-            return IfcPerson(*_args)
-        elif ifc_type == 'IFCPERSONANDORGANIZATION':
-            return IfcPersonAndOrganization(*_args)
-        elif ifc_type == 'IFCOWNERHISTORY':
-            return IfcOwnerHistory(*_args)
-        elif ifc_type == 'IFCSIUNIT':
-            return IfcSIUnit(*_args)
-        elif ifc_type == 'IFCDIMENSIONALEXPONENTS':
-            return IfcDimensionalExponents(*_args)
-        elif ifc_type == 'IFCMEASUREWITHUNIT':
-            return IfcMeasureWithUnit(*_args)
-        elif ifc_type == 'IFCCONVERSIONBASEDUNIT':
-            return IfcConversionBasedUnit(*_args)
-        elif ifc_type == 'IFCUNITASSIGNMENT':
-            return IfcUnitAssignment(*_args)
-        elif ifc_type == 'IFCPROJECT':
-            return IfcProject(*_args)
-        elif ifc_type == 'IFCOBJECTPLACEMENT':
-            return IfcObjectPlacement(*_args)
-        elif ifc_type == 'IFCLOCALPLACEMENT':
-            return IfcLocalPlacement(*_args)
-        elif ifc_type == 'IFCSITE':
-            return IfcSite(*_args)
-        elif ifc_type == 'IFCPOLYLOOP':
-            points = IfcPolyLoop.convert_to_points(_args)
-            return IfcPolyLoop(points)
-        elif ifc_type == 'IFCFACEOUTERBOUND':
-            return IfcFaceOuterBound(*_args)
-        elif ifc_type == 'IFCFACE':
-            return IfcFace(*_args)
-        elif ifc_type == 'IFCCLOSEDSHELL':
-            faces = IfcClosedShell.convert_to_faces(_args)
-            return IfcClosedShell(faces)
-        elif ifc_type == 'IFCFACETEDBREP':
-            return IfcFacetedBrep(*_args)
-        elif ifc_type == 'IFCCOLOURRGB':
-            return IfcColourRgb(*_args)
-        elif ifc_type == 'IFCSURFACESTYLERENDERING':
-            return IfcSurfaceStyleRendering(*_args)
-        elif ifc_type == 'IFCSURFACESTYLE':
-            return IfcSurfaceStyle(*_args)
-        elif ifc_type == 'IFCREPRESENTATIONITEM':
-            return IfcRepresentationItem(*_args)
-        elif ifc_type == 'IFCSTYLEDITEM':
-            return IfcStyledItem(*_args)
-        else:
-            # return {'ifc_type': ifc_type, 'id': id, 'values': cls.parse_nested_tuples(args)}
-            raise NotImplementedError(f'IFC type {ifc_type} not implemented')
-
-        return {'ifc_type': ifc_type, 'id': id, 'values': cls.parse_nested_tuples(args)}
+        try:
+            if ifc_type == 'IFCORGANIZATION':
+                return IfcOrganization(*_args)
+            elif ifc_type == 'IFCAPPLICATION':
+                return IfcApplication(*_args)
+            elif ifc_type == 'IFCCARTESIANPOINT':
+                coords = IfcCartesianPoint.convert_to_coords(_args)
+                return IfcCartesianPoint(list(coords))
+            elif ifc_type == 'IFCDIRECTION':
+                ratios = IfcDirection.convert_to_direction_ratios(_args)
+                return IfcDirection(ratios)
+            elif ifc_type == 'IFCAXIS2PLACEMENT2D':
+                return IfcAxis2Placement2D(*_args)
+            elif ifc_type == 'IFCAXIS2PLACEMENT3D':
+                return IfcAxis2Placement3D(*_args)
+            elif ifc_type == 'IFCGEOMETRICREPRESENTATIONCONTEXT':
+                return IfcGeometricRepresentationContext(*_args)
+            elif ifc_type == 'IFCGEOMETRICREPRESENTATIONSUBCONTEXT':
+                return IfcGeometricRepresentationSubContext(*_args)
+            elif ifc_type == 'IFCPERSON':
+                return IfcPerson(*_args)
+            elif ifc_type == 'IFCPERSONANDORGANIZATION':
+                return IfcPersonAndOrganization(*_args)
+            elif ifc_type == 'IFCOWNERHISTORY':
+                return IfcOwnerHistory(*_args)
+            elif ifc_type == 'IFCSIUNIT':
+                return IfcSIUnit(*_args)
+            elif ifc_type == 'IFCDIMENSIONALEXPONENTS':
+                return IfcDimensionalExponents(*_args)
+            elif ifc_type == 'IFCMEASUREWITHUNIT':
+                return IfcMeasureWithUnit(*_args)
+            elif ifc_type == 'IFCCONVERSIONBASEDUNIT':
+                return IfcConversionBasedUnit(*_args)
+            elif ifc_type == 'IFCUNITASSIGNMENT':
+                return IfcUnitAssignment(*_args)
+            elif ifc_type == 'IFCPROJECT':
+                return IfcProject(*_args)
+            elif ifc_type == 'IFCOBJECTPLACEMENT':
+                return IfcObjectPlacement(*_args)
+            elif ifc_type == 'IFCLOCALPLACEMENT':
+                return IfcLocalPlacement(*_args)
+            elif ifc_type == 'IFCSITE':
+                return IfcSite(*_args)
+            elif ifc_type == 'IFCPOLYLOOP':
+                points = IfcPolyLoop.convert_to_points(_args)
+                return IfcPolyLoop(points)
+            elif ifc_type == 'IFCFACEOUTERBOUND':
+                return IfcFaceOuterBound(*_args)
+            elif ifc_type == 'IFCFACE':
+                bounds = IfcFace.convert_to_bounds(_args)
+                return IfcFace(bounds)
+            elif ifc_type == 'IFCCLOSEDSHELL':
+                faces = IfcClosedShell.convert_to_faces(_args)
+                return IfcClosedShell(faces)
+            elif ifc_type == 'IFCFACETEDBREP':
+                return IfcFacetedBrep(*_args)
+            elif ifc_type == 'IFCCOLOURRGB':
+                return IfcColourRgb(*_args)
+            elif ifc_type == 'IFCSURFACESTYLERENDERING':
+                return IfcSurfaceStyleRendering(*_args)
+            elif ifc_type == 'IFCSURFACESTYLE':
+                return IfcSurfaceStyle(*_args)
+            elif ifc_type == 'IFCREPRESENTATIONITEM':
+                return IfcRepresentationItem(*_args)
+            elif ifc_type == 'IFCSTYLEDITEM':
+                return IfcStyledItem(*_args)
+            elif ifc_type == 'IFCSHAPEREPRESENTATION':
+                return IfcShapeRepresentation(*_args)
+            elif ifc_type == 'IFCPRODUCTDEFINITIONSHAPE':
+                return IfcProductDefinitionShape(*_args)
+            elif ifc_type == 'IFCBUILDINGELEMENTPROXY':
+                return IfcBuildingElementProxy(*_args)
+            elif ifc_type == 'IFCPROPERTYSINGLEVALUE':
+                return IfcPropertySingleValue(*_args)
+            elif ifc_type == 'IFCPROPERTYSET':
+                return IfcPropertySet(*_args)
+            elif ifc_type == 'IFCRELDEFINESBYPROPERTIES':
+                return IfcRelDefinesByProperties(*_args)
+            elif ifc_type == 'IFCFACEBOUND':
+                return IfcFaceBound(*_args)
+            elif ifc_type == 'IFCRELCONTAINEDINSPATIALSTRUCTURE':
+                return IfcRelContainedInSpatialStructure(*_args)
+            elif ifc_type == 'IFCRELAGGREGATES':
+                return IfcRelAggregates(*_args)
+            else:
+                # return {'ifc_type': ifc_type, 'id': id, 'values': cls.parse_nested_tuples(args)}
+                raise NotImplementedError(f'IFC type {ifc_type} not implemented')
+        except Exception as ex:
+            print(f'Error while parsing {ifc_type} with id {id}')
+            raise ex
 
 
     @classmethod
