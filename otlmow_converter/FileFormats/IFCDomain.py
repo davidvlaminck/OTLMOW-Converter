@@ -2,12 +2,16 @@ from dataclasses import dataclass
 from typing import Self
 
 
-@dataclass
+@dataclass(frozen=True)
 class Reference:
     id: str
 
 
-@dataclass
+@dataclass(frozen=True)
+class IfcRatioMeasure:
+    value: float
+
+@dataclass(frozen=True)
 class IfcOrganization:
     identification: str
     name: str
@@ -16,15 +20,15 @@ class IfcOrganization:
     addresses: list[dict]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcApplication:
     application_developer: IfcOrganization
     version: str
     application_full_name: str
-    Aapplication_identifier: str
+    application_identifier: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcCartesianPoint:
     coordinates: list[float]
 
@@ -33,7 +37,7 @@ class IfcCartesianPoint:
         return [float(c) for c in coords]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcDirection:
     direction_ratios: list[float]
 
@@ -42,26 +46,26 @@ class IfcDirection:
         return [float(c) for c in ratios]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcAxis2Placement2D:
     ref_direction: IfcDirection
     p: IfcDirection
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcAxis2Placement3D:
     axis: IfcDirection
     ref_direction: IfcDirection
     p: IfcDirection
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRepresentationContext:
     context_identifier: str
     context_type: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcGeometricRepresentationContext(IfcRepresentationContext):
     coordinate_space_dimension: int
     precision: float
@@ -69,7 +73,7 @@ class IfcGeometricRepresentationContext(IfcRepresentationContext):
     true_north: IfcDirection
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcGeometricRepresentationSubContext:
     context_identifier: str
     context_type: str
@@ -83,7 +87,7 @@ class IfcGeometricRepresentationSubContext:
     user_defined_target_view: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPerson:
     identification: str
     family_name: str
@@ -95,14 +99,14 @@ class IfcPerson:
     addresses: list[dict]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPersonAndOrganization:
     the_person: IfcPerson
     the_organization: IfcOrganization
     roles: list[dict]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcOwnerHistory:
     owning_user: IfcPersonAndOrganization
     owning_application: IfcApplication
@@ -114,7 +118,7 @@ class IfcOwnerHistory:
     creation_date: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcSIUnit:
     dimensions: str
     unit_type: str
@@ -122,7 +126,7 @@ class IfcSIUnit:
     name: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcDimensionalExponents:
     length_exponent: int
     mass_exponent: int
@@ -133,13 +137,13 @@ class IfcDimensionalExponents:
     luminous_intensity_exponent: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcMeasureWithUnit:
     value_component: float
     unit_component: IfcSIUnit
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcConversionBasedUnit:
     dimensions: str
     unit_type: str
@@ -147,12 +151,12 @@ class IfcConversionBasedUnit:
     conversion_factor: IfcMeasureWithUnit
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcUnitAssignment:
     units: list[dict]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcProject:
     global_id: str
     owner_history: IfcOwnerHistory
@@ -165,18 +169,18 @@ class IfcProject:
     units_in_context: IfcUnitAssignment
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcObjectPlacement:
     placement_rel_to: Self
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcLocalPlacement: # inherits from IfcObjectPlacement
     placement_rel_to: IfcObjectPlacement
     relative_placement: IfcAxis2Placement3D
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcSite:
     global_id: str
     owner_history: IfcOwnerHistory
@@ -194,12 +198,12 @@ class IfcSite:
     site_address: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcLoop:
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPolyLoop(IfcLoop):
     polygon: list[IfcCartesianPoint]
 
@@ -208,19 +212,19 @@ class IfcPolyLoop(IfcLoop):
         return [p for p in _args]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcFaceBound:
     bound: IfcLoop
     orientation: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcFaceOuterBound(IfcFaceBound):
     bound: IfcLoop
     orientation: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcFace:
     bounds: list[IfcFaceBound]
 
@@ -229,7 +233,7 @@ class IfcFace:
         return [b for b in _args]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcClosedShell:
     cfs_faces: list[IfcFace]
 
@@ -238,12 +242,12 @@ class IfcClosedShell:
         return [f for f in _args]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcFacetedBrep:
     outer: IfcClosedShell
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcColourRgb:
     name: str
     red: float
@@ -251,7 +255,7 @@ class IfcColourRgb:
     blue: float
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcSurfaceStyleRendering:
     surface_colour: IfcColourRgb
     transparency: float
@@ -264,30 +268,30 @@ class IfcSurfaceStyleRendering:
     reflectance_method: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPresentationStyle:
     name: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcSurfaceStyle(IfcPresentationStyle):
     side: str
     styles: list[IfcSurfaceStyleRendering]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRepresentationItem:
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcStyledItem:
     item: IfcRepresentationItem
     styles: list[IfcPresentationStyle]
     name: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcShapeRepresentation:
     context_of_items: IfcGeometricRepresentationContext
     representation_identifier: str
@@ -295,19 +299,19 @@ class IfcShapeRepresentation:
     items: list[IfcRepresentationItem]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcProductRepresentation:
     name: str
     description: str
     representations: list[IfcShapeRepresentation]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcProductDefinitionShape(IfcProductRepresentation):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRoot:
     global_id: str
     owner_history: IfcOwnerHistory
@@ -315,112 +319,121 @@ class IfcRoot:
     description: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcObjectDefinition(IfcRoot):
     object_type: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcObject(IfcObjectDefinition):
     object_type: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcProduct(IfcObject):
     object_placement: IfcObjectPlacement
     representation: IfcProductRepresentation
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcElement(IfcProduct):
     tag: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcBuiltElement(IfcElement):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcBuildingElementProxy(IfcBuiltElement):
     predefined_type: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcProperty:
     name: str
     specification: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcSimpleProperty(IfcProperty):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPropertySingleValue(IfcSimpleProperty):
     nominal_value: str
     unit: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPropertyDefinition(IfcRoot):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPropertySetDefinition(IfcPropertyDefinition):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcPropertySet(IfcPropertySetDefinition):
     properties: list[IfcProperty]
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRelationship(IfcRoot):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRelDefines(IfcRelationship):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRelDefinesByProperties(IfcRelDefines):
     related_objects: list[IfcObjectDefinition]
     property_definition: IfcPropertySetDefinition
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRelConnects(IfcRelationship):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcSpatialElement(IfcProduct):
     long_name: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcSpatialStructureElement(IfcSpatialElement):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRelContainedInSpatialStructure(IfcRelConnects):
     related_elements: list[IfcProduct]
     relating_structure: IfcSpatialElement
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRelDecomposes(IfcRelationship):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class IfcRelAggregates(IfcRelDecomposes):
     relating_object: IfcObjectDefinition
     related_objects: list[IfcObjectDefinition]
+
+
+@dataclass(frozen=True)
+class IfcNormalisedRatioMeasure(IfcRatioMeasure):
+    pass
+
+@dataclass(frozen=True)
+class IfcLabel:
+    value: str

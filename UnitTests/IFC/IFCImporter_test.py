@@ -1,7 +1,10 @@
+import json
+from dataclasses import fields
 from pathlib import Path
 
 from otlmow_model.OtlmowModel.Helpers.OTLObjectHelper import print_overview_assets
 
+from otlmow_converter.FileFormats.IFCDomain import IfcRelContainedInSpatialStructure
 from otlmow_converter.FileFormats.IFCImporter import IFCImporter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
@@ -26,10 +29,31 @@ def test_load_test_unnested_attributes(recwarn):
 def test_ifc_to_dict():
     file_location = Path(__file__).parent / 'Testfiles' / 'Output-IFC-metOTLdata.ifc'
 
+    d = IFCImporter.parse_ifc_file_to_ifc_dict(filepath=file_location)
+
+    type_dict = {}
+    for k, v in d.items():
+        if v['_type'] not in type_dict:
+            type_dict[v['_type']] = 0
+        type_dict[v['_type']] += 1
+
+    print(type_dict)
+    json.dump(d, open('ifc_dict.json', 'w'), indent=4)
+
+
+def test_ifc_to_objects():
+    file_location = Path(__file__).parent / 'Testfiles' / 'Output-IFC-metOTLdata.ifc'
+
     objects = IFCImporter.ifc_file_to_objects(filepath=file_location)
 
     for otl_ojbect in objects:
         print(otl_ojbect)
+
+
+def test_structure():
+    cls = IfcRelContainedInSpatialStructure
+    for field in fields(cls):
+        print(field)
 
 def test_parse_nested_tuples():
     result = IFCImporter.parse_nested_tuples('(a,b,c)')
