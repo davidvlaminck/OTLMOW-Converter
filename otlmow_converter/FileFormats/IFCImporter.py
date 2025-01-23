@@ -1,7 +1,5 @@
-import json
 import re
-import warnings
-from dataclasses import asdict, fields
+from dataclasses import fields
 from pathlib import Path
 from typing import Iterable, List
 
@@ -10,7 +8,6 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
-from otlmow_converter.Exceptions.UnexpectedIfcTypeWarning import UnexpectedIfcTypeWarning
 from otlmow_converter.FileFormats.IFCDomain import Reference, IfcOrganization, IfcApplication, IfcCartesianPoint, \
     IfcDirection, IfcAxis2Placement2D, IfcAxis2Placement3D, IfcGeometricRepresentationContext, \
     IfcGeometricRepresentationSubContext, IfcPerson, IfcPersonAndOrganization, IfcOwnerHistory, IfcSIUnit, \
