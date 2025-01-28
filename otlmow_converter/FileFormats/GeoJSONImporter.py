@@ -1,9 +1,9 @@
 import json
+from asyncio import sleep
 from pathlib import Path
 from typing import Iterable, List
-
+from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -24,7 +24,8 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['warn_for_non_otl_conform
 
 class GeoJSONImporter(AbstractImporter):
     @classmethod
-    def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
+    @async_to_sync_wraps
+    async def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         """Imports a geojson file created with DAVIE and decodes it to OTL objects
 
         :param filepath: location of the file, defaults to ''
@@ -56,7 +57,8 @@ class GeoJSONImporter(AbstractImporter):
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
 
-        return cls.decode_objects(data, ignore_failed_objects=ignore_failed_objects, model_directory=model_directory,
+        return await cls.decode_objects(data, ignore_failed_objects=ignore_failed_objects,
+                                      model_directory=model_directory,
                                   separator=separator, cardinality_indicator=cardinality_indicator,
                                   waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                                   cast_datetime=cast_datetime, cast_list=cast_list,
@@ -64,7 +66,9 @@ class GeoJSONImporter(AbstractImporter):
                                   warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
-    def decode_objects(cls, data, ignore_failed_objects: bool = False, model_directory: Path = None,
+
+    @async_to_sync_wraps
+    async def decode_objects(cls, data, ignore_failed_objects: bool = False, model_directory: Path = None,
                        cast_list: bool = False, cast_datetime: bool = False,
                        allow_non_otl_conform_attributes: bool = True,
                        warn_for_non_otl_conform_attributes: bool = True,
@@ -80,6 +84,8 @@ class GeoJSONImporter(AbstractImporter):
                 if ignore_failed_objects:
                     continue
                 raise ValueError('typeURI not found in properties')
+
+            await sleep(0)
 
             asset = DotnotationDictConverter.from_dict(
                 input_dict=props, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,

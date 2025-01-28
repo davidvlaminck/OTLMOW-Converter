@@ -9,10 +9,11 @@ from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_load_test_unnested_attributes(recwarn):
+@pytest.mark.asyncio(scope="module")
+async def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.geojson'
 
-    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -38,11 +39,12 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-def test_load_test_nested_attributes_level_1(recwarn):
+@pytest.mark.asyncio(scope="module")
+async def test_load_test_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.geojson'
 
 
-    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -72,11 +74,11 @@ def test_load_test_nested_attributes_level_1(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-def test_load_test_nested_attributes_level_2(recwarn):
+@pytest.mark.asyncio(scope="module")
+async def test_load_test_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.geojson'
 
-
-    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -98,6 +100,7 @@ def test_load_test_nested_attributes_level_2(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
+@pytest.mark.asyncio(scope="module")
 def test_invalid_typeURI():
     with pytest.raises(ValueError):
         GeoJSONImporter.decode_objects({"type": "FeatureCollection", "features": [{
@@ -105,12 +108,13 @@ def test_invalid_typeURI():
             "properties": {}}]})
 
 
-def test_load_test_non_conform(recwarn, subtests):
+@pytest.mark.asyncio(scope="module")
+async def test_load_test_non_conform(recwarn, subtests):
     file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attributes.geojson'
 
     with subtests.test(msg="default behaviour"):
         recwarn.clear()
-        objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+        objects = await GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
         assert len(recwarn.list) == 1
 
         assert len(objects) == 1
@@ -123,12 +127,12 @@ def test_load_test_non_conform(recwarn, subtests):
 
     with subtests.test(msg='non conform not allowed'):
         with pytest.raises(ValueError):
-            GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+            await GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
                                     allow_non_otl_conform_attributes=False)
 
     with subtests.test(msg="allowed, no warnings"):
         recwarn.clear()
-        objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+        objects = await GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
                                           warn_for_non_otl_conform_attributes=False)
         assert len(recwarn.list) == 0
 
