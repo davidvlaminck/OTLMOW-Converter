@@ -260,7 +260,6 @@ def test_export_agent(recwarn):
 
     agent = Agent()
     agent.fill_with_dummy_data()
-    print(f'agent: {agent}')
 
     instance = AllCasesTestClass()
     instance.fill_with_dummy_data()

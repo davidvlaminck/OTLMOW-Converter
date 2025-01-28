@@ -1,11 +1,11 @@
 import os
 import warnings
+from asyncio import sleep
 from pathlib import Path
-
+from universalasync import async_to_sync_wraps
 import openpyxl
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_uri
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
-
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
@@ -34,7 +34,8 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['warn_for_non_otl_conform_at
 
 class ExcelImporter(AbstractImporter):
     @classmethod
-    def to_objects(cls, filepath: Path = None, **kwargs) -> list:
+    @async_to_sync_wraps
+    async def to_objects(cls, filepath: Path = None, **kwargs) -> list:
         if not os.path.isfile(filepath):
             raise FileNotFoundError(f'Could not load the file at: {filepath}')
 
@@ -53,12 +54,13 @@ class ExcelImporter(AbstractImporter):
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
 
-        data = cls.get_data_dict_from_file_path(filepath=filepath)
+        data = await cls.get_data_dict_from_file_path(filepath=filepath)
 
         list_of_objects = []
         exception_group = ExceptionsGroup(message=f'Failed to create objects from Excel file {filepath}')
         for sheet, sheet_data in data.items():
             try:
+                await sleep(0)
                 if len(sheet_data) == 0:
                     if sheet_data == []:
                         continue
@@ -68,7 +70,7 @@ class ExcelImporter(AbstractImporter):
                 headers = sheet_data[0]
                 type_uri_index = cls.get_index_of_typeURI_column_in_sheet(
                     filepath=filepath, sheet=sheet, headers=headers, data=sheet_data)
-                cls.check_headers(headers=headers, sheet=sheet, filepath=filepath,
+                await cls.check_headers(headers=headers, sheet=sheet, filepath=filepath,
                                   type_uri=sheet_data[1][type_uri_index], model_directory=model_directory,
                                   cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
                                   separator=separator,
@@ -105,8 +107,10 @@ class ExcelImporter(AbstractImporter):
         return list_of_objects
 
     @classmethod
-    def get_data_dict_from_file_path(cls, filepath) -> dict[str, list[list]]:
+    @async_to_sync_wraps
+    async def get_data_dict_from_file_path(cls, filepath) -> dict[str, list[list]]:
         data = {}
+        await sleep(0)
         book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
 
         for sheet in book.worksheets:
@@ -115,6 +119,7 @@ class ExcelImporter(AbstractImporter):
             for row in sheet.rows:
                 row_data = []
                 for cell in row:
+                    await sleep(0)
                     if cell.value in {'True', 'TRUE', 'False', 'FALSE'}:
                         row_data.append(cell.value.lower() == 'true')
                     else:
@@ -150,16 +155,19 @@ class ExcelImporter(AbstractImporter):
         return type_index
 
     @staticmethod
-    def check_headers(headers: list[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
+    @async_to_sync_wraps
+    async def check_headers(headers: list[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
                       cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT,
                       separator: str = SEPARATOR,
                       allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
                       warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
+        await sleep(0)
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
         error = InvalidColumnNamesInExcelTabError(
             message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '
                     f'bad_columns', file_path=filepath, tab=sheet)
         for header in headers:
+            await sleep(0)
             if header == 'typeURI':
                 continue
             if header in ['bron.typeURI', 'doel.typeURI']:

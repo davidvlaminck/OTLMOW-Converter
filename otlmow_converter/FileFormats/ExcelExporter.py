@@ -1,9 +1,9 @@
+from asyncio import sleep
 from pathlib import Path
 from typing import List, Iterable
-
+from universalasync import async_to_sync_wraps
 from openpyxl import Workbook
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-
 from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -24,7 +24,8 @@ ABBREVIATE_EXCEL_SHEETTITLES = False
 
 class ExcelExporter(AbstractExporter):
     @classmethod
-    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    @async_to_sync_wraps
+    async def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
@@ -37,6 +38,7 @@ class ExcelExporter(AbstractExporter):
         abbreviate_excel_sheettitles = kwargs.get('abbreviate_excel_sheettitles',
                                                          ABBREVIATE_EXCEL_SHEETTITLES)
 
+        # TODO await this
         table_dict = DotnotationTableConverter.get_tables_per_type_from_data(
             cardinality_separator=cardinality_separator, cardinality_indicator=cardinality_indicator,
             waarde_shortcut=waarde_shortcut, cast_list=list_as_string, cast_datetime=datetime_as_string,
@@ -50,22 +52,26 @@ class ExcelExporter(AbstractExporter):
 
         created_a_sheet = False
         for class_name in table_dict:
-            created_a_sheet = cls._create_sheet_by_name(
+            created_a_sheet = await cls.create_sheet_by_name(
                 wb=wb, class_name=class_name, table_data=table_dict[class_name],
                 abbreviate_excel_sheettitles=abbreviate_excel_sheettitles) or created_a_sheet
+            await sleep(0)
 
         if created_a_sheet:
             del wb['Sheet']
 
+        await sleep(0)
         wb.save(filepath)
 
 
     @classmethod
-    def _create_sheet_by_name(cls, wb: Workbook, class_name: str, table_data: List[dict],
-                              abbreviate_excel_sheettitles: bool = False) -> bool:
+    @async_to_sync_wraps
+    async def create_sheet_by_name(cls, wb: Workbook, class_name: str, table_data: List[dict],
+                                   abbreviate_excel_sheettitles: bool = False) -> bool:
         if not table_data:
             return False
 
+        # TODO await this
         data = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
             list_of_dicts=table_data, empty_string_equals_none=True)
 
@@ -80,6 +86,7 @@ class ExcelExporter(AbstractExporter):
         sheet = wb.create_sheet(class_name)
         for row in data:
             sheet.append(row)
+            await sleep(0)
 
         sheet.sheet_format.defaultColWidth = 20
         return True
