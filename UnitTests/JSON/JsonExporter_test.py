@@ -4,7 +4,6 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
-import pytest_asyncio
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonExporter import JsonExporter

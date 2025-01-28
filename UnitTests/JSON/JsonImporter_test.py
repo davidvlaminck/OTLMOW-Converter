@@ -1,7 +1,6 @@
 import os
 from datetime import date, datetime, time
 from pathlib import Path
-import pytest_asyncio
 
 import pytest
 

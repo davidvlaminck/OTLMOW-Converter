@@ -30,7 +30,8 @@ dependencies = [
     'pytest>=6.2.5',
     'pytest-cov==4.0.0',
     'pytest-subtests>=0.8.0',
-    'cachetools>=5.3.0'
+    'cachetools>=5.3.0',
+    'universalasync>=0.4.0.1'
 ]
 
 [tool.setuptools.packages.find]
