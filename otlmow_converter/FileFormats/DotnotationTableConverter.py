@@ -1,10 +1,11 @@
 import warnings
+from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
 
+from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
-
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
@@ -38,15 +39,15 @@ class DotnotationTableConverter:
         return sorted_list
 
     @classmethod
-    def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject],
-                                   separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
-                                   cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                   waarde_shortcut: bool = WAARDE_SHORTCUT,
-                                   cast_list: bool = False, cast_datetime: bool = False,
-                                   allow_non_otl_conform_attributes: bool = True,
-                                   warn_for_non_otl_conform_attributes: bool = True,
-                                   allow_empty_asset_id: bool = True
-                                   ) -> list[dict]:
+    @async_to_sync_wraps
+    async def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject],
+                                         separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                         cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                         waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                         cast_list: bool = False, cast_datetime: bool = False,
+                                         allow_non_otl_conform_attributes: bool = True,
+                                         warn_for_non_otl_conform_attributes: bool = True,
+                                         allow_empty_asset_id: bool = True) -> list[dict]:
         """Returns a list of dicts, where each dict is a row, and the first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', separator)
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', separator)
@@ -65,6 +66,7 @@ class DotnotationTableConverter:
                                              or otl_object.assetId.identificator == ''):
                 raise ValueError(f'{otl_object} does not have a valid assetId.')
 
+            await sleep(0)  # TODO await below instead
             data_dict = DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
@@ -84,15 +86,17 @@ class DotnotationTableConverter:
         return list_of_dicts
 
     @classmethod
-    def get_tables_per_type_from_data(cls, sequence_of_objects: Iterable[OTLObject], values_as_string: bool = False,
-                                      separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
-                                      cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                      waarde_shortcut: bool = WAARDE_SHORTCUT,
-                                      cast_list: bool = False, cast_datetime: bool = False,
-                                      allow_non_otl_conform_attributes: bool = True,
-                                      warn_for_non_otl_conform_attributes: bool = True,
-                                      allow_empty_asset_id: bool = True
-                                      ) -> dict[str, list[dict]]:
+    @async_to_sync_wraps
+    async def get_tables_per_type_from_data(cls, sequence_of_objects: Iterable[OTLObject],
+                                            values_as_string: bool = False, separator: str = SEPARATOR,
+                                            cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                            cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                            waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                            cast_list: bool = False, cast_datetime: bool = False,
+                                            allow_non_otl_conform_attributes: bool = True,
+                                            warn_for_non_otl_conform_attributes: bool = True,
+                                            allow_empty_asset_id: bool = True
+                                            ) -> dict[str, list[dict]]:
         """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
         first row is the header"""
         identificator_key = 'assetId.identificator'.replace('.', separator)
@@ -120,6 +124,7 @@ class DotnotationTableConverter:
             header_dict = master_dict[short_uri][0]
             header_count = len(header_dict)
 
+            await sleep(0)  # TODO await below instead
             data_dict = DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
@@ -141,14 +146,15 @@ class DotnotationTableConverter:
         return master_dict
 
     @classmethod
-    def get_data_from_table(cls, table_data: list[dict], model_directory: Path = None,
-                            cast_list: bool = False, cast_datetime: bool = False,
-                            allow_non_otl_conform_attributes: bool = True,
-                            warn_for_non_otl_conform_attributes: bool = True,
-                            waarde_shortcut: bool = WAARDE_SHORTCUT,
-                            separator: str = SEPARATOR,
-                            cardinality_indicator: str = CARDINALITY_INDICATOR,
-                            cardinality_separator: str = CARDINALITY_SEPARATOR) -> list[OTLObject]:
+    @async_to_sync_wraps
+    async def get_data_from_table(cls, table_data: list[dict], model_directory: Path = None,
+                                  cast_list: bool = False, cast_datetime: bool = False,
+                                  allow_non_otl_conform_attributes: bool = True,
+                                  warn_for_non_otl_conform_attributes: bool = True,
+                                  waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                  separator: str = SEPARATOR,
+                                  cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                  cardinality_separator: str = CARDINALITY_SEPARATOR) -> list[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -161,25 +167,28 @@ class DotnotationTableConverter:
                 raise TypeUriNotInFirstRowError
         headers.pop('typeURI')
         for row in rows:
-            instance = cls.create_instance_from_row(
+            instance = await cls.create_instance_from_row(
                 row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
                 separator=separator, cardinality_indicator=cardinality_indicator,
                 waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             instances.append(instance)
+            await sleep(0)
 
         return instances
 
     @classmethod
-    def create_instance_from_row(cls, row: DotnotationDict, model_directory: Path = None,
-                                 cast_list: bool = False, cast_datetime: bool = False,
-                                 allow_non_otl_conform_attributes: bool = True,
-                                 warn_for_non_otl_conform_attributes: bool = True,
-                                 waarde_shortcut: bool = WAARDE_SHORTCUT,
-                                 separator: str = SEPARATOR,
-                                 cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                 cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
+    @async_to_sync_wraps
+    async def create_instance_from_row(cls, row: DotnotationDict, model_directory: Path = None,
+                                       cast_list: bool = False, cast_datetime: bool = False,
+                                       allow_non_otl_conform_attributes: bool = True,
+                                       warn_for_non_otl_conform_attributes: bool = True,
+                                       waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                       separator: str = SEPARATOR,
+                                       cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                       cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
+        await sleep(0)  # await below instead
         return DotnotationDictConverter.from_dict(
             input_dict=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
             separator=separator, cardinality_indicator=cardinality_indicator,
@@ -188,21 +197,24 @@ class DotnotationTableConverter:
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
-    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: list[dict],
-                                               empty_string_equals_none: bool = False) -> list[list]:
+    @async_to_sync_wraps
+    async def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: list[dict],
+                                                     empty_string_equals_none: bool = False) -> list[list]:
         """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
 
         header_dict, *data_dicts = list_of_dicts
         sorted_headers = cls._sort_headers(header_dict)
+        await sleep(0)
         matrix = [[cls._get_item_from_dict(input_dict=d, item=header, empty_string_equals_none=empty_string_equals_none)
                    for header in sorted_headers] for d in data_dicts]
         matrix.insert(0, list(sorted_headers))
         return matrix
 
     @classmethod
-    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: list[list],
-                                               empty_string_equals_none: bool = False) -> list[dict]:
+    @async_to_sync_wraps
+    async def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: list[list],
+                                                     empty_string_equals_none: bool = False) -> list[dict]:
         """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
         header_row, *data_rows = two_d_sequence
@@ -212,6 +224,7 @@ class DotnotationTableConverter:
         for row in data_rows:
             data_dict = {}
             for header, index in header_dict.items():
+
                 value = row[index]
                 if value is None:
                     continue
@@ -225,6 +238,7 @@ class DotnotationTableConverter:
             if not data_dict:
                 continue
             list_of_dicts.append(data_dict)
+            await sleep(0)
 
         return list_of_dicts
 

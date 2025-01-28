@@ -77,9 +77,9 @@ class ExcelImporter(AbstractImporter):
                                   allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                   warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
-                list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
+                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
-                list_of_objects.extend(DotnotationTableConverter.get_data_from_table(
+                list_of_objects.extend(await DotnotationTableConverter.get_data_from_table(
                     table_data=list_of_dicts, model_directory=model_directory,
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,

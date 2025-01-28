@@ -15,7 +15,7 @@ model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
 def test_export_unnested_attributes():
-    temp_dir_path = Path(__file__).parent / 'remove_after_test'
+    temp_dir_path = Path(__file__).parent / 'remove_after_test1'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'unnested.csv'
 
@@ -70,7 +70,7 @@ def test_export_unnested_attributes():
 
 
 def test_export_unnested_attributes_split_per_type():
-    temp_dir_path = Path(__file__).parent / 'remove_after_test'
+    temp_dir_path = Path(__file__).parent / 'remove_after_test2'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'unnested.csv'
 
@@ -111,7 +111,7 @@ def test_export_unnested_attributes_split_per_type():
 
 
 def test_export_and_then_import_nested_attributes_level_1():
-    temp_dir_path = Path(__file__).parent / 'remove_after_test'
+    temp_dir_path = Path(__file__).parent / 'remove_after_test3'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'nested_level_1.csv'
 
@@ -167,7 +167,7 @@ def test_export_and_then_import_nested_attributes_level_1():
 
 
 def test_export_and_then_import_nested_attributes_level_2():
-    temp_dir_path = Path(__file__).parent / 'remove_after_test'
+    temp_dir_path = Path(__file__).parent / 'remove_after_test4'
     os.mkdir(temp_dir_path)
     file_location = temp_dir_path / 'nested_level_2.csv'
 
