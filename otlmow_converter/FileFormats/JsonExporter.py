@@ -1,9 +1,9 @@
-﻿from json import JSONEncoder
+﻿from asyncio import sleep
+from json import JSONEncoder
 from pathlib import Path
 from typing import Iterable
-
+from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
-
 from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
@@ -16,7 +16,8 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = json_settings['warn_for_non_otl_conform_at
 
 class JsonExporter(AbstractExporter):
     @classmethod
-    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    @async_to_sync_wraps
+    async def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
@@ -30,6 +31,7 @@ class JsonExporter(AbstractExporter):
                                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             d['typeURI'] = asset.typeURI
             list_of_objects.append(d)
+            await sleep(0)
 
         encoded_json = JSONEncoder(indent=4).encode(list_of_objects)
 

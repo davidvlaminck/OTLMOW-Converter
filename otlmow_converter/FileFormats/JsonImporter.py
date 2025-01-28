@@ -1,8 +1,7 @@
 ﻿from pathlib import Path
 from typing import Iterable
-
+from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.FileFormats.JsonDecoder import JsonDecoder
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -17,7 +16,8 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = json_settings['warn_for_non_otl_conform_at
 
 class JsonImporter(AbstractImporter):
     @classmethod
-    def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
+    @async_to_sync_wraps
+    async def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         """Imports a json file created with Davie and decodes it to OTL objects
 
         :param filepath: location of the file to import
@@ -45,7 +45,7 @@ class JsonImporter(AbstractImporter):
             ignore_failed_objects = kwargs['ignore_failed_objects']
 
         data = Path(filepath).read_text()
-        return JsonDecoder.decode_json_string(json_string=data, ignore_failed_objects=ignore_failed_objects,
+        return await JsonDecoder.decode_json_string(json_string=data, ignore_failed_objects=ignore_failed_objects,
                                               allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                               warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
                                               model_directory=model_directory, waarde_shortcut=waarde_shortcut)

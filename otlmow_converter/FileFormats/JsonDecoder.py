@@ -1,13 +1,16 @@
 import json
+from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+from universalasync import async_to_sync_wraps
 
 
 class JsonDecoder:
     @classmethod
-    def decode_json_string(cls, json_string: str, ignore_failed_objects: bool=False, model_directory: Path=None,
+    @async_to_sync_wraps
+    async def decode_json_string(cls, json_string: str, ignore_failed_objects: bool=False, model_directory: Path=None,
                            allow_non_otl_conform_attributes: bool=True, warn_for_non_otl_conform_attributes: bool=True,
                            waarde_shortcut: bool=True) -> Iterable[OTLObject]:
         dict_list = json.loads(json_string)
@@ -22,6 +25,7 @@ class JsonDecoder:
                                                cast_datetime=True,
                                                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                await sleep(0)
                 object_list.append(instance)
 
             except Exception as ex:
