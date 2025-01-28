@@ -78,6 +78,7 @@ async def test_load_test_nested_attributes_level_1(recwarn):
 async def test_load_test_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.geojson'
 
+
     objects = await GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
@@ -101,9 +102,9 @@ async def test_load_test_nested_attributes_level_2(recwarn):
 
 
 @pytest.mark.asyncio(scope="module")
-def test_invalid_typeURI():
+async def test_invalid_typeURI():
     with pytest.raises(ValueError):
-        GeoJSONImporter.decode_objects({"type": "FeatureCollection", "features": [{
+        await GeoJSONImporter.decode_objects({"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {}}]})
 
