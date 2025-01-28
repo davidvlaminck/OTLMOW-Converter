@@ -258,7 +258,8 @@ class OtlmowConverter:
             yield await DotnotationDictConverter.to_dict(obj, **kwargs)
 
     @classmethod
-    def from_dotnotation_dicts_to_objects(cls, sequence_of_dotnotation_dicts: Iterable[DotnotationDict], **kwargs
+    @async_to_sync_wraps
+    async def from_dotnotation_dicts_to_objects(cls, sequence_of_dotnotation_dicts: Iterable[DotnotationDict], **kwargs
                                           ) -> Iterable[OTLObject]:
         """
         Converts a sequence of OTLObject objects to a sequence of dictionaries.
@@ -266,7 +267,7 @@ class OtlmowConverter:
         See the from_dict() method in the DotnotationDictConverter class for more information on the keyword arguments.
         """
         for obj in sequence_of_dotnotation_dicts:
-            yield DotnotationDictConverter.from_dict(obj, **kwargs)
+            yield await DotnotationDictConverter.from_dict(obj, **kwargs)
 
     @classmethod
     def from_file_to_objects(cls, file_path: Path, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
