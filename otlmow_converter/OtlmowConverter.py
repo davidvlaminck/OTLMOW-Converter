@@ -7,6 +7,7 @@ from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 from pandas import DataFrame
+from universalasync import async_to_sync_wraps
 
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
@@ -245,7 +246,8 @@ class OtlmowConverter:
             yield OTLObject.from_dict(input_dict=d, **kwargs)
 
     @classmethod
-    def from_objects_to_dotnotation_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs
+    @async_to_sync_wraps
+    async def from_objects_to_dotnotation_dicts(cls, sequence_of_objects: Iterable[OTLObject], **kwargs
                                           ) -> Iterable[DotnotationDict]:
         """
         Converts a sequence of OTLObject objects to a sequence of dictionaries.
@@ -253,7 +255,7 @@ class OtlmowConverter:
         See the to_dict() method in the DotnotationDictConverter class for more information on the keyword arguments.
         """
         for obj in sequence_of_objects:
-            yield DotnotationDictConverter.to_dict(obj, **kwargs)
+            yield await DotnotationDictConverter.to_dict(obj, **kwargs)
 
     @classmethod
     def from_dotnotation_dicts_to_objects(cls, sequence_of_dotnotation_dicts: Iterable[DotnotationDict], **kwargs

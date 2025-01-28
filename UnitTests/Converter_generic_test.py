@@ -206,7 +206,7 @@ def test_generic_to_file(subtests):
             assert json.load(output_file_path.open()) == json.load(expected_file_path.open())
 
         with subtests.test(msg="dotnotation_dicts to_file"):
-            dd_list = OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_list_of_objects)
+            dd_list = list(OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_list_of_objects))
             OtlmowConverter.to_file(subject=dd_list, file_path=output_file_path)
             assert json.load(output_file_path.open()) == json.load(expected_file_path.open())
 

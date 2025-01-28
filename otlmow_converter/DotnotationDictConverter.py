@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import inspect
 import warnings
+from asyncio import sleep
 from pathlib import Path
-
+from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
 from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
@@ -11,7 +12,6 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribu
     get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
-
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
@@ -33,7 +33,8 @@ class DotnotationDictConverter:
         self.cardinality_indicator: str = cardinality_indicator
         self.waarde_shortcut: bool = waarde_shortcut
 
-    def to_dict_instance(self, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT,
+    @async_to_sync_wraps
+    async def to_dict_instance(self, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT,
                          separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_SEPARATOR,
                          cardinality_separator: str = CARDINALITY_INDICATOR,
                          cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
@@ -48,14 +49,15 @@ class DotnotationDictConverter:
         if self.cardinality_separator is not None:
             cardinality_separator = self.cardinality_separator
 
-        return self.to_dict(otl_object=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
+        return await self.to_dict(otl_object=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
                             cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
                             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
                             cast_list=cast_list, cast_datetime=cast_datetime)
 
     @classmethod
-    def to_dict(cls, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
+    @async_to_sync_wraps
+    async def to_dict(cls, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
                 cardinality_indicator: str = CARDINALITY_INDICATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                 cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
                 warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
@@ -64,6 +66,7 @@ class DotnotationDictConverter:
         if type_uri is None:
             raise ValueError('typeURI is None. The object must have an attribute typeURI.')
 
+        await sleep(0)
         d = DotnotationDict(cls._iterate_over_attributes_and_values_by_dotnotation(
             object_or_attribute=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
             cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,

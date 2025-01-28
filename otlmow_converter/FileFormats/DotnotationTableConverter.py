@@ -66,8 +66,8 @@ class DotnotationTableConverter:
                                              or otl_object.assetId.identificator == ''):
                 raise ValueError(f'{otl_object} does not have a valid assetId.')
 
-            await sleep(0)  # TODO await below instead
-            data_dict = DotnotationDictConverter.to_dict(
+            await sleep(0)
+            data_dict = await DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
                 cast_list=cast_list, cast_datetime=cast_datetime,
@@ -124,8 +124,8 @@ class DotnotationTableConverter:
             header_dict = master_dict[short_uri][0]
             header_count = len(header_dict)
 
-            await sleep(0)  # TODO await below instead
-            data_dict = DotnotationDictConverter.to_dict(
+            await sleep(0)
+            data_dict = await DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
                 cast_list=cast_list, cast_datetime=cast_datetime,
