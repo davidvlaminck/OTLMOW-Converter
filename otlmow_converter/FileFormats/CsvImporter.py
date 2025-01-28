@@ -1,10 +1,10 @@
 import ast
 import csv
+from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
-
+from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
@@ -31,7 +31,8 @@ DELIMITER = csv_settings['delimiter']
 
 class CsvImporter(AbstractImporter):
     @classmethod
-    def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
+    @async_to_sync_wraps
+    async def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         delimiter = DELIMITER
         quote_char = '"'
 
@@ -69,6 +70,7 @@ class CsvImporter(AbstractImporter):
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
                 data = [next(csv_reader)]
                 for row in csv_reader:
+                    await sleep(0)
                     r = []
                     for d in row:
                         try:
@@ -77,9 +79,9 @@ class CsvImporter(AbstractImporter):
                             r.append(str(d))
                     data.append(r)
 
-                list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
+                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=data, empty_string_equals_none=True)
-                return DotnotationTableConverter.get_data_from_table(
+                return await DotnotationTableConverter.get_data_from_table(
                     table_data=list_of_dicts, model_directory=model_directory,
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
