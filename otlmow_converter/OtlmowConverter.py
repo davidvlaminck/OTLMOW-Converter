@@ -93,8 +93,8 @@ class OtlmowConverter:
                 else:
                     new_generator = iter(chain([first_element], generator))
                     if isinstance(first_element, DotnotationDict):
-                        objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
-                                                                        model_directory=model_directory, **kwargs)
+                        objects = list(cls.from_dotnotation_dicts_to_objects(
+                            sequence_of_dotnotation_dicts=new_generator, model_directory=model_directory, **kwargs))
                         cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
                     elif isinstance(first_element, dict):
                         objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,

@@ -171,7 +171,8 @@ class DotnotationDictConverter:
         if attribute is not None:
             yield attr_key, attribute
 
-    def from_dict_instance(self, input_dict: DotnotationDict, model_directory: Path = None,
+    @async_to_sync_wraps
+    async def from_dict_instance(self, input_dict: DotnotationDict, model_directory: Path = None,
                            waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
                            cardinality_indicator: str = CARDINALITY_SEPARATOR,
                            cardinality_separator: str = CARDINALITY_INDICATOR,
@@ -187,14 +188,16 @@ class DotnotationDictConverter:
         if self.cardinality_separator is not None:
             cardinality_separator = self.cardinality_separator
 
-        return self.from_dict(input_dict=input_dict, model_directory=model_directory, waarde_shortcut=waarde_shortcut,
+        return await self.from_dict(input_dict=input_dict, model_directory=model_directory,
+                                 waarde_shortcut=waarde_shortcut,
                               separator=separator, cardinality_indicator=cardinality_indicator, cast_list=cast_list,
                               cardinality_separator=cardinality_separator, cast_datetime=cast_datetime,
                               allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                               warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
-    def from_dict(cls, input_dict: DotnotationDict, model_directory: Path = None,
+    @async_to_sync_wraps
+    async def from_dict(cls, input_dict: DotnotationDict, model_directory: Path = None,
                   cast_list: bool = False, cast_datetime: bool = False,
                   allow_non_otl_conform_attributes: bool = True, warn_for_non_otl_conform_attributes: bool = True,
                   waarde_shortcut: bool = WAARDE_SHORTCUT,
@@ -211,6 +214,7 @@ class DotnotationDictConverter:
             model_directory = Path(otl_object_file).parent.parent.parent
 
         try:
+            await sleep(0)
             o = dynamic_create_instance_from_uri(str(type_uri), model_directory=model_directory)
         except TypeError as e:
             raise ValueError('typeURI is invalid. Add a valid typeURI to the input dictionary.') from e
@@ -220,6 +224,7 @@ class DotnotationDictConverter:
                 continue
             if k == 'typeURI':
                 continue
+            await sleep(0)
             if k.startswith('_'):
                 raise ValueError(f'{k} is a non standardized attribute of {o.__class__.__name__}. '
                                  f'While this is supported, the key can not start with "_".')

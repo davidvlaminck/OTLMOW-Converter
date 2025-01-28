@@ -188,8 +188,7 @@ class DotnotationTableConverter:
                                        separator: str = SEPARATOR,
                                        cardinality_indicator: str = CARDINALITY_INDICATOR,
                                        cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
-        await sleep(0)  # await below instead
-        return DotnotationDictConverter.from_dict(
+        return await DotnotationDictConverter.from_dict(
             input_dict=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
             separator=separator, cardinality_indicator=cardinality_indicator,
             waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
