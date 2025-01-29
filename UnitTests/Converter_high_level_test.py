@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
+from pandas import DataFrame
 from pandas._testing import assert_frame_equal
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -79,6 +80,17 @@ def test_dicts_to_dataframe():
     assert_frame_equal(expected_df, created_df)
 
 
+def test_file_to_dataframe():
+    orig_list_of_objects = return_test_objects()
+    expected_df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    json_file_path = Path(__file__).parent / 'test_file_to_dataframe.json'
+    OtlmowConverter.from_objects_to_file(sequence_of_objects=orig_list_of_objects, file_path=json_file_path,
+                                         model_directory=model_directory_path)
+
+    created_df = to_dataframe(json_file_path, model_directory=model_directory_path)
+    assert_frame_equal(expected_df, created_df)
+
+
 def test_dicts_to_dotnotation_dicts():
     orig_list_of_objects = return_test_objects()
     orig_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
@@ -119,15 +131,6 @@ def test_dotnotation_dicts_to_dotnotation_dicts():
 
     new_list_of_ddicts = to_dotnotation_dicts(orig_list_of_ddicts, model_directory=model_directory_path)
     assert orig_list_of_ddicts == list(new_list_of_ddicts)
-
-
-def test_dicts_to_dataframe():
-    orig_list_of_objects = return_test_objects()
-    orig_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
-    expected_df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
-
-    created_df = OtlmowConverter.to_dataframe(subject=orig_list_of_dicts, model_directory=model_directory_path)
-    assert_frame_equal(expected_df, created_df)
 
 
 def test_file_to_dotnotation_dicts():

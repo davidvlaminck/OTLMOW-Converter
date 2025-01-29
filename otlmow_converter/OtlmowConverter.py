@@ -110,18 +110,22 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    def to_dataframe(cls, subject: object, split_per_type: bool = False, model_directory: Path = None, **kwargs
+    @async_to_sync_wraps
+    async def to_dataframe(cls, subject: object, split_per_type: bool = False, model_directory: Path = None, **kwargs
                      ) -> Union[DataFrame, dict[str, DataFrame]]:
         """Converts any subject to a pandas Dataframe.
         This conversion uses the OTLMOW settings.
         """
         if isinstance(subject, Path):
-            objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
-            return cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type, **kwargs)
+            objects = await cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+            return await cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type,
+                                                    **kwargs)
         elif isinstance(subject, DataFrame):
             if split_per_type:
-                objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
-                return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=objects, **kwargs)
+                objects = await cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory,
+                                                            **kwargs)
+                return await PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=objects,
+                                                                                   **kwargs)
             return subject
         elif isinstance(subject, Iterable):
             try:
@@ -143,10 +147,11 @@ class OtlmowConverter:
                     elif isinstance(first_element, dict):
                         objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
                                                             model_directory=model_directory, **kwargs)
-                        return cls.from_objects_to_dataframe(sequence_of_objects=objects, split_per_type=split_per_type,
+                        return await cls.from_objects_to_dataframe(sequence_of_objects=objects,
+                                                              split_per_type=split_per_type,
                                                              **kwargs)
                     elif isinstance(first_element, OTLObject):
-                        return cls.from_objects_to_dataframe(sequence_of_objects=new_generator,
+                        return await cls.from_objects_to_dataframe(sequence_of_objects=new_generator,
                                                              split_per_type=split_per_type, **kwargs)
                     else:
                         raise ValueError(f"Unsupported subject type: {type(first_element)}")
@@ -270,41 +275,46 @@ class OtlmowConverter:
             yield await DotnotationDictConverter.from_dict(obj, **kwargs)
 
     @classmethod
-    def from_file_to_objects(cls, file_path: Path, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
+    @async_to_sync_wraps
+    async def from_file_to_objects(cls, file_path: Path, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
         """Converts a file to a sequence of OTLObject objects.
         This conversion uses the OTLMOW settings.
         See the specific Importer functions for more information on the keyword arguments.
         """
         importer = FileImporter.get_importer_from_extension(extension=file_path.suffix[1:])
-        return importer.to_objects(filepath=file_path, model_directory=model_directory, **kwargs)
+        return await importer.to_objects(filepath=file_path, model_directory=model_directory, **kwargs)
 
     @classmethod
-    def from_objects_to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
+    @async_to_sync_wraps
+    async def from_objects_to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
         """Converts a sequence of OTLObject objects to a file.
         This conversion uses the OTLMOW settings.
         See the specific Exporter functions for more information on the keyword arguments.
         """
         exporter = FileExporter.get_exporter_from_extension(extension=file_path.suffix[1:])
-        exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
+        await exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
 
     @classmethod
-    def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False, **kwargs
+    @async_to_sync_wraps
+    async def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False,
+    **kwargs
                                   ) -> Union[DataFrame, dict[str, DataFrame]]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame.
         This conversion uses the OTLMOW settings.
         """
         if split_per_type:
-            return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects, **kwargs)
+            return await PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects, **kwargs)
         else:
-            return PandasConverter.convert_objects_to_single_dataframe(sequence_of_objects, **kwargs)
+            return await PandasConverter.convert_objects_to_single_dataframe(sequence_of_objects, **kwargs)
 
     @classmethod
-    def from_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
+    @async_to_sync_wraps
+    async def from_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
         """Converts a pandas DataFrame to a sequence of OTLObject objects.
         This method can be used when you have a single dataframe to convert.
         This conversion uses the OTLMOW settings.
         """
-        return PandasConverter.convert_dataframe_to_objects(dataframe, **kwargs)
+        return await PandasConverter.convert_dataframe_to_objects(dataframe, **kwargs)
 
     suffix_mapping_table = {
         'json': 'JSON',
