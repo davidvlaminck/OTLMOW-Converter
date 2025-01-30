@@ -1,0 +1,25 @@
+name: Zip source code
+run-name: Zip source code for ${{ github.sha }}
+on: [push]
+
+jobs:
+  zip_source_code:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - name: zip files
+        run: |
+          rm -rf source.zip
+          zip -v -r source.zip ./otlmow_converter
+      - name: Commit files
+        run: |
+          git pull
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Zipped source code"
+          git push
