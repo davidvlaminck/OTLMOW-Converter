@@ -133,28 +133,26 @@ class OtlmowConverter:
                 first_element = next(generator)
                 if first_element is None:
                     return DataFrame()
-                else:
-                    new_generator = iter(chain([first_element], generator))
-                    if isinstance(first_element, DotnotationDict):
-                        if split_per_type:
-                            master_dict = defaultdict(list)
-                            for d in new_generator:
-                                master_dict[get_shortened_uri(d['typeURI'])].append(d)
+                new_generator = iter(chain([first_element], generator))
+                if isinstance(first_element, DotnotationDict):
+                    if not split_per_type:
+                        return DataFrame(new_generator)
+                    master_dict = defaultdict(list)
+                    for d in new_generator:
+                        master_dict[get_shortened_uri(d['typeURI'])].append(d)
 
-                            return {key: DataFrame(data=value) for key, value in master_dict.items()}
-                        else:
-                            return DataFrame(new_generator)
-                    elif isinstance(first_element, dict):
-                        objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
-                                                            model_directory=model_directory, **kwargs)
-                        return await cls.from_objects_to_dataframe(sequence_of_objects=objects,
-                                                              split_per_type=split_per_type,
-                                                             **kwargs)
-                    elif isinstance(first_element, OTLObject):
-                        return await cls.from_objects_to_dataframe(sequence_of_objects=new_generator,
-                                                             split_per_type=split_per_type, **kwargs)
-                    else:
-                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+                    return {key: DataFrame(data=value) for key, value in master_dict.items()}
+                elif isinstance(first_element, dict):
+                    objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                        model_directory=model_directory, **kwargs)
+                    return await cls.from_objects_to_dataframe(sequence_of_objects=objects,
+                                                          split_per_type=split_per_type,
+                                                         **kwargs)
+                elif isinstance(first_element, OTLObject):
+                    return await cls.from_objects_to_dataframe(sequence_of_objects=new_generator,
+                                                         split_per_type=split_per_type, **kwargs)
+                else:
+                    raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
                 return DataFrame()
         else:
