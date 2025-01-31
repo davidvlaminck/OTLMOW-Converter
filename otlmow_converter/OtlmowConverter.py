@@ -56,18 +56,19 @@ class OtlmowConverter:
                 first_element = next(generator)
                 if first_element is None:
                     yield from []
+                    return
+
+                new_generator = iter(chain([first_element], generator))
+                if isinstance(first_element, DotnotationDict):
+                    yield from cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                     model_directory=model_directory, **kwargs)
+                elif isinstance(first_element, dict):
+                    yield from cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                         model_directory=model_directory, **kwargs)
+                elif isinstance(first_element, OTLObject):
+                    yield from new_generator
                 else:
-                    new_generator = iter(chain([first_element], generator))
-                    if isinstance(first_element, DotnotationDict):
-                        yield from cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
-                                                                         model_directory=model_directory, **kwargs)
-                    elif isinstance(first_element, dict):
-                        yield from cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
-                                                             model_directory=model_directory, **kwargs)
-                    elif isinstance(first_element, OTLObject):
-                        yield from new_generator
-                    else:
-                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+                    raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
                 yield from []
         else:
@@ -90,20 +91,19 @@ class OtlmowConverter:
                 first_element = next(generator)
                 if first_element is None:
                     return
+                new_generator = iter(chain([first_element], generator))
+                if isinstance(first_element, DotnotationDict):
+                    objects = list(cls.from_dotnotation_dicts_to_objects(
+                        sequence_of_dotnotation_dicts=new_generator, model_directory=model_directory, **kwargs))
+                    cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+                elif isinstance(first_element, dict):
+                    objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                        model_directory=model_directory, **kwargs)
+                    cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+                elif isinstance(first_element, OTLObject):
+                    cls.from_objects_to_file(file_path=file_path, sequence_of_objects=new_generator, **kwargs)
                 else:
-                    new_generator = iter(chain([first_element], generator))
-                    if isinstance(first_element, DotnotationDict):
-                        objects = list(cls.from_dotnotation_dicts_to_objects(
-                            sequence_of_dotnotation_dicts=new_generator, model_directory=model_directory, **kwargs))
-                        cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
-                    elif isinstance(first_element, dict):
-                        objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
-                                                            model_directory=model_directory, **kwargs)
-                        cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
-                    elif isinstance(first_element, OTLObject):
-                        cls.from_objects_to_file(file_path=file_path, sequence_of_objects=new_generator, **kwargs)
-                    else:
-                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+                    raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
                 return
         else:
@@ -175,18 +175,18 @@ class OtlmowConverter:
                 first_element = next(generator)
                 if first_element is None:
                     yield from []
+                    return
+                new_generator = iter(chain([first_element], generator))
+                if isinstance(first_element, DotnotationDict):
+                    objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                    model_directory=model_directory, **kwargs)
+                    yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
+                elif isinstance(first_element, dict):
+                    yield from new_generator
+                elif isinstance(first_element, OTLObject):
+                    yield from cls.from_objects_to_dicts(sequence_of_objects=new_generator, **kwargs)
                 else:
-                    new_generator = iter(chain([first_element], generator))
-                    if isinstance(first_element, DotnotationDict):
-                        objects = cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
-                                                                        model_directory=model_directory, **kwargs)
-                        yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
-                    elif isinstance(first_element, dict):
-                        yield from new_generator
-                    elif isinstance(first_element, OTLObject):
-                        yield from cls.from_objects_to_dicts(sequence_of_objects=new_generator, **kwargs)
-                    else:
-                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+                    raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
                 yield from []
         else:
@@ -210,18 +210,18 @@ class OtlmowConverter:
                 first_element = next(generator)
                 if first_element is None:
                     yield from []
+                    return
+                new_generator = iter(chain([first_element], generator))
+                if isinstance(first_element, DotnotationDict):
+                    yield from new_generator
+                elif isinstance(first_element, dict):
+                    objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                        model_directory=model_directory, **kwargs)
+                    yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
+                elif isinstance(first_element, OTLObject):
+                    yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=new_generator, **kwargs)
                 else:
-                    new_generator = iter(chain([first_element], generator))
-                    if isinstance(first_element, DotnotationDict):
-                        yield from new_generator
-                    elif isinstance(first_element, dict):
-                        objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
-                                                            model_directory=model_directory, **kwargs)
-                        yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
-                    elif isinstance(first_element, OTLObject):
-                        yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=new_generator, **kwargs)
-                    else:
-                        raise ValueError(f"Unsupported subject type: {type(first_element)}")
+                    raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
                 yield from []
         else:
