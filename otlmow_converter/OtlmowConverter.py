@@ -47,30 +47,34 @@ class OtlmowConverter:
         This conversion uses the OTLMOW settings.
         """
         if isinstance(subject, Path):
-            yield from cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
+            for o in cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs):
+                yield o
         elif isinstance(subject, DataFrame):
-            yield from cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
+            for o in cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs):
+                yield o
         elif isinstance(subject, Iterable):
             try:
                 generator = iter(subject)
                 first_element = next(generator)
                 if first_element is None:
-                    yield from []
+                    yield
                     return
-
                 new_generator = iter(chain([first_element], generator))
                 if isinstance(first_element, DotnotationDict):
-                    yield from cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
-                                                                     model_directory=model_directory, **kwargs)
+                    for o in cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
+                                                                     model_directory=model_directory, **kwargs):
+                        yield o
                 elif isinstance(first_element, dict):
-                    yield from cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
-                                                         model_directory=model_directory, **kwargs)
+                    for o in cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
+                                                         model_directory=model_directory, **kwargs):
+                        yield o
                 elif isinstance(first_element, OTLObject):
-                    yield from new_generator
+                    for o in new_generator:
+                        yield o
                 else:
                     raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
-                yield from []
+                yield
         else:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
