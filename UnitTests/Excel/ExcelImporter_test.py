@@ -6,6 +6,7 @@ import pytest
 
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
+from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
@@ -138,6 +139,24 @@ def test_get_index_of_typeURI_column_in_sheet():
     assert isinstance(exception_2, NoTypeUriInExcelTabError)
     assert exception_2.file_path == file_location
     assert exception_2.tab == 'no_type_uri_in_sheet'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_columns():
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_columns.xlsx'
+
+    with pytest.raises(ExceptionsGroup) as ex:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.exceptions) == 1
+    assert len(ex.objects) == 1
+
+    exception_1 = ex.exceptions[0]
+    assert isinstance(exception_1, MissingHeaderError)
+    assert exception_1.file_path == file_location
+    assert exception_1.tab == 'missing header'
 
 
 def test_check_headers():

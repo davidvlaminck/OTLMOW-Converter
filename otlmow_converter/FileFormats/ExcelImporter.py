@@ -11,6 +11,7 @@ from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
+from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
@@ -97,6 +98,11 @@ class ExcelImporter(AbstractImporter):
                     message=f'Could not find typeURI within 5 rows in the file {filepath.name}',
                     file_path=filepath, tab=sheet
                 ))
+            except MissingHeaderError as ex:
+                exception_group.add_exception(MissingHeaderError(
+                    message=f'{ex.args[0]} in file {filepath.name}',
+                    file_path=filepath, tab=sheet
+                ))
             except BaseException as ex:
                 exception_group.add_exception(UnknownExcelError(original_exception=ex, tab=sheet))
 
@@ -118,12 +124,20 @@ class ExcelImporter(AbstractImporter):
             data[sheet_name] = []
             for row in sheet.rows:
                 row_data = []
+                all_none = True
                 for cell in row:
                     await sleep(0)
                     if cell.value in {'True', 'TRUE', 'False', 'FALSE'}:
                         row_data.append(cell.value.lower() == 'true')
+                        all_none = False
                     else:
                         row_data.append(cell.value)
+                        if all_none and cell.value is not None:
+                            all_none = False
+
+                # check if row_data contains all None values
+                if all_none:
+                    break
                 data[sheet_name].append(row_data)
 
         book.close()
@@ -171,6 +185,8 @@ class ExcelImporter(AbstractImporter):
             if header == 'typeURI':
                 continue
             if header in ['bron.typeURI', 'doel.typeURI']:
+                continue
+            if header is None:
                 continue
             if header.startswith('[DEPRECATED] '):
                 error.bad_columns.append(header)

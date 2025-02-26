@@ -15,6 +15,7 @@ from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonS
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 load_settings()
@@ -222,6 +223,8 @@ class DotnotationDictConverter:
         for k, v in input_dict.items():
             if v is None:
                 continue
+            if k is None:  # v is not None!
+                raise MissingHeaderError(f'Missing a header for value {v}')
             if k == 'typeURI':
                 continue
             await sleep(0)
