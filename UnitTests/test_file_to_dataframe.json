@@ -1,0 +1,22 @@
+[
+    {
+        "assetId": {
+            "identificator": "id1"
+        },
+        "testBooleanField": true,
+        "testDateField": "2020-01-01",
+        "testStringFieldMetKard": [
+            "test1",
+            "test2"
+        ],
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+    },
+    {
+        "assetId": {
+            "identificator": "id2"
+        },
+        "notitie": "note",
+        "non_conform_attribute": "non conform value",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass"
+    }
+]
