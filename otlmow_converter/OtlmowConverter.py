@@ -151,24 +151,26 @@ class OtlmowConverter:
     async def to_file_async(cls, subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
         """Converts any subject (including another file) to a file asynchronously."""
         if isinstance(subject, Path):
-            objects = cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory, **kwargs)
-            await cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+            objects = await cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory, **kwargs)
+            await cls.from_objects_to_file_async(file_path=file_path, sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, DataFrame):
-            objects = await cls.from_dataframe_to_objects_async(dataframe=subject, model_directory=model_directory, **kwargs)
-            await cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+            objects = await cls.from_dataframe_to_objects_async(
+                dataframe=subject, model_directory=model_directory, **kwargs)
+            await cls.from_objects_to_file_async(file_path=file_path, sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, Iterable):
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
                 if first_element is None:
-                    yield
                     return
                 if isinstance(first_element, DotnotationDict):
-                    objects = list(await cls.from_dotnotation_dicts_to_objects_async(
-                        sequence_of_dotnotation_dicts=new_generator, model_directory=model_directory, **kwargs))
+                    objects_gen = cls.from_dotnotation_dicts_to_objects_async(
+                        sequence_of_dotnotation_dicts=new_generator, model_directory=model_directory, **kwargs)
+                    objects = await cls.collect_to_list(objects_gen)
                     await cls.from_objects_to_file_async(file_path=file_path, sequence_of_objects=objects, **kwargs)
                 elif isinstance(first_element, dict):
-                    objects = await cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
+                    objects_gen = cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
                                                               model_directory=model_directory, **kwargs)
+                    objects = await cls.collect_to_list(objects_gen)
                     await cls.from_objects_to_file_async(file_path=file_path, sequence_of_objects=objects, **kwargs)
                 elif isinstance(first_element, OTLObject):
                     await cls.from_objects_to_file_async(file_path=file_path, sequence_of_objects=new_generator, **kwargs)

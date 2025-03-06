@@ -1,7 +1,6 @@
 import abc
 from pathlib import Path
 from typing import Iterable, AsyncIterable
-from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
 
