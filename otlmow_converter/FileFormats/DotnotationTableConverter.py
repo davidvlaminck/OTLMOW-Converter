@@ -3,7 +3,6 @@ from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
 
-from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 from otlmow_converter.DotnotationDict import DotnotationDict
@@ -39,8 +38,52 @@ class DotnotationTableConverter:
         return sorted_list
 
     @classmethod
-    @async_to_sync_wraps
-    async def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject],
+    def get_single_table_from_data(cls, list_of_objects: Iterable[OTLObject],
+                                         separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                         cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                         waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                         cast_list: bool = False, cast_datetime: bool = False,
+                                         allow_non_otl_conform_attributes: bool = True,
+                                         warn_for_non_otl_conform_attributes: bool = True,
+                                         allow_empty_asset_id: bool = True) -> list[dict]:
+        """Returns a list of dicts, where each dict is a row, and the first row is the header"""
+        identificator_key = 'assetId.identificator'.replace('.', separator)
+        toegekend_door_key = 'assetId.toegekendDoor'.replace('.', separator)
+
+        list_of_dicts = []
+        header_dict = {'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}
+        header_count = 3
+
+        for otl_object in list_of_objects:
+            if not hasattr(otl_object, 'typeURI'):
+                warnings.warn(BadTypeWarning(f'{otl_object} does not have a typeURI so this can not be instantiated. '
+                                             f'Ignoring this object'))
+                continue
+
+            if not allow_empty_asset_id and (otl_object.assetId.identificator is None
+                                             or otl_object.assetId.identificator == ''):
+                raise ValueError(f'{otl_object} does not have a valid assetId.')
+
+            data_dict = DotnotationDictConverter.to_dict(
+                otl_object, separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cast_list=cast_list, cast_datetime=cast_datetime,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+            data_dict['typeURI'] = otl_object.typeURI
+
+            for k, v in data_dict.items():
+                if k not in header_dict:
+                    header_dict[k] = header_count
+                    header_count += 1
+
+            list_of_dicts.append(data_dict)
+        list_of_dicts.insert(0, header_dict)
+        return list_of_dicts
+
+    @classmethod
+    async def get_single_table_from_data_async(cls, list_of_objects: Iterable[OTLObject],
                                          separator: str = SEPARATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                                          cardinality_indicator: str = CARDINALITY_INDICATOR,
                                          waarde_shortcut: bool = WAARDE_SHORTCUT,
@@ -86,8 +129,65 @@ class DotnotationTableConverter:
         return list_of_dicts
 
     @classmethod
-    @async_to_sync_wraps
-    async def get_tables_per_type_from_data(cls, sequence_of_objects: Iterable[OTLObject],
+    def get_tables_per_type_from_data(cls, sequence_of_objects: Iterable[OTLObject],
+                                            values_as_string: bool = False, separator: str = SEPARATOR,
+                                            cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                            cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                            waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                            cast_list: bool = False, cast_datetime: bool = False,
+                                            allow_non_otl_conform_attributes: bool = True,
+                                            warn_for_non_otl_conform_attributes: bool = True,
+                                            allow_empty_asset_id: bool = True
+                                            ) -> dict[str, list[dict]]:
+        """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
+        first row is the header"""
+        identificator_key = 'assetId.identificator'.replace('.', separator)
+        toegekend_door_key = 'assetId.toegekendDoor'.replace('.', separator)
+
+        master_dict = {}
+
+        for otl_object in sequence_of_objects:
+            if not hasattr(otl_object, 'typeURI'):
+                warnings.warn(BadTypeWarning(f'{otl_object} does not have a typeURI so this can not be instantiated. '
+                                             f'Ignoring this object'))
+                continue
+
+            if not allow_empty_asset_id and (otl_object.assetId.identificator is None or
+                                             otl_object.assetId.identificator == ''):
+                raise ValueError(f'{otl_object} does not have a valid assetId.')
+
+            if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
+                short_uri = 'Agent'
+            else:
+                short_uri = get_shortened_uri(otl_object.typeURI)
+
+            if short_uri not in master_dict:
+                master_dict[short_uri] = [{'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}]
+            header_dict = master_dict[short_uri][0]
+            header_count = len(header_dict)
+
+            data_dict = DotnotationDictConverter.to_dict(
+                otl_object, separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cast_list=cast_list, cast_datetime=cast_datetime,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+            data_dict['typeURI'] = otl_object.typeURI
+
+            for k, v in data_dict.items():
+                if k not in header_dict:
+                    header_dict[k] = header_count
+                    header_count += 1
+                if values_as_string and not isinstance(v, str):
+                    data_dict[k] = str(v)
+
+            master_dict[short_uri].append(data_dict)
+
+        return master_dict
+
+    @classmethod
+    async def get_tables_per_type_from_data_async(cls, sequence_of_objects: Iterable[OTLObject],
                                             values_as_string: bool = False, separator: str = SEPARATOR,
                                             cardinality_separator: str = CARDINALITY_SEPARATOR,
                                             cardinality_indicator: str = CARDINALITY_INDICATOR,
@@ -197,7 +297,7 @@ class DotnotationTableConverter:
                 raise TypeUriNotInFirstRowError
         headers.pop('typeURI')
         for row in rows:
-            instance = await cls.create_instance_from_row(
+            instance = cls.create_instance_from_row(
                 row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
                 separator=separator, cardinality_indicator=cardinality_indicator,
                 waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
@@ -234,7 +334,7 @@ class DotnotationTableConverter:
                                        separator: str = SEPARATOR,
                                        cardinality_indicator: str = CARDINALITY_INDICATOR,
                                        cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
-        return await DotnotationDictConverter.from_dict(
+        return await DotnotationDictConverter.from_dict_async(
             input_dict=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
             separator=separator, cardinality_indicator=cardinality_indicator,
             waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
@@ -242,8 +342,24 @@ class DotnotationTableConverter:
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
-    @async_to_sync_wraps
-    async def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: list[dict],
+    def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: list[dict],
+                                                     empty_string_equals_none: bool = False) -> list[list]:
+        """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
+        # TODO also try this with numpy arrays to see what is faster
+
+        header_dict, *data_dicts = list_of_dicts
+        sorted_headers = cls._sort_headers(header_dict)
+        matrix = []
+        for d in data_dicts:
+            row = []
+            for header in sorted_headers:
+                row.append(cls._get_item_from_dict(input_dict=d, item=header, empty_string_equals_none=empty_string_equals_none))
+            matrix.append(row)
+        matrix.insert(0, list(sorted_headers))
+        return matrix
+
+    @classmethod
+    async def transform_list_of_dicts_to_2d_sequence_async(cls, list_of_dicts: list[dict],
                                                      empty_string_equals_none: bool = False) -> list[list]:
         """Returns a 2d array from a list of dicts, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster
@@ -262,8 +378,36 @@ class DotnotationTableConverter:
         return matrix
 
     @classmethod
-    @async_to_sync_wraps
-    async def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: list[list],
+    def transform_2d_sequence_to_list_of_dicts(cls, two_d_sequence: list[list],
+                                                     empty_string_equals_none: bool = False) -> list[dict]:
+        """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
+        # TODO also try this with numpy arrays to see what is faster
+        header_row, *data_rows = two_d_sequence
+        header_dict = {header: index for index, header in enumerate(header_row)}
+
+        list_of_dicts = [header_dict]
+        for row in data_rows:
+            data_dict = {}
+            for header, index in header_dict.items():
+
+                value = row[index]
+                if value is None:
+                    continue
+                if empty_string_equals_none and value == '':
+                    continue
+                if value == 'true':
+                    value = True
+                if value == 'false':
+                    value = False
+                data_dict[header] = value
+            if not data_dict:
+                continue
+            list_of_dicts.append(data_dict)
+
+        return list_of_dicts
+
+    @classmethod
+    async def transform_2d_sequence_to_list_of_dicts_async(cls, two_d_sequence: list[list],
                                                      empty_string_equals_none: bool = False) -> list[dict]:
         """Returns a list of dicts from a 2d array, where each dict is a row, and the first row is the header"""
         # TODO also try this with numpy arrays to see what is faster

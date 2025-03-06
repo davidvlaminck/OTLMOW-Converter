@@ -126,7 +126,7 @@ class GeoJSONImporter(AbstractImporter):
 
             await sleep(0)
 
-            asset = await DotnotationDictConverter.from_dict(
+            asset = await DotnotationDictConverter.from_dict_async(
                 input_dict=props, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
                 separator=separator, cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
                 cardinality_separator=cardinality_separator,

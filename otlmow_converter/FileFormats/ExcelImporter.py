@@ -153,7 +153,7 @@ class ExcelImporter(AbstractImporter):
                                   allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                   warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
-                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
+                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts_async(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
                 obj = await DotnotationTableConverter.get_data_from_table_async(
                     table_data=list_of_dicts, model_directory=model_directory,

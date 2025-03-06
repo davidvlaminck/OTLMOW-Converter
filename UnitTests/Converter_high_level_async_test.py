@@ -33,7 +33,7 @@ def return_test_objects() -> [AllCasesTestClass, AnotherTestClass]:
 @pytest.mark.asyncio
 async def test_dataframe_to_dotnotation_dicts():
     orig_list_of_objects = return_test_objects()
-    df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
     expected_list_of_ddicts = [await DotnotationDictConverter.to_dict_async(o) for o in orig_list_of_objects]
 
     list_of_ddicts_gen = to_dotnotation_dicts_async(df, model_directory=model_directory_path)
@@ -44,7 +44,7 @@ async def test_dataframe_to_dotnotation_dicts():
 @pytest.mark.asyncio
 async def test_dataframe_to_dicts():
     orig_list_of_objects = return_test_objects()
-    df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
     expected_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
 
     list_of_dicts_gen = to_dicts_async(df, model_directory=model_directory_path)
@@ -56,7 +56,7 @@ async def test_dataframe_to_dicts():
 async def test_dotnotation_dicts_to_dataframe():
     orig_list_of_objects = return_test_objects()
     orig_list_of_ddicts = [DotnotationDictConverter.to_dict(o) for o in orig_list_of_objects]
-    expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    expected_df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
 
     created_df = await OtlmowConverter.to_dataframe_async(
         subject=orig_list_of_ddicts, model_directory=model_directory_path)
@@ -67,7 +67,7 @@ async def test_dotnotation_dicts_to_dataframe():
 async def test_dicts_to_dataframe():
     orig_list_of_objects = return_test_objects()
     orig_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
-    expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    expected_df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
 
     created_df = await OtlmowConverter.to_dataframe_async(subject=orig_list_of_dicts, model_directory=model_directory_path)
     assert_frame_equal(expected_df, created_df)
@@ -76,7 +76,7 @@ async def test_dicts_to_dataframe():
 @pytest.mark.asyncio
 async def test_file_to_dataframe():
     orig_list_of_objects = return_test_objects()
-    expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    expected_df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
     json_file_path = Path(__file__).parent / 'test_file_to_dataframe.json'
     await OtlmowConverter.from_objects_to_file_async(sequence_of_objects=orig_list_of_objects, file_path=json_file_path,
                                          model_directory=model_directory_path)
@@ -101,7 +101,7 @@ async def test_dicts_to_dotnotation_dicts():
 @pytest.mark.asyncio
 async def test_dotnotation_dicts_to_dicts():
     orig_list_of_objects = return_test_objects()
-    orig_list_of_ddicts = [DotnotationDictConverter.to_dict(o) for o in orig_list_of_objects]
+    orig_list_of_ddicts = [await DotnotationDictConverter.to_dict_async(o) for o in orig_list_of_objects]
     expected_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
 
     list_of_dicts_gen = to_dicts_async(orig_list_of_ddicts, model_directory=model_directory_path)
@@ -112,7 +112,7 @@ async def test_dotnotation_dicts_to_dicts():
 @pytest.mark.asyncio
 async def test_dataframe_to_dataframe():
     orig_list_of_objects = return_test_objects()
-    expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    expected_df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
 
     created_df = await to_dataframe_async(expected_df, model_directory=model_directory_path)
     assert_frame_equal(expected_df, created_df)
@@ -169,7 +169,7 @@ async def test_file_to_dicts():
 @pytest.mark.asyncio
 async def test_objects_to_dataframe():
     orig_list_of_objects = return_test_objects()
-    expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    expected_df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
     created_df = await to_dataframe_async(orig_list_of_objects, model_directory=model_directory_path)
     assert_frame_equal(expected_df, created_df)
 
@@ -195,7 +195,7 @@ async def test_objects_to_dotnotation_dicts():
 @pytest.mark.asyncio
 async def test_dataframe_to_file():
     orig_list_of_objects = return_test_objects()
-    df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
     excel_file_path = Path(__file__).parent / 'test_dataframe_to_file.xlsx'
     json_file_path = Path(__file__).parent / 'test_dataframe_to_file.json'
     csv_file_path = Path(__file__).parent / 'test_dataframe_to_file.csv'
@@ -485,7 +485,7 @@ async def test_dotnotation_dicts_to_objects():
 @pytest.mark.asyncio
 async def test_dataframe_to_objects():
     orig_list_of_objects = return_test_objects()
-    df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    df = await PandasConverter.convert_objects_to_single_dataframe_async(list_of_objects=orig_list_of_objects)
     list_of_objects_gen = to_objects_async(df, model_directory=model_directory_path)
     new_list_of_objects = await OtlmowConverter.collect_to_list(list_of_objects_gen)
 

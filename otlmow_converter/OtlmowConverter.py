@@ -238,7 +238,8 @@ class OtlmowConverter:
             if split_per_type:
                 objects = await cls.from_dataframe_to_objects_async(dataframe=subject, model_directory=model_directory,
                                                                     **kwargs)
-                return PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects=objects, **kwargs)
+                return await PandasConverter.convert_objects_to_multiple_dataframes_async(sequence_of_objects=objects,
+                                                                                   **kwargs)
             return subject
         elif isinstance(subject, Iterable):
             try:
@@ -481,7 +482,7 @@ class OtlmowConverter:
                                                       ) -> Iterable[OTLObject]:
         """Converts a sequence of OTLObject objects to a sequence of dictionaries."""
         for obj in sequence_of_dotnotation_dicts:
-            yield await DotnotationDictConverter.from_dict(obj, **kwargs)
+            yield await DotnotationDictConverter.from_dict_async(obj, **kwargs)
 
     @classmethod
     def from_file_to_objects(cls, file_path: Path, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
@@ -533,9 +534,9 @@ class OtlmowConverter:
                                               **kwargs) -> Union[DataFrame, dict[str, DataFrame]]:
         """Converts a sequence of OTLObject objects to a pandas DataFrame."""
         if split_per_type:
-            return await PandasConverter.convert_objects_to_multiple_dataframes(sequence_of_objects, **kwargs)
+            return await PandasConverter.convert_objects_to_multiple_dataframes_async(sequence_of_objects, **kwargs)
         else:
-            return await PandasConverter.convert_objects_to_single_dataframe(sequence_of_objects, **kwargs)
+            return await PandasConverter.convert_objects_to_single_dataframe_async(sequence_of_objects, **kwargs)
 
     @classmethod
     def from_dataframe_to_objects(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
@@ -548,7 +549,7 @@ class OtlmowConverter:
     @classmethod
     async def from_dataframe_to_objects_async(cls, dataframe: DataFrame, **kwargs) -> Iterable[OTLObject]:
         """Converts a pandas DataFrame to a sequence of OTLObject objects."""
-        return await PandasConverter.convert_dataframe_to_objects(dataframe, **kwargs)
+        return await PandasConverter.convert_dataframe_to_objects_async(dataframe, **kwargs)
 
     suffix_mapping_table = {
         'json': 'JSON',

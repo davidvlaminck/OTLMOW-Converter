@@ -60,7 +60,7 @@ class CsvExporter(AbstractExporter):
             delimiter = ';'
 
         if not split_per_type:
-            single_table = await DotnotationTableConverter.get_single_table_from_data(
+            single_table = await DotnotationTableConverter.get_single_table_from_data_async(
                 list_of_objects=sequence_of_objects,
                 separator=separator, cardinality_separator=cardinality_separator,
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
@@ -68,12 +68,12 @@ class CsvExporter(AbstractExporter):
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
-            data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
+            data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence_async(
                 list_of_dicts=single_table, empty_string_equals_none=True)
             cls._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
             return
 
-        multi_table_dict = await DotnotationTableConverter.get_tables_per_type_from_data(
+        multi_table_dict = await DotnotationTableConverter.get_tables_per_type_from_data_async(
             sequence_of_objects=sequence_of_objects,
             separator=separator, cardinality_separator=cardinality_separator,
             cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
@@ -82,7 +82,7 @@ class CsvExporter(AbstractExporter):
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
         for short_uri, table_data in multi_table_dict.items():
-            data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
+            data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence_async(
                 list_of_dicts=table_data, empty_string_equals_none=True)
             specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
             await sleep(0)

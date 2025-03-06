@@ -38,7 +38,7 @@ class ExcelExporter(AbstractExporter):
         abbreviate_excel_sheettitles = kwargs.get('abbreviate_excel_sheettitles',
                                                          ABBREVIATE_EXCEL_SHEETTITLES)
 
-        table_dict = await DotnotationTableConverter.get_tables_per_type_from_data(
+        table_dict = await DotnotationTableConverter.get_tables_per_type_from_data_async(
             cardinality_separator=cardinality_separator, cardinality_indicator=cardinality_indicator,
             waarde_shortcut=waarde_shortcut, cast_list=list_as_string, cast_datetime=datetime_as_string,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
@@ -70,7 +70,7 @@ class ExcelExporter(AbstractExporter):
         if not table_data:
             return False
 
-        data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
+        data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence_async(
             list_of_dicts=table_data, empty_string_equals_none=True)
 
         if abbreviate_excel_sheettitles:

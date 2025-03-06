@@ -211,8 +211,7 @@ class DotnotationDictConverter:
         if attribute is not None:
             yield attr_key, attribute
 
-    @async_to_sync_wraps
-    async def from_dict_instance(self, input_dict: DotnotationDict, model_directory: Path = None,
+    def from_dict_instance(self, input_dict: DotnotationDict, model_directory: Path = None,
                            waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
                            cardinality_indicator: str = CARDINALITY_SEPARATOR,
                            cardinality_separator: str = CARDINALITY_INDICATOR,
@@ -228,7 +227,30 @@ class DotnotationDictConverter:
         if self.cardinality_separator is not None:
             cardinality_separator = self.cardinality_separator
 
-        return await self.from_dict(input_dict=input_dict, model_directory=model_directory,
+        return self.from_dict(input_dict=input_dict, model_directory=model_directory,
+                                 waarde_shortcut=waarde_shortcut,
+                              separator=separator, cardinality_indicator=cardinality_indicator, cast_list=cast_list,
+                              cardinality_separator=cardinality_separator, cast_datetime=cast_datetime,
+                              allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                              warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+    async def from_dict_instance_async(self, input_dict: DotnotationDict, model_directory: Path = None,
+                           waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
+                           cardinality_indicator: str = CARDINALITY_SEPARATOR,
+                           cardinality_separator: str = CARDINALITY_INDICATOR,
+                           cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
+                           warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
+                           ) -> OTLObject:
+        if self.separator is not None:
+            separator = self.separator
+        if self.waarde_shortcut is not None:
+            waarde_shortcut = self.waarde_shortcut
+        if self.cardinality_indicator is not None:
+            cardinality_indicator = self.cardinality_indicator
+        if self.cardinality_separator is not None:
+            cardinality_separator = self.cardinality_separator
+
+        return await self.from_dict_async(input_dict=input_dict, model_directory=model_directory,
                                  waarde_shortcut=waarde_shortcut,
                               separator=separator, cardinality_indicator=cardinality_indicator, cast_list=cast_list,
                               cardinality_separator=cardinality_separator, cast_datetime=cast_datetime,
@@ -236,8 +258,7 @@ class DotnotationDictConverter:
                               warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
     @classmethod
-    @async_to_sync_wraps
-    async def from_dict(cls, input_dict: DotnotationDict, model_directory: Path = None,
+    def from_dict(cls, input_dict: DotnotationDict, model_directory: Path = None,
                   cast_list: bool = False, cast_datetime: bool = False,
                   allow_non_otl_conform_attributes: bool = True, warn_for_non_otl_conform_attributes: bool = True,
                   waarde_shortcut: bool = WAARDE_SHORTCUT,
@@ -245,6 +266,47 @@ class DotnotationDictConverter:
                   cardinality_indicator: str = CARDINALITY_INDICATOR,
                   cardinality_separator: str = CARDINALITY_SEPARATOR,
                   ) -> OTLObject:
+        type_uri = input_dict.get('typeURI')
+        if type_uri is None:
+            raise ValueError('typeURI is None. Add a valid typeURI to the input dictionary.')
+
+        if model_directory is None:
+            otl_object_file = inspect.getfile(OTLObject)
+            model_directory = Path(otl_object_file).parent.parent.parent
+
+        try:
+            o = dynamic_create_instance_from_uri(str(type_uri), model_directory=model_directory)
+        except TypeError as e:
+            raise ValueError('typeURI is invalid. Add a valid typeURI to the input dictionary.') from e
+
+        for k, v in input_dict.items():
+            if v is None:
+                continue
+            if k is None:  # v is not None!
+                raise MissingHeaderError(f'Missing a header for value {v}')
+            if k == 'typeURI':
+                continue
+            if k.startswith('_'):
+                raise ValueError(f'{k} is a non standardized attribute of {o.__class__.__name__}. '
+                                 f'While this is supported, the key can not start with "_".')
+            cls.set_attribute_by_dotnotation(
+                o, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                cast_datetime=cast_datetime, cast_list=cast_list,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+        return o
+
+    @classmethod
+    async def from_dict_async(cls, input_dict: DotnotationDict, model_directory: Path = None,
+                        cast_list: bool = False, cast_datetime: bool = False,
+                        allow_non_otl_conform_attributes: bool = True, warn_for_non_otl_conform_attributes: bool = True,
+                        waarde_shortcut: bool = WAARDE_SHORTCUT,
+                        separator: str = SEPARATOR,
+                        cardinality_indicator: str = CARDINALITY_INDICATOR,
+                        cardinality_separator: str = CARDINALITY_SEPARATOR,
+                        ) -> OTLObject:
         type_uri = input_dict.get('typeURI')
         if type_uri is None:
             raise ValueError('typeURI is None. Add a valid typeURI to the input dictionary.')

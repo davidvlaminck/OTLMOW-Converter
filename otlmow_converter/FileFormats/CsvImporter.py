@@ -146,7 +146,7 @@ class CsvImporter(AbstractImporter):
                             r.append(str(d))
                     data.append(r)
 
-                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
+                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts_async(
                     two_d_sequence=data, empty_string_equals_none=True)
                 return await DotnotationTableConverter.get_data_from_table_async(
                     table_data=list_of_dicts, model_directory=model_directory,
