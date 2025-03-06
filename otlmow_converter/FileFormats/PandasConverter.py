@@ -33,6 +33,6 @@ class PandasConverter:
         dict_list = [d]
         dict_list.extend(dataframe.to_dict('records'))
 
-        return await DotnotationTableConverter.get_data_from_table(
+        return await DotnotationTableConverter.get_data_from_table_async(
             table_data=dict_list,   model_directory=model_directory, **kwargs)
     

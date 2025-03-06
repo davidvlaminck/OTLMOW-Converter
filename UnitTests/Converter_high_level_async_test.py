@@ -33,9 +33,10 @@ def return_test_objects() -> [AllCasesTestClass, AnotherTestClass]:
 async def test_dataframe_to_dotnotation_dicts():
     orig_list_of_objects = return_test_objects()
     df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
-    expected_list_of_ddicts = [await DotnotationDictConverter.to_dict(o) for o in orig_list_of_objects]
+    expected_list_of_ddicts = [await DotnotationDictConverter.to_dict_async(o) for o in orig_list_of_objects]
 
-    new_list_of_ddicts = await to_dotnotation_dicts_async(df, model_directory=model_directory_path)
+    list_of_ddicts_gen = to_dotnotation_dicts_async(df, model_directory=model_directory_path)
+    new_list_of_ddicts = await OtlmowConverter.collect_to_list(list_of_ddicts_gen)
     assert expected_list_of_ddicts == list(new_list_of_ddicts)
 
 
@@ -54,9 +55,10 @@ async def test_dataframe_to_dicts():
 async def test_dotnotation_dicts_to_dataframe():
     orig_list_of_objects = return_test_objects()
     orig_list_of_ddicts = [DotnotationDictConverter.to_dict(o) for o in orig_list_of_objects]
-    expected_df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
 
-    created_df = await OtlmowConverter.to_dataframe(subject=orig_list_of_ddicts, model_directory=model_directory_path)
+    created_df = await OtlmowConverter.to_dataframe_async(
+        subject=orig_list_of_ddicts, model_directory=model_directory_path)
     assert_frame_equal(expected_df, created_df)
 
 
@@ -64,9 +66,9 @@ async def test_dotnotation_dicts_to_dataframe():
 async def test_dicts_to_dataframe():
     orig_list_of_objects = return_test_objects()
     orig_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
-    expected_df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
+    expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
 
-    created_df = await OtlmowConverter.to_dataframe(subject=orig_list_of_dicts, model_directory=model_directory_path)
+    created_df = await OtlmowConverter.to_dataframe_async(subject=orig_list_of_dicts, model_directory=model_directory_path)
     assert_frame_equal(expected_df, created_df)
 
 

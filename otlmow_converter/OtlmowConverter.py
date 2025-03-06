@@ -252,8 +252,9 @@ class OtlmowConverter:
 
                     return {key: DataFrame(data=value) for key, value in master_dict.items()}
                 elif isinstance(first_element, dict):
-                    objects = await cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
+                    objects_gen = cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
                                                                     model_directory=model_directory, **kwargs)
+                    objects = await cls.collect_to_list(objects_gen)
                     return await cls.from_objects_to_dataframe_async(sequence_of_objects=objects,
                                                                      split_per_type=split_per_type,
                                                                      **kwargs)
