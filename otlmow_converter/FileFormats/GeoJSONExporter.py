@@ -69,7 +69,7 @@ class GeoJSONExporter(AbstractExporter):
                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
 
         await cls.from_dotnotation_dicts(
-            [await DotnotationDictConverter.to_dict(
+            [await DotnotationDictConverter.to_dict_async(
                 asset, separator=separator, cardinality_indicator=cardinality_indicator,
                 waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                 cast_datetime=cast_datetime, cast_list=cast_list,
