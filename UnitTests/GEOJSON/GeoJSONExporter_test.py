@@ -119,7 +119,7 @@ async def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(r
     instance.testTimeField = time(11, 5, 26)
 
     recwarn.clear()
-    dotnotation_dicts = [await DotnotationDictConverter.to_dict(instance, cast_list=True, cast_datetime=True)]
+    dotnotation_dicts = [await DotnotationDictConverter.to_dict_async(instance, cast_list=True, cast_datetime=True)]
 
     await GeoJSONExporter.from_dotnotation_dicts(sequence_of_dotnotation_dicts=dotnotation_dicts,
                                                  filepath=file_location)

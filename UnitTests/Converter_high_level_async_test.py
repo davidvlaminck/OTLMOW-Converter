@@ -201,21 +201,24 @@ async def test_dataframe_to_file():
 
     geojson_file_path = Path(__file__).parent / 'test_dataframe_to_file.geojson'
 
-    await OtlmowConverter.to_file(subject=df, file_path=excel_file_path, model_directory=model_directory_path)
-    from_excel_objects = await OtlmowConverter.from_file_to_objects(excel_file_path, model_directory=model_directory_path)
+    await OtlmowConverter.to_file_async(subject=df, file_path=excel_file_path,
+                                            model_directory=model_directory_path)
+    from_excel_objects_gen = await OtlmowConverter.from_file_to_objects(excel_file_path,
+                                                                     model_directory=model_directory_path)
+    from_excel_objects = await OtlmowConverter.collect_to_list(from_excel_objects_gen)
     assert orig_list_of_objects == list(from_excel_objects)
 
-    await OtlmowConverter.to_file(subject=df, file_path=json_file_path, model_directory=model_directory_path)
+    await OtlmowConverter.to_file_async(subject=df, file_path=json_file_path, model_directory=model_directory_path)
     from_json_objects = await OtlmowConverter.from_file_to_objects(json_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_json_objects)
 
-    await OtlmowConverter.to_file(subject=df, file_path=csv_file_path, model_directory=model_directory_path)
+    await OtlmowConverter.to_file_async(subject=df, file_path=csv_file_path, model_directory=model_directory_path)
     from_csv_objects_2 = await OtlmowConverter.from_file_to_objects(csv_file_path_2, model_directory=model_directory_path)
     from_csv_objects_3 = await OtlmowConverter.from_file_to_objects(csv_file_path_3, model_directory=model_directory_path)
     combined_list = list(from_csv_objects_2) + list(from_csv_objects_3)
     assert orig_list_of_objects == combined_list
 
-    await OtlmowConverter.to_file(subject=df, file_path=geojson_file_path, model_directory=model_directory_path)
+    await OtlmowConverter.to_file_async(subject=df, file_path=geojson_file_path, model_directory=model_directory_path)
     from_geojson_objects = await OtlmowConverter.from_file_to_objects(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
