@@ -146,8 +146,38 @@ class DotnotationTableConverter:
         return master_dict
 
     @classmethod
-    @async_to_sync_wraps
-    async def get_data_from_table(cls, table_data: list[dict], model_directory: Path = None,
+    def get_data_from_table(cls, table_data: list[dict], model_directory: Path = None,
+                                  cast_list: bool = False, cast_datetime: bool = False,
+                                  allow_non_otl_conform_attributes: bool = True,
+                                  warn_for_non_otl_conform_attributes: bool = True,
+                                  waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                  separator: str = SEPARATOR,
+                                  cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                  cardinality_separator: str = CARDINALITY_SEPARATOR) -> list[OTLObject]:
+        """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
+        header"""
+        instances = []
+        headers, *rows = table_data
+        if 'typeURI' not in headers:
+            type_uri_in_first_rows = any('typeURI' in row.values() for row in rows)
+            if not type_uri_in_first_rows:
+                raise NoTypeUriInTableError
+            else:
+                raise TypeUriNotInFirstRowError
+        headers.pop('typeURI')
+        for row in rows:
+            instance = cls.create_instance_from_row(
+                row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
+                separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            instances.append(instance)
+
+        return instances
+
+    @classmethod
+    async def get_data_from_table_async(cls, table_data: list[dict], model_directory: Path = None,
                                   cast_list: bool = False, cast_datetime: bool = False,
                                   allow_non_otl_conform_attributes: bool = True,
                                   warn_for_non_otl_conform_attributes: bool = True,
@@ -179,8 +209,24 @@ class DotnotationTableConverter:
         return instances
 
     @classmethod
-    @async_to_sync_wraps
-    async def create_instance_from_row(cls, row: DotnotationDict, model_directory: Path = None,
+    def create_instance_from_row(cls, row: DotnotationDict, model_directory: Path = None,
+                                       cast_list: bool = False, cast_datetime: bool = False,
+                                       allow_non_otl_conform_attributes: bool = True,
+                                       warn_for_non_otl_conform_attributes: bool = True,
+                                       waarde_shortcut: bool = WAARDE_SHORTCUT,
+                                       separator: str = SEPARATOR,
+                                       cardinality_indicator: str = CARDINALITY_INDICATOR,
+                                       cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
+        return DotnotationDictConverter.from_dict(
+            input_dict=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
+            separator=separator, cardinality_indicator=cardinality_indicator,
+            waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+
+    @classmethod
+    async def create_instance_from_row_async(cls, row: DotnotationDict, model_directory: Path = None,
                                        cast_list: bool = False, cast_datetime: bool = False,
                                        allow_non_otl_conform_attributes: bool = True,
                                        warn_for_non_otl_conform_attributes: bool = True,

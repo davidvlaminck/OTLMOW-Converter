@@ -24,8 +24,47 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['warn_for_non_otl_conform
 
 class GeoJSONImporter(AbstractImporter):
     @classmethod
-    @async_to_sync_wraps
-    async def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
+    def to_objects(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
+        """Imports a geojson file created with DAVIE and decodes it to OTL objects
+
+        :param filepath: location of the file, defaults to ''
+        :type: Path
+        :rtype: list
+        :return: returns a list of OTL objects
+        """
+
+        ignore_failed_objects = False
+
+        if kwargs is not None and 'ignore_failed_objects' in kwargs:
+            ignore_failed_objects = kwargs['ignore_failed_objects']
+
+        separator = kwargs.get('separator', SEPARATOR)
+        cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
+        cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
+        waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
+        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
+        warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
+                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+
+        with open(filepath) as file:
+            data = json.load(file)
+
+        model_directory = None
+        if kwargs is not None and 'model_directory' in kwargs:
+            model_directory = kwargs['model_directory']
+
+        return cls.decode_objects(data, ignore_failed_objects=ignore_failed_objects, model_directory=model_directory,
+                                  separator=separator, cardinality_indicator=cardinality_indicator,
+                                  waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                                  cast_datetime=cast_datetime, cast_list=cast_list,
+                                  allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                                  warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+    @classmethod
+    async def to_objects_async(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
         """Imports a geojson file created with DAVIE and decodes it to OTL objects
 
         :param filepath: location of the file, defaults to ''

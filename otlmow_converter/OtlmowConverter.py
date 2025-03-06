@@ -60,7 +60,6 @@ class OtlmowConverter:
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
                 if first_element is None:
-                    yield
                     return
                 if isinstance(first_element, DotnotationDict):
                     for o in cls.from_dotnotation_dicts_to_objects(sequence_of_dotnotation_dicts=new_generator,
@@ -85,8 +84,8 @@ class OtlmowConverter:
         OTLObject]:
         """Converts any subject to a sequence of OTLObject objects asynchronously."""
         if isinstance(subject, Path):
-            for o in await cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory,
-                                                           **kwargs):
+            o_gen = await cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory, **kwargs)
+            for o in o_gen:
                 yield o
         elif isinstance(subject, DataFrame):
             for o in await cls.from_dataframe_to_objects_async(dataframe=subject, model_directory=model_directory,
@@ -99,12 +98,12 @@ class OtlmowConverter:
                     yield
                     return
                 if isinstance(first_element, DotnotationDict):
-                    for o in await cls.from_dotnotation_dicts_to_objects_async(
+                    async for o in cls.from_dotnotation_dicts_to_objects_async(
                             sequence_of_dotnotation_dicts=new_generator,
                             model_directory=model_directory, **kwargs):
                         yield o
                 elif isinstance(first_element, dict):
-                    for o in await cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
+                    async for o in cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
                                                                    model_directory=model_directory, **kwargs):
                         yield o
                 elif isinstance(first_element, OTLObject):
@@ -130,7 +129,6 @@ class OtlmowConverter:
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
                 if first_element is None:
-                    yield
                     return
                 if isinstance(first_element, DotnotationDict):
                     objects = list(cls.from_dotnotation_dicts_to_objects(
@@ -153,7 +151,7 @@ class OtlmowConverter:
     async def to_file_async(cls, subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
         """Converts any subject (including another file) to a file asynchronously."""
         if isinstance(subject, Path):
-            objects = await cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory, **kwargs)
+            objects = cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory, **kwargs)
             await cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, DataFrame):
             objects = await cls.from_dataframe_to_objects_async(dataframe=subject, model_directory=model_directory, **kwargs)
@@ -162,6 +160,7 @@ class OtlmowConverter:
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
                 if first_element is None:
+                    yield
                     return
                 if isinstance(first_element, DotnotationDict):
                     objects = list(await cls.from_dotnotation_dicts_to_objects_async(
@@ -199,7 +198,6 @@ class OtlmowConverter:
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
                 if first_element is None:
-                    yield
                     return
                 if isinstance(first_element, DotnotationDict):
                     if not split_per_type:
@@ -317,10 +315,11 @@ class OtlmowConverter:
                 if first_element is None:
                     return  # Changed from yield to return
                 if isinstance(first_element, DotnotationDict):
-                    objects = await cls.from_dotnotation_dicts_to_objects_async(
+                    objects_gen = cls.from_dotnotation_dicts_to_objects_async(
                         sequence_of_dotnotation_dicts=new_generator,
                         model_directory=model_directory, **kwargs)
-                    for obj in cls.from_objects_to_dicts_async(sequence_of_objects=objects, **kwargs):
+                    objects = await cls.collect_to_list(objects_gen)
+                    async for obj in cls.from_objects_to_dicts_async(sequence_of_objects=objects, **kwargs):
                         yield obj
                 elif isinstance(first_element, dict):
                     for obj in new_generator:
@@ -386,11 +385,12 @@ class OtlmowConverter:
                 if first_element is None:
                     return  # Changed from yield to return
                 if isinstance(first_element, DotnotationDict):
-                    async for dotnotation_dict in new_generator:
+                    for dotnotation_dict in new_generator:
                         yield dotnotation_dict
                 elif isinstance(first_element, dict):
-                    objects = await cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
+                    objects_gen = cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
                                                                     model_directory=model_directory, **kwargs)
+                    objects= await cls.collect_to_list(objects_gen)
                     async for dotnotation_dict in cls.from_objects_to_dotnotation_dicts_async(
                             sequence_of_objects=objects, **kwargs):
                         yield dotnotation_dict
@@ -458,7 +458,7 @@ class OtlmowConverter:
         """Converts a sequence of OTLObject objects to a sequence of dictionaries."""
         for obj in sequence_of_objects:
             await sleep(0)
-            yield DotnotationDictConverter.to_dict_async(obj, **kwargs)
+            yield await DotnotationDictConverter.to_dict_async(obj, **kwargs)
 
     @classmethod
     def from_dotnotation_dicts_to_objects(cls, sequence_of_dotnotation_dicts: Iterable[DotnotationDict], **kwargs
@@ -493,7 +493,7 @@ class OtlmowConverter:
         OTLObject]:
         """Converts a file to a sequence of OTLObject objects."""
         importer = FileImporter.get_importer_from_extension(extension=file_path.suffix[1:])
-        return await importer.to_objects(filepath=file_path, model_directory=model_directory, **kwargs)
+        return await importer.to_objects_async(filepath=file_path, model_directory=model_directory, **kwargs)
 
     @classmethod
     def from_objects_to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
@@ -606,7 +606,8 @@ def to_file(subject: object, file_path: Path, model_directory: Path = None, **kw
 
 
 async def to_file_async(subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
-    await OtlmowConverter.to_file_async(subject=subject, file_path=file_path, model_directory=model_directory, **kwargs)
+    return OtlmowConverter.to_file_async(subject=subject, file_path=file_path, model_directory=model_directory,
+                                         **kwargs)
 
 
 def to_dataframe(subject: object, split_per_type: bool = False, model_directory: Path = None, **kwargs
