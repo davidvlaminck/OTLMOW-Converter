@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_5ac00d4cf9403f80_ExcelImporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.12">coverage.py v7.6.12</a>,
-            created at 2025-02-26 21:02 +0000
+            created at 2025-03-06 20:17 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -120,7 +120,7 @@
     <p class="run"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">        <span class="nam">abbreviate_excel_sheettitles</span> <span class="op">=</span> <span class="nam">kwargs</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">'abbreviate_excel_sheettitles'</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t39" href="#t39">39</a></span><span class="t">                                                         <span class="nam">ABBREVIATE_EXCEL_SHEETTITLES</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t40" href="#t40">40</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">        <span class="nam">table_dict</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">DotnotationTableConverter</span><span class="op">.</span><span class="nam">get_tables_per_type_from_data</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t41" href="#t41">41</a></span><span class="t">        <span class="nam">table_dict</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">DotnotationTableConverter</span><span class="op">.</span><span class="nam">get_tables_per_type_from_data_async</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t42" href="#t42">42</a></span><span class="t">            <span class="nam">cardinality_separator</span><span class="op">=</span><span class="nam">cardinality_separator</span><span class="op">,</span> <span class="nam">cardinality_indicator</span><span class="op">=</span><span class="nam">cardinality_indicator</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t43" href="#t43">43</a></span><span class="t">            <span class="nam">waarde_shortcut</span><span class="op">=</span><span class="nam">waarde_shortcut</span><span class="op">,</span> <span class="nam">cast_list</span><span class="op">=</span><span class="nam">list_as_string</span><span class="op">,</span> <span class="nam">cast_datetime</span><span class="op">=</span><span class="nam">datetime_as_string</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t44" href="#t44">44</a></span><span class="t">            <span class="nam">allow_non_otl_conform_attributes</span><span class="op">=</span><span class="nam">allow_non_otl_conform_attributes</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -152,7 +152,7 @@
     <p class="run"><span class="n"><a id="t70" href="#t70">70</a></span><span class="t">        <span class="key">if</span> <span class="key">not</span> <span class="nam">table_data</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t71" href="#t71">71</a></span><span class="t">            <span class="key">return</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t72" href="#t72">72</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">        <span class="nam">data</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">DotnotationTableConverter</span><span class="op">.</span><span class="nam">transform_list_of_dicts_to_2d_sequence</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t73" href="#t73">73</a></span><span class="t">        <span class="nam">data</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">DotnotationTableConverter</span><span class="op">.</span><span class="nam">transform_list_of_dicts_to_2d_sequence_async</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">            <span class="nam">list_of_dicts</span><span class="op">=</span><span class="nam">table_data</span><span class="op">,</span> <span class="nam">empty_string_equals_none</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">        <span class="key">if</span> <span class="nam">abbreviate_excel_sheettitles</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -179,7 +179,7 @@
             <a class="nav" href="z_5ac00d4cf9403f80_ExcelImporter_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.12">coverage.py v7.6.12</a>,
-            created at 2025-02-26 21:02 +0000
+            created at 2025-03-06 20:17 +0000
         </p>
     </div>
 </footer>
