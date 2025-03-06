@@ -607,7 +607,7 @@ def to_file(subject: object, file_path: Path, model_directory: Path = None, **kw
 
 
 async def to_file_async(subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
-    return OtlmowConverter.to_file_async(subject=subject, file_path=file_path, model_directory=model_directory,
+    await OtlmowConverter.to_file_async(subject=subject, file_path=file_path, model_directory=model_directory,
                                          **kwargs)
 
 
