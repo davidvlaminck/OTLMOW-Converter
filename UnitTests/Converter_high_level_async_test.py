@@ -77,10 +77,10 @@ async def test_file_to_dataframe():
     orig_list_of_objects = return_test_objects()
     expected_df = await PandasConverter.convert_objects_to_single_dataframe(list_of_objects=orig_list_of_objects)
     json_file_path = Path(__file__).parent / 'test_file_to_dataframe.json'
-    await OtlmowConverter.from_objects_to_file(sequence_of_objects=orig_list_of_objects, file_path=json_file_path,
+    await OtlmowConverter.from_objects_to_file_async(sequence_of_objects=orig_list_of_objects, file_path=json_file_path,
                                          model_directory=model_directory_path)
 
-    created_df = await to_dataframe(json_file_path, model_directory=model_directory_path)
+    created_df = await to_dataframe_async(json_file_path, model_directory=model_directory_path)
     assert_frame_equal(expected_df, created_df)
 
 
@@ -339,8 +339,9 @@ async def test_objects_to_file():
     geojson_file_path = Path(__file__).parent / 'test_objects_to_file.geojson'
 
     await OtlmowConverter.to_file_async(subject=orig_list_of_objects, file_path=excel_file_path)
-    from_excel_objects = await OtlmowConverter.from_file_to_objects_async(
+    from_excel_objects_gen = OtlmowConverter.from_file_to_objects_async(
         excel_file_path, model_directory=model_directory_path)
+    from_excel_objects = await OtlmowConverter.collect_to_list(from_excel_objects_gen)
     assert orig_list_of_objects == list(from_excel_objects)
 
     to_file_async(subject=orig_list_of_objects, file_path=json_file_path)

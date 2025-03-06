@@ -372,8 +372,9 @@ class OtlmowConverter:
         DotnotationDict]:
         """Converts any subject to a sequence of DotnotationDict objects asynchronously."""
         if isinstance(subject, Path):
-            objects = await cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory, **kwargs)
-            for dotnotation_dict in cls.from_objects_to_dotnotation_dicts_async(sequence_of_objects=objects,
+            objects = await cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory,
+                                                            **kwargs)
+            async for dotnotation_dict in cls.from_objects_to_dotnotation_dicts_async(sequence_of_objects=objects,
                                                                                       **kwargs):
                 yield dotnotation_dict
         elif isinstance(subject, DataFrame):
