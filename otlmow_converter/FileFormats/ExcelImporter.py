@@ -130,7 +130,7 @@ class ExcelImporter(AbstractImporter):
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
 
-        data = await cls.get_data_dict_from_file_path(filepath=filepath)
+        data = await cls.get_data_dict_from_file_path_async(filepath=filepath)
 
         list_of_objects = []
         exception_group = ExceptionsGroup(message=f'Failed to create objects from Excel file {filepath}')
@@ -189,8 +189,35 @@ class ExcelImporter(AbstractImporter):
         return list_of_objects
 
     @classmethod
-    @async_to_sync_wraps
-    async def get_data_dict_from_file_path(cls, filepath) -> dict[str, list[list]]:
+    def get_data_dict_from_file_path(cls, filepath) -> dict[str, list[list]]:
+        data = {}
+        book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
+
+        for sheet in book.worksheets:
+            sheet_name = sheet.title
+            data[sheet_name] = []
+            for row in sheet.rows:
+                row_data = []
+                all_none = True
+                for cell in row:
+                    if cell.value in {'True', 'TRUE', 'False', 'FALSE'}:
+                        row_data.append(cell.value.lower() == 'true')
+                        all_none = False
+                    else:
+                        row_data.append(cell.value)
+                        if all_none and cell.value is not None:
+                            all_none = False
+
+                # check if row_data contains all None values
+                if all_none:
+                    break
+                data[sheet_name].append(row_data)
+
+        book.close()
+        return data
+
+    @classmethod
+    async def get_data_dict_from_file_path_async(cls, filepath) -> dict[str, list[list]]:
         data = {}
         await sleep(0)
         book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
