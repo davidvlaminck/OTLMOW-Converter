@@ -80,7 +80,9 @@ class JsonLdExporter(AbstractExporter):
                 raise ValueError(f'No identificator found for asset: {d}')
             else:
                 if is_relation(asset, model_directory):
-                    d['@id'] = 'https://data.awvvlaanderen.be/id/assetrelatie/' + asset.assetId.identificator
+                    d['@id'] = (
+                        f'https://data.awvvlaanderen.be/id/assetrelatie/{asset.assetId.identificator}'
+                    )
                 else:
                     d['@id'] = 'https://data.awvvlaanderen.be/id/asset/' + asset.assetId.identificator
             list_of_objects.append(d)
