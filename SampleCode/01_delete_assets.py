@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
-from otlmow_model.Classes.Onderdeel.Wegkantkast import Wegkantkast
+from otlmow_model.OtlmowModel.Classes.Onderdeel.Wegkantkast import Wegkantkast
 
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
@@ -54,6 +54,6 @@ if __name__ == '__main__':
 
     # export
     file_path = Path(f'/home/davidlinux/Documents/AWV/{datetime.now().strftime("%Y%m%d%H%M%S")}_export.xlsx')
-    otlmow_converter.create_file_from_assets(filepath=file_path, list_of_objects=assets_to_create)
+    otlmow_converter.from_objects_to_file(sequence_of_objects=assets_to_create, file_path=file_path)
 
 

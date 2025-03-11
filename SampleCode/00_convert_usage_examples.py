@@ -1,6 +1,6 @@
 from otlmow_model.OtlmowModel.Classes.Onderdeel.Boom import Boom
-
 from otlmow_converter.OtlmowConverter import OtlmowConverter
+
 
 if __name__ == '__main__':
     boom = Boom()
