@@ -4,7 +4,6 @@ import inspect
 import warnings
 from asyncio import sleep
 from pathlib import Path
-from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
 from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
