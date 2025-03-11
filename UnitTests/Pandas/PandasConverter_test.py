@@ -372,7 +372,7 @@ def test_convert_dataframe_to_objects_nan_values(caplog):
 
     instances = [instance, instance2]
 
-    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    df = DataFrame(PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances))
     assert df.shape == (2, 4)
 
     assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'

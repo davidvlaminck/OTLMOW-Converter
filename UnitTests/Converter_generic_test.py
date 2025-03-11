@@ -163,7 +163,7 @@ def test_generic_to_objects(subtests):
             assert generic_objects_3 == orig_list_of_objects
 
         with subtests.test(msg="dotnotation_dicts to_objects"):
-            d_dicts = OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_list_of_objects)
+            d_dicts = list(OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_list_of_objects))
             generic_objects_4 = list(OtlmowConverter.to_objects(d_dicts, model_directory=model_directory_path))
             assert generic_objects_4 == orig_list_of_objects
 
@@ -206,7 +206,7 @@ def test_generic_to_file(subtests):
             assert json.load(output_file_path.open()) == json.load(expected_file_path.open())
 
         with subtests.test(msg="dotnotation_dicts to_file"):
-            dd_list = OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_list_of_objects)
+            dd_list = list(OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=orig_list_of_objects))
             OtlmowConverter.to_file(subject=dd_list, file_path=output_file_path)
             assert json.load(output_file_path.open()) == json.load(expected_file_path.open())
 
@@ -259,7 +259,7 @@ def test_generic_to_dicts(subtests):
         with subtests.test(msg="dotnotation_dicts to_dicts"):
             objects = list(OtlmowConverter.from_dicts_to_objects(orig_list_of_dicts,
                                                                  model_directory=model_directory_path))
-            dd_list = OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=objects)
+            dd_list = list(OtlmowConverter.from_objects_to_dotnotation_dicts(sequence_of_objects=objects))
             result_dicts = list(OtlmowConverter.to_dicts(subject=dd_list,
                                                          model_directory=model_directory_path))
             assert result_dicts == orig_list_of_dicts

@@ -1,12 +1,11 @@
+from asyncio import sleep
 from json import JSONEncoder
 from pathlib import Path
 from typing import Iterable
-
 import geojson
 import numpy as np
 from geojson import LineString, Point, MultiPoint, MultiLineString, Polygon, MultiPolygon, GeometryCollection
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-
 from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -52,6 +51,33 @@ class GeoJSONExporter(AbstractExporter):
             file.write(encoded_json)
 
     @classmethod
+    async def from_dotnotation_dicts_async(cls, sequence_of_dotnotation_dicts: Iterable[dict], filepath: Path) -> None:
+        list_of_objects = []
+        for d in sequence_of_dotnotation_dicts:
+            feature_dict = {
+                'id': d['assetId.identificator'],
+                'properties': d,
+                'type': 'Feature'}
+
+            geometry = d.get('geometry', None)
+            if geometry is not None:
+                geom = cls.convert_wkt_string_to_geojson(d.pop("geometry"))
+                feature_dict['geometry'] = geom
+
+            list_of_objects.append(feature_dict)
+            await sleep(0)
+
+        fc = {
+            'type': 'FeatureCollection',
+            'features': list_of_objects
+        }
+        encoded_json = JSONEncoder(indent=4).encode(fc)
+        await sleep(0)
+
+        with open(filepath, "w") as file:
+            file.write(encoded_json)
+
+    @classmethod
     def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
         separator = kwargs.get('separator', SEPARATOR)
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
@@ -72,6 +98,28 @@ class GeoJSONExporter(AbstractExporter):
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
                 for asset in sequence_of_objects], filepath=filepath)
+
+    @classmethod
+    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+        separator = kwargs.get('separator', SEPARATOR)
+        cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
+        cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
+        waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
+        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
+        warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
+                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+
+        await cls.from_dotnotation_dicts_async(
+            [await DotnotationDictConverter.to_dict_async(
+                asset, separator=separator, cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                cast_datetime=cast_datetime, cast_list=cast_list,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+             for asset in sequence_of_objects], filepath=filepath)
 
     @classmethod
     def convert_wkt_string_to_geojson(cls, wkt_string: str):

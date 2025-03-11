@@ -3,6 +3,8 @@ import os
 from datetime import time, date, datetime
 from pathlib import Path
 
+import pytest
+
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.FileFormats.GeoJSONExporter import GeoJSONExporter
@@ -11,7 +13,8 @@ base_dir = Path(__file__).parent
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_export_and_then_import_unnested_attributes(recwarn):
+@pytest.mark.asyncio(scope="module")
+async def test_export_and_then_import_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.geojson'
 
     instance = AllCasesTestClass()
@@ -33,7 +36,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     instance.testTimeField = time(11, 5, 26)
 
     recwarn.clear()
-    GeoJSONExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await GeoJSONExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location
@@ -93,7 +96,8 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     os.unlink(file_location)
 
 
-def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(recwarn):
+@pytest.mark.asyncio(scope="module")
+async def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.geojson'
 
     instance = AllCasesTestClass()
@@ -115,9 +119,10 @@ def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(recwarn
     instance.testTimeField = time(11, 5, 26)
 
     recwarn.clear()
-    dotnotation_dicts = [DotnotationDictConverter.to_dict(instance, cast_list=True, cast_datetime=True)]
+    dotnotation_dicts = [await DotnotationDictConverter.to_dict_async(instance, cast_list=True, cast_datetime=True)]
 
-    GeoJSONExporter.from_dotnotation_dicts(sequence_of_dotnotation_dicts=dotnotation_dicts, filepath=file_location)
+    await GeoJSONExporter.from_dotnotation_dicts_async(sequence_of_dotnotation_dicts=dotnotation_dicts,
+                                                 filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location
@@ -177,7 +182,8 @@ def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(recwarn
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_1(recwarn):
+@pytest.mark.asyncio(scope="module")
+async def test_export_and_then_import_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.geojson'
 
     instance = AllCasesTestClass()
@@ -209,7 +215,7 @@ def test_export_and_then_import_nested_attributes_level_1(recwarn):
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
     recwarn.clear()
-    GeoJSONExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await GeoJSONExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location

@@ -3,13 +3,15 @@ import os
 from datetime import date, datetime, time
 from pathlib import Path
 
+import pytest
+
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.JsonExporter import JsonExporter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
-
-def test_export_and_then_import_unnested_attributes(recwarn):
+@pytest.mark.asyncio()
+async def test_export_and_then_import_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.json'
 
     instance = AllCasesTestClass()
@@ -31,7 +33,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     instance.testTimeField = time(11, 5, 26)
 
     recwarn.clear()
-    JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await JsonExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location
@@ -75,7 +77,8 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_1(recwarn):
+@pytest.mark.asyncio()
+async def test_export_and_then_import_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.json'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -114,7 +117,7 @@ def test_export_and_then_import_nested_attributes_level_1(recwarn):
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
     recwarn.list.clear()
-    JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await JsonExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     with open(file_location) as file:
@@ -154,7 +157,8 @@ def test_export_and_then_import_nested_attributes_level_1(recwarn):
     os.unlink(file_location)
 
 
-def test_export_and_then_import_nested_attributes_level_2(recwarn):
+@pytest.mark.asyncio()
+async def test_export_and_then_import_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_2_generated.json'
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -176,7 +180,7 @@ def test_export_and_then_import_nested_attributes_level_2(recwarn):
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
     recwarn.list.clear()
-    JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await JsonExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     with open(file_location) as file:
