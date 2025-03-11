@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="z_9b6ec40cf66cbf77_SettingsManager_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.12">coverage.py v7.6.12</a>,
-            created at 2025-03-06 20:17 +0000
+            created at 2025-03-11 10:18 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -596,7 +596,7 @@
     <p class="pln"><span class="n"><a id="t514" href="#t514">514</a></span><span class="t">                                         <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span> <span class="op">-></span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t515" href="#t515">515</a></span><span class="t">        <span class="str">"""Converts a sequence of OTLObject objects to a file."""</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t516" href="#t516">516</a></span><span class="t">        <span class="nam">exporter</span> <span class="op">=</span> <span class="nam">FileExporter</span><span class="op">.</span><span class="nam">get_exporter_from_extension</span><span class="op">(</span><span class="nam">extension</span><span class="op">=</span><span class="nam">file_path</span><span class="op">.</span><span class="nam">suffix</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t517" href="#t517">517</a></span><span class="t">        <span class="key">await</span> <span class="nam">exporter</span><span class="op">.</span><span class="nam">from_objects</span><span class="op">(</span><span class="nam">sequence_of_objects</span><span class="op">=</span><span class="nam">sequence_of_objects</span><span class="op">,</span> <span class="nam">filepath</span><span class="op">=</span><span class="nam">file_path</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t517" href="#t517">517</a></span><span class="t">        <span class="key">await</span> <span class="nam">exporter</span><span class="op">.</span><span class="nam">from_objects_async</span><span class="op">(</span><span class="nam">sequence_of_objects</span><span class="op">=</span><span class="nam">sequence_of_objects</span><span class="op">,</span> <span class="nam">filepath</span><span class="op">=</span><span class="nam">file_path</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t518" href="#t518">518</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t519" href="#t519">519</a></span><span class="t">    <span class="op">@</span><span class="nam">classmethod</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t520" href="#t520">520</a></span><span class="t">    <span class="key">def</span> <span class="nam">from_objects_to_dataframe</span><span class="op">(</span><span class="nam">cls</span><span class="op">,</span> <span class="nam">sequence_of_objects</span><span class="op">:</span> <span class="nam">Iterable</span><span class="op">[</span><span class="nam">OTLObject</span><span class="op">]</span><span class="op">,</span> <span class="nam">split_per_type</span><span class="op">:</span> <span class="nam">bool</span> <span class="op">=</span> <span class="key">False</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
@@ -716,7 +716,7 @@
             <a class="nav" href="z_9b6ec40cf66cbf77_SettingsManager_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.6.12">coverage.py v7.6.12</a>,
-            created at 2025-03-06 20:17 +0000
+            created at 2025-03-11 10:18 +0000
         </p>
     </div>
 </footer>
