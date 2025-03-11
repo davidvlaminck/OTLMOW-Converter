@@ -40,7 +40,6 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
-@pytest.mark.asyncio(scope="module")
 async def test_load_test_unnested_attributes_async(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.json'
 
