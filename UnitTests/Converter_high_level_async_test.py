@@ -1,4 +1,3 @@
-import asyncio
 import os
 from datetime import date
 from pathlib import Path
@@ -10,8 +9,8 @@ from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.FileFormats.PandasConverter import PandasConverter
-from otlmow_converter.OtlmowConverter import OtlmowConverter, to_objects, to_file, to_dicts, to_dotnotation_dicts, \
-    to_dataframe, to_dotnotation_dicts_async, to_dicts_async, to_objects_async, to_dataframe_async, to_file_async
+from otlmow_converter.OtlmowConverter import OtlmowConverter, to_dotnotation_dicts_async, to_dicts_async, \
+    to_objects_async, to_dataframe_async, to_file_async
 
 model_directory_path = Path(__file__).parent / 'TestModel'
 
@@ -221,7 +220,8 @@ async def test_dataframe_to_file():
     assert orig_list_of_objects == combined_list
 
     await to_file_async(subject=df, file_path=geojson_file_path, model_directory=model_directory_path)
-    from_geojson_objects = await OtlmowConverter.from_file_to_objects(geojson_file_path, model_directory=model_directory_path)
+    from_geojson_objects = await OtlmowConverter.from_file_to_objects_async(
+        geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
     os.unlink(excel_file_path)

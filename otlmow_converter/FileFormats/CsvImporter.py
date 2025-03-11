@@ -3,7 +3,6 @@ import csv
 from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
-from universalasync import async_to_sync_wraps
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError

@@ -44,7 +44,7 @@ def test_load_test_unnested_attributes(recwarn):
 async def test_load_test_unnested_attributes_async(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.json'
 
-    objects = await JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await JsonImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -75,7 +75,7 @@ async def test_load_test_unnested_attributes_async(recwarn):
 async def test_load_test_nested_attributes_1_level_async(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.json'
 
-    objects = await JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await JsonImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -108,7 +108,7 @@ async def test_load_test_nested_attributes_1_level_async(recwarn):
 async def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.json'
 
-    objects = await JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await JsonImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -135,7 +135,7 @@ async def test_load_test_non_conform(recwarn, subtests):
 
     with subtests.test(msg="default behaviour"):
         recwarn.clear()
-        objects = await JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+        objects = await JsonImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
         assert len(recwarn.list) == 1
 
         assert len(objects) == 1
@@ -148,12 +148,12 @@ async def test_load_test_non_conform(recwarn, subtests):
 
     with subtests.test(msg='non conform not allowed'):
         with pytest.raises(ValueError):
-            await JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+            await JsonImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path,
                                     allow_non_otl_conform_attributes=False)
 
     with subtests.test(msg="allowed, no warnings"):
         recwarn.clear()
-        objects = await JsonImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+        objects = await JsonImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path,
                                           warn_for_non_otl_conform_attributes=False)
         assert len(recwarn.list) == 0
 

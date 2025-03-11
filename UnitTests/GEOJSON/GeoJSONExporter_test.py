@@ -36,7 +36,7 @@ async def test_export_and_then_import_unnested_attributes(recwarn):
     instance.testTimeField = time(11, 5, 26)
 
     recwarn.clear()
-    await GeoJSONExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await GeoJSONExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location
@@ -121,7 +121,7 @@ async def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(r
     recwarn.clear()
     dotnotation_dicts = [await DotnotationDictConverter.to_dict_async(instance, cast_list=True, cast_datetime=True)]
 
-    await GeoJSONExporter.from_dotnotation_dicts(sequence_of_dotnotation_dicts=dotnotation_dicts,
+    await GeoJSONExporter.from_dotnotation_dicts_async(sequence_of_dotnotation_dicts=dotnotation_dicts,
                                                  filepath=file_location)
     assert len(recwarn.list) == 0
 
@@ -215,7 +215,7 @@ async def test_export_and_then_import_nested_attributes_level_1(recwarn):
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
     recwarn.clear()
-    await GeoJSONExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await GeoJSONExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location

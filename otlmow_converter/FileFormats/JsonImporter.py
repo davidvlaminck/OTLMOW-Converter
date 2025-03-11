@@ -77,7 +77,7 @@ class JsonImporter(AbstractImporter):
             ignore_failed_objects = kwargs['ignore_failed_objects']
 
         data = Path(filepath).read_text()
-        return await JsonDecoder.decode_json_string(json_string=data, ignore_failed_objects=ignore_failed_objects,
+        return await JsonDecoder.decode_json_string_async(json_string=data, ignore_failed_objects=ignore_failed_objects,
                                               allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                               warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
                                               model_directory=model_directory, waarde_shortcut=waarde_shortcut)

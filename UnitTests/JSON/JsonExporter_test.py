@@ -33,7 +33,7 @@ async def test_export_and_then_import_unnested_attributes(recwarn):
     instance.testTimeField = time(11, 5, 26)
 
     recwarn.clear()
-    await JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await JsonExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     # read json file at file_location
@@ -117,7 +117,7 @@ async def test_export_and_then_import_nested_attributes_level_1(recwarn):
     instance.testUnionTypeMetKard[1].unionKwantWrd.waarde = 20.0
 
     recwarn.list.clear()
-    await JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await JsonExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     with open(file_location) as file:
@@ -180,7 +180,7 @@ async def test_export_and_then_import_nested_attributes_level_2(recwarn):
     instance.testComplexTypeMetKard[1].testComplexType2.testStringField = 'string2'
 
     recwarn.list.clear()
-    await JsonExporter.from_objects(sequence_of_objects=[instance], filepath=file_location)
+    await JsonExporter.from_objects_async(sequence_of_objects=[instance], filepath=file_location)
     assert len(recwarn.list) == 0
 
     with open(file_location) as file:

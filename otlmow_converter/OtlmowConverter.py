@@ -514,7 +514,7 @@ class OtlmowConverter:
                                          **kwargs) -> None:
         """Converts a sequence of OTLObject objects to a file."""
         exporter = FileExporter.get_exporter_from_extension(extension=file_path.suffix[1:])
-        await exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
+        await exporter.from_objects_async(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
 
     @classmethod
     def from_objects_to_dataframe(cls, sequence_of_objects: Iterable[OTLObject], split_per_type: bool = False,
