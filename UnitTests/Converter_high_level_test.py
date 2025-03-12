@@ -1,21 +1,14 @@
-import json
-import os
 from datetime import date
 from pathlib import Path
 
-import pytest
-from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
-from pandas import DataFrame
 from pandas._testing import assert_frame_equal
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
-from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.FileFormats.PandasConverter import PandasConverter
 from otlmow_converter.OtlmowConverter import OtlmowConverter, to_objects, to_file, to_dicts, to_dotnotation_dicts, \
     to_dataframe
-from otlmow_converter.SettingsManager import update_settings_by_dict
 
 model_directory_path = Path(__file__).parent / 'TestModel'
 
@@ -90,6 +83,8 @@ def test_file_to_dataframe():
     created_df = to_dataframe(json_file_path, model_directory=model_directory_path)
     assert_frame_equal(expected_df, created_df)
 
+    json_file_path.unlink()
+
 
 def test_dicts_to_dotnotation_dicts():
     orig_list_of_objects = return_test_objects()
@@ -142,7 +137,7 @@ def test_file_to_dotnotation_dicts():
     new_list_of_ddicts = list(to_dotnotation_dicts(subject=json_file_path, model_directory=model_directory_path))
 
     assert new_list_of_ddicts == [DotnotationDictConverter.to_dict(o) for o in orig_list_of_objects]
-    os.unlink(json_file_path)
+    json_file_path.unlink()
 
 
 def test_file_to_dicts():
@@ -154,7 +149,7 @@ def test_file_to_dicts():
     new_list_of_dicts = list(to_dicts(subject=json_file_path, model_directory=model_directory_path))
 
     assert new_list_of_dicts == [o.to_dict() for o in orig_list_of_objects]
-    os.unlink(json_file_path)
+    json_file_path.unlink()
 
 
 def test_objects_to_dataframe():
@@ -207,11 +202,11 @@ def test_dataframe_to_file():
     from_geojson_objects = OtlmowConverter.from_file_to_objects(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
-    os.unlink(excel_file_path)
-    os.unlink(json_file_path)
-    os.unlink(csv_file_path_2)
-    os.unlink(csv_file_path_3)
-    os.unlink(geojson_file_path)
+    excel_file_path.unlink()
+    json_file_path.unlink()
+    csv_file_path_2.unlink()
+    csv_file_path_3.unlink()
+    geojson_file_path.unlink()
 
 
 def test_dotnotation_dicts_to_file():
@@ -243,11 +238,11 @@ def test_dotnotation_dicts_to_file():
     from_geojson_objects = OtlmowConverter.from_file_to_objects(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
-    os.unlink(excel_file_path)
-    os.unlink(json_file_path)
-    os.unlink(csv_file_path_2)
-    os.unlink(csv_file_path_3)
-    os.unlink(geojson_file_path)
+    excel_file_path.unlink()
+    json_file_path.unlink()
+    csv_file_path_2.unlink()
+    csv_file_path_3.unlink()
+    geojson_file_path.unlink()
 
 
 def test_file_to_file():
@@ -301,16 +296,16 @@ def test_file_to_file():
                                                                          model_directory=model_directory_path)
     assert list(imported_geojson_file) == list(imported_created_geojson_file)
 
-    os.unlink(excel_file_path)
-    os.unlink(created_excel_file_path)
-    os.unlink(json_file_path)
-    os.unlink(created_json_file_path)
-    os.unlink(csv_file_path_2)
-    os.unlink(csv_file_path_3)
-    os.unlink(created_csv_file_path_2)
-    os.unlink(created_csv_file_path_3)
-    os.unlink(geojson_file_path)
-    os.unlink(created_geojson_file_path)
+    excel_file_path.unlink()
+    created_excel_file_path.unlink()
+    json_file_path.unlink()
+    created_json_file_path.unlink()
+    csv_file_path_2.unlink()
+    csv_file_path_3.unlink()
+    created_csv_file_path_2.unlink()
+    created_csv_file_path_3.unlink()
+    geojson_file_path.unlink()
+    created_geojson_file_path.unlink()
 
 
 def test_objects_to_file():
@@ -340,11 +335,11 @@ def test_objects_to_file():
     from_geojson_objects = OtlmowConverter.from_file_to_objects(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
-    os.unlink(excel_file_path)
-    os.unlink(json_file_path)
-    os.unlink(csv_file_path_2)
-    os.unlink(csv_file_path_3)
-    os.unlink(geojson_file_path)
+    excel_file_path.unlink()
+    json_file_path.unlink()
+    csv_file_path_2.unlink()
+    csv_file_path_3.unlink()
+    geojson_file_path.unlink()
 
 
 def test_dicts_to_file():
@@ -376,11 +371,11 @@ def test_dicts_to_file():
     from_geojson_objects = OtlmowConverter.from_file_to_objects(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
-    os.unlink(excel_file_path)
-    os.unlink(json_file_path)
-    os.unlink(csv_file_path_2)
-    os.unlink(csv_file_path_3)
-    os.unlink(geojson_file_path)
+    excel_file_path.unlink()
+    json_file_path.unlink()
+    csv_file_path_2.unlink()
+    csv_file_path_3.unlink()
+    geojson_file_path.unlink()
 
 
 def test_file_to_objects():  # sourcery skip: extract-duplicate-method
@@ -411,11 +406,11 @@ def test_file_to_objects():  # sourcery skip: extract-duplicate-method
     from_geojson_objects = to_objects(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
-    os.unlink(excel_file_path)
-    os.unlink(json_file_path)
-    os.unlink(csv_file_path_2)
-    os.unlink(csv_file_path_3)
-    os.unlink(geojson_file_path)
+    excel_file_path.unlink()
+    json_file_path.unlink()
+    csv_file_path_2.unlink()
+    csv_file_path_3.unlink()
+    geojson_file_path.unlink()
 
 
 def test_objects_to_objects():
