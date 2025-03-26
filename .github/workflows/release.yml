@@ -9,16 +9,17 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
     permissions:
       id-token: write
     concurrency: release
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Install uv with Python version 3.13
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.12'
+          python-version: 3.13
       - run: python3 -m pip install --upgrade build && python3 -m build
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1

@@ -371,8 +371,8 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    async def to_dotnotation_dicts_async(cls, subject: object, model_directory: Path = None, **kwargs) -> AsyncIterable[
-        DotnotationDict]:
+    async def to_dotnotation_dicts_async(cls, subject: object, model_directory: Path = None, **kwargs
+                                         ) -> AsyncIterable[DotnotationDict]:
         """Converts any subject to a sequence of DotnotationDict objects asynchronously."""
         if isinstance(subject, Path):
             objects = await cls.from_file_to_objects_async(file_path=subject, model_directory=model_directory,
@@ -421,7 +421,7 @@ class OtlmowConverter:
             yield create_dict_from_asset(obj, **kwargs)
 
     @classmethod
-    async def from_objects_to_dicts_async(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> Iterable[dict]:
+    async def from_objects_to_dicts_async(cls, sequence_of_objects: Iterable[OTLObject], **kwargs) -> AsyncIterable[dict]:
         """Converts a sequence of OTLObject objects to a sequence of dictionaries."""
         for obj in sequence_of_objects:
             await sleep(0)
@@ -439,7 +439,7 @@ class OtlmowConverter:
             yield OTLObject.from_dict(input_dict=d, **kwargs)
 
     @classmethod
-    async def from_dicts_to_objects_async(cls, sequence_of_dicts: Iterable[dict], **kwargs) -> Iterable[OTLObject]:
+    async def from_dicts_to_objects_async(cls, sequence_of_dicts: Iterable[dict], **kwargs) -> AsyncIterable[OTLObject]:
         """Converts a sequence of dictionaries to a sequence of OTLObject objects."""
         for d in sequence_of_dicts:
             await sleep(0)
@@ -459,7 +459,7 @@ class OtlmowConverter:
 
     @classmethod
     async def from_objects_to_dotnotation_dicts_async(cls, sequence_of_objects: Iterable[OTLObject], **kwargs
-                                                      ) -> Iterable[DotnotationDict]:
+                                                      ) -> AsyncIterable[DotnotationDict]:
         """Converts a sequence of OTLObject objects to a sequence of dictionaries."""
         for obj in sequence_of_objects:
             await sleep(0)
@@ -478,8 +478,7 @@ class OtlmowConverter:
 
     @classmethod
     async def from_dotnotation_dicts_to_objects_async(cls, sequence_of_dotnotation_dicts: Iterable[DotnotationDict],
-                                                      **kwargs
-                                                      ) -> Iterable[OTLObject]:
+                                                      **kwargs) -> AsyncIterable[OTLObject]:
         """Converts a sequence of OTLObject objects to a sequence of dictionaries."""
         for obj in sequence_of_dotnotation_dicts:
             yield await DotnotationDictConverter.from_dict_async(obj, **kwargs)
@@ -494,7 +493,7 @@ class OtlmowConverter:
         return importer.to_objects(filepath=file_path, model_directory=model_directory, **kwargs)
 
     @classmethod
-    async def from_file_to_objects_async(cls, file_path: Path, model_directory: Path = None, **kwargs) -> Iterable[
+    async def from_file_to_objects_async(cls, file_path: Path, model_directory: Path = None, **kwargs) -> AsyncIterable[
         OTLObject]:
         """Converts a file to a sequence of OTLObject objects."""
         importer = FileImporter.get_importer_from_extension(extension=file_path.suffix[1:])
