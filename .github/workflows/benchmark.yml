@@ -10,10 +10,10 @@ jobs:
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
-      - name: Install uv with Python version ${{ matrix.python-version }}
+      - name: Install uv with Python version 3.13
         uses: astral-sh/setup-uv@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.13
       - name: Installing dependencies with uv
         run: uv pip install -r pyproject.toml --extra benchmark
       - name: Run benchmarks
