@@ -190,7 +190,7 @@ class ExcelImporter(AbstractImporter):
     @classmethod
     def get_data_dict_from_file_path(cls, filepath) -> dict[str, list[list]]:
         data = {}
-        book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
+        book = openpyxl.load_workbook(filepath, data_only=True)
 
         for sheet in book.worksheets:
             sheet_name = sheet.title
@@ -219,7 +219,7 @@ class ExcelImporter(AbstractImporter):
     async def get_data_dict_from_file_path_async(cls, filepath) -> dict[str, list[list]]:
         data = {}
         await sleep(0)
-        book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
+        book = openpyxl.load_workbook(filepath, data_only=True)
 
         for sheet in book.worksheets:
             sheet_name = sheet.title
