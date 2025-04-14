@@ -9,7 +9,7 @@ from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.geojson'
 
@@ -39,7 +39,7 @@ async def test_load_test_unnested_attributes(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.geojson'
 
@@ -74,7 +74,7 @@ async def test_load_test_nested_attributes_level_1(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.geojson'
 
@@ -101,7 +101,7 @@ async def test_load_test_nested_attributes_level_2(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_invalid_typeURI():
     with pytest.raises(ValueError):
         await GeoJSONImporter.decode_objects_async({"type": "FeatureCollection", "features": [{
@@ -109,7 +109,7 @@ async def test_invalid_typeURI():
             "properties": {}}]})
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_non_conform(recwarn, subtests):
     file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attributes.geojson'
 
@@ -147,16 +147,12 @@ async def test_load_test_non_conform(recwarn, subtests):
 
 
 def test_construct_wkt_string_from_geojson_point():
-
-
     point = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "Point", "coordinates": [200000.1, 200000.2, 0]})
     assert point == 'POINT Z (200000.1 200000.2 0)'
 
 
 def test_construct_wkt_string_from_geojson_line():
-
-
     line = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "LineString", "coordinates": [[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.6, 0],
                                                [200000.7, 200000.8, 0]]})
@@ -164,8 +160,6 @@ def test_construct_wkt_string_from_geojson_line():
 
 
 def test_construct_wkt_string_from_geojson_polygon():
-
-
     polygon = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "Polygon", "coordinates": [[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
                                                 [200000.1, 200000.2, 0]]]})
@@ -173,8 +167,6 @@ def test_construct_wkt_string_from_geojson_polygon():
 
 
 def test_construct_wkt_string_from_geojson_multipolygon():
-
-
     multipolygon = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "MultiPolygon", "coordinates": [[[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
                                                 [200000.1, 200000.2, 0]]],

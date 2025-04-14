@@ -70,7 +70,7 @@ async def test_load_test_unnested_attributes_async(recwarn):
 
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_nested_attributes_1_level_async(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.json'
 
@@ -103,7 +103,7 @@ async def test_load_test_nested_attributes_1_level_async(recwarn):
     assert instance.testUnionTypeMetKard[1].unionKwantWrd.waarde == 20.0
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.json'
 
@@ -128,7 +128,7 @@ async def test_load_test_nested_attributes_2_levels(recwarn):
     assert instance.testComplexTypeMetKard[0].testComplexType2MetKard[0].testStringField is None
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_non_conform(recwarn, subtests):
     file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attributes.json'
 

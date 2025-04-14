@@ -10,7 +10,7 @@ from otlmow_converter.FileFormats.JsonExporter import JsonExporter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_export_and_then_import_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.json'
 
@@ -77,7 +77,7 @@ async def test_export_and_then_import_unnested_attributes(recwarn):
     os.unlink(file_location)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_export_and_then_import_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.json'
     instance = AllCasesTestClass()

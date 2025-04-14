@@ -13,7 +13,7 @@ base_dir = Path(__file__).parent
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_export_and_then_import_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.geojson'
 
@@ -96,7 +96,7 @@ async def test_export_and_then_import_unnested_attributes(recwarn):
     os.unlink(file_location)
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_unnested_attributes_generated.geojson'
 
@@ -182,7 +182,7 @@ async def test_export_and_then_read_unnested_attributes_using_dotnotaton_dicts(r
     os.unlink(file_location)
 
 
-@pytest.mark.asyncio(scope="module")
+@pytest.mark.asyncio(loop_scope="function")
 async def test_export_and_then_import_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'export_nested_attributes_1_generated.geojson'
 

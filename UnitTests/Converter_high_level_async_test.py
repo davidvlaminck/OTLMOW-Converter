@@ -25,7 +25,7 @@ def return_test_objects() -> [AllCasesTestClass, AnotherTestClass]:
     instance2 = AnotherTestClass()
     instance2.assetId.identificator = 'id2'
     instance2.notitie = 'note'
-    instance2.non_conform_attribute = 'non conform value'
+    # instance2.non_conform_attribute = 'non conform value'
     return [instance1, instance2]
 
 

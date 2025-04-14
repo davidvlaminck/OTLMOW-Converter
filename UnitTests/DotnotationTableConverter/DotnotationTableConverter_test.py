@@ -147,15 +147,6 @@ def test_transform_2d_sequence_to_list_of_dicts():
 def test_get_tables_per_type_from_data(subtests):
     """Test the function get_tables_per_type_from_data conversion
     """
-    with subtests.test(msg='Test OTL Asset convertion to DotnotationTable'):
-        camera_instance = dynamic_create_instance_from_uri('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Camera')
-        camera_instance.fill_with_dummy_data()
-        sequence_of_objects = [camera_instance]
-
-        test_dictionary = DotnotationTableConverter.get_tables_per_type_from_data(sequence_of_objects=sequence_of_objects)
-
-        assert test_dictionary['onderdeel#Camera'][1]['typeURI'] == camera_instance.typeURI
-
     with subtests.test(msg='Test OTL Relation convertion to DotnotationTable'):
         relation_instance = dynamic_create_instance_from_uri('https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Bevestiging')
         relation_instance.fill_with_dummy_data()

@@ -414,10 +414,7 @@ class DotnotationDictConverter:
                         value = [str(v) for v in value]
                     else:
                         value = str(value)
-                try:
-                    attribute.set_waarde(value)
-                except Exception as exc:
-                    print(exc)
+                attribute.set_waarde(value)
             return
 
         first, rest = dotnotation.split(separator, 1)
