@@ -8,6 +8,7 @@ from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
+from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -394,17 +395,18 @@ class DotnotationTableConverter:
         for row in data_rows:
             data_dict = {}
             for header, index in header_dict.items():
-
                 value = row[index]
                 if value is None:
                     continue
+                if header is None:
+                    raise MissingHeaderError(f'Header is None at column {index+1}')
                 if empty_string_equals_none and value == '':
                     continue
                 if value == 'true':
                     value = True
                 if value == 'false':
                     value = False
-                data_dict[header] = value
+                data_dict[str(header)] = value
             if not data_dict:
                 continue
             list_of_dicts.append(data_dict)
@@ -423,17 +425,18 @@ class DotnotationTableConverter:
         for row in data_rows:
             data_dict = {}
             for header, index in header_dict.items():
-
                 value = row[index]
                 if value is None:
                     continue
+                if header is None:
+                    raise MissingHeaderError(f'Header is None at column {index + 1}')
                 if empty_string_equals_none and value == '':
                     continue
                 if value == 'true':
                     value = True
                 if value == 'false':
                     value = False
-                data_dict[header] = value
+                data_dict[str(header)] = value
             if not data_dict:
                 continue
             list_of_dicts.append(data_dict)

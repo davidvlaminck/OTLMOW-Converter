@@ -9,6 +9,7 @@ from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import Invali
 from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
+from otlmow_converter.Exceptions.UnknownExcelError import UnknownExcelError
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -157,6 +158,24 @@ def test_bad_columns():
     assert isinstance(exception_1, MissingHeaderError)
     assert exception_1.file_path == file_location
     assert exception_1.tab == 'missing header'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_column_integer():
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_column_int.xlsx'
+
+    with pytest.raises(ExceptionsGroup) as ex:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                 allow_non_otl_conform_attributes=False)
+
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.exceptions) == 1
+
+    exception_1 = ex.exceptions[0]
+    assert isinstance(exception_1, UnknownExcelError)
+    assert exception_1.file_path == file_location
+    assert exception_1.tab == 'int_in_header'
 
 
 def test_check_headers():
