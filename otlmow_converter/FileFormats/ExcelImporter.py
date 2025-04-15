@@ -287,6 +287,7 @@ class ExcelImporter(AbstractImporter):
                 continue
             if header is None:
                 continue
+            header = str(header)
             if header.startswith('[DEPRECATED] '):
                 error.bad_columns.append(header)
                 continue
@@ -328,6 +329,7 @@ class ExcelImporter(AbstractImporter):
                 continue
             if header is None:
                 continue
+            header = str(header)
             if header.startswith('[DEPRECATED] '):
                 error.bad_columns.append(header)
                 continue
