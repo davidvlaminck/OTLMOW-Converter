@@ -98,12 +98,12 @@ class ExcelExporter(AbstractExporter):
 
     @classmethod
     def create_sheet_by_name(cls, wb: Workbook, class_name: str, table_data: List[dict],
-                                   abbreviate_excel_sheettitles: bool = False) -> bool:
+                                   abbreviate_excel_sheettitles: bool = False, separator: str = SEPARATOR) -> bool:
         if not table_data:
             return False
 
         data = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
-            list_of_dicts=table_data, empty_string_equals_none=True)
+            list_of_dicts=table_data, empty_string_equals_none=True, separator=separator)
 
         if abbreviate_excel_sheettitles:
             # abbreviates the class_name so it doesn't exceed the 31 character limit of sheet titles in excel
@@ -122,12 +122,12 @@ class ExcelExporter(AbstractExporter):
 
     @classmethod
     async def create_sheet_by_name_async(cls, wb: Workbook, class_name: str, table_data: List[dict],
-                                   abbreviate_excel_sheettitles: bool = False) -> bool:
+                                   abbreviate_excel_sheettitles: bool = False, separator: str = SEPARATOR) -> bool:
         if not table_data:
             return False
 
         data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence_async(
-            list_of_dicts=table_data, empty_string_equals_none=True)
+            list_of_dicts=table_data, empty_string_equals_none=True, separator=separator)
 
         if abbreviate_excel_sheettitles:
             # abbreviates the class_name so it doesn't exceed the 31 character limit of sheet titles in excel
