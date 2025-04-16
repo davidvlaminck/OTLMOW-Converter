@@ -277,9 +277,8 @@ class ExcelImporter(AbstractImporter):
                       allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
                       warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
-        error = InvalidColumnNamesInExcelTabError(
-            message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '
-                    f'bad_columns', file_path=filepath, tab=sheet)
+        bad_columns = []
+
         for header in headers:
             if header == 'typeURI':
                 continue
@@ -289,17 +288,17 @@ class ExcelImporter(AbstractImporter):
                 continue
             header = str(header)
             if header.startswith('[DEPRECATED] '):
-                error.bad_columns.append(header)
+                bad_columns.append(header)
                 continue
             try:
                 DotnotationHelper.get_attribute_by_dotnotation(
                     instance_or_attribute=instance, dotnotation=header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
             except DotnotationListOfListError:
-                error.bad_columns.append(header)
+                bad_columns.append(header)
             except AttributeError:
                 if not allow_non_otl_conform_attributes:
-                    error.bad_columns.append(header)
+                    bad_columns.append(header)
                 elif warn_for_non_otl_conform_attributes:
                     warnings.warn(
                         message=f'{header} is a non standardized attribute of {type_uri}. '
@@ -307,8 +306,10 @@ class ExcelImporter(AbstractImporter):
                         stacklevel=2,
                         category=NonStandardAttributeWarning)
 
-        if len(error.bad_columns) > 0:
-            raise error
+        if len(bad_columns) > 0:
+            raise InvalidColumnNamesInExcelTabError(
+                message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
+                ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)
 
     @staticmethod
     async def check_headers_async(headers: list[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
@@ -317,6 +318,7 @@ class ExcelImporter(AbstractImporter):
                       allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
                       warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
         await sleep(0)
+        bad_columns = []
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
         error = InvalidColumnNamesInExcelTabError(
             message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '
@@ -338,10 +340,10 @@ class ExcelImporter(AbstractImporter):
                     instance_or_attribute=instance, dotnotation=header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
             except DotnotationListOfListError:
-                error.bad_columns.append(header)
+                bad_columns.append(header)
             except AttributeError:
                 if not allow_non_otl_conform_attributes:
-                    error.bad_columns.append(header)
+                    bad_columns.append(header)
                 elif warn_for_non_otl_conform_attributes:
                     warnings.warn(
                         message=f'{header} is a non standardized attribute of {type_uri}. '
@@ -349,5 +351,7 @@ class ExcelImporter(AbstractImporter):
                         stacklevel=2,
                         category=NonStandardAttributeWarning)
 
-        if len(error.bad_columns) > 0:
-            raise error
+        if len(bad_columns) > 0:
+            raise InvalidColumnNamesInExcelTabError(
+                message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
+                ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)

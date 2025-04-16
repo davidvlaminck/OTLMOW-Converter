@@ -30,7 +30,7 @@ class GeoJSONExporter(AbstractExporter):
         list_of_objects = []
         for d in sequence_of_dotnotation_dicts:
             feature_dict = {
-                'id': d['assetId.identificator'],
+                'id': d['assetId.identificator'] if d['typeURI'] != 'http://purl.org/dc/terms/Agent' else d['agentId.identificator'],
                 'properties': d,
                 'type': 'Feature'}
 
