@@ -29,9 +29,27 @@ class DotnotationTableConverter:
         if headers is None or not headers:
             return []
         headers.pop('typeURI')
-        headers.pop('assetId.identificator')
-        headers.pop('assetId.toegekendDoor')
-        sorted_list = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
+        has_agent_headers = False
+        has_asset_headers = False
+        if 'assetId.identificator' in headers:
+            headers.pop('assetId.identificator')
+            has_asset_headers = True
+        if 'assetId.toegekendDoor' in headers:
+            headers.pop('assetId.toegekendDoor')
+            has_asset_headers = True
+        if 'agentId.identificator' in headers:
+            headers.pop('agentId.identificator')
+            has_agent_headers = True
+        if 'agentId.toegekendDoor' in headers:
+            headers.pop('agentId.toegekendDoor')
+            has_agent_headers = True
+        if has_asset_headers and has_agent_headers:
+            sorted_list = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'agentId.identificator',
+            'agentId.toegekendDoor']
+        elif has_agent_headers:
+            sorted_list = ['typeURI', 'agentId.identificator', 'agentId.toegekendDoor']
+        else:
+            sorted_list = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
 
         sorted_rest = sorted(headers)
         sorted_list.extend(sorted_rest)
@@ -61,9 +79,12 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not allow_empty_asset_id and (otl_object.assetId.identificator is None
-                                             or otl_object.assetId.identificator == ''):
-                raise ValueError(f'{otl_object} does not have a valid assetId.')
+            if not allow_empty_asset_id:
+                if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
+                    if otl_object.agentId.identificator is None or otl_object.agentId.identificator == '':
+                        raise ValueError(f'{otl_object} does not have a valid agentId.')
+                elif otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
+                    raise ValueError(f'{otl_object} does not have a valid assetId.')
 
             data_dict = DotnotationDictConverter.to_dict(
                 otl_object, separator=separator, cardinality_separator=cardinality_separator,
@@ -106,9 +127,12 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not allow_empty_asset_id and (otl_object.assetId.identificator is None
-                                             or otl_object.assetId.identificator == ''):
-                raise ValueError(f'{otl_object} does not have a valid assetId.')
+            if not allow_empty_asset_id:
+                if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
+                    if otl_object.agentId.identificator is None or otl_object.agentId.identificator == '':
+                        raise ValueError(f'{otl_object} does not have a valid agentId.')
+                elif otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
+                    raise ValueError(f'{otl_object} does not have a valid assetId.')
 
             await sleep(0)
             data_dict = await DotnotationDictConverter.to_dict_async(
@@ -142,6 +166,7 @@ class DotnotationTableConverter:
                                             ) -> dict[str, list[dict]]:
         """Returns a dictionary with typeURIs as keys and a list of dicts as values, where each dict is a row, and the
         first row is the header"""
+
         identificator_key = 'assetId.identificator'.replace('.', separator)
         toegekend_door_key = 'assetId.toegekendDoor'.replace('.', separator)
 
@@ -153,9 +178,12 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not allow_empty_asset_id and (otl_object.assetId.identificator is None or
-                                             otl_object.assetId.identificator == ''):
-                raise ValueError(f'{otl_object} does not have a valid assetId.')
+            if not allow_empty_asset_id:
+                if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
+                    if otl_object.agentId.identificator is None or otl_object.agentId.identificator == '':
+                        raise ValueError(f'{otl_object} does not have a valid agentId.')
+                elif otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
+                    raise ValueError(f'{otl_object} does not have a valid assetId.')
 
             if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
                 short_uri = 'Agent'
@@ -163,7 +191,11 @@ class DotnotationTableConverter:
                 short_uri = get_shortened_uri(otl_object.typeURI)
 
             if short_uri not in master_dict:
-                master_dict[short_uri] = [{'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}]
+                if short_uri == 'Agent':
+                    master_dict[short_uri] = [{'typeURI': 0, 'agentId.identificator'.replace('.', separator): 1,
+                                               'agentId.toegekendDoor'.replace('.', separator): 2}]
+                else:
+                    master_dict[short_uri] = [{'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}]
             header_dict = master_dict[short_uri][0]
             header_count = len(header_dict)
 
@@ -211,9 +243,12 @@ class DotnotationTableConverter:
                                              f'Ignoring this object'))
                 continue
 
-            if not allow_empty_asset_id and (otl_object.assetId.identificator is None or
-                                             otl_object.assetId.identificator == ''):
-                raise ValueError(f'{otl_object} does not have a valid assetId.')
+            if not allow_empty_asset_id:
+                if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
+                    if otl_object.agentId.identificator is None or otl_object.agentId.identificator == '':
+                        raise ValueError(f'{otl_object} does not have a valid agentId.')
+                elif otl_object.assetId.identificator is None or otl_object.assetId.identificator == '':
+                    raise ValueError(f'{otl_object} does not have a valid assetId.')
 
             if otl_object.typeURI == 'http://purl.org/dc/terms/Agent':
                 short_uri = 'Agent'
@@ -221,7 +256,11 @@ class DotnotationTableConverter:
                 short_uri = get_shortened_uri(otl_object.typeURI)
 
             if short_uri not in master_dict:
-                master_dict[short_uri] = [{'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}]
+                if short_uri == 'Agent':
+                    master_dict[short_uri] = [{'typeURI': 0, 'agentId.identificator'.replace('.', separator): 1,
+                                               'agentId.toegekendDoor'.replace('.', separator): 2}]
+                else:
+                    master_dict[short_uri] = [{'typeURI': 0, identificator_key: 1, toegekend_door_key: 2}]
             header_dict = master_dict[short_uri][0]
             header_count = len(header_dict)
 
@@ -448,3 +487,4 @@ class DotnotationTableConverter:
     def _get_item_from_dict(cls, input_dict: dict, item: str, empty_string_equals_none: bool) -> object:
         value = input_dict.get(item)
         return '' if empty_string_equals_none and value is None else value
+
