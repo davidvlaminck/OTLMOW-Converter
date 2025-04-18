@@ -1,5 +1,6 @@
 import ast
 import csv
+import re
 from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
@@ -71,7 +72,11 @@ class CsvImporter(AbstractImporter):
                     r = []
                     for d in row:
                         try:
-                            r.append(ast.literal_eval(d))
+                            # check if d is a string and is a scientific notation  using regex
+                            if isinstance(d, str) and re.match(r'^[+-]?\d+(\.\d+)?[eE][+-]?\d+$', d):
+                                r.append(str(d))
+                            else:
+                                r.append(ast.literal_eval(d))
                         except (SyntaxError, ValueError):
                             r.append(str(d))
                     data.append(r)
