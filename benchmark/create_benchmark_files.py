@@ -2,12 +2,13 @@ import itertools
 import os
 import random
 import time
-from os.path import isfile
 from pathlib import Path
 
 import pytest
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_ns_and_name
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.Helpers.generated_lists import get_hardcoded_class_dict, get_hardcoded_relation_dict
 
+from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -15,47 +16,41 @@ base_dir = os.path.dirname(os.path.realpath(__file__))
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def instantiate_all():
-    classes_to_instantiate = {}
     start = time.time()
 
-    class_location = Path('../venv2/lib/python3.11/site-packages/otlmow_model/OtlmowModel/Classes/')
-    installatie_location = class_location / 'Installatie'
-    onderdeel_location = class_location / 'Onderdeel'
-    levenscyclus_location = class_location / 'Levenscyclus'
-    proefenmeting_location = class_location / 'ProefEnMeting'
-
-    for dir_location in [installatie_location, onderdeel_location, levenscyclus_location, proefenmeting_location]:
-        for f in os.listdir(dir_location):
-            if not isfile(dir_location / f):
-                continue
-            class_name = f[:-3]
-            classes_to_instantiate[class_name] = (dir_location.stem, class_name)
-
-    classes_to_instantiate['ActivityComplex'] = ('ImplementatieElement', 'ActivityComplex')
-    classes_to_instantiate['ElectricityAppurtenance'] = ('ImplementatieElement', 'ElectricityAppurtenance')
-    classes_to_instantiate['Derdenobject'] = ('ImplementatieElement', 'Derdenobject')
-    classes_to_instantiate['ElectricityCable'] = ('ImplementatieElement', 'ElectricityCable')
-    classes_to_instantiate['Pipe'] = ('ImplementatieElement', 'Pipe')
-    classes_to_instantiate['TelecommunicationsAppurtenance'] = ('ImplementatieElement', 'TelecommunicationsAppurtenance')
-    classes_to_instantiate['TelecommunicationsCable'] = ('ImplementatieElement', 'TelecommunicationsCable')
+    class_dict = get_hardcoded_class_dict()
 
     all_instances_list = []
-    for class_name, class_tuple in classes_to_instantiate.items():
-        if class_name == 'HeeftBetrokkene':
+    for class_uri, class_info in class_dict.items():
+        if class_uri == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#HeeftBetrokkene':
             continue
-        instance = create_dummy_instance(class_tuple[0], class_tuple[1])
+        if class_uri.startswith('https://lgc.'):
+            continue
+        if class_info['abstract']:
+            continue
+        instance = dynamic_create_instance_from_uri(class_uri)
+        instance.fill_with_dummy_data()
+        DotnotationHelper.clear_list_of_list_attributes(instance)
         all_instances_list.append(instance)
 
-    random_10_class_names = []
-    while len(random_10_class_names) < 10:
-        class_tuple = random.choice(list(classes_to_instantiate.values()))
-        if class_tuple[1] == 'HeeftBetrokkene':
+    classes_to_instantiate = []
+    while len(classes_to_instantiate) < 10:
+        class_uri = random.choice(list(class_dict.keys()))
+        if class_uri in get_hardcoded_relation_dict():
             continue
-        random_10_class_names.append(class_tuple)
+        if class_uri.startswith('https://lgc.'):
+            continue
+        class_info = class_dict[class_uri]
+        if class_info['abstract']:
+            continue
+
+        classes_to_instantiate.append(class_uri)
 
     random_10_class = []
-    for class_tuple, _ in itertools.product(random_10_class_names, range(1000)):
-        instance = create_dummy_instance(class_tuple[0], class_tuple[1])
+    for class_uri, _ in itertools.product(classes_to_instantiate, range(1000)):
+        instance = dynamic_create_instance_from_uri(class_uri)
+        instance.fill_with_dummy_data()
+        DotnotationHelper.clear_list_of_list_attributes(instance)
         random_10_class.append(instance)
 
     OtlmowConverter.from_objects_to_file(sequence_of_objects=all_instances_list,
@@ -82,12 +77,6 @@ def instantiate_all():
 
     end = time.time()
     print(f'Time: {round(end - start, 2)}')
-
-
-def create_dummy_instance(namespace: str, class_name: str):
-    instance = dynamic_create_instance_from_ns_and_name(namespace, class_name)
-    instance.fill_with_dummy_data()
-    return instance
 
 
 if __name__ == '__main__':

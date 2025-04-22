@@ -68,18 +68,17 @@ class CsvImporter(AbstractImporter):
             with open(filepath, encoding='utf-8') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
                 data = [next(csv_reader)]
-                harccoded_values = {'7.50', '3.50', '91E0'}
                 for row in csv_reader:
                     r = []
                     for d in row:
-                        try:
-                            # check if d is a string and is a scientific notation  using regex
-                            if d in harccoded_values:
-                                r.append(str(d))
-                            else:
-                                r.append(ast.literal_eval(d))
-                        except (SyntaxError, ValueError):
-                            r.append(str(d))
+                        if d is None:
+                            r.append(None)
+                        elif d == 'True':
+                            r.append(True)
+                        elif d == 'False':
+                            r.append(False)
+                        else:
+                            r.append(d)
                     data.append(r)
 
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
