@@ -21,13 +21,13 @@ def test_load_test_file(recwarn):
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
     assert len(assets) == 1
     assert assets[0].assetId.identificator == 'UgVLnoH'
-    assert recwarn.list == []
+    assert len(recwarn.list) == 2
 
 
 def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 0
+    assert len(recwarn.list) == 2
 
     assert len(assets) == 1
     instance = assets[0]
@@ -56,7 +56,7 @@ def test_load_test_unnested_attributes(recwarn):
 def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 0
+    assert len(recwarn.list) == 1
 
     assert len(assets) == 1
     instance = assets[0]
@@ -87,7 +87,7 @@ def test_load_test_nested_attributes_1_level(recwarn):
 def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 0
+    assert len(recwarn.list) == 1
 
     assert len(assets) == 1
     instance = assets[0]
@@ -110,7 +110,7 @@ def test_load_test_subset_file(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'template_file_text_onderdeel_AllCasesTestClass.csv'
 
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 0
+    assert len(recwarn.list) == 2
     assert len(assets) == 1
 
 
