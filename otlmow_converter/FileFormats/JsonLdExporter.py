@@ -39,13 +39,14 @@ class JsonLdExporter(AbstractExporter):
                                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             d['@type'] = asset.typeURI
             d['https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI'] = asset.typeURI
-            if asset.assetId.identificator is None:
+            id = asset.assetId.identificator if asset.typeURI != 'http://purl.org/dc/terms/Agent' else asset.agentId.identificator
+            if id is None:
                 raise ValueError(f'No identificator found for asset: {d}')
             else:
                 if is_relation(asset, model_directory):
-                    d['@id'] = 'https://data.awvvlaanderen.be/id/assetrelatie/' + asset.assetId.identificator
+                    d['@id'] = 'https://data.awvvlaanderen.be/id/assetrelatie/' + id
                 else:
-                    d['@id'] = 'https://data.awvvlaanderen.be/id/asset/' + asset.assetId.identificator
+                    d['@id'] = 'https://data.awvvlaanderen.be/id/asset/' + id
             list_of_objects.append(d)
 
         graph_dict = {'@graph': (list_of_objects if isinstance(list_of_objects, list) else [list_of_objects])}
