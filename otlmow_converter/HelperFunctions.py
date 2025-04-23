@@ -4,8 +4,10 @@ from pathlib import Path
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
+from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.CannotCombineAssetsError import CannotCombineAssetsError
-from otlmow_converter.Exceptions.CannotCombineDifferentAssetsError import CannotCombineDifferentAssetsError
+from otlmow_converter.Exceptions.CannotCombineDifferentAssetsError import CannotCombineDifferentAssetsError, \
+    CannotCombineAssetsWithDifferentIdError, CannotCombineAssetsWithDifferentTypeError
 from otlmow_converter.Exceptions.NoIdentificatorError import NoIdentificatorError
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
@@ -32,6 +34,7 @@ def combine_files(list_of_files: list[Path], model_directory: Path = None) -> li
             assets_dict[id].append((file_path, asset))
 
     combined_assets = []
+    list_of_errors = []
     for object_id, asset_tuple_list in assets_dict.items():
         if len(asset_tuple_list) == 1:
             combined_assets.append(asset_tuple_list[1])
@@ -42,7 +45,7 @@ def combine_files(list_of_files: list[Path], model_directory: Path = None) -> li
             for asset in asset_tuple_list[2:]:
                 combined_asset = combine_two_asset_instances(combined_asset, asset[1], model_directory)
             combined_assets.append(combined_asset)
-        except ValueError as ex:
+        except CannotCombineAssetsError as ex:
             ex.files = [file for file, _ in asset_tuple_list]
             short_uri = asset_tuple_list[0][1].typeURI.split('/')[-1]
             error_str = '\n'.join([f'{t[0]}: {t[1][0]} != {t[1][1]}' for t in ex.attribute_errors])
@@ -50,7 +53,21 @@ def combine_files(list_of_files: list[Path], model_directory: Path = None) -> li
                        f'that occur in files: {", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])}\n'
                        f'due to conflicting values in attribute(s):\n{error_str}')
             ex.type_uri = asset_tuple_list[0][1].typeURI
-            raise ex
+            list_of_errors.append(ex)
+        except CannotCombineAssetsWithDifferentTypeError as ex:
+            ex.files = [file for file, _ in asset_tuple_list]
+            short_uri = asset_tuple_list[0][1].typeURI.split('/')[-1]
+            short_uri_2 = asset_tuple_list[1][1].typeURI.split('/')[-1]
+            ex.message = (f'Cannot combine the assets with id: "{object_id}"\n'
+                       f'that occur in files: {", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])}\n'
+                       f'due to conflicting types: {short_uri} != {short_uri_2}')
+            list_of_errors.append(ex)
+
+    if list_of_errors:
+        raise ExceptionsGroup(
+            message='There were errors while combining the assets',
+            exceptions=list_of_errors
+        )
 
     return combined_assets
 
@@ -87,10 +104,15 @@ def combine_two_asset_instances(asset1: OTLObject, asset2: OTLObject, model_dire
         raise NoIdentificatorError('One of the assets has no assetId.identificator')
 
     if id1 != id2:
-        raise CannotCombineDifferentAssetsError('The assets have different identificator values')
+        ex = CannotCombineAssetsWithDifferentIdError('The assets have different identificator values')
+        ex.attribute_errors = [('identificator', (id1, id2))]
+        raise ex
 
     if asset1.typeURI != asset2.typeURI:
-        raise CannotCombineDifferentAssetsError('The assets have different types')
+        ex = CannotCombineAssetsWithDifferentTypeError('The assets have different types')
+        ex.attribute_errors = [('typeURI', (asset1.typeURI, asset2.typeURI))]
+        ex.object_id = id1
+        raise ex
 
     ddict1 = DotnotationDictConverter.to_dict(asset1)
     ddict2 = DotnotationDictConverter.to_dict(asset2)
