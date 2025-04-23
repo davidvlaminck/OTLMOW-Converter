@@ -7,23 +7,52 @@ from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.CannotCombineAssetsError import CannotCombineAssetsError
 from otlmow_converter.Exceptions.CannotCombineDifferentAssetsError import CannotCombineDifferentAssetsError
 from otlmow_converter.Exceptions.NoIdentificatorError import NoIdentificatorError
+from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
 def wrap_in_quotes(text: str) -> str:
     if not isinstance(text, str):
         raise TypeError
-    if text == '':
+    if not text:
         return "''"
-    singles = sum(1 for c in text if c == "'")
-    doubles = sum(1 for c in text if c == '"')
+    singles = text.count("'")
+    doubles = text.count('"')
     if singles > doubles:
-        if doubles > 0:
-            return '"' + text.replace('"', '\\"') + '"'
-        return '"' + text + '"'
-    else:
-        if singles > 0:
-            return "'" + text.replace("'", "\\'") + "'"
-        return "'" + text + "'"
+        return '"' + text.replace('"', '\\"') + '"' if doubles > 0 else f'"{text}"'
+    return "'" + text.replace("'", "\\'") + "'" if singles > 0 else f"'{text}'"
+
+
+def combine_files(list_of_files: list[Path], model_directory: Path = None) -> list[OTLObject]:
+    assets_dict = defaultdict(list)
+    for file_path in list_of_files:
+        file_assets = OtlmowConverter.from_file_to_objects(file_path, model_directory=model_directory)
+        for asset in file_assets:
+            id = asset.assetId.identificator if asset.typeURI != 'http://purl.org/dc/terms/Agent' \
+                else asset.agentId.identificator
+            assets_dict[id].append((file_path, asset))
+
+    combined_assets = []
+    for object_id, asset_tuple_list in assets_dict.items():
+        if len(asset_tuple_list) == 1:
+            combined_assets.append(asset_tuple_list[1])
+            continue
+        try:
+            combined_asset = combine_two_asset_instances(asset_tuple_list[0][1], asset_tuple_list[1][1],
+                                                         model_directory)
+            for asset in asset_tuple_list[2:]:
+                combined_asset = combine_two_asset_instances(combined_asset, asset[1], model_directory)
+            combined_assets.append(combined_asset)
+        except ValueError as ex:
+            ex.files = [file for file, _ in asset_tuple_list]
+            short_uri = asset_tuple_list[0][1].typeURI.split('/')[-1]
+            error_str = '\n'.join([f'{t[0]}: {t[1][0]} != {t[1][1]}' for t in ex.attribute_errors])
+            ex.message = (f'Cannot combine the assets with id: "{object_id}" with type "{short_uri}"\n'
+                       f'that occur in files: {", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])}\n'
+                       f'due to conflicting values in attribute(s):\n{error_str}')
+            ex.type_uri = asset_tuple_list[0][1].typeURI
+            raise ex
+
+    return combined_assets
 
 
 def combine_assets(asset_list: list[OTLObject], model_directory: Path = None) -> list[OTLObject]:
@@ -84,9 +113,12 @@ def combine_two_asset_instances(asset1: OTLObject, asset2: OTLObject, model_dire
 
     if attribute_errors:
         error_str = '\n'.join([f'{key}: {ddict1[key]}, {value}' for key, _, value in sorted(attribute_errors)])
-        raise CannotCombineAssetsError(
+        ex = CannotCombineAssetsError(
             message=f'Cannot combine the assets with id {id1} because some attributes '
                     'have conflicting values:\n'
                     f'{error_str}')
+        ex.object_id = id1
+        ex.attribute_errors = [(key, (ddict1[key], value)) for key, _, value in attribute_errors]
+        raise ex
 
     return DotnotationDictConverter.from_dict(ddict1, model_directory=model_directory)

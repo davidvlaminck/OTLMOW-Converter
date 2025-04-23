@@ -8,7 +8,7 @@ from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import A
 from otlmow_converter.Exceptions.CannotCombineAssetsError import CannotCombineAssetsError
 from otlmow_converter.Exceptions.CannotCombineDifferentAssetsError import CannotCombineDifferentAssetsError
 from otlmow_converter.Exceptions.NoIdentificatorError import NoIdentificatorError
-from otlmow_converter.HelperFunctions import combine_assets, combine_two_asset_instances
+from otlmow_converter.HelperFunctions import combine_assets, combine_two_asset_instances, combine_files
 
 
 @pytest.fixture
@@ -106,6 +106,33 @@ def empty():
 
 
 test_model_directory = Path(__file__).parent / 'TestModel'
+combine_directory = Path(__file__).parent / 'Combine'
+
+
+def test_combine_files_three_files_failing(subtests):
+    csv_path = combine_directory / 'asset_1.csv'
+    json_path = combine_directory / 'asset_1.json'
+    xlsx_path = combine_directory / 'asset_1.xlsx'
+
+    with pytest.raises(CannotCombineAssetsError) as exc:
+        combine_files([csv_path, json_path, xlsx_path], model_directory=test_model_directory)
+
+    with subtests.test('Check exception message'):
+        assert exc.value.message == ('Cannot combine the assets with id: "1" with type "onderdeel#AllCasesTestClass"\n'
+                                     'that occur in files: "asset_1.csv", "asset_1.json", "asset_1.xlsx"\n'
+                                     'due to conflicting values in attribute(s):\n'
+                                     'testBooleanField: False != True\n'
+                                     'testStringField: naam != naam_2')
+    with subtests.test('Check exception attributes: id and type_uri'):
+        assert exc.value.object_id == '1'
+        assert exc.value.type_uri == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+
+    with subtests.test('Check exception attributes: attribute error list'):
+        assert exc.value.attribute_errors == [('testBooleanField', (False, True)),
+                                              ('testStringField', ('naam', 'naam_2'))]
+
+    with subtests.test('Check exception attributes: file list'):
+        assert exc.value.files == [csv_path, json_path, xlsx_path]
 
 
 def test_combine_assets_multiple_instances(minimum, minimum_2, one_attribute, one_complex_attribute):
@@ -122,7 +149,6 @@ def test_combine_assets_two_instances(minimum, one_attribute):
     assert len(results) == 1
     assert results[0].assetId.identificator == '1'
     assert results[0].toestand == 'in-gebruik'
-
 
 
 def test_combine_assets_two_instances_agent(agent_one_attribute, agent_one_attribute_different):
