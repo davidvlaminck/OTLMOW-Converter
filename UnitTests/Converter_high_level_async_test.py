@@ -203,23 +203,27 @@ async def test_dataframe_to_file():
 
     geojson_file_path = Path(__file__).parent / 'test_dataframe_to_file.geojson'
 
-    await to_file_async(subject=df, file_path=excel_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=df, file_path=excel_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (excel_file_path,)
     from_excel_objects = await OtlmowConverter.from_file_to_objects_async(excel_file_path,
                                                                           model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_excel_objects)
 
-    await to_file_async(subject=df, file_path=json_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=df, file_path=json_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (json_file_path,)
     from_json_objects = await OtlmowConverter.from_file_to_objects_async(json_file_path,
                                                                     model_directory=model_directory_path)
     assert orig_list_of_objects == from_json_objects
 
-    await to_file_async(subject=df, file_path=csv_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=df, file_path=csv_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (csv_file_path_2, csv_file_path_3)
     from_csv_objects_2 = await OtlmowConverter.from_file_to_objects_async(csv_file_path_2, model_directory=model_directory_path)
     from_csv_objects_3 = await OtlmowConverter.from_file_to_objects_async(csv_file_path_3, model_directory=model_directory_path)
     combined_list = list(from_csv_objects_2) + list(from_csv_objects_3)
     assert orig_list_of_objects == combined_list
 
-    await to_file_async(subject=df, file_path=geojson_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=df, file_path=geojson_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (geojson_file_path,)
     from_geojson_objects = await OtlmowConverter.from_file_to_objects_async(
         geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
@@ -242,23 +246,27 @@ async def test_dotnotation_dicts_to_file():
     csv_file_path_3 = Path(__file__).parent / 'test_dotnotation_dicts_to_file_onderdeel_AnotherTestClass.csv'
     geojson_file_path = Path(__file__).parent / 'test_dotnotation_dicts_to_file.geojson'
 
-    await to_file_async(subject=orig_list_of_ddicts, file_path=excel_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_ddicts, file_path=excel_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (excel_file_path,)
     from_excel_objects = await OtlmowConverter.from_file_to_objects_async(excel_file_path,
                                                                      model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_excel_objects)
 
-    await to_file_async(subject=orig_list_of_ddicts, file_path=json_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_ddicts, file_path=json_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (json_file_path,)
     from_json_objects = await OtlmowConverter.from_file_to_objects_async(json_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_json_objects)
 
-    await to_file_async(subject=orig_list_of_ddicts, file_path=csv_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_ddicts, file_path=csv_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (csv_file_path_2, csv_file_path_3)
     from_csv_objects_2 = await OtlmowConverter.from_file_to_objects_async(csv_file_path_2, model_directory=model_directory_path)
     from_csv_objects_3 = await OtlmowConverter.from_file_to_objects_async(csv_file_path_3, model_directory=model_directory_path)
     combined_list = list(from_csv_objects_2) + list(from_csv_objects_3)
     assert orig_list_of_objects == combined_list
 
-    await to_file_async(subject=orig_list_of_ddicts, file_path=geojson_file_path,
+    created_file_paths = await to_file_async(subject=orig_list_of_ddicts, file_path=geojson_file_path,
                             model_directory=model_directory_path)
+    assert created_file_paths == (geojson_file_path,)
     from_geojson_objects = await OtlmowConverter.from_file_to_objects_async(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
@@ -288,8 +296,9 @@ async def test_file_to_file():
     await OtlmowConverter.from_objects_to_file_async(
         sequence_of_objects=orig_list_of_objects, file_path=excel_file_path,model_directory=model_directory_path)
 
-    await to_file_async(subject=excel_file_path, file_path=created_excel_file_path,
+    created_file_paths = await to_file_async(subject=excel_file_path, file_path=created_excel_file_path,
                         model_directory=model_directory_path)
+    assert created_file_paths == (created_excel_file_path,)
     imported_excel_file = await OtlmowConverter.from_file_to_objects_async(
         excel_file_path, model_directory=model_directory_path)
     imported_created_excel_file = await OtlmowConverter.from_file_to_objects_async(
@@ -298,7 +307,8 @@ async def test_file_to_file():
 
     await OtlmowConverter.from_objects_to_file_async(sequence_of_objects=orig_list_of_objects, file_path=json_file_path,
                                             model_directory=model_directory_path)
-    await to_file_async(subject=json_file_path, file_path=created_json_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=json_file_path, file_path=created_json_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (created_json_file_path,)
     imported_json_file = await OtlmowConverter.from_file_to_objects_async(json_file_path, model_directory=model_directory_path)
     imported_created_json_file = await OtlmowConverter.from_file_to_objects_async(created_json_file_path,
                                                                       model_directory=model_directory_path)
@@ -306,8 +316,10 @@ async def test_file_to_file():
 
     await OtlmowConverter.from_objects_to_file_async(sequence_of_objects=orig_list_of_objects, file_path=csv_file_path,
                                          model_directory=model_directory_path)
-    await to_file_async(subject=csv_file_path_2, file_path=created_csv_file_path, model_directory=model_directory_path)
-    await to_file_async(subject=csv_file_path_3, file_path=created_csv_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=csv_file_path_2, file_path=created_csv_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (created_csv_file_path_2,)
+    created_file_paths = await to_file_async(subject=csv_file_path_3, file_path=created_csv_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (created_csv_file_path_3,)
     imported_csv_file_2 = await OtlmowConverter.from_file_to_objects_async(
         csv_file_path_2, model_directory=model_directory_path)
     imported_csv_file_3 = await OtlmowConverter.from_file_to_objects_async(csv_file_path_3, model_directory=model_directory_path)
@@ -319,7 +331,8 @@ async def test_file_to_file():
 
     await OtlmowConverter.from_objects_to_file_async(sequence_of_objects=orig_list_of_objects, file_path=geojson_file_path,
                                          model_directory=model_directory_path)
-    await to_file_async(subject=geojson_file_path, file_path=created_geojson_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=geojson_file_path, file_path=created_geojson_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (created_geojson_file_path,)
     imported_geojson_file = await OtlmowConverter.from_file_to_objects_async(geojson_file_path,
                                                                         model_directory=model_directory_path)
     imported_created_geojson_file = await OtlmowConverter.from_file_to_objects_async(created_geojson_file_path,
@@ -348,17 +361,20 @@ async def test_objects_to_file():
     csv_file_path_3 = Path(__file__).parent / 'test_objects_to_file_onderdeel_AnotherTestClass.csv'
     geojson_file_path = Path(__file__).parent / 'test_objects_to_file.geojson'
 
-    await to_file_async(subject=orig_list_of_objects, file_path=json_file_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_objects, file_path=json_file_path)
+    assert created_file_paths == (json_file_path,)
     from_json_objects = await OtlmowConverter.from_file_to_objects_async(
         json_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == from_json_objects
 
-    await to_file_async(subject=orig_list_of_objects, file_path=excel_file_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_objects, file_path=excel_file_path)
+    assert created_file_paths == (excel_file_path,)
     from_excel_objects = await OtlmowConverter.from_file_to_objects_async(
         excel_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == from_excel_objects
 
-    await to_file_async(subject=orig_list_of_objects, file_path=csv_file_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_objects, file_path=csv_file_path)
+    assert created_file_paths == (csv_file_path_2, csv_file_path_3)
     from_csv_objects_2 = await OtlmowConverter.from_file_to_objects_async(
         csv_file_path_2, model_directory=model_directory_path)
     from_csv_objects_3 = await OtlmowConverter.from_file_to_objects_async(
@@ -366,7 +382,8 @@ async def test_objects_to_file():
     combined_list = from_csv_objects_2 + from_csv_objects_3
     assert orig_list_of_objects == combined_list
 
-    await to_file_async(subject=orig_list_of_objects, file_path=geojson_file_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_objects, file_path=geojson_file_path)
+    assert created_file_paths == (geojson_file_path,)
     from_geojson_objects = await OtlmowConverter.from_file_to_objects_async(
         geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == from_geojson_objects
@@ -389,22 +406,26 @@ async def test_dicts_to_file():
     csv_file_path_3 = Path(__file__).parent / 'test_dicts_to_file_onderdeel_AnotherTestClass.csv'
     geojson_file_path = Path(__file__).parent / 'test_dicts_to_file.geojson'
 
-    await to_file_async(subject=orig_list_of_dicts, file_path=json_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_dicts, file_path=json_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (json_file_path,)
     from_json_objects = await OtlmowConverter.from_file_to_objects_async(json_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_json_objects)
 
-    await to_file_async(subject=orig_list_of_dicts, file_path=excel_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_dicts, file_path=excel_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (excel_file_path,)
     from_excel_objects = await OtlmowConverter.from_file_to_objects_async(excel_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_excel_objects)
 
-    await to_file_async(subject=orig_list_of_dicts, file_path=csv_file_path, model_directory=model_directory_path)
+    created_file_paths = await to_file_async(subject=orig_list_of_dicts, file_path=csv_file_path, model_directory=model_directory_path)
+    assert created_file_paths == (csv_file_path_2, csv_file_path_3)
     from_csv_objects_2 = await OtlmowConverter.from_file_to_objects_async(csv_file_path_2, model_directory=model_directory_path)
     from_csv_objects_3 = await OtlmowConverter.from_file_to_objects_async(csv_file_path_3, model_directory=model_directory_path)
     combined_list = list(from_csv_objects_2) + list(from_csv_objects_3)
     assert orig_list_of_objects == combined_list
 
-    await to_file_async(subject=orig_list_of_dicts, file_path=geojson_file_path,
+    created_file_paths = await to_file_async(subject=orig_list_of_dicts, file_path=geojson_file_path,
                             model_directory=model_directory_path)
+    assert created_file_paths == (geojson_file_path,)
     from_geojson_objects = await OtlmowConverter.from_file_to_objects_async(geojson_file_path, model_directory=model_directory_path)
     assert orig_list_of_objects == list(from_geojson_objects)
 
