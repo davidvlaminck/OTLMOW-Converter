@@ -165,25 +165,26 @@ def test_combine_files_three_files_failing(subtests):
     json_path = combine_directory / 'asset_1.json'
     xlsx_path = combine_directory / 'asset_1.xlsx'
 
-    with pytest.raises(ExceptionsGroup) as exc:
+    with pytest.raises(ExceptionsGroup) as exc_group:
         combine_files([csv_path, json_path, xlsx_path], model_directory=test_model_directory)
 
+    exc = exc_group.value.exceptions[0]
     with subtests.test('Check exception message'):
-        assert exc.value.message == ('Cannot combine the assets with id: "1" with type "onderdeel#AllCasesTestClass"\n'
+        assert exc.message == ('Cannot combine the assets with id: "1" with type "onderdeel#AllCasesTestClass"\n'
                                      'that occur in files: "asset_1.csv", "asset_1.json", "asset_1.xlsx"\n'
                                      'due to conflicting values in attribute(s):\n'
                                      'testBooleanField: False != True\n'
                                      'testStringField: naam != naam_2')
     with subtests.test('Check exception attributes: id and type_uri'):
-        assert exc.value.object_id == '1'
-        assert exc.value.type_uri == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+        assert exc.object_id == '1'
+        assert exc.type_uri == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
 
     with subtests.test('Check exception attributes: attribute error list'):
-        assert exc.value.attribute_errors == [('testBooleanField', (False, True)),
+        assert exc.attribute_errors == [('testBooleanField', (False, True)),
                                               ('testStringField', ('naam', 'naam_2'))]
 
     with subtests.test('Check exception attributes: file list'):
-        assert exc.value.files == [csv_path, json_path, xlsx_path]
+        assert exc.files == [csv_path, json_path, xlsx_path]
 
 
 def test_combine_assets_multiple_instances(minimum, minimum_2, one_attribute, one_complex_attribute):
