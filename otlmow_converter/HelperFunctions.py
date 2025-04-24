@@ -49,8 +49,9 @@ def combine_files(list_of_files: list[Path], model_directory: Path = None) -> li
             ex.files = [file for file, _ in asset_tuple_list]
             short_uri = asset_tuple_list[0][1].typeURI.split('/')[-1]
             error_str = '\n'.join([f'{t[0]}: {t[1][0]} != {t[1][1]}' for t in ex.attribute_errors])
+            file_list = ", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])
             ex.message = (f'Cannot combine the assets with id: "{object_id}" with type "{short_uri}"\n'
-                         f'that occur in files: {", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])}\n'
+                         f'that occur in files: {file_list}\n'
                          'due to conflicting values in attribute(s):\n' + error_str)
             ex.type_uri = asset_tuple_list[0][1].typeURI
             list_of_errors.append(ex)
@@ -58,8 +59,9 @@ def combine_files(list_of_files: list[Path], model_directory: Path = None) -> li
             ex.files = [file for file, _ in asset_tuple_list]
             short_uri = asset_tuple_list[0][1].typeURI.split('/')[-1]
             short_uri_2 = asset_tuple_list[1][1].typeURI.split('/')[-1]
+            file_list = ", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])
             ex.message = (f'Cannot combine the assets with id: "{object_id}"\n'
-                       f'that occur in files: {", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])}\n'
+                       f'that occur in files: {file_list}\n'
                        f'due to conflicting types: {short_uri} != {short_uri_2}')
             list_of_errors.append(ex)
 
