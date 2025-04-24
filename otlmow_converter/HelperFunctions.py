@@ -50,8 +50,8 @@ def combine_files(list_of_files: list[Path], model_directory: Path = None) -> li
             short_uri = asset_tuple_list[0][1].typeURI.split('/')[-1]
             error_str = '\n'.join([f'{t[0]}: {t[1][0]} != {t[1][1]}' for t in ex.attribute_errors])
             ex.message = (f'Cannot combine the assets with id: "{object_id}" with type "{short_uri}"\n'
-                       f'that occur in files: {", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])}\n'
-                       f'due to conflicting values in attribute(s):\n{error_str}')
+                         f'that occur in files: {", ".join([f'"{file.name}"' for file, _ in asset_tuple_list])}\n'
+                         'due to conflicting values in attribute(s):\n' + error_str)
             ex.type_uri = asset_tuple_list[0][1].typeURI
             list_of_errors.append(ex)
         except CannotCombineAssetsWithDifferentTypeError as ex:
