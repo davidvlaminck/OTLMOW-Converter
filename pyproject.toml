@@ -41,6 +41,7 @@ test = [
     "pytest-cov",
     "pytest-subtests",
     "pytest-timeout",
+    "pytest-asyncio",
     "nbmake"
 ]
 benchmark = [
