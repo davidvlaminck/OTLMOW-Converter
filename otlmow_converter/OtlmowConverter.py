@@ -117,29 +117,29 @@ class OtlmowConverter:
             raise ValueError(f"Unsupported subject type: {type(subject)}")
 
     @classmethod
-    def to_file(cls, subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
+    def to_file(cls, subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> tuple[Path]:
         """Converts any subject (including another file) to a file."""
         if isinstance(subject, Path):
             objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
-            cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+            return cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, DataFrame):
             objects = cls.from_dataframe_to_objects(dataframe=subject, model_directory=model_directory, **kwargs)
-            cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+            return cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, Iterable):
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
                 if first_element is None:
-                    return
+                    return None
                 if isinstance(first_element, DotnotationDict):
                     objects = list(cls.from_dotnotation_dicts_to_objects(
                         sequence_of_dotnotation_dicts=new_generator, model_directory=model_directory, **kwargs))
-                    cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+                    return cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
                 elif isinstance(first_element, dict):
                     objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
                                                         model_directory=model_directory, **kwargs)
-                    cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
+                    return cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
                 elif isinstance(first_element, OTLObject):
-                    cls.from_objects_to_file(file_path=file_path, sequence_of_objects=new_generator, **kwargs)
+                    return cls.from_objects_to_file(file_path=file_path, sequence_of_objects=new_generator, **kwargs)
                 else:
                     raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
@@ -500,13 +500,13 @@ class OtlmowConverter:
         return await importer.to_objects_async(filepath=file_path, model_directory=model_directory, **kwargs)
 
     @classmethod
-    def from_objects_to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> None:
+    def from_objects_to_file(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject], **kwargs) -> tuple[Path]:
         """Converts a sequence of OTLObject objects to a file.
         This conversion uses the OTLMOW settings.
         See the specific Exporter functions for more information on the keyword arguments.
         """
         exporter = FileExporter.get_exporter_from_extension(extension=file_path.suffix[1:])
-        exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
+        return exporter.from_objects(sequence_of_objects=sequence_of_objects, filepath=file_path, **kwargs)
 
     @classmethod
     async def from_objects_to_file_async(cls, file_path: Path, sequence_of_objects: Iterable[OTLObject],
@@ -605,11 +605,11 @@ async def to_dotnotation_dicts_async(subject: object, model_directory: Path = No
         yield o
 
 
-def to_file(subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
-    OtlmowConverter.to_file(subject=subject, file_path=file_path, model_directory=model_directory, **kwargs)
+def to_file(subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> tuple[Path]:
+    return OtlmowConverter.to_file(subject=subject, file_path=file_path, model_directory=model_directory, **kwargs)
 
 
-async def to_file_async(subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> None:
+async def to_file_async(subject: object, file_path: Path, model_directory: Path = None, **kwargs) -> tuple[Path]:
     await OtlmowConverter.to_file_async(subject=subject, file_path=file_path, model_directory=model_directory,
                                          **kwargs)
 

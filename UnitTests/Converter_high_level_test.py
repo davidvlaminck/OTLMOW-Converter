@@ -202,21 +202,25 @@ def test_dataframe_to_file():
 
         geojson_file_path = Path(__file__).parent / 'test_dataframe_to_file.geojson'
 
-        OtlmowConverter.to_file(subject=df, file_path=excel_file_path, model_directory=model_directory_path)
+        created_file_paths = OtlmowConverter.to_file(subject=df, file_path=excel_file_path, model_directory=model_directory_path)
+        assert created_file_paths == (excel_file_path,)
         from_excel_objects = OtlmowConverter.from_file_to_objects(excel_file_path, model_directory=model_directory_path)
         assert orig_list_of_objects == list(from_excel_objects)
 
-        OtlmowConverter.to_file(subject=df, file_path=json_file_path, model_directory=model_directory_path)
+        created_file_paths = OtlmowConverter.to_file(subject=df, file_path=json_file_path, model_directory=model_directory_path)
+        assert created_file_paths == (json_file_path,)
         from_json_objects = OtlmowConverter.from_file_to_objects(json_file_path, model_directory=model_directory_path)
         assert orig_list_of_objects == list(from_json_objects)
 
-        OtlmowConverter.to_file(subject=df, file_path=csv_file_path, model_directory=model_directory_path)
+        created_file_paths = OtlmowConverter.to_file(subject=df, file_path=csv_file_path, model_directory=model_directory_path)
+        assert created_file_paths == (csv_file_path_2, csv_file_path_3)
         from_csv_objects_2 = OtlmowConverter.from_file_to_objects(csv_file_path_2, model_directory=model_directory_path)
         from_csv_objects_3 = OtlmowConverter.from_file_to_objects(csv_file_path_3, model_directory=model_directory_path)
         combined_list = list(from_csv_objects_2) + list(from_csv_objects_3)
         assert orig_list_of_objects == combined_list
 
-        OtlmowConverter.to_file(subject=df, file_path=geojson_file_path, model_directory=model_directory_path)
+        created_file_paths = OtlmowConverter.to_file(subject=df, file_path=geojson_file_path, model_directory=model_directory_path)
+        assert created_file_paths == (geojson_file_path,)
         from_geojson_objects = OtlmowConverter.from_file_to_objects(geojson_file_path, model_directory=model_directory_path)
         assert orig_list_of_objects == list(from_geojson_objects)
 
