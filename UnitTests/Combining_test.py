@@ -165,7 +165,7 @@ def test_combine_files_three_files_failing(subtests):
     json_path = combine_directory / 'asset_1.json'
     xlsx_path = combine_directory / 'asset_1.xlsx'
 
-    with pytest.raises(CannotCombineAssetsError) as exc:
+    with pytest.raises(ExceptionsGroup) as exc:
         combine_files([csv_path, json_path, xlsx_path], model_directory=test_model_directory)
 
     with subtests.test('Check exception message'):
