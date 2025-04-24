@@ -25,7 +25,7 @@ DELIMITER = csv_settings['delimiter']
 
 class CsvExporter(AbstractExporter):
     @classmethod
-    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         delimiter = DELIMITER
         split_per_type = True
         quote_char = '"'
@@ -69,7 +69,8 @@ class CsvExporter(AbstractExporter):
             data = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
                 list_of_dicts=single_table, empty_string_equals_none=True, separator=separator)
             cls._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
-            return
+            filepath.touch()
+            return (filepath,)
 
         multi_table_dict = DotnotationTableConverter.get_tables_per_type_from_data(
             sequence_of_objects=sequence_of_objects,
@@ -79,16 +80,22 @@ class CsvExporter(AbstractExporter):
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
+        created_filepaths = []
         for short_uri, table_data in multi_table_dict.items():
             data = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
                 list_of_dicts=table_data, empty_string_equals_none=True, separator=separator)
             specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
+            created_filepath = Path(filepath.parent / specific_filename)
 
-            cls._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
+            cls._write_file(file_location=created_filepath, data=data,
                             delimiter=delimiter, quote_char=quote_char)
+            created_filepath.touch()
+            created_filepaths.append(created_filepath)
+        return tuple(created_filepaths)
+
 
     @classmethod
-    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         delimiter = DELIMITER
         split_per_type = True
         quote_char = '"'
@@ -132,7 +139,8 @@ class CsvExporter(AbstractExporter):
             data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence_async(
                 list_of_dicts=single_table, empty_string_equals_none=True, separator=separator)
             cls._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
-            return
+            filepath.touch()
+            return (filepath,)
 
         multi_table_dict = await DotnotationTableConverter.get_tables_per_type_from_data_async(
             sequence_of_objects=sequence_of_objects,
@@ -142,14 +150,19 @@ class CsvExporter(AbstractExporter):
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
+        created_filepaths = []
         for short_uri, table_data in multi_table_dict.items():
             data = await DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence_async(
                 list_of_dicts=table_data, empty_string_equals_none=True, separator=separator)
             specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
+            created_filepath = Path(filepath.parent / specific_filename)
             await sleep(0)
 
-            cls._write_file(file_location=Path(filepath.parent / specific_filename), data=data,
+            cls._write_file(file_location=created_filepath, data=data,
                             delimiter=delimiter, quote_char=quote_char)
+            created_filepath.touch()
+            created_filepaths.append(created_filepath)
+        return tuple(created_filepaths)
 
     @classmethod
     def _write_file(cls, file_location: Path, data: Iterable[Iterable], delimiter: str, quote_char: str) -> None:

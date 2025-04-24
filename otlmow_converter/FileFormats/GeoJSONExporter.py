@@ -26,7 +26,7 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = geojson_settings['warn_for_non_otl_conform
 
 class GeoJSONExporter(AbstractExporter):
     @classmethod
-    def from_dotnotation_dicts(cls, sequence_of_dotnotation_dicts: Iterable[dict], filepath: Path) -> None:
+    def from_dotnotation_dicts(cls, sequence_of_dotnotation_dicts: Iterable[dict], filepath: Path) -> tuple[Path]:
         list_of_objects = []
         for d in sequence_of_dotnotation_dicts:
             feature_dict = {
@@ -50,8 +50,11 @@ class GeoJSONExporter(AbstractExporter):
         with open(filepath, "w") as file:
             file.write(encoded_json)
 
+        filepath.touch()
+        return (filepath,)
+
     @classmethod
-    async def from_dotnotation_dicts_async(cls, sequence_of_dotnotation_dicts: Iterable[dict], filepath: Path) -> None:
+    async def from_dotnotation_dicts_async(cls, sequence_of_dotnotation_dicts: Iterable[dict], filepath: Path) -> tuple[Path]:
         list_of_objects = []
         for d in sequence_of_dotnotation_dicts:
             feature_dict = {
@@ -77,8 +80,11 @@ class GeoJSONExporter(AbstractExporter):
         with open(filepath, "w") as file:
             file.write(encoded_json)
 
+        filepath.touch()
+        return (filepath,)
+
     @classmethod
-    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         separator = kwargs.get('separator', SEPARATOR)
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
@@ -90,7 +96,7 @@ class GeoJSONExporter(AbstractExporter):
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
 
-        cls.from_dotnotation_dicts(
+        return cls.from_dotnotation_dicts(
             [DotnotationDictConverter.to_dict(
                 asset, separator=separator, cardinality_indicator=cardinality_indicator,
                 waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
@@ -100,7 +106,7 @@ class GeoJSONExporter(AbstractExporter):
                 for asset in sequence_of_objects], filepath=filepath)
 
     @classmethod
-    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         separator = kwargs.get('separator', SEPARATOR)
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
@@ -112,7 +118,7 @@ class GeoJSONExporter(AbstractExporter):
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
 
-        await cls.from_dotnotation_dicts_async(
+        return await cls.from_dotnotation_dicts_async(
             [await DotnotationDictConverter.to_dict_async(
                 asset, separator=separator, cardinality_indicator=cardinality_indicator,
                 waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,

@@ -23,7 +23,7 @@ ABBREVIATE_EXCEL_SHEETTITLES = False
 
 class ExcelExporter(AbstractExporter):
     @classmethod
-    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
@@ -58,8 +58,11 @@ class ExcelExporter(AbstractExporter):
 
         wb.save(filepath)
 
+        filepath.touch()
+        return (filepath,)
+
     @classmethod
-    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
         cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
@@ -95,6 +98,9 @@ class ExcelExporter(AbstractExporter):
 
         await sleep(0)
         wb.save(filepath)
+
+        filepath.touch()
+        return (filepath,)
 
     @classmethod
     def create_sheet_by_name(cls, wb: Workbook, class_name: str, table_data: List[dict],
