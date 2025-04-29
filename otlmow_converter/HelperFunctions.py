@@ -26,15 +26,21 @@ def wrap_in_quotes(text: str) -> str:
 
 def combine_files(list_of_files: list[Path], model_directory: Path = None) -> list[OTLObject]:
     assets_dict = defaultdict(list)
+    list_of_errors = []
     for file_path in list_of_files:
-        file_assets = OtlmowConverter.from_file_to_objects(file_path, model_directory=model_directory)
+        try:
+            file_assets = OtlmowConverter.from_file_to_objects(file_path, model_directory=model_directory)
+        except Exception as ex:
+            ex.file_path = file_path
+            list_of_errors.append(ex)
+            continue
         for asset in file_assets:
             id = asset.assetId.identificator if asset.typeURI != 'http://purl.org/dc/terms/Agent' \
                 else asset.agentId.identificator
             assets_dict[id].append((file_path, asset))
 
     combined_assets = []
-    list_of_errors = []
+
     for object_id, asset_tuple_list in assets_dict.items():
         if len(asset_tuple_list) == 1:
             combined_assets.append(asset_tuple_list[1])
