@@ -43,7 +43,7 @@ def combine_files(list_of_files: list[Path], model_directory: Path = None) -> li
 
     for object_id, asset_tuple_list in assets_dict.items():
         if len(asset_tuple_list) == 1:
-            combined_assets.append(asset_tuple_list[1])
+            combined_assets.append(asset_tuple_list[0])
             continue
         try:
             combined_asset = combine_two_asset_instances(asset_tuple_list[0][1], asset_tuple_list[1][1],
