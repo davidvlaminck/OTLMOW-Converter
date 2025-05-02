@@ -67,6 +67,9 @@ class ExcelImporter(AbstractImporter):
                     raise NoTypeUriInExcelTabError(
                         message=f'Could not find typeURI within 5 rows in Excel tab {sheet} in file {filepath.name}',
                         file_path=filepath, tab=sheet)
+                if len(sheet_data) == 1:
+                    # means there is a header but no data
+                    continue
                 headers = sheet_data[0]
                 type_uri_index = cls.get_index_of_typeURI_column_in_sheet(
                     filepath=filepath, sheet=sheet, headers=headers, data=sheet_data)
@@ -148,6 +151,9 @@ class ExcelImporter(AbstractImporter):
                     raise NoTypeUriInExcelTabError(
                         message=f'Could not find typeURI within 5 rows in Excel tab {sheet} in file {filepath.name}',
                         file_path=filepath, tab=sheet)
+                if len(sheet_data) == 1:
+                    # means there is a header but no data
+                    continue
                 headers = sheet_data[0]
                 type_uri_index = cls.get_index_of_typeURI_column_in_sheet(
                     filepath=filepath, sheet=sheet, headers=headers, data=sheet_data)
