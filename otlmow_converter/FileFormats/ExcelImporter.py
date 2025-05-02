@@ -1,4 +1,6 @@
 import os
+import sys
+import traceback
 import warnings
 from asyncio import sleep
 from pathlib import Path
@@ -101,6 +103,10 @@ class ExcelImporter(AbstractImporter):
                     file_path=filepath, tab=sheet
                 ))
             except BaseException as ex:
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                print("error caught!")
+                print("error message: \n: " + tb)
                 exception_group.add_exception(UnknownExcelError(original_exception=ex, tab=sheet))
 
         if len(exception_group.exceptions) > 0:
@@ -179,6 +185,10 @@ class ExcelImporter(AbstractImporter):
                     file_path=filepath, tab=sheet
                 ))
             except BaseException as ex:
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                print("error caught!")
+                print("error message: \n: " + tb)
                 exception_group.add_exception(UnknownExcelError(original_exception=ex, tab=sheet))
 
         if len(exception_group.exceptions) > 0:
