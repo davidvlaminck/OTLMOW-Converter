@@ -1,11 +1,16 @@
 import ast
 import csv
+import math
+#from line_profiler_pycharm import profile
 import re
 from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+from pyarrow._csv import read_csv, ParseOptions, ReadOptions, ConvertOptions
+
 from otlmow_converter.AbstractImporter import AbstractImporter
+from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
@@ -63,6 +68,64 @@ class CsvImporter(AbstractImporter):
         model_directory = None
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
+
+        # try reading only the headers with csv:
+        # with open('your_file.csv', mode='r') as file:
+        #     reader = csv.reader(file)
+        #     column_names = next(reader)
+
+        # then set the schema with pyarrow using the headers
+        # Define the schema with specific columns as strings and others to be inferred
+        # schema = pa.schema([
+        #     ('column1', pa.string()),  # Read 'column1' as string
+        #     ('column2', pa.string()),  # Read 'column2' as string
+        #     # Add more columns as needed, or leave them out to be inferred
+        # ])
+
+        # only works if all objects have the same typeURI
+
+        import pyarrow as pa
+        parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
+
+        # Read the CSV file to infer the schema
+        infer_table = read_csv(filepath, read_options=ReadOptions(autogenerate_column_names=False, use_threads=True,
+                                                                  skip_rows_after_names=10000),
+                               parse_options=parse_options)
+
+        # Dynamically create a schema with all fields as strings
+        schema = pa.schema([(name, pa.string()) for name in infer_table.column_names])
+
+        # Read the CSV file again with the specified schema
+        table = read_csv(filepath,
+                         read_options=ReadOptions(column_names=schema.names, use_threads=True, skip_rows=1),
+                         parse_options=parse_options,
+                         convert_options=ConvertOptions(column_types=schema))
+
+
+        list_of_dicts = [
+            {col: row[col] for col in table.column_names
+             if row[col] not in [None, '', float('nan')] and not (isinstance(row[col], float) and math.isnan(row[col]))}
+            for row in table.to_pylist()
+        ]
+        #
+        # list_of_dicts = [row._asdict() for row in df.itertuples(index=False)]
+        #
+        # # Convert the list of dictionaries to a list of OTLObjects
+        # # and handle the conversion of empty strings to None
+        # # exclude agents
+        #
+        # def filter_dict(d):
+        #     return {k: v for k, v in d.items() if
+        #                 v not in [None, '', float('nan')] and not (isinstance(v, float) and math.isnan(v))}
+
+        return [DotnotationDictConverter.from_dict(
+            input_dict=x, model_directory=model_directory, cast_list=cast_list,
+            cast_datetime=cast_datetime,
+            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes, waarde_shortcut=waarde_shortcut,
+            separator=separator, cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator) for x in
+                list_of_dicts if x['typeURI'] != 'http://purl.org/dc/terms/Agent']
+
 
         try:
             with open(filepath, encoding='utf-8') as file:
