@@ -6,14 +6,21 @@ import re
 from asyncio import sleep
 from pathlib import Path
 from typing import Iterable
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+
+import pyarrow
+from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, dynamic_create_instance_from_uri
+from otlmow_model.OtlmowModel.BaseClasses.StringField import StringField
+from otlmow_model.OtlmowModel.BaseClasses.BooleanField import BooleanField
 from pyarrow._csv import read_csv, ParseOptions, ReadOptions, ConvertOptions
 
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
+from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
+from otlmow_converter.OtlmowConverter import to_objects
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 csv.field_size_limit(2147483647)
@@ -58,6 +65,7 @@ class CsvImporter(AbstractImporter):
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+        contains_exactly_one_type = kwargs.get('contains_exactly_one_type', False)
 
         if filepath is None:
             raise ValueError(f'Can not write a file to: {filepath}')
@@ -69,44 +77,70 @@ class CsvImporter(AbstractImporter):
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
 
-        # try reading only the headers with csv:
-        # with open('your_file.csv', mode='r') as file:
-        #     reader = csv.reader(file)
-        #     column_names = next(reader)
+        if contains_exactly_one_type:
+            import pyarrow as pa
+            import pyarrow.compute as pc
 
-        # then set the schema with pyarrow using the headers
-        # Define the schema with specific columns as strings and others to be inferred
-        # schema = pa.schema([
-        #     ('column1', pa.string()),  # Read 'column1' as string
-        #     ('column2', pa.string()),  # Read 'column2' as string
-        #     # Add more columns as needed, or leave them out to be inferred
-        # ])
+            # use pyarrow to read the csv file and infer the schema
 
-        # only works if all objects have the same typeURI
+            # try reading only the headers with csv:
+            with open(filepath, encoding='utf-8') as file:
+                reader = csv.DictReader(file, delimiter=delimiter, quotechar=quote_char)
+                first_row = next(reader)
 
-        import pyarrow as pa
-        parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
+            instance = dynamic_create_instance_from_uri(first_row['typeURI'], model_directory=model_directory)
+            # get the headers from the first row
+            headers = list(first_row.keys())
+            headers.remove('typeURI')
+            headers.remove('assetId.identificator')
 
-        # Read the CSV file to infer the schema
-        infer_table = read_csv(filepath, read_options=ReadOptions(autogenerate_column_names=False, use_threads=True,
-                                                                  skip_rows_after_names=10000),
-                               parse_options=parse_options)
+            schema_list = []
+            headers_card = []
+            for header in headers:
+                attribute = DotnotationHelper.get_attribute_by_dotnotation(
+                    instance, dotnotation=header, separator=separator,
+                    cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
+                if attribute.kardinaliteit_max != '1':
+                    schema_list.append((header, pa.string()))
+                    if issubclass(attribute.field, KeuzelijstField):
+                        headers_card.append((header, pa.list_(pa.string())))
+                    elif issubclass(attribute.field, StringField):
+                        headers_card.append((header, pa.list_(pa.string())))
+                    elif issubclass(attribute.field, BooleanField):
+                        headers_card.append((header, pa.list_(pa.bool_())))
+                elif issubclass(attribute.field, KeuzelijstField):
+                    schema_list.append((header, pa.string()))
+                elif issubclass(attribute.field, StringField):
+                    schema_list.append((header, pa.string()))
+                elif issubclass(attribute.field, BooleanField):
+                    schema_list.append((header, pa.bool_()))
+            schema = pa.schema(schema_list)
 
-        # Dynamically create a schema with all fields as strings
-        schema = pa.schema([(name, pa.string()) for name in infer_table.column_names])
+            parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
 
-        # Read the CSV file again with the specified schema
-        table = read_csv(filepath,
-                         read_options=ReadOptions(column_names=schema.names, use_threads=True, skip_rows=1),
-                         parse_options=parse_options,
-                         convert_options=ConvertOptions(column_types=schema))
+            # Read the CSV file again with the specified schema
+            table = read_csv(filepath,
+                             read_options=ReadOptions(use_threads=True),
+                             parse_options=parse_options,
+                             convert_options=ConvertOptions(column_types=schema))
 
+            for header_card in headers_card:
+                split_column = pyarrow.compute.split_pattern(table[header_card[0]], '|')
+                converted_data = split_column.cast(header_card[1])
+                table = table.set_column(table.schema.get_field_index(header_card[0]), header_card[0], converted_data)
 
-        list_of_dicts = [
-            {col: row[col] for col in table.column_names
-             if row[col] not in [None, '', float('nan')] and not (isinstance(row[col], float) and math.isnan(row[col]))}
-            for row in table.to_pylist()
-        ]
+            # Convert the table to a DataFrame
+            df = table.to_pandas()
+            return to_objects(df, model_directory=model_directory,
+                              allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                              warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+        #
+        # list_of_dicts = [
+        #     {col: row[col] for col in table.column_names
+        #      if row[col] not in [None, '', float('nan')] and not (isinstance(row[col], float) and math.isnan(row[col]))}
+        #     for row in table.to_pylist()
+        # ]
         #
         # list_of_dicts = [row._asdict() for row in df.itertuples(index=False)]
         #
@@ -117,15 +151,14 @@ class CsvImporter(AbstractImporter):
         # def filter_dict(d):
         #     return {k: v for k, v in d.items() if
         #                 v not in [None, '', float('nan')] and not (isinstance(v, float) and math.isnan(v))}
-
-        return [DotnotationDictConverter.from_dict(
-            input_dict=x, model_directory=model_directory, cast_list=cast_list,
-            cast_datetime=cast_datetime,
-            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes, waarde_shortcut=waarde_shortcut,
-            separator=separator, cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator) for x in
-                list_of_dicts if x['typeURI'] != 'http://purl.org/dc/terms/Agent']
-
+        #
+        # return [DotnotationDictConverter.from_dict(
+        #     input_dict=x, model_directory=model_directory, cast_list=cast_list,
+        #     cast_datetime=cast_datetime,
+        #     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+        #     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes, waarde_shortcut=waarde_shortcut,
+        #     separator=separator, cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator) for x in
+        #         list_of_dicts if x['typeURI'] != 'http://purl.org/dc/terms/Agent']
 
         try:
             with open(filepath, encoding='utf-8') as file:
