@@ -58,7 +58,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     instance.assetId.identificator = '0000-0000'
     instance.testBooleanField = False
     instance.testDateField = date(2019, 9, 20)
-    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
+    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15, 123456)
     instance.testDecimalField = 79.07
     instance.testDecimalFieldMetKard = [10.0, 20.0]
     instance.testEenvoudigType.waarde = 'string1'
@@ -84,7 +84,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
 
     assert not instanceImported.testBooleanField
     assert instanceImported.testDateField == date(2019, 9, 20)
-    assert instanceImported.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instanceImported.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15, 123456)
     assert instanceImported.testDecimalField == 79.07
     assert instanceImported.testDecimalFieldMetKard == [10.0, 20.0]
     assert instanceImported.testEenvoudigType.waarde == 'string1'
