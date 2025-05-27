@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
+from otlmow_model.OtlmowModel.Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -731,7 +732,7 @@ def test_from_dict_errors(subtests):
                 model_directory=model_directory_path)
 
     with subtests.test("error raised when using dict with invalid typeURI"):
-        with pytest.raises(ValueError):
+        with pytest.raises(CouldNotCreateInstanceError):
             DotnotationDictConverter.from_dict(DotnotationDict(
                 {'complex.attribute': 'complex attributes only valid within OTL', 'typeURI': 'not_valid_uri'}),
                 model_directory=model_directory_path)

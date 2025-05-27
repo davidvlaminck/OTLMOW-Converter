@@ -234,7 +234,7 @@ def test_export_and_then_import_sheetname_abbreviation(recwarn):
     assert not warns
 
     # first load the objects in the template to see it the basics are there
-    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = ExcelImporter.to_objects(filepath=file_location)
     assert len(objects) == 3
 
     instance_imported, instance_to_be_abbreviated_imported, instance_to_be_abbreviated2_imported = objects
