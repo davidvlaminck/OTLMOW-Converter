@@ -142,51 +142,6 @@ def is_directional_relation(otl_object: OTLObject, model_directory=Path(__file__
     return relation_dict[type_uri]['directional']
 
 
-def combine_two_asset_instances(asset1: OTLObject, asset2: OTLObject, allow_attribute_overrides: bool = True) -> OTLObject:
-    if asset1 is None:
-        raise ValueError('asset1 is None')
-    if asset2 is None:
-        raise ValueError('asset2 is None')
-    if asset1.assetId.identificator is None:
-        raise ValueError('asset1 has no assetId.identificator')
-    if asset2.assetId.identificator is None:
-        raise ValueError('asset2 has no assetId.identificator')
-    if asset1.assetId.identificator != asset2.assetId.identificator:
-        raise ValueError('asset1 and asset2 have different assetId.identificator values')
-
-    for attr in asset2:
-        attribute = get_attribute_by_name(asset1, attr.naam)
-        if attribute is None:
-            raise ValueError(f'attribute {attr.naam} does not exist in asset1')
-        if attribute.objectUri == 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.assetId':
-            continue
-        if attribute.waarde is not None and not allow_attribute_overrides and attribute.waarde != attr.waarde:
-            raise ValueError(f'attribute {attr.naam} already has a value in asset1 that is different {attribute.waarde}')
-        if attr.waarde is None:
-            continue
-        attribute.waarde = attr.waarde
-    return asset1
-
-def combine_assets(asset_list: list[OTLObject], allow_attribute_overrides: bool = True) -> list[OTLObject]:
-    if len(asset_list) < 2:
-        raise ValueError('asset_list has less than 2 assets')
-
-    grouped_list = {}
-    for asset in asset_list:
-        if asset.assetId.identificator not in grouped_list:
-            grouped_list[asset.assetId.identificator] = []
-        grouped_list[asset.assetId.identificator].append(asset)
-
-    combined_list = []
-    for assets in grouped_list.values():
-        asset1 = assets[0]
-        for asset in assets[1:]:
-            asset1 = combine_two_asset_instances(asset1, asset, allow_attribute_overrides)
-        combined_list.append(asset1)
-
-    return combined_list
-
-
 def is_aim_id(aim_id: str, model_directory: Path = None) -> bool:
     """
     Checks if the aim_id is valid. An aim_id is valid if it is a valid guid followed by a base64 encoded shortened uri.
