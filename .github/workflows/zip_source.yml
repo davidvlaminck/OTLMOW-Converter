@@ -1,6 +1,12 @@
 name: Zip source code
 run-name: Zip source code for ${{ github.sha }}
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   zip_source_code:
