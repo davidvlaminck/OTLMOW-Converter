@@ -24,7 +24,7 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.assetId.identificator == '0000-0000'
     assert not instance.testBooleanField
     assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15, 123456)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'
@@ -40,6 +40,7 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.geometry == 'POINT Z (200000 200000 0)'
 
 
+@pytest.mark.asyncio(loop_scope="function")
 async def test_load_test_unnested_attributes_async(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.json'
 
@@ -53,7 +54,7 @@ async def test_load_test_unnested_attributes_async(recwarn):
     assert instance.assetId.identificator == '0000-0000'
     assert not instance.testBooleanField
     assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15, 123456)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'

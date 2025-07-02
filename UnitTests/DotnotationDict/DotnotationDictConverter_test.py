@@ -3,10 +3,10 @@ from pathlib import Path
 
 import pytest
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
+from otlmow_model.OtlmowModel.Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
-from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
@@ -92,11 +92,11 @@ def test_from_dict_datetime_convert_true(recwarn):
     expected = AllCasesTestClass()
     expected.testDateField = date(2022, 12, 12)
     expected.testTimeField = time(10, 11, 12)
-    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
+    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12, 123456)
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI, 'testDateField': '2022-12-12', 'testTimeField': '10:11:12',
-         'testDateTimeField': '2022-12-12 10:11:12'}),
+         'testDateTimeField': '2022-12-12 10:11:12.123456'}),
         model_directory=model_directory_path, cast_datetime=True)
 
     assert created_instance == expected
@@ -107,13 +107,13 @@ def test_from_dict_datetime_convert_false(recwarn):
     expected = AllCasesTestClass()
     expected.testDateField = date(2022, 12, 12)
     expected.testTimeField = time(10, 11, 12)
-    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
+    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12, 123456)
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI,
          'testDateField': date(2022, 12, 12),
          'testTimeField': time(10, 11, 12),
-         'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12)}),
+         'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12, 123456)}),
         model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -124,18 +124,18 @@ def test_to_dict_datetime():
     instance = AllCasesTestClass()
     instance.testDateField = date(2022, 12, 12)
     instance.testTimeField = time(10, 11, 12)
-    instance.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
+    instance.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12, 123456)
 
     assert DotnotationDictConverter.to_dict(instance) == {
         'testDateField': date(2022, 12, 12),
         'testTimeField': time(10, 11, 12),
-        'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12),
+        'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12, 123456),
         'typeURI': AllCasesTestClass.typeURI}
 
     assert DotnotationDictConverter.to_dict(instance, cast_datetime=True) == {
         'testDateField': '2022-12-12',
         'testTimeField': '10:11:12',
-        'testDateTimeField': '2022-12-12 10:11:12',
+        'testDateTimeField': '2022-12-12 10:11:12.123456',
         'typeURI': AllCasesTestClass.typeURI}
 
 
@@ -732,7 +732,7 @@ def test_from_dict_errors(subtests):
                 model_directory=model_directory_path)
 
     with subtests.test("error raised when using dict with invalid typeURI"):
-        with pytest.raises(ValueError):
+        with pytest.raises(CouldNotCreateInstanceError):
             DotnotationDictConverter.from_dict(DotnotationDict(
                 {'complex.attribute': 'complex attributes only valid within OTL', 'typeURI': 'not_valid_uri'}),
                 model_directory=model_directory_path)

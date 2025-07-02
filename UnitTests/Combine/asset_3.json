@@ -1,0 +1,16 @@
+[
+    {
+        "assetId": {
+            "identificator": "3"
+        },
+        "testStringField": "naam_3",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+    },
+    {
+        "assetId": {
+            "identificator": "3_2"
+        },
+        "testStringField": "naam_3_2",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+    }
+]

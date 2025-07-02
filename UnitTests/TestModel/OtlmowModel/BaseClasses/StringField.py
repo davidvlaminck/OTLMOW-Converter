@@ -50,4 +50,4 @@ class StringField(OTLField):
 
     @classmethod
     def create_dummy_data(cls) -> str:
-        return 'dummy_' + ''.join(random.choice(string.ascii_letters) for _ in range(random.randint(1, 10)))
+        return 'dummy_' + ''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 10)))

@@ -1,0 +1,14 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "id": "3",
+            "properties": {
+                "assetId.identificator": "3",
+                "isActief": true,
+                "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass"
+            },
+            "type": "Feature"
+        }
+    ]
+}

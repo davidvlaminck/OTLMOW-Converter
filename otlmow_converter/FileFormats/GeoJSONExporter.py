@@ -3,7 +3,6 @@ from json import JSONEncoder
 from pathlib import Path
 from typing import Iterable
 import geojson
-import numpy as np
 from geojson import LineString, Point, MultiPoint, MultiLineString, Polygon, MultiPolygon, GeometryCollection
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_converter.AbstractExporter import AbstractExporter
@@ -169,12 +168,18 @@ class GeoJSONExporter(AbstractExporter):
 
     @classmethod
     def get_bounding_box(cls, geometry):
-        coords = np.array(list(geojson.utils.coords(geometry)))
-        if coords.shape[1] == 3:
-            return [coords[:, 0].min(), coords[:, 1].min(), coords[:, 2].min(),
-                    coords[:, 0].max(), coords[:, 1].max(), coords[:, 2].max()]
+        coords = list(geojson.utils.coords(geometry))
+        if not coords:
+            return []
+
+        xs = [c[0] for c in coords]
+        ys = [c[1] for c in coords]
+        dim = len(coords[0])
+        if dim == 3:
+            zs = [c[2] for c in coords]
+            return [min(xs), min(ys), min(zs), max(xs), max(ys), max(zs)]
         else:
-            return [[coords[:, 0].min(), coords[:, 1].min()], [coords[:, 0].max(), coords[:, 1].max()]]
+            return [[min(xs), min(ys)], [max(xs), max(ys)]]
 
     @classmethod
     def split_and_add_to_list(cls, coords_list: list, coords_str: str):

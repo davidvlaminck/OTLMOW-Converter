@@ -51,9 +51,15 @@ class DateTimeField(OTLField):
         if isinstance(value, str):
             try:
                 if 'T' in value:
-                    dt = datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
+                    if '.' in value:
+                        dt = datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                    else:
+                        dt = datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
                 else:
-                    dt = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                    if '.' in value:
+                        dt = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S.%f")
+                    else:
+                        dt = datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
                 if log_warnings:
                     warnings.warn(category=IncorrectTypeWarning,
                                   message='Assigned a string to a datetime datatype. '
@@ -82,8 +88,16 @@ class DateTimeField(OTLField):
             ) from exc
 
     @classmethod
-    def value_default(cls, value: datetime.datetime) -> str:
-        return value.strftime("%Y-%m-%d %H:%M:%S")
+    def value_default(cls, value: datetime.datetime) -> Optional[str]:
+        if value is None:
+            return None
+        if not isinstance(value, datetime.datetime):
+            raise TypeError(f'Expecting datetime.datetime in {cls.__name__} and got {type(value)} when trying to '
+                            f'parse {value}')
+        if value.microsecond > 0:
+            return value.strftime("%Y-%m-%d %H:%M:%S.%f")
+        else:
+            return value.strftime("%Y-%m-%d %H:%M:%S")
 
     def __str__(self) -> str:
         return OTLField.__str__(self)

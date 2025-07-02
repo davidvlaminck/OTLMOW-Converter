@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 
-from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
@@ -23,7 +22,7 @@ async def test_load_test_unnested_attributes(recwarn):
     assert instance.assetId.identificator == '0000-0000'
     assert not instance.testBooleanField
     assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15, 123456)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'

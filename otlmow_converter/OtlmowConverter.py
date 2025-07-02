@@ -4,7 +4,6 @@ from itertools import chain
 from pathlib import Path
 from typing import Iterable, Union, AsyncIterable
 
-from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, create_dict_from_asset
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 from pandas import DataFrame
@@ -346,7 +345,7 @@ class OtlmowConverter:
             objects = cls.from_file_to_objects(file_path=subject, model_directory=model_directory, **kwargs)
             yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, DataFrame):
-            subject = subject.replace({nan: None})
+            subject = subject.where(~subject.isna(), None)
             yield from [DotnotationDict({k: v for k, v in d.items() if v is not None})
                         for d in subject.to_dict('records')]
         elif isinstance(subject, Iterable):
@@ -381,7 +380,7 @@ class OtlmowConverter:
                                                                                       **kwargs):
                 yield dotnotation_dict
         elif isinstance(subject, DataFrame):
-            subject = subject.replace({nan: None})
+            subject = subject.where(~subject.isna(), None)
             for d in subject.to_dict('records'):
                 yield DotnotationDict({k: v for k, v in d.items() if v is not None})
         elif isinstance(subject, Iterable):
