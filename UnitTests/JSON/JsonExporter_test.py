@@ -19,7 +19,7 @@ async def test_export_and_then_import_unnested_attributes(recwarn):
     instance.assetId.identificator = '0000-0000'
     instance.testBooleanField = False
     instance.testDateField = date(2019, 9, 20)
-    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
+    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15, 123456)
     instance.testDecimalField = 79.07
     instance.testDecimalFieldMetKard = [10.0, 20.0]
     instance.testEenvoudigType.waarde = 'string1'
@@ -47,7 +47,7 @@ async def test_export_and_then_import_unnested_attributes(recwarn):
         "geometry": "POINT Z (200000 200000 0)",
         "testBooleanField": False,
         "testDateField": "2019-09-20",
-        "testDateTimeField": "2001-12-15 22:22:15",
+        "testDateTimeField": "2001-12-15 22:22:15.123456",
         "testDecimalField": 79.07,
         "testDecimalFieldMetKard": [
             10.0,

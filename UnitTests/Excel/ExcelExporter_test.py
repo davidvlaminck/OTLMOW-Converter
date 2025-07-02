@@ -58,7 +58,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     instance.assetId.identificator = '0000-0000'
     instance.testBooleanField = False
     instance.testDateField = date(2019, 9, 20)
-    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
+    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15, 123456)
     instance.testDecimalField = 79.07
     instance.testDecimalFieldMetKard = [10.0, 20.0]
     instance.testEenvoudigType.waarde = 'string1'
@@ -84,7 +84,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
 
     assert not instanceImported.testBooleanField
     assert instanceImported.testDateField == date(2019, 9, 20)
-    assert instanceImported.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instanceImported.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15, 123456)
     assert instanceImported.testDecimalField == 79.07
     assert instanceImported.testDecimalFieldMetKard == [10.0, 20.0]
     assert instanceImported.testEenvoudigType.waarde == 'string1'
@@ -234,7 +234,7 @@ def test_export_and_then_import_sheetname_abbreviation(recwarn):
     assert not warns
 
     # first load the objects in the template to see it the basics are there
-    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = ExcelImporter.to_objects(filepath=file_location)
     assert len(objects) == 3
 
     instance_imported, instance_to_be_abbreviated_imported, instance_to_be_abbreviated2_imported = objects

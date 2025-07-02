@@ -91,8 +91,10 @@ class ExcelImporter(AbstractImporter):
                     file_path=filepath, tab=sheet
                 ))
             except NoTypeUriInTableError:
+                if sheet.title() == 'Keuzelijsten':
+                    continue
                 exception_group.add_exception(NoTypeUriInExcelTabError(
-                    message=f'Could not find typeURI within 5 rows in the file {filepath.name}',
+                    message=f'Could not find typeURI within 5 rows in the file {filepath.name} in sheet {sheet}',
                     file_path=filepath, tab=sheet
                 ))
             except MissingHeaderError as ex:

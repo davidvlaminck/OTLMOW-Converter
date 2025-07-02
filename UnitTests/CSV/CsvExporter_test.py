@@ -24,7 +24,7 @@ def test_export_unnested_attributes():
     instance.assetId.identificator = '0000'
     instance.testBooleanField = False
     instance.testDateField = date(2019, 9, 20)
-    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
+    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15, 123456)
     instance.testDecimalField = 79.07
     instance.testDecimalFieldMetKard = [10.0, 20.0]
     instance.testEenvoudigType.waarde = 'string1'
@@ -63,7 +63,7 @@ def test_export_unnested_attributes():
 
     line_1 = lines[1]
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'False',
-                      '2019-09-20', '2001-12-15 22:22:15', '79.07', '10.0|20.0', 'string1', 'string1|string2', '-55',
+                      '2019-09-20', '2001-12-15 22:22:15.123456', '79.07', '10.0|20.0', 'string1', 'string1|string2', '-55',
                       '76|2', 'waarde-4', 'waarde-4|waarde-3', '98.21', '10.0|20.0', 'oFfeDLp', 'string1|string2',
                       '11:05:26']
 
