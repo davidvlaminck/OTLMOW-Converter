@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Iterable
 
-from numpy import ndarray
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from pandas import DataFrame
 
@@ -37,13 +36,18 @@ class PandasConverter:
         return {key: DataFrame(data=value[1:]) for key, value in dict_tables.items()}
 
     @classmethod
+    def tolist_if_possible(cls, x):
+        tolist = getattr(x, "tolist", None)
+        return tolist() if callable(tolist) else x
+
+    @classmethod
     def convert_dataframe_to_objects(cls, dataframe: DataFrame, model_directory: Path = None, **kwargs
                                      ) -> Iterable[OTLObject]:
         df = dataframe.where(~dataframe.isna(), None)
 
         for col in df.columns:
-            if df[col].apply(lambda x: isinstance(x, ndarray)).any():
-                df[col] = df[col].apply(lambda x: x.tolist() if isinstance(x, ndarray) else x)
+            if any(callable(getattr(x, "tolist", None)) for x in df[col]):
+                df[col] = df[col].apply(cls.tolist_if_possible)
 
         headers = list(df)
         d = {header: index for index, header in enumerate(headers)}
@@ -64,4 +68,4 @@ class PandasConverter:
 
         return await DotnotationTableConverter.get_data_from_table_async(
             table_data=dict_list,   model_directory=model_directory, **kwargs)
-    
+
