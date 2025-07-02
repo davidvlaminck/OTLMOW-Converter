@@ -21,7 +21,7 @@ WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = jsonld_settings['warn_for_non_otl_conform_
 
 class JsonLdExporter(AbstractExporter):
     @classmethod
-    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
@@ -57,8 +57,11 @@ class JsonLdExporter(AbstractExporter):
         with open(filepath, "w") as file:
             file.write(encoded_json)
 
+        filepath.touch()
+        return (filepath,)
+
     @classmethod
-    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
@@ -97,6 +100,9 @@ class JsonLdExporter(AbstractExporter):
 
         with open(filepath, "w") as file:
             file.write(encoded_json)
+
+        filepath.touch()
+        return (filepath,)
 
     @classmethod
     def modify_jsonld_for_context(cls, encoded_json: str):
