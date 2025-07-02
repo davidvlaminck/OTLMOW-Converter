@@ -171,15 +171,14 @@ class GeoJSONExporter(AbstractExporter):
         coords = list(geojson.utils.coords(geometry))
         if not coords:
             return []
+
+        xs = [c[0] for c in coords]
+        ys = [c[1] for c in coords]
         dim = len(coords[0])
         if dim == 3:
-            xs = [c[0] for c in coords]
-            ys = [c[1] for c in coords]
             zs = [c[2] for c in coords]
             return [min(xs), min(ys), min(zs), max(xs), max(ys), max(zs)]
         else:
-            xs = [c[0] for c in coords]
-            ys = [c[1] for c in coords]
             return [[min(xs), min(ys)], [max(xs), max(ys)]]
 
     @classmethod
