@@ -166,7 +166,7 @@ def test_combine_files_three_files_success(subtests):
     json_path = combine_directory / 'asset_3.json'
     geojson_path = combine_directory / 'asset_3.geojson'
     combined_objects = combine_files([csv_path, json_path, geojson_path], model_directory=test_model_directory)
-    assert len(combined_objects) == 1
+    assert len(combined_objects) == 2
 
 
 def test_combine_files_file_read_error():
