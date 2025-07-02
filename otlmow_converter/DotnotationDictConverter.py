@@ -9,6 +9,7 @@ from typing import Generator
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
 from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
+from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
@@ -175,7 +176,7 @@ class DotnotationDictConverter:
             )
 
     @staticmethod
-    def _handle_none_value(attribute: OTLAttribuut, field, kard_max: str, waarde_shortcut: bool,
+    def _handle_none_value(attribute: OTLAttribuut, field: OTLField, kard_max: str, waarde_shortcut: bool,
         separator: str, cardinality_indicator: str ) -> Generator[tuple[str, object], None, None]:
         if not attribute.mark_to_be_cleared:
             return
@@ -189,9 +190,10 @@ class DotnotationDictConverter:
             yield dotnotation, field.clearing_value
 
     @staticmethod
-    def _handle_primitive_value(attribute: OTLAttribuut, field, kard_max: str, waarde: object, waarde_shortcut: bool,
-                                separator: str, cardinality_indicator: str, cardinality_separator: str,
-                                cast_list: bool, cast_datetime: bool) -> Generator[tuple[str, object], None, None]:
+    def _handle_primitive_value(attribute: OTLAttribuut, field: OTLField, kard_max: str, waarde: object,
+                                waarde_shortcut: bool, separator: str, cardinality_indicator: str,
+                                cardinality_separator: str,  cast_list: bool, cast_datetime: bool
+                                ) -> Generator[tuple[str, object], None, None]:
         dotnotation = DotnotationHelper.get_dotnotation(
             attribute, waarde_shortcut=waarde_shortcut, separator=separator,
             cardinality_indicator=cardinality_indicator
