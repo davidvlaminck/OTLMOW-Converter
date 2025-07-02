@@ -1,7 +1,5 @@
 from pathlib import Path
 from typing import Iterable
-
-from numpy import nan
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from pandas import DataFrame
 
@@ -39,7 +37,7 @@ class PandasConverter:
     @classmethod
     def convert_dataframe_to_objects(cls, dataframe: DataFrame, model_directory: Path = None, **kwargs
                                      ) -> Iterable[OTLObject]:
-        dataframe = dataframe.replace({nan: None})
+        dataframe = dataframe.where(~dataframe.isna(), None)
         headers = list(dataframe)
         d = {header: index for index, header in enumerate(headers)}
         dict_list = [d]
@@ -51,7 +49,7 @@ class PandasConverter:
     @classmethod
     async def convert_dataframe_to_objects_async(cls, dataframe: DataFrame, model_directory: Path = None, **kwargs
                                      ) -> Iterable[OTLObject]:
-        dataframe = dataframe.replace({nan: None})
+        dataframe = dataframe.where(~dataframe.isna(), None)
         headers = list(dataframe)
         d = {header: index for index, header in enumerate(headers)}
         dict_list = [d]
