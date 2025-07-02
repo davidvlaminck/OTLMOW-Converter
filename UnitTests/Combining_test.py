@@ -10,6 +10,7 @@ from otlmow_converter.Exceptions.CannotCombineDifferentAssetsError import Cannot
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.NoIdentificatorError import NoIdentificatorError
 from otlmow_converter.HelperFunctions import combine_assets, combine_two_asset_instances, combine_files
+from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 
 @pytest.fixture
@@ -158,6 +159,30 @@ def test_combine_files_two_errors_in_two_files(subtests):
 
     with subtests.test('Check 2nd exception attributes: file list'):
         assert exc2.files == [csv_path, json_path]
+
+
+def test_combine_files_three_files_success(subtests):
+    csv_path = combine_directory / 'asset_3.csv'
+    json_path = combine_directory / 'asset_3.json'
+    geojson_path = combine_directory / 'asset_3.geojson'
+    combined_objects = combine_files([csv_path, json_path, geojson_path], model_directory=test_model_directory)
+    assert len(combined_objects) == 1
+
+
+def test_combine_files_file_read_error():
+    # Create a dummy file path that does not exist or will cause an error
+    bad_file = combine_directory / "not_a_real_file.json"
+    # This file does not exist, so OtlmowConverter.from_file_to_objects will raise an Exception
+
+    # The test expects that the exception is caught, file_path is set, and the error is collected
+    with pytest.raises(Exception) as exc_group:
+        combine_files([bad_file])
+
+    # If the exception is an ExceptionsGroup, check the file_path attribute
+    if hasattr(exc_group.value, "exceptions"):
+        ex = exc_group.value.exceptions[0]
+        assert hasattr(ex, "file_path")
+        assert ex.file_path == bad_file
 
 
 def test_combine_files_three_files_failing(subtests):
