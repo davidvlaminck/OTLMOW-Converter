@@ -79,5 +79,21 @@ def instantiate_all():
     print(f'Time: {round(end - start, 2)}')
 
 
+def return_all_benchmark_file_paths():
+    """Reads all files in the benchmark/files directory and returns a list of Path objects."""
+    files_dir = Path(base_dir) / 'files'
+    return [f for f in files_dir.iterdir() if f.is_file()]
+
+
+def read_all_files():
+    for file_path in return_all_benchmark_file_paths():
+        try:
+            OtlmowConverter.from_file_to_objects(file_path)
+        except Exception as ex:
+            print(f'Error reading file {file_path}: {ex}')
+            continue
+
+
 if __name__ == '__main__':
     instantiate_all()
+    read_all_files()
