@@ -16,19 +16,26 @@ class PyArrowConverter:
         # Collect all keys in a single pass
         all_keys = sorted(set().union(*(d.keys() for d in dict_list)))
 
-        # Pre-allocate a list of dicts with all keys, only if needed
-        if all(len(d) == len(all_keys) for d in dict_list):
-            # All dicts already have all keys, no need to normalize
-            return pa.Table.from_pylist(dict_list)
-        else:
-            # Only fill missing keys for dicts that need it
+        # Normalize dicts so all have all keys
+        if any(len(d) != len(all_keys) for d in dict_list):
             normalized_dict_list = []
             for d in dict_list:
                 if len(d) == len(all_keys):
                     normalized_dict_list.append(d)
                 else:
                     normalized_dict_list.append({k: d.get(k, None) for k in all_keys})
-            return pa.Table.from_pylist(normalized_dict_list)
+            dict_list = normalized_dict_list
+
+        # Build schema: auto-detect for all columns except 'aanleg' and 'aansluitvermogen'
+        str_columns = {'aanleg','aansluitvermogen','aantalAdersEnSectie','afmeting','afmetingGrondvlak','afmetingen','appurtenanceType','armlengte','autonomie','beheeroptie','bijlage','brandweerstand','breedte','buitendiameter','code','communicatiewijze','detectieprincipe','diameter','diameterPaalschacht','diepte','dikte','droogzetbaarheid','fabrikant','foto','frequentierange','functie','gebruik','gewicht','hellingshoek','hoogte','hoogteBovenMaaiveld','kaliber','kleur','laagtype','lengte','licentie','lichtpuntHoogte','masthoogte','masttype','materiaal','maximaalDebiet','merk','modelnaam','nominaalVermogen','nominaleSpanning','ontwerpbelasting','opschrift','opstelHoogte','opstelling','paallengte','plaatsingswijze','productfamilie','protocol','rijrichting','rijstrook','schermelementtype','sluitkracht','soort','soortLamp','soortOmschrijving','spanning','subthema','totaleLengte','type','typeBevestiging','typeSpecificatie','uitvoering','uitvoeringsmethode','uitvoeringswijze','vermogen','vorm','vormgeving'}
+        str_columns = {col for base in str_columns for col in (base, f"{base}[]")}
+        for key in all_keys:
+            if key in str_columns:
+                for d in dict_list:
+                    if key in d and d[key] is not None and not isinstance(d[key], str):
+                        d[key] = str(d[key])
+
+        return pa.Table.from_pylist(dict_list)
 
     @classmethod
     def convert_objects_to_multiple_tables(cls, list_of_objects) -> dict[str, pa.Table]:
