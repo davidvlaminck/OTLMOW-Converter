@@ -163,7 +163,7 @@ def test_export_and_then_import_nested_attributes_level_1():
                       'testUnionTypeMetKard[].unionKwantWrd']
     line_1 = lines[1]
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '',
-                      'True', '65.14', '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
+                      'true', '65.14', '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
                       'string1|string2', 'RWKofW', '10.0|20.0']
 
     shutil.rmtree(temp_dir_path)

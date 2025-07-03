@@ -199,7 +199,7 @@ class CsvExporter(AbstractExporter):
 
         # Reorder columns: required_first, then the rest (excluding duplicates)
         all_names = full_table.schema.names
-        rest = [name for name in all_names if name not in required_first]
+        rest = sorted(name for name in all_names if name not in required_first)
         final_order = required_first + rest
         reordered_columns = [full_table.column(name) for name in final_order]
 
