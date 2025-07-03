@@ -8,7 +8,7 @@ class PyArrowConverter:
     @classmethod
     def convert_objects_to_single_table(cls, list_of_objects) -> pa.Table:
         # Convert each object to a dotnotation dict
-        dict_list = [DotnotationDictConverter.to_dict(obj) for obj in list_of_objects]
+        dict_list = [DotnotationDictConverter.to_dict(obj, cast_list=True, cast_datetime=True, waarde_shortcut=True) for obj in list_of_objects]
 
         if not dict_list:
             return pa.table({})
