@@ -61,8 +61,32 @@ class CsvExporter(AbstractExporter):
             delimiter = ';'
 
         if not split_per_type:
-            table = PyArrowConverter.convert_objects_to_single_table(sequence_of_objects)
-            CsvExporter.from_pyarrow_table(table, Path(filepath))
+            table = PyArrowConverter.convert_objects_to_single_table(
+                list_of_objects=sequence_of_objects,
+                separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cast_list=cast_list, cast_datetime=cast_datetime,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            CsvExporter.from_pyarrow_table_to_file(table, Path(filepath), delimiter=delimiter)
+        else:
+            multi_table_dict = PyArrowConverter.convert_objects_to_multiple_tables(
+                list_of_objects=sequence_of_objects,
+                separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cast_list=cast_list, cast_datetime=cast_datetime,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+            created_filepaths = []
+            for short_uri, table_data in multi_table_dict.items():
+                specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
+                created_filepath = Path(filepath.parent / specific_filename)
+
+                cls.from_pyarrow_table_to_file(
+                    table=table_data, filepath=created_filepath, delimiter=delimiter)
+                created_filepath.touch()
+                created_filepaths.append(created_filepath)
         return
 
         if not split_per_type:
@@ -173,7 +197,7 @@ class CsvExporter(AbstractExporter):
         return tuple(created_filepaths)
 
     @classmethod
-    def from_pyarrow_table(cls, table: 'pa.Table', filepath: Path, delimiter: str = None) -> Path:
+    def from_pyarrow_table_to_file(cls, table: 'pa.Table', filepath: Path, delimiter: str = None) -> Path:
         """
         Write a pyarrow.Table to a CSV file.
         Ensures 'typeURI', 'assetId.identificator', and 'assetId.toegekendDoor' are the first columns,
