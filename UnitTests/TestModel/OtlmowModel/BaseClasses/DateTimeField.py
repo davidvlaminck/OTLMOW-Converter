@@ -18,6 +18,7 @@ class DateTimeField(OTLField):
     label = 'Datumtijd'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#dateTime'
     clearing_value = '88888888'
+    native_type = datetime.datetime
 
     @classmethod
     def validate(cls, value: Any, attribuut) -> bool:

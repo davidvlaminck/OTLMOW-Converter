@@ -15,6 +15,7 @@ class BooleanField(OTLField):
     label = 'Boolean'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#boolean'
     clearing_value = '88888888'
+    native_type = bool
 
     @classmethod
     def convert_to_correct_type(cls, value: Any, log_warnings: bool = True) -> Optional[bool]:

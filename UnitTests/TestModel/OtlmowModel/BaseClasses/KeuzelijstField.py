@@ -15,6 +15,7 @@ class KeuzelijstField(OTLField):
     options: Dict[str, KeuzelijstWaarde] = {}
     codelist = ''
     clearing_value = '88888888'
+    native_type = str
 
     @classmethod
     def create_dummy_data_keuzelijst(cls, options) -> Optional[str]:
