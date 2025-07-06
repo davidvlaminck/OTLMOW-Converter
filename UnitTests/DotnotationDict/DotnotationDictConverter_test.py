@@ -246,6 +246,33 @@ def test_from_dict_simple_attribute_with_cardinality_clear_values():
     assert created_instance == expected
 
 
+def test_to_dict_native_types_dict_for_cardinality_and_nested():
+    instance = AllCasesTestClass()
+    instance.testIntegerFieldMetKard = [1, 2, 3]
+    instance.testDateField = date(2022, 1, 1)
+    instance.testComplexType.testBooleanField = True
+    instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde = 20.0
+
+    result = DotnotationDictConverter.to_dict(instance, collect_native_types=True)
+    assert result['_native_type_dict']['testDateField'] == date
+    assert result['_native_type_dict']['testComplexType.testBooleanField'] == bool
+    assert result['_native_type_dict']['testComplexTypeMetKard[].testComplexType2.testKwantWrd'] == float
+    assert result['_native_type_dict']['testIntegerFieldMetKard[]'] == int
+
+
+def test_to_dict_native_types_dict_for_clear_values_and_lists():
+    instance = AllCasesTestClass()
+    instance._testDateField.clear_value()
+    instance._testIntegerFieldMetKard.clear_value()
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[0]._testStringField.clear_value()
+
+    result = DotnotationDictConverter.to_dict(instance, collect_native_types=True)
+    assert result['_native_type_dict']['testDateField'] == date
+    assert result['_native_type_dict']['testIntegerFieldMetKard[]'] == int
+    assert result['_native_type_dict']['testComplexTypeMetKard[].testStringField'] == str
+
+
 def test_to_dict_simple_attribute_with_cardinality():
     instance = AllCasesTestClass()
     instance.testIntegerFieldMetKard = [1, 2, 3]
