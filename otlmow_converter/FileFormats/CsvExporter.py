@@ -69,6 +69,7 @@ class CsvExporter(AbstractExporter):
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             CsvExporter.from_pyarrow_table_to_file(table, Path(filepath), delimiter=delimiter)
+            return (filepath,)
         else:
             multi_table_dict = PyArrowConverter.convert_objects_to_multiple_tables(
                 list_of_objects=sequence_of_objects,
@@ -87,7 +88,7 @@ class CsvExporter(AbstractExporter):
                     table=table_data, filepath=created_filepath, delimiter=delimiter)
                 created_filepath.touch()
                 created_filepaths.append(created_filepath)
-        return
+        return tuple(created_filepaths)
 
         if not split_per_type:
             single_table = DotnotationTableConverter.get_single_table_from_data(

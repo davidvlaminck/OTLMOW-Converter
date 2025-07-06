@@ -99,16 +99,16 @@ def test_export_unnested_attributes_split_per_type():
     line_1 = lines[1]
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'oFfeDLp']
 
-    with open(temp_dir_path / 'unnested_onderdeel_AnotherTestClass.csv', 'r') as file:
-        lines = list(file)
+    with open(temp_dir_path / 'unnested_onderdeel_AnotherTestClass.csv', newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file, delimiter=';')
+        lines = list(csv_reader)
     assert len(lines) == 2
 
-    line_0 = lines[0].split(';')
-    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie\n']
+    line_0 = lines[0]
+    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie']
 
-    line_1 = lines[1].split(';')
-    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '0001', '',
-                      'notitie\n']
+    line_1 = lines[1]
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '0001', '', 'notitie']
 
     shutil.rmtree(temp_dir_path)
 
