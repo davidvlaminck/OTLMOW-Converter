@@ -67,7 +67,8 @@ class CsvExporter(AbstractExporter):
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
                 cast_list=cast_list, cast_datetime=cast_datetime,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                avoid_multiple_types_in_single_column=True)
             CsvExporter.from_pyarrow_table_to_file(table, Path(filepath), delimiter=delimiter)
             return (filepath,)
         else:
@@ -77,7 +78,8 @@ class CsvExporter(AbstractExporter):
                 cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
                 cast_list=cast_list, cast_datetime=cast_datetime,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                avoid_multiple_types_in_single_column=True)
 
             created_filepaths = []
             for short_uri, table_data in multi_table_dict.items():
