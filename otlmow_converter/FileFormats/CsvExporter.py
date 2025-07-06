@@ -6,7 +6,10 @@ from typing import Iterable
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
+from otlmow_converter.FileFormats.PyArrowConverter import PyArrowConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
+import pyarrow as pa
+import pyarrow.csv as pacsv
 
 load_settings()
 
@@ -56,6 +59,35 @@ class CsvExporter(AbstractExporter):
 
         if delimiter == '':
             delimiter = ';'
+
+        if not split_per_type:
+            table = PyArrowConverter.convert_objects_to_single_table(
+                list_of_objects=sequence_of_objects,
+                separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cast_list=cast_list, cast_datetime=cast_datetime,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            CsvExporter.from_pyarrow_table_to_file(table, Path(filepath), delimiter=delimiter)
+        else:
+            multi_table_dict = PyArrowConverter.convert_objects_to_multiple_tables(
+                list_of_objects=sequence_of_objects,
+                separator=separator, cardinality_separator=cardinality_separator,
+                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                cast_list=cast_list, cast_datetime=cast_datetime,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+            created_filepaths = []
+            for short_uri, table_data in multi_table_dict.items():
+                specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
+                created_filepath = Path(filepath.parent / specific_filename)
+
+                cls.from_pyarrow_table_to_file(
+                    table=table_data, filepath=created_filepath, delimiter=delimiter)
+                created_filepath.touch()
+                created_filepaths.append(created_filepath)
+        return
 
         if not split_per_type:
             single_table = DotnotationTableConverter.get_single_table_from_data(
@@ -163,6 +195,45 @@ class CsvExporter(AbstractExporter):
             created_filepath.touch()
             created_filepaths.append(created_filepath)
         return tuple(created_filepaths)
+
+    @classmethod
+    def from_pyarrow_table_to_file(cls, table: 'pa.Table', filepath: Path, delimiter: str = None) -> Path:
+        """
+        Write a pyarrow.Table to a CSV file.
+        Ensures 'typeURI', 'assetId.identificator', and 'assetId.toegekendDoor' are the first columns,
+        adding them as empty columns if missing.
+        """
+        if delimiter is None:
+            delimiter = DELIMITER or ';'
+
+        required_first = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
+        table_colnames = table.schema.names
+        num_rows = table.num_rows
+
+        # Add missing required columns as empty string columns
+        new_fields = list(table.schema)
+        new_columns = list(table.itercolumns())
+        for col in required_first:
+            if col not in table_colnames:
+                new_fields.append(pa.field(col, pa.string()))
+                new_columns.append(pa.array([''] * num_rows))
+
+        # Build a new table with all columns (original + missing)
+        full_table = pa.table(new_columns, names=[f.name for f in new_fields])
+
+        # Reorder columns: required_first, then the rest (excluding duplicates)
+        all_names = full_table.schema.names
+        rest = sorted(name for name in all_names if name not in required_first)
+        final_order = required_first + rest
+        reordered_columns = [full_table.column(name) for name in final_order]
+
+        final_table = pa.table(reordered_columns, names=final_order)
+
+        write_options = pacsv.WriteOptions(delimiter=delimiter)
+        with open(filepath, "wb") as f:
+            pacsv.write_csv(final_table, f, write_options=write_options)
+        filepath.touch()
+        return filepath
 
     @classmethod
     def _write_file(cls, file_location: Path, data: Iterable[Iterable], delimiter: str, quote_char: str) -> None:

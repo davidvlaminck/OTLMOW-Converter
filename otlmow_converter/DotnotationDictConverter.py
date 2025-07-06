@@ -4,9 +4,12 @@ import inspect
 import warnings
 from asyncio import sleep
 from pathlib import Path
+from typing import Generator
+
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
 from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
+from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
@@ -288,9 +291,10 @@ class DotnotationDictConverter:
         else:
             yield from combined_dict.items()
 
-    @classmethod
-    def handle_non_conform_attribute(cls, allow_non_otl_conform_attributes, attr_key, attribute, object_or_attribute,
-                                     warn_for_non_otl_conform_attributes):
+    @staticmethod
+    def handle_non_conform_attribute(allow_non_otl_conform_attributes: bool, attr_key: str, attribute: object,
+        object_or_attribute: object, warn_for_non_otl_conform_attributes: bool
+                                     ) -> Generator[tuple[str, object], None, None]:
         if attr_key.startswith('_'):
             raise ValueError(
                 f'{attr_key} is a non standardized attribute of {object_or_attribute.__class__.__name__}. '

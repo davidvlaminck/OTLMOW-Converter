@@ -5,6 +5,7 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
@@ -62,7 +63,7 @@ def test_export_unnested_attributes():
                       'testTimeField']
 
     line_1 = lines[1]
-    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'False',
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'false',
                       '2019-09-20', '2001-12-15 22:22:15.123456', '79.07', '10.0|20.0', 'string1', 'string1|string2', '-55',
                       '76|2', 'waarde-4', 'waarde-4|waarde-3', '98.21', '10.0|20.0', 'oFfeDLp', 'string1|string2',
                       '11:05:26']
@@ -163,7 +164,7 @@ def test_export_and_then_import_nested_attributes_level_1():
                       'testUnionTypeMetKard[].unionKwantWrd']
     line_1 = lines[1]
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '',
-                      'True', '65.14', '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
+                      'true', '65.14', '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
                       'string1|string2', 'RWKofW', '10.0|20.0']
 
     shutil.rmtree(temp_dir_path)
@@ -228,3 +229,29 @@ def test_export_list_of_lists():
 
     with pytest.raises(DotnotationListOfListError):
         CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False)
+
+
+def test_export_choice_list():
+
+    d = {
+        "assetId": {
+            "identificator": "dummy_LySD",
+            "toegekendDoor": "dummy_hxzA"
+        },
+        "diameter": "100",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Fietslantaarn"
+    }
+    e = {
+        "assetId": {
+            "identificator": "dummy_Lesw",
+            "toegekendDoor": "dummy_ySKHg"
+        },
+        "Tank": 70.29,
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Tank"
+    }
+    obj_d = OTLObject.from_dict(d)
+    obj_e = OTLObject.from_dict(e, waarde_shortcut=True)
+    file_location = Path(__file__).parent / 'Testfiles' / 'choice_list.csv'
+    CsvExporter.from_objects(sequence_of_objects=[obj_e, obj_d], filepath=file_location,
+                             split_per_type=False, )
+    file_location.unlink()
