@@ -126,17 +126,24 @@ def test_to_dict_datetime():
     instance.testTimeField = time(10, 11, 12)
     instance.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12, 123456)
 
-    assert DotnotationDictConverter.to_dict(instance) == {
+    assert DotnotationDictConverter.to_dict(instance, collect_native_types=True) == {
         'testDateField': date(2022, 12, 12),
         'testTimeField': time(10, 11, 12),
         'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12, 123456),
-        'typeURI': AllCasesTestClass.typeURI}
+        'typeURI': AllCasesTestClass.typeURI,
+        '_native_type_dict': {
+            'testDateField': date,
+            'testTimeField': time,
+            'testDateTimeField': datetime
+        }
+    }
 
     assert DotnotationDictConverter.to_dict(instance, cast_datetime=True) == {
         'testDateField': '2022-12-12',
         'testTimeField': '10:11:12',
         'testDateTimeField': '2022-12-12 10:11:12.123456',
-        'typeURI': AllCasesTestClass.typeURI}
+        'typeURI': AllCasesTestClass.typeURI
+    }
 
 
 def test_from_dict_with_non_conform_otl_attributes(subtests, recwarn):

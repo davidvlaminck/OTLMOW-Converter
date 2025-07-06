@@ -79,20 +79,39 @@ class DotnotationDictConverter:
     def to_dict(cls, otl_object: OTLObject, waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
                 cardinality_indicator: str = CARDINALITY_INDICATOR, cardinality_separator: str = CARDINALITY_SEPARATOR,
                 cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
-                warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False
-                ) -> DotnotationDict:
+                warn_for_non_otl_conform_attributes: bool = True, cast_list: bool = False,
+                collect_native_types: bool = False) -> DotnotationDict:
         type_uri = getattr(otl_object, 'typeURI', None)
         if type_uri is None:
             raise ValueError('typeURI is None. The object must have an attribute typeURI.')
 
-        d = DotnotationDict(cls._iterate_over_attributes_and_values_by_dotnotation(
-            object_or_attribute=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
-            cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
-            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
-            cast_list=cast_list, cast_datetime=cast_datetime))
-        d['typeURI'] = type_uri
-        return d
+        ddict = {}
+
+        if collect_native_types:
+            native_type_dict = {}
+            for dot_key, value, native_type in cls._iterate_over_attributes_and_values_by_dotnotation(
+                object_or_attribute=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
+                cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                cast_list=cast_list, cast_datetime=cast_datetime, collect_native_types=collect_native_types):
+                ddict[dot_key] = value
+                if native_type is not None:
+                    native_type_dict[dot_key] = native_type
+            if native_type_dict:
+                ddict['_native_type_dict'] = native_type_dict
+        else:
+            for dot_key, value in cls._iterate_over_attributes_and_values_by_dotnotation(
+                object_or_attribute=otl_object, waarde_shortcut=waarde_shortcut, separator=separator,
+                cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                cast_list=cast_list, cast_datetime=cast_datetime):
+                ddict[dot_key] = value
+
+        ddict['typeURI'] = type_uri
+
+        return DotnotationDict(ddict)
 
     @classmethod
     async def to_dict_async(
@@ -116,21 +135,29 @@ class DotnotationDictConverter:
         return d
 
     @classmethod
-    def _iterate_over_attributes_and_values_by_dotnotation(cls, object_or_attribute: OTLObject | OTLAttribuut,
-                                                           waarde_shortcut: bool = WAARDE_SHORTCUT,
-                                                           separator: str = SEPARATOR,
-                                                           cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                                           cardinality_separator: str = CARDINALITY_SEPARATOR,
-                                                           allow_non_otl_conform_attributes: bool = True,
-                                                           warn_for_non_otl_conform_attributes: bool = True,
-                                                           cast_list: bool = False,
-                                                           cast_datetime: bool = False) -> (str, object):
+    def _iterate_over_attributes_and_values_by_dotnotation(
+            cls, object_or_attribute: OTLObject | OTLAttribuut,
+            waarde_shortcut: bool = WAARDE_SHORTCUT,
+            separator: str = SEPARATOR,
+            cardinality_indicator: str = CARDINALITY_INDICATOR,
+            cardinality_separator: str = CARDINALITY_SEPARATOR,
+            allow_non_otl_conform_attributes: bool = True,
+            warn_for_non_otl_conform_attributes: bool = True,
+            cast_list: bool = False,
+            cast_datetime: bool = False,
+            collect_native_types: bool = False
+    ):
         for attr_key, attribute in vars(object_or_attribute).items():
             if attr_key in {'_parent', '_valid_relations', '_geometry_types'}:
                 continue
             if not isinstance(attribute, OTLAttribuut):
-                yield from cls.handle_non_conform_attribute(allow_non_otl_conform_attributes, attr_key, attribute,
-                                                            object_or_attribute, warn_for_non_otl_conform_attributes)
+                for k, v in cls.handle_non_conform_attribute(
+                        allow_non_otl_conform_attributes, attr_key, attribute,
+                        object_or_attribute, warn_for_non_otl_conform_attributes):
+                    if collect_native_types:
+                        yield k, v, None
+                    else:
+                        yield k, v
                 continue
             if attribute.waarde is None:
                 if not attribute.mark_to_be_cleared:
@@ -139,56 +166,93 @@ class DotnotationDictConverter:
                 dotnotation = DotnotationHelper.get_dotnotation(
                     attribute, waarde_shortcut=waarde_shortcut, separator=separator,
                     cardinality_indicator=cardinality_indicator)
+                native_type = getattr(getattr(attribute, 'field', None), 'native_type',
+                                      None) if collect_native_types else None
                 if attribute.kardinaliteit_max != '1':
-                    yield dotnotation, '88888888'
+                    if collect_native_types:
+                        yield dotnotation, '88888888', native_type
+                    else:
+                        yield dotnotation, '88888888'
                 else:
-                    yield dotnotation, attribute.field.clearing_value
+                    if collect_native_types:
+                        yield dotnotation, attribute.field.clearing_value, native_type
+                    else:
+                        yield dotnotation, attribute.field.clearing_value
                 continue
 
             if attribute.field.waardeObject is None:
                 dotnotation = DotnotationHelper.get_dotnotation(
                     attribute, waarde_shortcut=waarde_shortcut, separator=separator,
                     cardinality_indicator=cardinality_indicator)
+                native_type = getattr(getattr(attribute, 'field', None), 'native_type',
+                                      None) if collect_native_types else None
                 if dotnotation.count(cardinality_indicator) > 1:
                     raise DotnotationListOfListError(f'Can not use dotnotation for lists of lists. '
                                                      f'Dotnotation: {dotnotation}')
                 if attribute.mark_to_be_cleared:
-                    yield dotnotation, attribute.field.clearing_value
+                    if collect_native_types:
+                        yield dotnotation, attribute.field.clearing_value, native_type
+                    else:
+                        yield dotnotation, attribute.field.clearing_value
 
                 if cast_list and attribute.kardinaliteit_max != '1':
-                    yield dotnotation, cardinality_separator.join(str(a) for a in attribute.waarde)
+                    if collect_native_types:
+                        yield dotnotation, cardinality_separator.join(str(a) for a in attribute.waarde), native_type
+                    else:
+                        yield dotnotation, cardinality_separator.join(str(a) for a in attribute.waarde)
                 elif cast_datetime:
-                    yield dotnotation, attribute.field.value_default(attribute.waarde)
+                    if collect_native_types:
+                        yield dotnotation, attribute.field.value_default(attribute.waarde), native_type
+                    else:
+                        yield dotnotation, attribute.field.value_default(attribute.waarde)
                 else:
-                    yield dotnotation, attribute.waarde
+                    if collect_native_types:
+                        yield dotnotation, attribute.waarde, native_type
+                    else:
+                        yield dotnotation, attribute.waarde
             elif attribute.kardinaliteit_max != '1':
                 combined_dict: dict[str, list] = {}
+                native_types: dict[str, object] = {}
                 for index, lijst_item in enumerate(attribute.waarde):
-                    for k1, v1 in cls._iterate_over_attributes_and_values_by_dotnotation(
+                    for k1, v1, *nt in cls._iterate_over_attributes_and_values_by_dotnotation(
                             object_or_attribute=lijst_item, waarde_shortcut=waarde_shortcut, separator=separator,
                             cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
                             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
-                            cast_list=cast_list, cast_datetime=cast_datetime):
+                            cast_list=cast_list, cast_datetime=cast_datetime,
+                            collect_native_types=collect_native_types):
                         if k1 not in combined_dict:
                             combined_dict[k1] = [None for _ in range(index)]
                         combined_dict[k1].append(v1)
+                        if collect_native_types and nt:
+                            native_types[k1] = nt[0]
 
                     for lijst in combined_dict.values():
                         if len(lijst) < index + 1:
                             lijst.append(None)
                 if cast_list:
                     for k, v in combined_dict.items():
-                        yield k, cardinality_separator.join(str(a) for a in v)
+                        if collect_native_types:
+                            yield k, cardinality_separator.join(str(a) for a in v), native_types.get(k)
+                        else:
+                            yield k, cardinality_separator.join(str(a) for a in v)
                 else:
-                    yield from combined_dict.items()
+                    if collect_native_types:
+                        for k, v in combined_dict.items():
+                            yield k, v, native_types.get(k)
+                    else:
+                        yield from combined_dict.items()
             else:
-                yield from cls._iterate_over_attributes_and_values_by_dotnotation(
-                    object_or_attribute=attribute.waarde, waarde_shortcut=waarde_shortcut, separator=separator,
-                    cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
-                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
-                    cast_list=cast_list, cast_datetime=cast_datetime)
+                for result in cls._iterate_over_attributes_and_values_by_dotnotation(
+                        object_or_attribute=attribute.waarde, waarde_shortcut=waarde_shortcut, separator=separator,
+                        cardinality_indicator=cardinality_indicator, cardinality_separator=cardinality_separator,
+                        allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                        cast_list=cast_list, cast_datetime=cast_datetime, collect_native_types=collect_native_types):
+                    if collect_native_types:
+                        yield result
+                    else:
+                        yield result
 
     @classmethod
     def handle_non_conform_attribute(cls, allow_non_otl_conform_attributes, attr_key, attribute, object_or_attribute,
