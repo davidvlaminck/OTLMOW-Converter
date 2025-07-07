@@ -67,8 +67,7 @@ class PyArrowConverter:
     def convert_objects_to_multiple_tables(cls, list_of_objects: Iterable, waarde_shortcut: bool = WAARDE_SHORTCUT, separator: str = SEPARATOR,
             cardinality_separator: str = CARDINALITY_SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR,
             cast_list: bool = False, cast_datetime: bool = False, allow_non_otl_conform_attributes: bool = True,
-            warn_for_non_otl_conform_attributes: bool = True, allow_empty_asset_id: bool = True,
-            avoid_multiple_types_in_single_column: bool = False) -> dict[str, pa.Table]:
+            warn_for_non_otl_conform_attributes: bool = True, allow_empty_asset_id: bool = True) -> dict[str, pa.Table]:
         from collections import defaultdict
         type_to_objs = defaultdict(list)
         for otl_object in list_of_objects:
@@ -82,6 +81,5 @@ class PyArrowConverter:
             separator=separator, cardinality_indicator=cardinality_indicator,
             cardinality_separator=cardinality_separator,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
-            avoid_multiple_types_in_single_column=avoid_multiple_types_in_single_column)
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             for short_uri, objs in type_to_objs.items()}
