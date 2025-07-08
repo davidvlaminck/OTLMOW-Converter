@@ -1,5 +1,6 @@
 import ast
 import csv
+import logging
 from asyncio import sleep
 from datetime import datetime, date, time
 from pathlib import Path
@@ -123,7 +124,7 @@ class CsvImporter(AbstractImporter):
                     if e.args[0] == "'NoneType' object has no attribute 'field'":
                         if allow_non_otl_conform_attributes:
                             if warn_for_non_otl_conform_attributes:
-                                print(f'Warning: {e.args[0]}: {header} in file {filepath.name}, this is not OTL conform but will be loaded as string.')
+                                logging.warning(f'Warning: {e.args[0]}: {header} in file {filepath.name}, this is not OTL conform but will be loaded as string.')
                             schema_list.append((header, pa.string()))
                             if cardinality_indicator in header:
                                 headers_with_cardinality.append((header, pa.list_(pa.string())))
@@ -216,7 +217,6 @@ class CsvImporter(AbstractImporter):
         except pyarrow.lib.ArrowKeyError as e:
             cls.check_for_type_uri_in_first_five_rows_using_csv(delimiter, e, filepath, quote_char)
         type_uri_column = set(table_typeuri['typeURI'])
-        print(f'Found typeURI in file {filepath.name}: {type_uri_column}')
 
         if len(type_uri_column) == 1:
             return cls.to_objects(
