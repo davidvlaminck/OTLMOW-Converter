@@ -218,7 +218,7 @@ class CsvExporter(AbstractExporter):
         for col in required_first:
             if col not in table_colnames:
                 new_fields.append(pa.field(col, pa.string()))
-                new_columns.append(pa.array([''] * num_rows))
+                new_columns.append(pa.array([None] * num_rows))
 
         # Build a new table with all columns (original + missing)
         full_table = pa.table(new_columns, names=[f.name for f in new_fields])

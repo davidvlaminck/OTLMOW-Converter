@@ -21,13 +21,26 @@ def test_load_test_file(recwarn):
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
     assert len(assets) == 1
     assert assets[0].assetId.identificator == 'UgVLnoH'
-    assert len(recwarn.list) == 2
+    assert len(recwarn.list) == 0
+
+
+def test_load_test_file_with_non_otl_conform_attributes(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attribute.csv'
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
+    assert len(assets) == 1
+    assert assets[0].assetId.identificator == 'id2'
+    assert len(recwarn.list) == 1
+    assert recwarn.list[0].message.args[0] == ('non_conform_attribute is a non standardized attribute of '
+                                               'AnotherTestClass. The attribute will be added on the instance.')
+
+    with pytest.raises(AttributeError) as exc:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, allow_non_otl_conform_attributes=False))
 
 
 def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.csv'
-    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 2
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+    assert len(recwarn.list) == 0
 
     assert len(assets) == 1
     instance = assets[0]
@@ -56,7 +69,7 @@ def test_load_test_unnested_attributes(recwarn):
 def test_load_test_nested_attributes_1_level(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 1
+    assert len(recwarn.list) == 0
 
     assert len(assets) == 1
     instance = assets[0]
@@ -86,8 +99,8 @@ def test_load_test_nested_attributes_1_level(recwarn):
 
 def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.csv'
-    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 1
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+    assert len(recwarn.list) == 0
 
     assert len(assets) == 1
     instance = assets[0]
@@ -110,7 +123,7 @@ def test_load_test_subset_file(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'template_file_text_onderdeel_AllCasesTestClass.csv'
 
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
-    assert len(recwarn.list) == 2
+    assert len(recwarn.list) == 0
     assert len(assets) == 1
 
 
