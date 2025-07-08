@@ -111,19 +111,10 @@ if __name__ == '__main__':
         table = PrettyTable()
         table.field_names = [
             "Format", "Options",
-            "All Size (kB)", "All Read (s)", "All Write (s)",
-            "n", "10 Size (kB)", "10 Read (s)", "10 Write (s)"
+            "All/Size (kB)", "All/Read (s)", "All/Write (s)",
+            "n", "10/Size (kB)", "10/Read (s)", "10/Write (s)"
         ]
-        table.align = "r"
-        table.align["Format"] = "l"
-        table.align["Options"] = "l"
-        table.align["n"] = "c"
-        table.align["All Size (kB)"] = "r"
-        table.align["10 Size (kB)"] = "r"
-        table.align["All Read (s)"] = "r"
-        table.align["All Write (s)"] = "r"
-        table.align["10 Read (s)"] = "r"
-        table.align["10 Write (s)"] = "r"
+
         rows = []
 
     for format_details in formats:
@@ -213,7 +204,72 @@ if __name__ == '__main__':
             ])
 
         # Write to file in the new format using PrettyTable
-    with open(Path(base_dir) / 'benchmark_results.txt', "w") as file:
-        file.write(str(table) + "\n")
+        table_str = str(table)
+        lines = table_str.splitlines()
 
-    shutil.rmtree(Path(base_dir) / 'temp')
+        # Find the header (second row, index 1)
+        header_idx = 1
+        header_line = lines[header_idx]
+
+        # Remove "All/" and "10/" from the header, but replace with spaces to keep alignment
+        col_titles = [col for col in header_line.strip('|').split('|')]
+        new_header = []
+        all_indices = []
+        ten_indices = []
+        for i, col in enumerate(col_titles):
+            if col.strip().startswith("All/"):
+                new_header.append(col.replace("All/", " " * 4))
+                all_indices.append(i)
+            elif col.strip().startswith("10/"):
+                new_header.append(col.replace("10/", " " * 3))
+                ten_indices.append(i)
+            else:
+                new_header.append(col)
+
+            # Build the multi-line header
+            # First line: empty for Format/Options, then "All" over the All columns, "10" over the 10 columns
+            # Use the same width as the columns for the spaces
+            def col_width(col):
+                return len(col)
+
+
+            # Calculate column widths from the border line
+            border_line = lines[0]
+            col_widths = [len(part) for part in border_line.split('+')[1:-1]]
+
+            # Build the first multi-header line: two empty cells, then "All" spanning 3 columns, then "10" spanning 4 columns
+            first_multi_header_cells = []
+            first_multi_header_cells.append(" " * col_widths[0])
+            first_multi_header_cells.append(" " * col_widths[1])
+            # "All" spans columns 2,3,4
+            all_span = sum(col_widths[2:5]) + 2  # 2 separators between 3 columns
+            first_multi_header_cells.append("All".center(all_span))
+            # "10" spans columns 5,6,7,8
+            ten_span = sum(col_widths[5:]) + 3  # 3 separators between 4 columns
+            first_multi_header_cells.append("10".center(ten_span))
+            # Fill to match the number of columns
+            while len(first_multi_header_cells) < len(col_widths):
+                first_multi_header_cells.append(" " * col_widths[len(first_multi_header_cells)])
+
+            # Now, build the line with | separators
+            # The first two columns are empty, then "All" (spanning 3), then "10" (spanning 4)
+            first_multi_header = "|"
+            first_multi_header += first_multi_header_cells[0] + "|"
+            first_multi_header += first_multi_header_cells[1] + "|"
+            first_multi_header += first_multi_header_cells[2] + "|"
+            first_multi_header += first_multi_header_cells[3] + "|"
+
+            # Rebuild the header line with the new column names (without All/ and 10/)
+            new_header_line = "|".join([col if col.startswith(" ") else col.strip() for col in new_header])
+            new_header_line = "|" + new_header_line + "|"
+
+        # Write the new table to file
+        with open(Path(base_dir) / 'benchmark_results.txt', "w") as file:
+            file.write(lines[0] + "\n")  # top border
+            file.write(first_multi_header.rstrip() + "\n")
+            file.write(lines[0] + "\n")  # border
+            file.write(new_header_line + "\n")
+            for l in lines[2:]:
+                file.write(l + "\n")
+
+        shutil.rmtree(Path(base_dir) / 'temp')
