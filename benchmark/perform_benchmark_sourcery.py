@@ -7,7 +7,7 @@ from collections import namedtuple
 from pathlib import Path
 from statistics import mean, stdev
 
-from prettytable import prettytable
+from prettytable import PrettyTable
 
 # allow relative import of otlmow_converter
 base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     FormatDetails = namedtuple('FormatDetails', ['Extension', 'Label', 'WriteArguments'])
 
-    tb = prettytable.PrettyTable()
+    tb = PrettyTable()
     tb.field_names = ['Format', 'Read all classes', 'Write all classes', 'Size all classes',
                       'Read 10 random classes', 'Write 10 random classes', 'Size 10 random classes']
 
@@ -107,20 +107,25 @@ if __name__ == '__main__':
             csv_data = {'read_data_all_classes': results_dict['read_data_all_classes'],
                         'read_data_ten_classes': results_dict['read_data_ten_classes']}
 
-    # Prepare new ASCII table format
-    header = (
-        "+--------+------------------------+----------------------------------------+--------------------------------------------------------------------------+\n"
-        "| Format | Options                | All classes                            | 10 random classes                                                        |\n"
-        "|        |                        +----------------------------------------+--------------------------------------------------------------------------+\n"
-        "|        |                        |    Size (kB)     |    Read (s)     |    Write (s)    |   n   |   Size (kB)    |    Read (s)      |    Write (s)      |\n"
-        "+--------+------------------------+------------------+-----------------+-----------------+-------+---------------+------------------+-------------------+\n"
-    )
-    footer = (
-        "+--------+------------------------+------------------+-----------------+-----------------+-------+---------------+------------------+-------------------+\n"
-    )
+        # Use PrettyTable for automatic formatting
+        table = PrettyTable()
+        table.field_names = [
+            "Format", "Options",
+            "All Size (kB)", "All Read (s)", "All Write (s)",
+            "n", "10 Size (kB)", "10 Read (s)", "10 Write (s)"
+        ]
+        table.align = "r"
+        table.align["Format"] = "l"
+        table.align["Options"] = "l"
+        table.align["n"] = "c"
+        table.align["All Size (kB)"] = "r"
+        table.align["10 Size (kB)"] = "r"
+        table.align["All Read (s)"] = "r"
+        table.align["All Write (s)"] = "r"
+        table.align["10 Read (s)"] = "r"
+        table.align["10 Write (s)"] = "r"
+        rows = []
 
-    # Collect rows in new format
-    rows = []
     for format_details in formats:
         results_dict = {}
         read_all_classes_file_name = Path(base_dir) / 'files/all_classes.json'
@@ -157,7 +162,6 @@ if __name__ == '__main__':
 
         # Write and read for ten_random_classes, for 10, 100, 1000 objects per assettype
         for n_per_assettype in [10, 100, 1000]:
-            # Group by typeURI
             from collections import defaultdict
 
             grouped = defaultdict(list)
@@ -195,19 +199,21 @@ if __name__ == '__main__':
             read_ten_stdev = round(stdev(read_ten_times), 3) if len(read_ten_times) > 1 else 0.0
             read_ten = f"{read_ten_mean} +/- {read_ten_stdev}"
 
-            # Compose the row for this format and n_per_assettype
-            row = (
-                f"| {format_details.Label:<7}| {'':<23}|"
-                f" {size_all:<16}| {read_all:<15}| {write_all:<16}|"
-                f" {n_per_assettype:^5} | {size_ten:<13}| {read_ten:<16}| {write_ten:<17}|\n"
-            )
-            rows.append(row)
+            # Add row to PrettyTable
+            table.add_row([
+                format_details.Label,
+                "",  # Options column
+                size_all,
+                read_all,
+                write_all,
+                n_per_assettype,
+                size_ten,
+                read_ten,
+                write_ten
+            ])
 
-    # Write to file in the new format
+        # Write to file in the new format using PrettyTable
     with open(Path(base_dir) / 'benchmark_results.txt', "w") as file:
-        file.write(header)
-        for row in rows:
-            file.write(row)
-        file.write(footer)
+        file.write(str(table) + "\n")
 
     shutil.rmtree(Path(base_dir) / 'temp')
