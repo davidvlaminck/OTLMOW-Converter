@@ -14,7 +14,7 @@ base_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(str(Path(base_dir) / '../'))
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
-REPEAT_TIMES = 2
+REPEAT_TIMES = 5
 logging.getLogger().setLevel(logging.ERROR)
 csv_data = None
 
@@ -162,10 +162,10 @@ if __name__ == '__main__':
     formats = [
         FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': True}),
         FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
-        # FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
-        # FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
-        # FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={}),
-        # FormatDetails(Extension='geojson', Label='GeoJSON', WriteArguments={}),
+        FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
+        FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
+        FormatDetails(Extension='jsonld', Label='JSON-LD', WriteArguments={}),
+        FormatDetails(Extension='geojson', Label='GeoJSON', WriteArguments={}),
         # FormatDetails(Extension='ttl', Label='TTL', WriteArguments={'no_read': True})
     ]
 
