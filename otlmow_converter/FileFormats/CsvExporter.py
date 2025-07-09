@@ -210,6 +210,8 @@ class CsvExporter(AbstractExporter):
 
         required_first = ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor']
         table_colnames = table.schema.names
+        if 'agentId.identificator' in table_colnames:
+            required_first = ['typeURI', 'agentId.identificator', 'agentId.toegekendDoor']
         num_rows = table.num_rows
 
         # Add missing required columns as empty string columns

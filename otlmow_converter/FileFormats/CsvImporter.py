@@ -112,7 +112,6 @@ class CsvImporter(AbstractImporter):
             else:
                 cls.check_for_type_uri_in_first_five_rows_using_csv(delimiter, None, filepath, quote_char)
 
-
             schema_list = [('typeURI', pa.string())]
             headers_with_cardinality = []
             for header in headers:
@@ -131,6 +130,8 @@ class CsvImporter(AbstractImporter):
                             continue
                         else:
                             raise e
+                    logging.error(f'Error while processing header {header} in file {filepath.name}: {e}')
+                    raise e
 
                 if cardinality_indicator in header:
                     schema_list.append((header, pa.string()))
@@ -168,10 +169,16 @@ class CsvImporter(AbstractImporter):
                     raise NotImplementedError(f'Unsupported native type: {attribute.field.native_type} from {attribute.field.__class__.__name__} for header {header}')
 
             missing_columns = []
-            if 'assetId.identificator' not in headers:
-                missing_columns.append('assetId.identificator')
-            if 'assetId.toegekendDoor' not in headers:
-                missing_columns.append('assetId.toegekendDoor')
+            if first_row['typeURI'] == 'http://purl.org/dc/terms/Agent':
+                if 'agentId.identificator' not in headers:
+                    missing_columns.append('agentId.identificator')
+                if 'agentId.toegekendDoor' not in headers:
+                    missing_columns.append('agentId.toegekendDoor')
+            else:
+                if 'assetId.identificator' not in headers:
+                    missing_columns.append('assetId.identificator')
+                if 'assetId.toegekendDoor' not in headers:
+                    missing_columns.append('assetId.toegekendDoor')
 
             schema = pa.schema(schema_list)
 
