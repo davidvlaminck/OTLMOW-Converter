@@ -26,6 +26,7 @@ class PyArrowConverter:
         dict_list = [DotnotationDictConverter.to_dict(
             otl_object=obj, cast_list=cast_list, cast_datetime=cast_datetime, waarde_shortcut=waarde_shortcut,
             separator=separator, cardinality_indicator=cardinality_indicator,
+            cardinality_separator=cardinality_separator,
             collect_native_types=avoid_multiple_types_in_single_column,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
