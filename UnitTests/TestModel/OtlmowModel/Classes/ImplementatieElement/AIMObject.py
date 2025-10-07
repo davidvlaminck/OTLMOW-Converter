@@ -14,7 +14,7 @@ from otlmow_model.OtlmowModel.BaseClasses.StringField import StringField
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
-class AIMObject(AIMDBStatus, AIMToestand, OTLAsset, RelationInteractor):
+class AIMObject(AIMDBStatus, AIMToestand, RelationInteractor, OTLAsset):
     """Abstracte als de basisklasse voor alle uniek geïdentificeerde OTL objecten met de basiseigenschappen die elk OTL object minstens heeft."""
 
     typeURI = 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject'
