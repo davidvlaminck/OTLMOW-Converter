@@ -99,6 +99,13 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     assert instanceImported.testTimeField == time(11, 5, 26)
     assert instanceImported.geometry == 'POINT Z (200000 200000 0)'
 
+    # test the datetime value in cell G2 using openpyxl directly
+    from openpyxl import load_workbook
+    wb = load_workbook(filename=file_location, read_only=True)
+    ws = wb['onderdeel#AllCasesTestClass']
+    cell_value = ws['G2'].value
+    assert cell_value == '2001-12-15T22:22:15.123456'
+
     os.unlink(file_location)
 
 
