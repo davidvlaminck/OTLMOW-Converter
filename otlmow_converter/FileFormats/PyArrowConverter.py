@@ -1,9 +1,15 @@
+from pathlib import Path
 from typing import Iterable
 
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+from pyarrow import Table
 import pyarrow as pa
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
 
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
+from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
+from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
+from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 load_settings()
@@ -84,3 +90,14 @@ class PyArrowConverter:
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             for short_uri, objs in type_to_objs.items()}
+
+    @classmethod
+    def convert_table_to_objects(cls, table: Table, model_directory: Path = None, **kwargs) -> Iterable[OTLObject]:
+        headers = list(table.column_names)
+        header_dict = {header: idx for idx, header in enumerate(headers)}
+        dict_list = [header_dict] + [
+            {k: (None if v is pa.NA else v) for k, v in row.items()}
+            for row in table.to_pylist()
+        ]
+
+        return DotnotationTableConverter.get_data_from_table(table_data=dict_list, model_directory=model_directory, **kwargs)

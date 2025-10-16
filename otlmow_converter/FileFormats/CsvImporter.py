@@ -16,6 +16,7 @@ from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
+from otlmow_converter.FileFormats.PyArrowConverter import PyArrowConverter
 from otlmow_converter.OtlmowConverter import to_objects
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
@@ -96,6 +97,11 @@ class CsvImporter(AbstractImporter):
         if contains_exactly_one_type:
             import pyarrow as pa
             import pyarrow.compute as pc
+
+            if 'cast_list' in kwargs:
+                kwargs['cast_list'] = False
+            if 'cast_datetime' in kwargs:
+                kwargs['cast_datetime'] = False
 
             # use pyarrow to read the csv file and infer the schema
 
@@ -205,11 +211,8 @@ class CsvImporter(AbstractImporter):
                     null_array = pa.array([None] * len(table), type=pa.string())
                     table = table.append_column(col, null_array)
 
-            # Convert the table to a DataFrame
-            df = table.to_pandas()
-            return to_objects(df, model_directory=model_directory,
-                              allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                              warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            return PyArrowConverter.convert_table_to_objects(
+                table=table, **kwargs)
 
         try:
             table_typeuri = pa_csv.read_csv(

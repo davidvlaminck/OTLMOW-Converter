@@ -296,7 +296,7 @@ class DotnotationTableConverter:
                                   waarde_shortcut: bool = WAARDE_SHORTCUT,
                                   separator: str = SEPARATOR,
                                   cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                  cardinality_separator: str = CARDINALITY_SEPARATOR) -> list[OTLObject]:
+                                  cardinality_separator: str = CARDINALITY_SEPARATOR, **kwargs) -> list[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
