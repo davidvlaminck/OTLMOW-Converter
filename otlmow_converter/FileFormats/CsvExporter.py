@@ -8,6 +8,7 @@ from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.FileFormats.PyArrowConverter import PyArrowConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
+from pyarrow import Table
 import pyarrow as pa
 import pyarrow.csv as pacsv
 
@@ -199,7 +200,7 @@ class CsvExporter(AbstractExporter):
         return tuple(created_filepaths)
 
     @classmethod
-    def from_pyarrow_table_to_file(cls, table: 'pa.Table', filepath: Path, delimiter: str = None) -> Path:
+    def from_pyarrow_table_to_file(cls, table: Table, filepath: Path, delimiter: str = None) -> Path:
         """
         Write a pyarrow.Table to a CSV file.
         Ensures 'typeURI', 'assetId.identificator', and 'assetId.toegekendDoor' are the first columns,
