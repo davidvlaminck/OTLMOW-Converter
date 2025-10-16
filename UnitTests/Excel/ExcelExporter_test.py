@@ -1,3 +1,4 @@
+import gc
 import os
 from datetime import date, datetime, time
 from pathlib import Path
@@ -106,6 +107,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     cell_value = ws['G2'].value
     assert cell_value == '2001-12-15T22:22:15.123456'
 
+    gc.collect()
     os.unlink(file_location)
 
 
