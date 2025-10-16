@@ -141,7 +141,7 @@ def test_to_dict_datetime():
     assert DotnotationDictConverter.to_dict(instance, cast_datetime=True) == {
         'testDateField': '2022-12-12',
         'testTimeField': '10:11:12',
-        'testDateTimeField': '2022-12-12 10:11:12.123456',
+        'testDateTimeField': '2022-12-12T10:11:12.123456',
         'typeURI': AllCasesTestClass.typeURI
     }
 
