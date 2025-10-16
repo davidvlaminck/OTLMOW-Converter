@@ -52,7 +52,7 @@ class PyArrowConverter:
                     normalized_dict_list.append({k: d.get(k, None) for k in all_keys})
             dict_list = normalized_dict_list
 
-        # Build schema: auto-detect for all columns except 'aanleg' and 'aansluitvermogen'
+        # Build schema: auto-detect for all columns except the ones listed below
         if avoid_multiple_types_in_single_column:
             str_columns = {'aanleg','aansluitvermogen','aantalAdersEnSectie','afmeting','afmetingGrondvlak','afmetingen','appurtenanceType','armlengte','autonomie','beheeroptie','bijlage','brandweerstand','breedte','buitendiameter','code','communicatiewijze','detectieprincipe','diameter','diameterPaalschacht','diepte','dikte','droogzetbaarheid','fabrikant','foto','frequentierange','functie','gebruik','gewicht','hellingshoek','hoogte','hoogteBovenMaaiveld','kaliber','kleur','laagtype','lengte','licentie','lichtpuntHoogte','masthoogte','masttype','materiaal','maximaalDebiet','merk','modelnaam','nominaalVermogen','nominaleSpanning','ontwerpbelasting','opschrift','opstelHoogte','opstelling','paallengte','plaatsingswijze','productfamilie','protocol','rijrichting','rijstrook','schermelementtype','sluitkracht','soort','soortLamp','soortOmschrijving','spanning','subthema','totaleLengte','type','typeBevestiging','typeSpecificatie','uitvoering','uitvoeringsmethode','uitvoeringswijze','vermogen','vorm','vormgeving'}
             str_columns = {col for base in str_columns for col in (base, f"{base}[]")}
