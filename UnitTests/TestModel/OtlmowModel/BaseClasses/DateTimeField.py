@@ -96,9 +96,9 @@ class DateTimeField(OTLField):
             raise TypeError(f'Expecting datetime.datetime in {cls.__name__} and got {type(value)} when trying to '
                             f'parse {value}')
         if value.microsecond > 0:
-            return value.strftime("%Y-%m-%d %H:%M:%S.%f")
+            return value.strftime("%Y-%m-%dT%H:%M:%S.%f")
         else:
-            return value.strftime("%Y-%m-%d %H:%M:%S")
+            return value.strftime("%Y-%m-%dT%H:%M:%S")
 
     def __str__(self) -> str:
         return OTLField.__str__(self)
