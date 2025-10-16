@@ -1,5 +1,8 @@
 name: Zip source code
 run-name: Zip source code for ${{ github.sha }}
+concurrency:
+  group: coverage_and_zip_master
+  cancel-in-progress: false
 on:
   push:
     branches:
