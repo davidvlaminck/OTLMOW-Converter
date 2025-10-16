@@ -106,8 +106,8 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     ws = wb['onderdeel#AllCasesTestClass']
     cell_value = ws['G2'].value
     assert cell_value == '2001-12-15T22:22:15.123456'
+    wb.close()
 
-    gc.collect()
     os.unlink(file_location)
 
 
