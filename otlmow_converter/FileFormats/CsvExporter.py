@@ -92,43 +92,6 @@ class CsvExporter(AbstractExporter):
                 created_filepaths.append(created_filepath)
         return tuple(created_filepaths)
 
-        if not split_per_type:
-            single_table = DotnotationTableConverter.get_single_table_from_data(
-                list_of_objects=sequence_of_objects,
-                separator=separator, cardinality_separator=cardinality_separator,
-                cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                cast_list=cast_list, cast_datetime=cast_datetime,
-                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
-
-            data = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
-                list_of_dicts=single_table, empty_string_equals_none=True, separator=separator)
-            cls._write_file(file_location=filepath, data=data, delimiter=delimiter, quote_char=quote_char)
-            filepath.touch()
-            return (filepath,)
-
-        multi_table_dict = DotnotationTableConverter.get_tables_per_type_from_data(
-            sequence_of_objects=sequence_of_objects,
-            separator=separator, cardinality_separator=cardinality_separator,
-            cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-            cast_list=cast_list, cast_datetime=cast_datetime,
-            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
-
-        created_filepaths = []
-        for short_uri, table_data in multi_table_dict.items():
-            data = DotnotationTableConverter.transform_list_of_dicts_to_2d_sequence(
-                list_of_dicts=table_data, empty_string_equals_none=True, separator=separator)
-            specific_filename = (f'{filepath.stem}_' + short_uri.replace('#', '_') + filepath.suffix)
-            created_filepath = Path(filepath.parent / specific_filename)
-
-            cls._write_file(file_location=created_filepath, data=data,
-                            delimiter=delimiter, quote_char=quote_char)
-            created_filepath.touch()
-            created_filepaths.append(created_filepath)
-        return tuple(created_filepaths)
-
-
     @classmethod
     async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         delimiter = DELIMITER
