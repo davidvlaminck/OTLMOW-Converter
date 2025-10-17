@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 from otlmow_model.OtlmowModel.Classes.Agent import Agent
+from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
@@ -115,7 +116,8 @@ def test_combine_files_two_errors_in_two_files(subtests):
     json_path = combine_directory / 'asset_2.json'
 
     with pytest.raises(ExceptionsGroup) as exc_group:
-        combine_files([csv_path, json_path], model_directory=test_model_directory)
+        with pytest.warns(NonStandardAttributeWarning):
+            combine_files([csv_path, json_path], model_directory=test_model_directory)
 
     exc1 = exc_group.value.exceptions[0]
     exc2 = exc_group.value.exceptions[1]

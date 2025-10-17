@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
@@ -231,7 +232,7 @@ def test_export_list_of_lists():
         CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False)
 
 
-def test_export_choice_list():
+def test_export_choice_list(recwarn):
 
     d = {
         "assetId": {
@@ -252,6 +253,8 @@ def test_export_choice_list():
     obj_d = OTLObject.from_dict(d)
     obj_e = OTLObject.from_dict(e, waarde_shortcut=True)
     file_location = Path(__file__).parent / 'Testfiles' / 'choice_list.csv'
-    CsvExporter.from_objects(sequence_of_objects=[obj_e, obj_d], filepath=file_location,
-                             split_per_type=False, )
+    with pytest.warns(NonStandardAttributeWarning):
+        CsvExporter.from_objects(sequence_of_objects=[obj_e, obj_d], filepath=file_location,
+                                 split_per_type=False, )
+
     file_location.unlink()
