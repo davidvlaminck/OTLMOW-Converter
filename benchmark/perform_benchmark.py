@@ -160,7 +160,7 @@ if __name__ == '__main__':
                       'Read 10 random classes', 'Write 10 random classes', 'Size 10 random classes']
 
     formats = [
-        FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': True}),
+        FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': True, 'contains_exactly_one_type' : True}),
         FormatDetails(Extension='csv', Label='CSV', WriteArguments={'split_per_type': False}),
         FormatDetails(Extension='json', Label='JSON', WriteArguments={}),
         FormatDetails(Extension='xlsx', Label='Excel', WriteArguments={}),
@@ -182,6 +182,7 @@ if __name__ == '__main__':
     filepath = ''
 
     for format_details in formats:
+        print(f'format: {format_details.Extension}')
         results_dict = {}
         read_all_classes_file_name = Path(base_dir) / 'files/all_classes.json'
         ten_random_classes_file_name = Path(base_dir) / 'files/ten_random_classes.json'
