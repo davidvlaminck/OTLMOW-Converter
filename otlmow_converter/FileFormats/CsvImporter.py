@@ -133,9 +133,7 @@ class CsvImporter(AbstractImporter):
         return str(delimiter), str(quote_char)
 
     @classmethod
-    def _get_options(cls, kwargs: dict[str, object] | None) -> tuple[
-        str, str, str, bool, bool, bool, bool, bool, bool
-    ]:
+    def _get_options(cls, kwargs: dict[str, object] | None) -> tuple[str, str, str, bool, bool, bool, bool, bool, bool]:
         if kwargs is None:
             kwargs = {}
         separator = str(kwargs.get('separator', SEPARATOR))
@@ -163,19 +161,9 @@ class CsvImporter(AbstractImporter):
         return ';' if delimiter == '' else delimiter
 
     @classmethod
-    def _convert_single_type_path(
-        cls,
-        filepath: Path,
-        kwargs: dict[str, object],
-        delimiter: str,
-        quote_char: str,
-        separator: str,
-        cardinality_indicator: str,
-        waarde_shortcut: bool,
-        allow_non_otl_conform_attributes: bool,
-        warn_for_non_otl_conform_attributes: bool,
-        model_directory: Path | None
-    ) -> Iterable[OTLObject]:
+    def _convert_single_type_path(cls, filepath: Path, kwargs: dict[str, object], delimiter: str, quote_char: str,
+        separator: str, cardinality_indicator: str, waarde_shortcut: bool, allow_non_otl_conform_attributes: bool,
+        warn_for_non_otl_conform_attributes: bool, model_directory: Path | None) -> Iterable[OTLObject]:
         # Prevent double casting downstream
         if 'cast_list' in kwargs:
             kwargs['cast_list'] = False
@@ -204,9 +192,8 @@ class CsvImporter(AbstractImporter):
         return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
 
     @classmethod
-    def _read_first_row_and_headers(
-        cls, filepath: Path, delimiter: str, quote_char: str
-    ) -> tuple[dict[str, str], list[str]]:
+    def _read_first_row_and_headers(cls, filepath: Path, delimiter: str, quote_char: str
+                                    ) -> tuple[dict[str, str], list[str]]:
         with open(filepath, encoding='utf-8') as file:
             reader = csv.DictReader(file, delimiter=delimiter, quotechar=quote_char)
             first_row: dict[str, str] = next(reader)
@@ -220,16 +207,9 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def _build_schema_for_headers(
-        cls,
-        instance: OTLObject,
-        headers: list[str],
-        separator: str,
-        cardinality_indicator: str,
-        waarde_shortcut: bool,
-        allow_non_otl_conform_attributes: bool,
-        warn_for_non_otl_conform_attributes: bool,
-        filepath: Path
-    ) -> tuple[pyarrow.Schema, list[tuple[str, pyarrow.DataType]]]:
+        cls, instance: OTLObject, headers: list[str], separator: str, cardinality_indicator: str,
+        waarde_shortcut: bool, allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool,
+        filepath: Path) -> tuple[pyarrow.Schema, list[tuple[str, pyarrow.DataType]]]:
         import pyarrow as pa
         schema_list: list[tuple[str, pyarrow.DataType]] = [('typeURI', pa.string())]
         headers_with_cardinality: list[tuple[str, pyarrow.DataType]] = []
@@ -307,8 +287,7 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def _read_csv_table_with_schema(
-        cls, filepath: Path, delimiter: str, quote_char: str, schema: pyarrow.Schema
-    ) -> pyarrow.Table:
+        cls, filepath: Path, delimiter: str, quote_char: str, schema: pyarrow.Schema) -> pyarrow.Table:
         parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
         table = read_csv(
             filepath,
@@ -320,8 +299,7 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def _apply_cardinality_splitting(
-        cls, table: pyarrow.Table, headers_with_cardinality: list[tuple[str, pyarrow.DataType]]
-    ) -> pyarrow.Table:
+        cls, table: pyarrow.Table, headers_with_cardinality: list[tuple[str, pyarrow.DataType]]) -> pyarrow.Table:
         if not headers_with_cardinality:
             return table
         for header, list_type in headers_with_cardinality:
@@ -352,19 +330,9 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def _python_fallback_to_objects(
-        cls,
-        filepath: Path,
-        delimiter: str,
-        quote_char: str,
-        model_directory: Path | None,
-        separator: str,
-        cardinality_indicator: str,
-        waarde_shortcut: bool,
-        cardinality_separator: str,
-        cast_datetime: bool,
-        cast_list: bool,
-        allow_non_otl_conform_attributes: bool,
-        warn_for_non_otl_conform_attributes: bool
+        cls, filepath: Path, delimiter: str, quote_char: str, model_directory: Path | None, separator: str,
+        cardinality_indicator: str, waarde_shortcut: bool, cardinality_separator: str, cast_datetime: bool,
+        cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool
     ) -> Iterable[OTLObject]:
         try:
             with open(filepath, encoding='utf-8') as file:
