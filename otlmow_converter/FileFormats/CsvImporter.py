@@ -6,8 +6,9 @@ from datetime import datetime, date, time
 from pathlib import Path
 from typing import Iterable
 
-import pyarrow
+import pyarrow as pa
 import pyarrow.csv as pa_csv
+import pyarrow.compute as pc
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, dynamic_create_instance_from_uri
 from pyarrow._csv import read_csv, ParseOptions, ReadOptions, ConvertOptions
 
@@ -84,13 +85,13 @@ class CsvImporter(AbstractImporter):
                 waarde_shortcut=waarde_shortcut,
                 allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
-                model_directory=model_directory  # type: ignore[arg-type]
-            )
+                model_directory=model_directory,
+                cardinality_separator=cardinality_separator)
 
         # Multi-type detection
         try:
             type_uris = cls._read_unique_typeuris(filepath, delimiter, quote_char)
-        except pyarrow.lib.ArrowKeyError as e:
+        except pa.lib.ArrowKeyError as e:
             cls.check_for_type_uri_in_first_five_rows_using_csv(delimiter, e, filepath, quote_char)
             raise  # unreachable, re-raised above
 
@@ -163,7 +164,8 @@ class CsvImporter(AbstractImporter):
     @classmethod
     def _convert_single_type_path(cls, filepath: Path, kwargs: dict[str, object], delimiter: str, quote_char: str,
         separator: str, cardinality_indicator: str, waarde_shortcut: bool, allow_non_otl_conform_attributes: bool,
-        warn_for_non_otl_conform_attributes: bool, model_directory: Path | None) -> Iterable[OTLObject]:
+        warn_for_non_otl_conform_attributes: bool, model_directory: Path | None, cardinality_separator: str
+                                  ) -> Iterable[OTLObject]:
         # Prevent double casting downstream
         if 'cast_list' in kwargs:
             kwargs['cast_list'] = False
@@ -186,7 +188,7 @@ class CsvImporter(AbstractImporter):
         missing_columns = cls._compute_missing_columns(first_row['typeURI'], headers)
 
         table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
-        table = cls._apply_cardinality_splitting(table, headers_with_cardinality)
+        table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
         table = cls._append_missing_columns_to_table(table, missing_columns)
 
         return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
@@ -209,10 +211,9 @@ class CsvImporter(AbstractImporter):
     def _build_schema_for_headers(
         cls, instance: OTLObject, headers: list[str], separator: str, cardinality_indicator: str,
         waarde_shortcut: bool, allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool,
-        filepath: Path) -> tuple[pyarrow.Schema, list[tuple[str, pyarrow.DataType]]]:
-        import pyarrow as pa
-        schema_list: list[tuple[str, pyarrow.DataType]] = [('typeURI', pa.string())]
-        headers_with_cardinality: list[tuple[str, pyarrow.DataType]] = []
+        filepath: Path) -> tuple[pa.Schema, list[tuple[str, pa.DataType]]]:
+        schema_list: list[tuple[str, pa.DataType]] = [('typeURI', pa.string())]
+        headers_with_cardinality: list[tuple[str, pa.DataType]] = []
 
         for header in headers:
             try:
@@ -287,34 +288,46 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def _read_csv_table_with_schema(
-        cls, filepath: Path, delimiter: str, quote_char: str, schema: pyarrow.Schema) -> pyarrow.Table:
+        cls, filepath: Path, delimiter: str, quote_char: str, schema: pa.Schema) -> pa.Table:
         parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
+        include_columns = list(schema.names)  # projection pushdown
+        parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
+        convert_options = ConvertOptions(
+            column_types=schema,
+            include_columns=include_columns,
+            null_values=["", "NULL", "null"],
+            strings_can_be_null=True,
+            # normalize boolean parsing to common variants
+            true_values=["true", "True", "1", "Y", "Yes"],
+            false_values=["false", "False", "0", "N", "No"]
+        )
         table = read_csv(
             filepath,
-            read_options=ReadOptions(use_threads=True),
+            read_options=ReadOptions(use_threads=True, block_size=(8 << 20)),  # larger blocks for throughput
             parse_options=parse_options,
-            convert_options=ConvertOptions(column_types=schema, null_values=[""], strings_can_be_null=True),
+            convert_options=convert_options,
         )
-        return table
+        # Fewer chunks -> faster downstream ops
+        return table.combine_chunks()
 
     @classmethod
     def _apply_cardinality_splitting(
-        cls, table: pyarrow.Table, headers_with_cardinality: list[tuple[str, pyarrow.DataType]]) -> pyarrow.Table:
+        cls, table: pa.Table, headers_with_cardinality: list[tuple[str, pa.DataType]],
+            cardinality_separator: str) -> pa.Table:
         if not headers_with_cardinality:
             return table
         for header, list_type in headers_with_cardinality:
-            split_column = pyarrow.compute.split_pattern(table[header], '|')  # keep behavior
+            split_column = pa.compute.split_pattern(table[header], cardinality_separator)
             converted_data = split_column.cast(list_type)
             table = table.set_column(table.schema.get_field_index(header), header, converted_data)
         return table
 
     @classmethod
-    def _append_missing_columns_to_table(cls, table: pyarrow.Table, missing_columns: list[str]) -> pyarrow.Table:
+    def _append_missing_columns_to_table(cls, table: pa.Table, missing_columns: list[str]) -> pa.Table:
         if not missing_columns:
             return table
-        import pyarrow as pa
         for col in missing_columns:
-            null_array = pa.array([None] * len(table), type=pa.string())
+            null_array = pa.nulls(len(table), type=pa.string())
             table = table.append_column(col, null_array)
         return table
 
@@ -326,7 +339,9 @@ class CsvImporter(AbstractImporter):
             parse_options=pa_csv.ParseOptions(delimiter=delimiter, quote_char=quote_char),
             convert_options=pa_csv.ConvertOptions(include_columns=['typeURI'])
         )
-        return set(table_typeuri['typeURI'])
+        arr = table_typeuri["typeURI"].combine_chunks()
+        uniques = pc.unique(arr).to_pylist()
+        return {v for v in uniques if isinstance(v, str)}
 
     @classmethod
     def _python_fallback_to_objects(
