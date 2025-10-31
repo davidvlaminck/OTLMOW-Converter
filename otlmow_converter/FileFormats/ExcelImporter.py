@@ -10,6 +10,7 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instan
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
@@ -108,6 +109,11 @@ class ExcelImporter(AbstractImporter):
                     message=f'{ex.args[0]} in file {filepath.name}',
                     file_path=filepath, tab=sheet
                 ))
+            except BadLinesInExcelError as ex:
+                ex.tab = sheet
+                ex.file_path = filepath
+                exception_group.add_exception(ex)
+                list_of_objects.extend(ex.objects)
             except BaseException as ex:
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))

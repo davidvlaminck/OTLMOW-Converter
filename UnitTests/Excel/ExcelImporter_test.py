@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
 from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
@@ -204,3 +205,26 @@ def test_load_non_conform_attributes(recwarn):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.testBooleanField
     assert instance.non_conform_attribute == 'value'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_multiple_errors_in_different_lines(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'multiple_errors_in_different_lines.xlsx'
+
+    with pytest.raises(ExceptionsGroup) as ex:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                           warn_for_non_otl_conform_attributes=False)
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.objects) == 2
+    assert len(ex.exceptions) == 1
+    bad_lines_error = ex.exceptions[0]
+    assert isinstance(bad_lines_error, BadLinesInExcelError)
+    assert bad_lines_error.tab == 'onderdeel#AllCasesTestClass'
+    assert len(bad_lines_error.exceptions) == 3
+    error_line_1 = bad_lines_error.exceptions[0]
+    assert error_line_1.line_number == 1
+    error_line_2 = bad_lines_error.exceptions[1]
+    assert error_line_2.line_number == 3
+    error_line_3 = bad_lines_error.exceptions[2]
+    assert error_line_3.line_number == 5
