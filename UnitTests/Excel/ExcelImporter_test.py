@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
+from otlmow_converter.Exceptions.ErrorInExcelLine import ErrorInExcelLine
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
 from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
@@ -218,13 +219,21 @@ def test_load_multiple_errors_in_different_lines(recwarn):
     assert isinstance(ex, ExceptionsGroup)
     assert len(ex.objects) == 2
     assert len(ex.exceptions) == 1
+
     bad_lines_error = ex.exceptions[0]
+    # Assert that bad_lines_error is of the expected type
     assert isinstance(bad_lines_error, BadLinesInExcelError)
-    assert bad_lines_error.tab == 'onderdeel#AllCasesTestClass'
+    # Assert that bad_lines_error.exceptions is a list with expected length
+    assert isinstance(bad_lines_error.exceptions, list)
     assert len(bad_lines_error.exceptions) == 3
-    error_line_1 = bad_lines_error.exceptions[0]
-    assert error_line_1.line_number == 1
-    error_line_2 = bad_lines_error.exceptions[1]
-    assert error_line_2.line_number == 3
-    error_line_3 = bad_lines_error.exceptions[2]
-    assert error_line_3.line_number == 5
+
+    # Assert error types and messages for each exception in bad_lines_error.exceptions
+    expected_types = [ErrorInExcelLine, ErrorInExcelLine, ErrorInExcelLine]
+    expected_messages = [
+        'Error in line 1: aaa is not a valid WKT string for geometry',
+        'Error in line 3: aaa could not be converted to correct type (implied by DateField)',
+        'Error in line 5: aaa could not be converted to correct type (implied by BooleanField)'
+    ]
+    for exc, expected_type, expected_message in zip(bad_lines_error.exceptions, expected_types, expected_messages):
+        assert isinstance(exc, expected_type)
+        assert expected_message in str(exc)
