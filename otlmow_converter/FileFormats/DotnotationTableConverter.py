@@ -356,15 +356,28 @@ class DotnotationTableConverter:
             else:
                 raise TypeUriNotInFirstRowError
         headers.pop('typeURI')
-        for row in rows:
-            instance = cls.create_instance_from_row(
-                row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
-                separator=separator, cardinality_indicator=cardinality_indicator,
-                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
-            instances.append(instance)
-            await sleep(0)
+        lines_error = BadLinesInExcelError()
+        for row_nr, row in enumerate(rows):
+            try:
+                instance = await cls.create_instance_from_row_async(
+                    row=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
+                    separator=separator, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                instances.append(instance)
+                await sleep(0)
+            except (ValueError, CouldNotConvertToCorrectTypeError, CouldNotCreateInstanceError,
+                    CouldNotCreateRelationError) as e:
+                line_error = ErrorInExcelLine(
+                    message=f'Error creating instance from line {row_nr + 1} (ignoring headers): {e}',
+                    line_number=row_nr + 1, error = e)
+                lines_error.add_exception(line_error)
+                await sleep(0)
+
+        if lines_error.exceptions:
+            lines_error.objects = instances
+            raise lines_error
 
         return instances
 

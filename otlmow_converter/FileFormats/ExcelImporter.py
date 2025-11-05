@@ -199,6 +199,11 @@ class ExcelImporter(AbstractImporter):
                     message=f'{ex.args[0]} in file {filepath.name}',
                     file_path=filepath, tab=sheet
                 ))
+            except BadLinesInExcelError as ex:
+                ex.tab = sheet
+                ex.file_path = filepath
+                exception_group.add_exception(ex)
+                list_of_objects.extend(ex.objects)
             except BaseException as ex:
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
