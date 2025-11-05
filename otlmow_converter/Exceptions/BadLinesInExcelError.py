@@ -14,7 +14,7 @@ class BadLinesInExcelError(FailedToImportFileError):
         self.exceptions = exceptions
         self.objects = objects
 
-    def add_exception(self, error: BaseException):
+    def add_exception(self, error: ErrorInExcelLine):
         self.exceptions.append(error)
 
     def __str__(self):
