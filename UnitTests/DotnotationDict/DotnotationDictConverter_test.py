@@ -3,13 +3,17 @@ from pathlib import Path
 
 import pytest
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
+from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
 from otlmow_model.OtlmowModel.Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
+from otlmow_model.OtlmowModel.Exceptions.InvalidOptionError import InvalidOptionError
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+from otlmow_converter.Exceptions.MultipleAttributeError import MultipleAttributeError
+from otlmow_converter.Exceptions.OTLAttributeError import OTLAttributeError
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
@@ -799,3 +803,28 @@ def test_to_dict_instance_version():
     created_dict = converter.to_dict_instance(instance, cast_list=True)
 
     assert created_dict == expected_dict
+
+def test_from_dict_combined_attribute_errors():
+    input_dict = DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI,
+         'testBooleanField': 'a',
+         "testKeuzelijst": "ingebruik",
+         'testComplexType.testKwantWrdMetKard[]': 'a',
+         'testComplexTypeMetKard[].testBooleanField': [True, 'b', False]})
+
+    with pytest.raises(CouldNotConvertToCorrectTypeError):
+        DotnotationDictConverter.from_dict(input_dict,
+            model_directory=model_directory_path)
+
+    with pytest.raises(MultipleAttributeError) as excinfo:
+        DotnotationDictConverter.from_dict(input_dict,
+            model_directory=model_directory_path, combine_errors=True)
+
+    assert excinfo.value.args[0] == ("At least one error occurred while converting from dict to an instance of "
+                                     "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass, "
+                                     "see attribute exceptions for details.")
+    assert len(excinfo.value.exceptions) == 4
+    assert isinstance(excinfo.value.exceptions[0], OTLAttributeError)
+    assert isinstance(excinfo.value.exceptions[0].orig_exception, CouldNotConvertToCorrectTypeError)
+    assert isinstance(excinfo.value.exceptions[1].orig_exception, InvalidOptionError)
+
