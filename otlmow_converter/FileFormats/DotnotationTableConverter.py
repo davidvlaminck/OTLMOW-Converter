@@ -15,6 +15,7 @@ from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelErro
 from otlmow_converter.Exceptions.BadTypeWarning import BadTypeWarning
 from otlmow_converter.Exceptions.ErrorInExcelLine import ErrorInExcelLine
 from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
+from otlmow_converter.Exceptions.MultipleAttributeError import MultipleAttributeError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -302,7 +303,8 @@ class DotnotationTableConverter:
                                   waarde_shortcut: bool = WAARDE_SHORTCUT,
                                   separator: str = SEPARATOR,
                                   cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                  cardinality_separator: str = CARDINALITY_SEPARATOR) -> list[OTLObject]:
+                                  cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                  combine_errors: bool = False, additional_header_lines: int = 0) -> list[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -322,13 +324,15 @@ class DotnotationTableConverter:
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                    combine_errors=combine_errors)
                 instances.append(instance)
             except (ValueError, CouldNotConvertToCorrectTypeError, CouldNotCreateInstanceError,
-                    CouldNotCreateRelationError) as e:
+                    CouldNotCreateRelationError, MultipleAttributeError) as e:
+                line_number = row_nr + 2 + additional_header_lines
                 line_error = ErrorInExcelLine(
-                    message=f'Error creating instance from line {row_nr + 1} (ignoring headers): {e}',
-                    line_number=row_nr + 1, error = e)
+                    message=f'Error creating instance from line {line_number}: {e}',
+                    line_number=line_number, error = e)
                 lines_error.add_exception(line_error)
 
         if lines_error.exceptions:
@@ -344,7 +348,8 @@ class DotnotationTableConverter:
                                   waarde_shortcut: bool = WAARDE_SHORTCUT,
                                   separator: str = SEPARATOR,
                                   cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                  cardinality_separator: str = CARDINALITY_SEPARATOR) -> list[OTLObject]:
+                                  cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                  combine_errors: bool = False, additional_header_lines: int = 0) -> list[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []
@@ -364,14 +369,16 @@ class DotnotationTableConverter:
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                    combine_errors=combine_errors)
                 instances.append(instance)
                 await sleep(0)
             except (ValueError, CouldNotConvertToCorrectTypeError, CouldNotCreateInstanceError,
-                    CouldNotCreateRelationError) as e:
+                    CouldNotCreateRelationError, MultipleAttributeError) as e:
+                line_number = row_nr + 2 + additional_header_lines
                 line_error = ErrorInExcelLine(
-                    message=f'Error creating instance from line {row_nr + 1} (ignoring headers): {e}',
-                    line_number=row_nr + 1, error = e)
+                    message=f'Error creating instance from line {line_number}: {e}',
+                    line_number=line_number, error = e)
                 lines_error.add_exception(line_error)
                 await sleep(0)
 
