@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
+from otlmow_converter.Exceptions.ErrorInExcelLine import ErrorInExcelLine
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
 from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
@@ -204,3 +206,37 @@ def test_load_non_conform_attributes(recwarn):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.testBooleanField
     assert instance.non_conform_attribute == 'value'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_multiple_errors_in_different_lines(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'multiple_errors_in_different_lines.xlsx'
+
+    with pytest.raises(ExceptionsGroup) as ex:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                           warn_for_non_otl_conform_attributes=False)
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.objects) == 2
+    assert len(ex.exceptions) == 1
+
+    bad_lines_error = ex.exceptions[0]
+    # Assert that bad_lines_error is of the expected type
+    assert isinstance(bad_lines_error, BadLinesInExcelError)
+    # Assert that bad_lines_error.exceptions is a list with expected length
+    assert isinstance(bad_lines_error.exceptions, list)
+    assert len(bad_lines_error.exceptions) == 3
+
+    assert isinstance(bad_lines_error.exceptions[0], ErrorInExcelLine)
+    assert isinstance(bad_lines_error.exceptions[1], ErrorInExcelLine)
+    assert isinstance(bad_lines_error.exceptions[2], ErrorInExcelLine)
+
+    assert (str(bad_lines_error.exceptions[0]) ==
+            ('Error in line 2: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "geometry" with value "aaa": ValueError'))
+    assert (str(bad_lines_error.exceptions[1]) ==
+            ('Error in line 4: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "testDateField" with value "aaa": CouldNotConvertToCorrectTypeError'))
+    assert (str(bad_lines_error.exceptions[2]) ==
+            ('Error in line 6: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "testBooleanField" with value "aaa": CouldNotConvertToCorrectTypeError'))
