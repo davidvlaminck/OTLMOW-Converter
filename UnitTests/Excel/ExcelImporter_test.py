@@ -227,13 +227,16 @@ def test_load_multiple_errors_in_different_lines(recwarn):
     assert isinstance(bad_lines_error.exceptions, list)
     assert len(bad_lines_error.exceptions) == 3
 
-    # Assert error types and messages for each exception in bad_lines_error.exceptions
-    expected_types = [ErrorInExcelLine, ErrorInExcelLine, ErrorInExcelLine]
-    expected_messages = [
-        'Error in line 1: aaa is not a valid WKT string for geometry',
-        'Error in line 3: aaa could not be converted to correct type (implied by DateField)',
-        'Error in line 5: aaa could not be converted to correct type (implied by BooleanField)'
-    ]
-    for exc, expected_type, expected_message in zip(bad_lines_error.exceptions, expected_types, expected_messages):
-        assert isinstance(exc, expected_type)
-        assert expected_message in str(exc)
+    assert isinstance(bad_lines_error.exceptions[0], ErrorInExcelLine)
+    assert isinstance(bad_lines_error.exceptions[1], ErrorInExcelLine)
+    assert isinstance(bad_lines_error.exceptions[2], ErrorInExcelLine)
+
+    assert (str(bad_lines_error.exceptions[0]) ==
+            ('Error in line 2: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "geometry" with value "aaa": ValueError'))
+    assert (str(bad_lines_error.exceptions[1]) ==
+            ('Error in line 4: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "testDateField" with value "aaa": CouldNotConvertToCorrectTypeError'))
+    assert (str(bad_lines_error.exceptions[2]) ==
+            ('Error in line 6: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "testBooleanField" with value "aaa": CouldNotConvertToCorrectTypeError'))
