@@ -14,6 +14,6 @@ class MultipleAttributeError(BaseException):
         self.exceptions.append(error)
 
     def __str__(self):
-        return (f'MultipleAttributeError with {len(self.exceptions)} error(s): ' +
-                ('\n'.join([str(error) for error in self.exceptions])))
+        return (f'MultipleAttributeError with {len(self.exceptions)} error(s):\n' +
+                ('\n'.join([('- ' + str(error)) for error in self.exceptions])))
 
