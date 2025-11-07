@@ -287,8 +287,8 @@ class DotnotationDictConverter:
         except TypeError as e:
             raise ValueError('typeURI is invalid. Add a valid typeURI to the input dictionary.') from e
 
-        if not combine_errors:
-            for k, v in input_dict.items():
+        def _set_attributes_from_dict(items, obj, error_collector=None):
+            for k, v in items:
                 if v is None:
                     continue
                 if k is None:  # v is not None!
@@ -296,39 +296,31 @@ class DotnotationDictConverter:
                 if k == 'typeURI':
                     continue
                 if k.startswith('_'):
-                    raise ValueError(f'{k} is a non standardized attribute of {o.__class__.__name__}. '
+                    raise ValueError(f'{k} is a non standardized attribute of {obj.__class__.__name__}. '
                                      f'While this is supported, the key can not start with "_".')
-                cls.set_attribute_by_dotnotation(
-                    o, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
-                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                    cast_datetime=cast_datetime, cast_list=cast_list,
-                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                try:
+                    cls.set_attribute_by_dotnotation(
+                        obj, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
+                        waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                        cast_datetime=cast_datetime, cast_list=cast_list,
+                        allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                except (ValueError, CouldNotConvertToCorrectTypeError, UnionTypeError, RemovedOptionError,
+                        WrongGeometryTypeError,) as e:
+                    if error_collector is not None:
+                        attr_error = OTLAttributeError(message=e.args[0], attribute_dotnotation=k, attribute_value=v,
+                                                       orig_exception=e)
+                        error_collector.add_exception(attr_error)
+                    else:
+                        raise
+
+        if not combine_errors:
+            _set_attributes_from_dict(input_dict.items(), o)
             return o
 
-        combined_error = MultipleAttributeError(f'At least one error occurred while converting from dict to an instance of {type_uri}, see attribute exceptions for details.')
-        for k, v in input_dict.items():
-            if v is None:
-                continue
-            if k is None:  # v is not None!
-                raise MissingHeaderError(f'Missing a header for value {v}')
-            if k == 'typeURI':
-                continue
-            if k.startswith('_'):
-                raise ValueError(f'{k} is a non standardized attribute of {o.__class__.__name__}. '
-                                 f'While this is supported, the key can not start with "_".')
-            try:
-                cls.set_attribute_by_dotnotation(
-                    o, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
-                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                    cast_datetime=cast_datetime, cast_list=cast_list,
-                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
-            except (ValueError, CouldNotConvertToCorrectTypeError, UnionTypeError, RemovedOptionError,
-                    WrongGeometryTypeError, ) as e:
-                attr_error = OTLAttributeError(message=e.args[0], attribute_dotnotation=k, attribute_value=v,
-                                               orig_exception=e)
-                combined_error.add_exception(attr_error)
+        combined_error = MultipleAttributeError(
+            f'At least one error occurred while converting from dict to an instance of {type_uri}, see attribute exceptions for details.')
+        _set_attributes_from_dict(input_dict.items(), o, error_collector=combined_error)
         if combined_error.exceptions:
             raise combined_error
         return o
@@ -342,6 +334,7 @@ class DotnotationDictConverter:
                         separator: str = SEPARATOR,
                         cardinality_indicator: str = CARDINALITY_INDICATOR,
                         cardinality_separator: str = CARDINALITY_SEPARATOR,
+                        combine_errors: bool = False
                         ) -> OTLObject:
         type_uri = input_dict.get('typeURI')
         if type_uri is None:
@@ -357,24 +350,43 @@ class DotnotationDictConverter:
         except TypeError as e:
             raise ValueError('typeURI is invalid. Add a valid typeURI to the input dictionary.') from e
 
-        for k, v in input_dict.items():
-            if v is None:
-                continue
-            if k is None:  # v is not None!
-                raise MissingHeaderError(f'Missing a header for value {v}')
-            if k == 'typeURI':
-                continue
-            await sleep(0)
-            if k.startswith('_'):
-                raise ValueError(f'{k} is a non standardized attribute of {o.__class__.__name__}. '
-                                 f'While this is supported, the key can not start with "_".')
-            cls.set_attribute_by_dotnotation(
-                o, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
-                waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                cast_datetime=cast_datetime, cast_list=cast_list,
-                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+        async def _set_attributes_from_dict_async(items, obj, error_collector=None):
+            for k, v in items:
+                if v is None:
+                    continue
+                if k is None:  # v is not None!
+                    raise MissingHeaderError(f'Missing a header for value {v}')
+                if k == 'typeURI':
+                    continue
+                await sleep(0)
+                if k.startswith('_'):
+                    raise ValueError(f'{k} is a non standardized attribute of {obj.__class__.__name__}. '
+                                     f'While this is supported, the key can not start with "_".')
+                try:
+                    cls.set_attribute_by_dotnotation(
+                        obj, dotnotation=k, value=v, separator=separator, cardinality_indicator=cardinality_indicator,
+                        waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                        cast_datetime=cast_datetime, cast_list=cast_list,
+                        allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                except (ValueError, CouldNotConvertToCorrectTypeError, UnionTypeError, RemovedOptionError,
+                        WrongGeometryTypeError,) as e:
+                    if error_collector is not None:
+                        attr_error = OTLAttributeError(message=e.args[0], attribute_dotnotation=k, attribute_value=v,
+                                                       orig_exception=e)
+                        error_collector.add_exception(attr_error)
+                    else:
+                        raise
 
+        if not combine_errors:
+            await _set_attributes_from_dict_async(input_dict.items(), o)
+            return o
+
+        combined_error = MultipleAttributeError(
+            f'At least one error occurred while converting from dict to an instance of {type_uri}, see attribute exceptions for details.')
+        await _set_attributes_from_dict_async(input_dict.items(), o, error_collector=combined_error)
+        if combined_error.exceptions:
+            raise combined_error
         return o
 
     @classmethod

@@ -389,13 +389,14 @@ class DotnotationTableConverter:
                                        waarde_shortcut: bool = WAARDE_SHORTCUT,
                                        separator: str = SEPARATOR,
                                        cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                       cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
+                                       cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                       combine_errors: bool = False) -> OTLObject:
         return DotnotationDictConverter.from_dict(
             input_dict=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
             separator=separator, cardinality_indicator=cardinality_indicator,
             waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes, combine_errors=combine_errors)
 
 
     @classmethod
@@ -406,13 +407,14 @@ class DotnotationTableConverter:
                                        waarde_shortcut: bool = WAARDE_SHORTCUT,
                                        separator: str = SEPARATOR,
                                        cardinality_indicator: str = CARDINALITY_INDICATOR,
-                                       cardinality_separator: str = CARDINALITY_SEPARATOR) -> OTLObject:
+                                       cardinality_separator: str = CARDINALITY_SEPARATOR,
+                                       combine_errors: bool = False) -> OTLObject:
         return await DotnotationDictConverter.from_dict_async(
             input_dict=row, model_directory=model_directory, cast_list=cast_list, cast_datetime=cast_datetime,
             separator=separator, cardinality_indicator=cardinality_indicator,
             waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
             allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes, combine_errors=combine_errors)
 
     @classmethod
     def transform_list_of_dicts_to_2d_sequence(cls, list_of_dicts: list[dict], separator: str = SEPARATOR,
