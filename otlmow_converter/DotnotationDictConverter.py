@@ -11,12 +11,11 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribu
     get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
 from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
-from otlmow_model.OtlmowModel.Exceptions.InvalidOptionError import InvalidOptionError
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
+from otlmow_model.OtlmowModel.Exceptions.RemovedOptionError import RemovedOptionError
 from otlmow_model.OtlmowModel.Exceptions.UnionTypeError import UnionTypeError
 from otlmow_model.OtlmowModel.Exceptions.WrongGeometryTypeError import WrongGeometryTypeError
 
-from UnitTests.TestModel.OtlmowModel.Exceptions.RemovedOptionError import RemovedOptionError
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
