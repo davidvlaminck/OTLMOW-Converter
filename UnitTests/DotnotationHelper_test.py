@@ -1,7 +1,7 @@
 ﻿import json
-import logging
 
 import pytest
+from otlmow_model.OtlmowModel.warnings.IncorrectTypeWarning import IncorrectTypeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationHelper import DotnotationHelper
@@ -320,10 +320,9 @@ def test_set_attribute_by_dotnotation_decimal_value_convert_scenarios(subtests, 
 
     with subtests.test(
             msg='cardinality > 1 and incorrectly typed and convert=False (converted by set_waarde method on attribute itself)'):
-        recwarn.clear()
-        DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', ["9.0"], convert=False)
+        with pytest.warns(IncorrectTypeWarning):
+            DotnotationHelper.set_attribute_by_dotnotation(instance, 'testDecimalFieldMetKard[]', ["9.0"], convert=False)
         assert instance.testDecimalFieldMetKard[0] == 9.0
-        assert len(recwarn.list) == 1
 
 
 def test_set_attributes_by_dotnotation_default_values(subtests):
