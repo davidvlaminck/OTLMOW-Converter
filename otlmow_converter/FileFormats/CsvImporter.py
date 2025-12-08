@@ -133,7 +133,7 @@ class CsvImporter(AbstractImporter):
         return str(delimiter), str(quote_char)
 
     @classmethod
-    def _get_options(cls, kwargs: dict[str, object] | None) -> tuple[str, str, str, bool, bool, bool, bool, bool, bool]:
+    def _get_options(cls, kwargs: Optional[dict[str, object]]) -> tuple[str, str, str, bool, bool, bool, bool, bool, bool]:
         if kwargs is None:
             kwargs = {}
         separator = str(kwargs.get('separator', SEPARATOR))
@@ -163,7 +163,7 @@ class CsvImporter(AbstractImporter):
     @classmethod
     def _convert_single_type_path(cls, filepath: Path, kwargs: dict[str, object], delimiter: str, quote_char: str,
         separator: str, cardinality_indicator: str, waarde_shortcut: bool, allow_non_otl_conform_attributes: bool,
-        warn_for_non_otl_conform_attributes: bool, model_directory: Path | None, cardinality_separator: str
+        warn_for_non_otl_conform_attributes: bool, model_directory: Optional[Path], cardinality_separator: str
                                   ) -> Iterable[OTLObject]:
         # Prevent double casting downstream
         if 'cast_list' in kwargs:
@@ -343,7 +343,7 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def _python_fallback_to_objects(
-        cls, filepath: Path, delimiter: str, quote_char: str, model_directory: Path | None, separator: str,
+        cls, filepath: Path, delimiter: str, quote_char: str, model_directory: Optional[Path], separator: str,
         cardinality_indicator: str, waarde_shortcut: bool, cardinality_separator: str, cast_datetime: bool,
         cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool
     ) -> Iterable[OTLObject]:
