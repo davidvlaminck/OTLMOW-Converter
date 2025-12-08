@@ -5,6 +5,7 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+import pyarrow as pa
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
@@ -258,3 +259,50 @@ def test_export_choice_list(recwarn):
                                  split_per_type=False, )
 
     file_location.unlink()
+
+
+def test_from_pyarrow_table_to_file_column_order_and_auto_ids():
+    # Build a minimal PyArrow table that is missing the assetId/agentId columns
+    table = pa.table(
+        {
+            "typeURI": [
+                "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Fietslantaarn"
+            ],
+            "someField": ["value-1"],
+        }
+    )
+
+    output_path = Path(__file__).parent / 'Testfiles' / "export.csv"
+
+    # Call the PyArrow-based CSV export directly
+    CsvExporter.from_pyarrow_table_to_file(
+        table=table,
+        filepath=output_path,
+    )
+
+    # Read back the CSV and assert header order and auto-added ID columns
+    with output_path.open(newline="", encoding="utf-8") as f:
+        # Adjust delimiter if the rest of the tests use something different (e.g. ';')
+        reader = csv.DictReader(f, delimiter=";")
+        fieldnames = reader.fieldnames
+        row = next(reader)
+
+    # Expected that the exporter ensures these columns exist and are ordered first
+    expected_prefix = [
+        "typeURI",
+        "assetId.identificator",
+        "assetId.toegekendDoor",
+        "someField",
+    ]
+
+    # Column ordering: prefix must match at the beginning of the header
+    assert fieldnames[: len(expected_prefix)] == expected_prefix
+
+    # Auto-added ID columns should be present and empty, because they were
+    # not present in the original PyArrow table
+    assert row["assetId.identificator"] == ""
+    assert row["assetId.toegekendDoor"] == ""
+
+    # The original data columns should still be present and unchanged
+    assert row["typeURI"] == "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Fietslantaarn"
+    assert row["someField"] == "value-1"
