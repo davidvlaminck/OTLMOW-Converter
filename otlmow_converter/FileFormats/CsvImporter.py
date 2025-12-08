@@ -404,12 +404,10 @@ class CsvImporter(AbstractImporter):
                         file_path=filepath)
             if e is not None:
                 raise TypeUriNotInFirstRowError(
-                    message=f'The typeURI is not in the first row in file {filepath.name}.'
-                            f' Please remove the excess rows',
+                    message=f'The typeURI is not in the first row in file {filepath.name}. Please remove the excess rows',
                     file_path=filepath) from e
             raise TypeUriNotInFirstRowError(
-                message=f'The typeURI is not in the first row in file {filepath.name}.'
-                        f' Please remove the excess rows',
+                message=f'The typeURI is not in the first row in file {filepath.name}. Please remove the excess rows',
                 file_path=filepath)
 
     @classmethod
