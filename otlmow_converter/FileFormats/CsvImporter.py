@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Iterable
 
 import pyarrow as pa
-import pyarrow.csv as pa_csv
 import pyarrow.compute as pc
+import pyarrow.csv as pa_csv
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, dynamic_create_instance_from_uri
 from pyarrow._csv import read_csv, ParseOptions, ReadOptions, ConvertOptions
 
@@ -18,7 +18,6 @@ from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableEr
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.FileFormats.PyArrowConverter import PyArrowConverter
-from otlmow_converter.OtlmowConverter import to_objects
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
 csv.field_size_limit(2147483647)
@@ -93,7 +92,7 @@ class CsvImporter(AbstractImporter):
             type_uris = cls._read_unique_typeuris(filepath, delimiter, quote_char)
         except pa.lib.ArrowKeyError as e:
             cls.check_for_type_uri_in_first_five_rows_using_csv(delimiter, e, filepath, quote_char)
-            raise  # unreachable, re-raised above
+            raise
 
         if len(type_uris) == 1:
             return cls.to_objects(
@@ -289,7 +288,6 @@ class CsvImporter(AbstractImporter):
     @classmethod
     def _read_csv_table_with_schema(
         cls, filepath: Path, delimiter: str, quote_char: str, schema: pa.Schema) -> pa.Table:
-        parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
         include_columns = list(schema.names)  # projection pushdown
         parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
         convert_options = ConvertOptions(
