@@ -4,7 +4,7 @@ import logging
 from asyncio import sleep
 from datetime import datetime, date, time
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional
 
 import pyarrow as pa
 import pyarrow.compute as pc
@@ -122,7 +122,7 @@ class CsvImporter(AbstractImporter):
     # ---------- helper methods ----------
 
     @classmethod
-    def _get_delimiter_and_quote(cls, kwargs: dict[str, object] | None) -> tuple[str, str]:
+    def _get_delimiter_and_quote(cls, kwargs: Optional[dict[str, object]]) -> tuple[str, str]:
         delimiter = DELIMITER
         quote_char = '"'
         if kwargs is not None:
