@@ -9,7 +9,6 @@ from typing import Generator
 from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
 from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
 from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
-from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
