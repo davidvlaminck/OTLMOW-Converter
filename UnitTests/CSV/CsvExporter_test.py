@@ -5,6 +5,9 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+import pyarrow as pa
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AnotherTestClass import AnotherTestClass
@@ -62,7 +65,7 @@ def test_export_unnested_attributes():
                       'testTimeField']
 
     line_1 = lines[1]
-    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'False',
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'false',
                       '2019-09-20', '2001-12-15T22:22:15.123456', '79.07', '10.0|20.0', 'string1', 'string1|string2', '-55',
                       '76|2', 'waarde-4', 'waarde-4|waarde-3', '98.21', '10.0|20.0', 'oFfeDLp', 'string1|string2',
                       '11:05:26']
@@ -98,16 +101,16 @@ def test_export_unnested_attributes_split_per_type():
     line_1 = lines[1]
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '', 'oFfeDLp']
 
-    with open(temp_dir_path / 'unnested_onderdeel_AnotherTestClass.csv', 'r') as file:
-        lines = list(file)
+    with open(temp_dir_path / 'unnested_onderdeel_AnotherTestClass.csv', newline='', encoding='utf-8') as file:
+        csv_reader = csv.reader(file, delimiter=';')
+        lines = list(csv_reader)
     assert len(lines) == 2
 
-    line_0 = lines[0].split(';')
-    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie\n']
+    line_0 = lines[0]
+    assert line_0 == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'notitie']
 
-    line_1 = lines[1].split(';')
-    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '0001', '',
-                      'notitie\n']
+    line_1 = lines[1]
+    assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass', '0001', '', 'notitie']
 
     shutil.rmtree(temp_dir_path)
 
@@ -163,7 +166,7 @@ def test_export_and_then_import_nested_attributes_level_1():
                       'testUnionTypeMetKard[].unionKwantWrd']
     line_1 = lines[1]
     assert line_1 == ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass', '0000', '',
-                      'True', '65.14', '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
+                      'true', '65.14', '10.0|20.0', 'KmCtMXM', 'string1|string2', 'True|False', '10.0|20.0',
                       'string1|string2', 'RWKofW', '10.0|20.0']
 
     shutil.rmtree(temp_dir_path)
@@ -228,3 +231,78 @@ def test_export_list_of_lists():
 
     with pytest.raises(DotnotationListOfListError):
         CsvExporter.from_objects(sequence_of_objects=[instance], filepath=file_location, split_per_type=False)
+
+
+def test_export_choice_list(recwarn):
+
+    d = {
+        "assetId": {
+            "identificator": "dummy_LySD",
+            "toegekendDoor": "dummy_hxzA"
+        },
+        "diameter": "100",
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Fietslantaarn"
+    }
+    e = {
+        "assetId": {
+            "identificator": "dummy_Lesw",
+            "toegekendDoor": "dummy_ySKHg"
+        },
+        "Tank": 70.29,
+        "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Tank"
+    }
+    obj_d = OTLObject.from_dict(d)
+    obj_e = OTLObject.from_dict(e, waarde_shortcut=True)
+    file_location = Path(__file__).parent / 'Testfiles' / 'choice_list.csv'
+    with pytest.warns(NonStandardAttributeWarning):
+        CsvExporter.from_objects(sequence_of_objects=[obj_e, obj_d], filepath=file_location,
+                                 split_per_type=False, )
+
+    file_location.unlink()
+
+
+def test_from_pyarrow_table_to_file_column_order_and_auto_ids():
+    # Build a minimal PyArrow table that is missing the assetId/agentId columns
+    table = pa.table(
+        {
+            "typeURI": [
+                "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Fietslantaarn"
+            ],
+            "someField": ["value-1"],
+        }
+    )
+
+    output_path = Path(__file__).parent / 'Testfiles' / "export.csv"
+
+    # Call the PyArrow-based CSV export directly
+    CsvExporter.from_pyarrow_table_to_file(
+        table=table,
+        filepath=output_path,
+    )
+
+    # Read back the CSV and assert header order and auto-added ID columns
+    with output_path.open(newline="", encoding="utf-8") as f:
+        # Adjust delimiter if the rest of the tests use something different (e.g. ';')
+        reader = csv.DictReader(f, delimiter=";")
+        fieldnames = reader.fieldnames
+        row = next(reader)
+
+    # Expected that the exporter ensures these columns exist and are ordered first
+    expected_prefix = [
+        "typeURI",
+        "assetId.identificator",
+        "assetId.toegekendDoor",
+        "someField",
+    ]
+
+    # Column ordering: prefix must match at the beginning of the header
+    assert fieldnames[: len(expected_prefix)] == expected_prefix
+
+    # Auto-added ID columns should be present and empty, because they were
+    # not present in the original PyArrow table
+    assert row["assetId.identificator"] == ""
+    assert row["assetId.toegekendDoor"] == ""
+
+    # The original data columns should still be present and unchanged
+    assert row["typeURI"] == "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Fietslantaarn"
+    assert row["someField"] == "value-1"

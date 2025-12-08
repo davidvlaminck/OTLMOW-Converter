@@ -304,7 +304,8 @@ class DotnotationTableConverter:
                                   separator: str = SEPARATOR,
                                   cardinality_indicator: str = CARDINALITY_INDICATOR,
                                   cardinality_separator: str = CARDINALITY_SEPARATOR,
-                                  combine_errors: bool = False, additional_header_lines: int = 0) -> list[OTLObject]:
+                                  combine_errors: bool = False, additional_header_lines: int = 0,
+                                  **kwargs) -> list[OTLObject]:
         """Returns a list of OTL objects from a list of dicts, where each dict is a row, and the first row is the
         header"""
         instances = []

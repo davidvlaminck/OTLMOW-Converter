@@ -59,18 +59,18 @@ There are also from_A_to_B methods (i.e. from_dicts_to_objects) where either A o
 These methods are more efficient as they do not need to determine the format of the subject.
 
 ## Installation and requirements
-OTLMOW-Converter has a couple of dependencies besides the standard Python libraries. It depends on another OTLMOW 
-package: otlmow-model. These libraries will be automatically installed when installing this library. Currently, you 
-need at least Python version 3.8 to use this library.
-
-To install the OTL MOW project into your Python project, use pip to install it:
+I recommend working with uv. Install this first:
 ``` 
-pip install otlmow_converter
+pip install uv
 ```
-To upgrade an existing installation use:
+Then install this package by using the uv pip install command:
 ``` 
-pip install otlmow_converter --upgrade
+uv pip install otlmow-converter
 ```
+If you are a developer, use this command to install the dependencies, including those needed to run the test suite.
+``` 
+uv pip install -r pyproject.toml --extra test
+``` 
 
 ## Code examples and usage
 See the [Readme notebook](https://github.com/davidvlaminck/OTLMOW-Converter/blob/master/Readme.ipynb)

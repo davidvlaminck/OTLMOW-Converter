@@ -1,7 +1,7 @@
 [
     {
         "assetId": {
-            "identificator": "1"
+            "identificator": "a1"
         },
         "testBooleanField": true,
         "testStringField": "naam_2",

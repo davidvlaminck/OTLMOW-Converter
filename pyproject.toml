@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "otlmow_converter"
-version = "1.15rc4"
+version = "1.15"
 authors = [{name = "David Vlaminck", email = "david.vlaminck@mow.vlaanderen.be"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -26,7 +26,8 @@ dependencies = [
     'geojson>=3.0.1',
     'prettytable>=3.6.0',
     'lxml>=4.9.3',
-    'pandas>=1.3.5'
+    'pandas>=1.3.5',
+    'pyarrow>=12.0.0',
 ]
 
 [tool.setuptools.packages.find]
