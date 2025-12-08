@@ -63,7 +63,6 @@ def test_convert_objects_to_dataframe_minimal_test():
 
     pa_table = PyArrowConverter.convert_objects_to_single_table(list_of_objects=instances)
 
-    print(pa_table.to_pylist())
 
     assert pa_table.num_rows == 2
     assert pa_table.num_columns == 4
