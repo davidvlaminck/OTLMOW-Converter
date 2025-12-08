@@ -1,14 +1,12 @@
 from pathlib import Path
 from typing import Iterable
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
-from pyarrow import Table
 import pyarrow as pa
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_shortened_uri
+from pyarrow import Table
 
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
-from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
-from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
 
@@ -46,7 +44,7 @@ class PyArrowConverter:
         if avoid_multiple_types_in_single_column:
             all_keys.remove('_native_type_dict')
             for d in dict_list:
-                del d['_native_type_dict']  # Remove native types if present
+                d.pop('_native_type_dict', None)  # Remove native types if present
 
         # Normalize dicts so all have all keys
         if any(len(d) != len(all_keys) for d in dict_list):
