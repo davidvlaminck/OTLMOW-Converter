@@ -11,8 +11,6 @@
         "assetId": {
             "identificator": "2"
         },
-        "testBooleanField": true,
-        "testStringField": "naam2_2",
         "typeURI": "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass"
     }
 ]

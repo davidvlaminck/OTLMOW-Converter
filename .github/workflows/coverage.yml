@@ -1,5 +1,8 @@
 name: Coverage
 run-name: Coverage for ${{ github.sha }}
+concurrency:
+  group: coverage_and_zip_master
+  cancel-in-progress: false
 on:
   push:
     branches:
