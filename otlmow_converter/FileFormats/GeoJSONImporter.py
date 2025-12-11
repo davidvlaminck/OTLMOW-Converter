@@ -130,7 +130,8 @@ class GeoJSONImporter(AbstractImporter):
 
             if 'geometry' in data_object:
                 geom = data_object['geometry']
-                asset.geometry = cls.construct_wkt_string_from_geojson(geom)
+                if geom is not None:
+                    asset.geometry = cls.construct_wkt_string_from_geojson(geom)
 
             list_of_objects.append(asset)
         return list_of_objects
