@@ -1,15 +1,15 @@
 import re
 from abc import abstractmethod
 
-from otlmow_model.OtlmowModel.GeometrieTypes.PuntGeometrie import PuntGeometrie
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut
-from otlmow_model.OtlmowModel.BaseClasses.StringField import StringField
-from otlmow_model.OtlmowModel.Datatypes.DtcIdentificator import DtcIdentificatorWaarden, DtcIdentificator
-from otlmow_model.OtlmowModel.BaseClasses.RelationInteractor import RelationInteractor
-from otlmow_model.OtlmowModel.BaseClasses.OTLAsset import OTLAsset
-from otlmow_model.OtlmowModel.Classes.ImplementatieElement.AIMToestand import AIMToestand
-from otlmow_model.OtlmowModel.Classes.ImplementatieElement.AIMDBStatus import AIMDBStatus
-from otlmow_model.OtlmowModel.Classes.ImplementatieElement.AIMVersie import AIMVersie
+from ..GeometrieTypes.PuntGeometrie import PuntGeometrie
+from .OTLObject import OTLAttribuut
+from .StringField import StringField
+from ..Datatypes.DtcIdentificator import DtcIdentificatorWaarden, DtcIdentificator
+from .RelationInteractor import RelationInteractor
+from .OTLAsset import OTLAsset
+from ..Classes.ImplementatieElement.AIMToestand import AIMToestand
+from ..Classes.ImplementatieElement.AIMDBStatus import AIMDBStatus
+from ..Classes.ImplementatieElement.AIMVersie import AIMVersie
 
 
 

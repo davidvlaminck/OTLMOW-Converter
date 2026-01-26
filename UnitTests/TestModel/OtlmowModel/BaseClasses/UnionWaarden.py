@@ -1,9 +1,12 @@
-﻿from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
+﻿from typing import Generator
+
+from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
 
 
 class UnionWaarden(WaardenObject):
     def __init__(self):
         super().__init__()
+        self._is_union_waarden_object: bool = True
 
     def clear_other_props(self, prop_name: str):
         prop_name = prop_name[1:]
@@ -14,3 +17,6 @@ class UnionWaarden(WaardenObject):
                 setattr(attribute.waarde, 'waarde', None)
             else:
                 setattr(attribute, 'waarde', None)
+
+    def __iter__(self):
+        yield from super().__iter__()
