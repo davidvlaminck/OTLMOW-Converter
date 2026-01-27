@@ -3,7 +3,7 @@ from typing import Sequence
 from otlmow_converter.Exceptions.OTLAttributeError import OTLAttributeError
 
 
-class MultipleAttributeError(BaseException):
+class MultipleAttributeError(Exception):
     def __init__(self, message, exceptions: Sequence[OTLAttributeError] = None):
         super().__init__(message)
         if exceptions is None:

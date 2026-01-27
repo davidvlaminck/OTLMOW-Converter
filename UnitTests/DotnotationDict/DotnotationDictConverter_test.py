@@ -2,17 +2,15 @@ from datetime import date, time, datetime
 from pathlib import Path
 
 import pytest
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
-from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
-from otlmow_model.OtlmowModel.Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
-from otlmow_model.OtlmowModel.Exceptions.InvalidOptionError import InvalidOptionError
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
+
+from UnitTests.TestModel.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
+from otlmow_model.OtlmowModel.Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
-from otlmow_converter.Exceptions.MultipleAttributeError import MultipleAttributeError
 from otlmow_converter.Exceptions.OTLAttributeError import OTLAttributeError
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
@@ -838,7 +836,7 @@ def test_to_dict_instance_version():
 
     assert created_dict == expected_dict
 
-def test_from_dict_combined_attribute_errors():
+def test_from_dict_combined_attribute_errors_not_combined():
     input_dict = DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI,
          'testBooleanField': 'a',
@@ -846,19 +844,41 @@ def test_from_dict_combined_attribute_errors():
          'testComplexType.testKwantWrdMetKard[]': 'a',
          'testComplexTypeMetKard[].testBooleanField': [True, 'b', False]})
 
-    with pytest.raises(CouldNotConvertToCorrectTypeError):
+    with pytest.raises(Exception) as excinfo:
         DotnotationDictConverter.from_dict(input_dict,
             model_directory=model_directory_path)
+    assert excinfo.type.__name__ == 'CouldNotConvertToCorrectTypeError'
 
-    with pytest.raises(MultipleAttributeError) as excinfo:
+
+def test_from_dict_combined_attribute_errors_combined():
+    input_dict = DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI,
+         'testBooleanField': 'a',
+         "testKeuzelijst": "ingebruik",
+         'testComplexType.testKwantWrdMetKard[]': 'a',
+         'testComplexTypeMetKard[].testBooleanField': [True, 'b', False]})
+
+
+    with pytest.raises(Exception) as excinfo:
         DotnotationDictConverter.from_dict(input_dict,
             model_directory=model_directory_path, combine_errors=True)
+    assert excinfo.type.__name__ == 'MultipleAttributeError'
+
+    print("inner exception types:", [f"{type(e).__module__}.{type(e).__name__}" for e in excinfo.value.exceptions])
+    print("orig exception types:",
+          [f"{type(e.orig_exception).__module__}.{type(e.orig_exception).__name__}" for e in excinfo.value.exceptions])
+
+
+    assert excinfo.type.__name__ == 'MultipleAttributeError'
 
     assert excinfo.value.args[0] == ("At least one error occurred while converting from dict to an instance of "
                                      "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass, "
                                      "see attribute exceptions for details.")
     assert len(excinfo.value.exceptions) == 4
     assert isinstance(excinfo.value.exceptions[0], OTLAttributeError)
-    assert isinstance(excinfo.value.exceptions[0].orig_exception, CouldNotConvertToCorrectTypeError)
-    assert isinstance(excinfo.value.exceptions[1].orig_exception, InvalidOptionError)
+    assert excinfo.value.exceptions[0].orig_exception.__class__.__name__ == 'CouldNotConvertToCorrectTypeError'
+    assert excinfo.value.exceptions[1].orig_exception.__class__.__name__ == 'InvalidOptionError'
+    assert excinfo.value.exceptions[2].orig_exception.__class__.__name__ == 'CouldNotConvertToCorrectTypeError'
+    assert excinfo.value.exceptions[3].orig_exception.__class__.__name__ == 'CouldNotConvertToCorrectTypeError'
+
 

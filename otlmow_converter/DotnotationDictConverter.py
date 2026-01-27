@@ -3,15 +3,13 @@ from __future__ import annotations
 import inspect
 import warnings
 from asyncio import sleep
+from datetime import time, datetime, date
 from pathlib import Path
 from typing import Generator
 
-from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
-from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
 from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     get_attribute_by_name
-from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
 from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
 from otlmow_model.OtlmowModel.Exceptions.RemovedOptionError import RemovedOptionError
@@ -157,9 +155,10 @@ class DotnotationDictConverter:
         collect_native_types: bool = False
     ):
         for attr_key, attribute in vars(object_or_attribute).items():
-            if attr_key in {'_parent', '_valid_relations', '_geometry_types'}:
+            if attr_key in {'_parent', '_valid_relations', '_geometry_types',
+                            '_is_waarden_object', '_is_union_waarden_object'}:
                 continue
-            if not isinstance(attribute, OTLAttribuut):
+            if not getattr(attribute, 'is_otl_attribute', False):
                 yield from cls._yield_non_conform(attr_key, attribute, object_or_attribute,
                                                   allow_non_otl_conform_attributes, warn_for_non_otl_conform_attributes,
                                                   collect_native_types)
@@ -405,12 +404,23 @@ class DotnotationDictConverter:
                         cast_datetime=cast_datetime, cast_list=cast_list,
                         allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                         warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
-                except (ValueError, CouldNotConvertToCorrectTypeError, UnionTypeError, RemovedOptionError,
-                        WrongGeometryTypeError,) as e:
-                    if error_collector is not None:
-                        attr_error = OTLAttributeError(message=e.args[0], attribute_dotnotation=k, attribute_value=v,
-                                                       orig_exception=e)
-                        error_collector.add_exception(attr_error)
+                except Exception as e:
+                    allowed_names = {
+                        'ValueError',
+                        'CouldNotConvertToCorrectTypeError',
+                        'UnionTypeError',
+                        'InvalidOptionError',
+                        'RemovedOptionError',
+                        'WrongGeometryTypeError',
+                    }
+                    if e.__class__.__name__ in allowed_names:
+                        if error_collector is not None:
+                            attr_error = OTLAttributeError(
+                                message=e.args[0], attribute_dotnotation=k, attribute_value=v, orig_exception=e
+                            )
+                            error_collector.add_exception(attr_error)
+                        else:
+                            raise
                     else:
                         raise
 
@@ -556,7 +566,8 @@ class DotnotationDictConverter:
                         separator=separator, cardinality_indicator=cardinality_indicator,
                         waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator)
             else:
-                if cast_datetime and attribute.field in {TimeField, DateField, DateTimeField}:
+                if (cast_datetime and attribute.field.is_otl_field and 
+                        attribute.field.native_type in {time, datetime, date}):
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
                 elif issubclass(attribute.field, KeuzelijstField):
                     if cardinality and value != '88888888':

@@ -2,7 +2,6 @@
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLAttribuut, OTLObject, get_attribute_by_name
 from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
-from otlmow_model.OtlmowModel.BaseClasses.UnionWaarden import UnionWaarden
 
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.SettingsManager import load_settings, GlobalVariables
@@ -45,10 +44,10 @@ class DotnotationHelper:
         if attribute.kardinaliteit_max != '1':
             dotnotation += cardinality_indicator
 
-        if isinstance(attribute.owner, OTLAttribuut):
+        if getattr(attribute.owner, 'is_otl_attribute', False):
             return dotnotation
 
-        if isinstance(attribute.owner, WaardenObject):
+        if getattr(attribute.owner, '_is_waarden_object', False):
             return cls.get_dotnotation(
                 attribute=attribute.owner._parent, separator=separator, cardinality_indicator=cardinality_indicator,
                 waarde_shortcut=waarde_shortcut) + separator + dotnotation
@@ -207,7 +206,7 @@ class DotnotationHelper:
                 attribute = get_attribute_by_name(instance_or_attribute, first_part)
                 if attribute.waarde is None:
                     attribute.add_empty_value()
-                elif isinstance(attribute.waarde, UnionWaarden):
+                elif getattr(attribute.waarde, '_is_union_waarden_object', False):
                     attribute.waarde.clear_other_props(prop_name=rest)
 
                 # Recursive function call

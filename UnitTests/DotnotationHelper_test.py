@@ -1,9 +1,9 @@
 ﻿import json
 
 import pytest
-from otlmow_model.OtlmowModel.warnings.IncorrectTypeWarning import IncorrectTypeWarning
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
+from UnitTests.TestModel.OtlmowModel.warnings.IncorrectTypeWarning import IncorrectTypeWarning
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 
 
