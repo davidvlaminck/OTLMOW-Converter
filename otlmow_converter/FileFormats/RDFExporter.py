@@ -57,7 +57,8 @@ class RDFExporter:
         keys = list(filter(lambda k: k[0] == '_', vars(asset_or_attribute).keys()))
 
         for key in keys:
-            if key in ['_valid_relations', '_parent', '_geometry_types']:  # TODO fix geometry
+            if key in {'_valid_relations', '_parent', '_geometry_types',
+                       '_is_union_waarden_object', '_is_waarden_object'}:  # TODO fix geometry
                 continue
 
             attribute = getattr(asset_or_attribute, key)
@@ -80,18 +81,18 @@ class RDFExporter:
 
             if attribute.kardinaliteit_max != '1':
                 for waarde_item in attribute.waarde:
-                    if waarde_item is not None and issubclass(attribute.field, KeuzelijstField):
+                    if waarde_item is not None and hasattr(attribute.field, 'options'):
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri),
                                    URIRef(attribute.field.options[waarde_item].objectUri)))
-                    elif issubclass(attribute.field, FloatOrDecimalField):
+                    elif attribute.field.native_type == float:
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(waarde_item, datatype=XSD.decimal)))
                     else:
                         graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(waarde_item)))
             else:
-                if issubclass(attribute.field, KeuzelijstField):
+                if hasattr(attribute.field, 'options'):
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri),
                                URIRef(attribute.field.options[attribute.waarde].objectUri)))
-                elif issubclass(attribute.field, FloatOrDecimalField):
+                elif attribute.field.native_type == float:
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(attribute.waarde, datatype=XSD.decimal)))
                 else:
                     graph.add((asset_attribute_ref, URIRef(attribute.objectUri), Literal(attribute.waarde)))
