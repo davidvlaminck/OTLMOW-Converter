@@ -13,7 +13,7 @@ class OTLField:
     waardeObject: Any = None
     clearing_value: Any = None
     is_otl_field: bool = True
-    native_type: Any
+    native_type: Any = None
 
     @classmethod
     def validate(cls, value: Any, attribuut) -> bool:

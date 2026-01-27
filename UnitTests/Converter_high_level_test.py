@@ -122,13 +122,14 @@ def test_dataframe_to_dataframe():
         assert_frame_equal(expected_df, created_df)
 
 
-def test_dicts_to_dicts():
-    with pytest.warns(NonStandardAttributeWarning):
-        orig_list_of_objects = return_test_objects()
-        orig_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
-
-        new_list_of_dicts = to_dicts(orig_list_of_dicts, model_directory=model_directory_path)
-        assert orig_list_of_dicts == list(new_list_of_dicts)
+def test_dicts_to_dicts(recwarn):
+    orig_list_of_objects = return_test_objects()
+    orig_list_of_dicts = [o.to_dict() for o in orig_list_of_objects]
+    new_list_of_dicts = to_dicts(orig_list_of_dicts, model_directory=model_directory_path)
+    assert orig_list_of_dicts == list(new_list_of_dicts)
+    # Check that the warning was raised
+    assert any(w.message.__class__.__name__ == 'NonStandardAttributeWarning' for w in recwarn), \
+        f"Captured warnings: {[w.message for w in recwarn]}"
 
 
 def test_dotnotation_dicts_to_dotnotation_dicts():

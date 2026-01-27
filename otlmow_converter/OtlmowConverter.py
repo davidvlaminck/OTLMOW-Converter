@@ -68,9 +68,10 @@ class OtlmowConverter:
                     for o in cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
                                                        model_directory=model_directory, **kwargs):
                         yield o
-                elif isinstance(first_element, OTLObject):
-                    for o in new_generator:
-                        yield o
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
+                        for o in new_generator:
+                            yield o
                 else:
                     raise ValueError(f"Unsupported subject type: {type(first_element)}")
             except StopIteration:
@@ -105,7 +106,8 @@ class OtlmowConverter:
                     async for o in cls.from_dicts_to_objects_async(sequence_of_dicts=new_generator,
                                                                    model_directory=model_directory, **kwargs):
                         yield o
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     for o in new_generator:
                         yield o
                 else:
@@ -137,7 +139,8 @@ class OtlmowConverter:
                     objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
                                                         model_directory=model_directory, **kwargs)
                     return cls.from_objects_to_file(file_path=file_path, sequence_of_objects=objects, **kwargs)
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     return cls.from_objects_to_file(file_path=file_path, sequence_of_objects=new_generator, **kwargs)
                 else:
                     raise ValueError(f"Unsupported subject type: {type(first_element)}")
@@ -171,7 +174,8 @@ class OtlmowConverter:
                                                               model_directory=model_directory, **kwargs)
                     objects = await cls.collect_to_list(objects_gen)
                     return await cls.from_objects_to_file_async(file_path=file_path, sequence_of_objects=objects, **kwargs)
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     return await cls.from_objects_to_file_async(file_path=file_path, sequence_of_objects=new_generator, **kwargs)
                 else:
                     raise ValueError(f"Unsupported subject type: {type(first_element)}")
@@ -214,7 +218,8 @@ class OtlmowConverter:
                     return cls.from_objects_to_dataframe(sequence_of_objects=objects,
                                                          split_per_type=split_per_type,
                                                          **kwargs)
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     return cls.from_objects_to_dataframe(sequence_of_objects=new_generator,
                                                          split_per_type=split_per_type, **kwargs)
                 else:
@@ -260,7 +265,8 @@ class OtlmowConverter:
                     return await cls.from_objects_to_dataframe_async(sequence_of_objects=objects,
                                                                      split_per_type=split_per_type,
                                                                      **kwargs)
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     return await cls.from_objects_to_dataframe_async(sequence_of_objects=new_generator,
                                                                      split_per_type=split_per_type, **kwargs)
                 else:
@@ -291,7 +297,8 @@ class OtlmowConverter:
                     yield from cls.from_objects_to_dicts(sequence_of_objects=objects, **kwargs)
                 elif isinstance(first_element, dict):
                     yield from new_generator
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     yield from cls.from_objects_to_dicts(sequence_of_objects=new_generator, **kwargs)
                 else:
                     raise ValueError(f"Unsupported subject type: {type(first_element)}")
@@ -327,7 +334,8 @@ class OtlmowConverter:
                 elif isinstance(first_element, dict):
                     for obj in new_generator:
                         yield obj
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     async for obj in cls.from_objects_to_dicts_async(sequence_of_objects=new_generator, **kwargs):
                         yield obj
                 else:
@@ -360,7 +368,8 @@ class OtlmowConverter:
                     objects = cls.from_dicts_to_objects(sequence_of_dicts=new_generator,
                                                         model_directory=model_directory, **kwargs)
                     yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=new_generator, **kwargs)
                 else:
                     raise ValueError(f"Unsupported subject type: {type(first_element)}")
@@ -398,7 +407,8 @@ class OtlmowConverter:
                     async for dotnotation_dict in cls.from_objects_to_dotnotation_dicts_async(
                             sequence_of_objects=objects, **kwargs):
                         yield dotnotation_dict
-                elif isinstance(first_element, OTLObject):
+                elif (callable(getattr(first_element, "return_is_otl_object", None))
+                      and first_element.return_is_otl_object()):
                     async for dotnotation_dict in cls.from_objects_to_dotnotation_dicts_async(
                             sequence_of_objects=new_generator, **kwargs):
                         yield dotnotation_dict
