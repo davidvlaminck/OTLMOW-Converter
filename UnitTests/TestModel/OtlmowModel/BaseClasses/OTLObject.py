@@ -8,8 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Union, Dict, List, Generator, TypeVar, Type
 
-from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
-from .KeuzelijstField import KeuzelijstField
+from .DateTimeField import DateTimeField
 from .OTLField import OTLField
 from .URIField import URIField
 from .UnionTypeField import UnionTypeField
@@ -20,7 +19,7 @@ from ..Exceptions.ClassDeprecationWarning import ClassDeprecationWarning
 from ..Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
 from ..Exceptions.MethodNotApplicableError import MethodNotApplicableError
 from ..Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
-from ..Helpers.GenericHelper import get_titlecase_from_ns, get_ns_and_name_from_uri
+from ..Helpers.GenericHelper import get_titlecase_from_ns
 from ..Helpers.generated_lists import get_hardcoded_class_dict
 
 
@@ -166,7 +165,7 @@ class OTLAttribuut:
             converted_values = []
             for el_value in value:
                 converted_value = self.field.convert_to_correct_type(el_value)
-                if issubclass(self.field, KeuzelijstField):
+                if hasattr(self.field, 'options') and self.field.options is not None:
                     converted_value = self.field.convert_to_invulwaarde(converted_value, self.field)
 
                 field_validated = self.field.validate(converted_value, self)
@@ -181,7 +180,7 @@ class OTLAttribuut:
                 self.waarde = value
             else:
                 converted_value = self.field.convert_to_correct_type(value)
-                if issubclass(self.field, KeuzelijstField):
+                if hasattr(self.field, 'options') and self.field.options is not None:
                     converted_value = self.field.convert_to_invulwaarde(converted_value, self.field)
                 if self.field.validate(value=converted_value, attribuut=self):
                     self.waarde = converted_value
@@ -691,7 +690,7 @@ def _recursive_create_rdf_dict_from_asset(
                                                      for list_item in attr.waarde]
                             else:
                                 d[attr.objectUri] = datetime.strftime(attr.waarde, "%Y-%m-%d %H:%M:%S")
-                        elif issubclass(attr.field, KeuzelijstField):
+                        elif hasattr(attr.field, 'options') and attr.field.options is not None:
                             if isinstance(attr.waarde, list):
                                 if attr.waarde == [None]:
                                     d[attr.objectUri] = []
@@ -702,7 +701,7 @@ def _recursive_create_rdf_dict_from_asset(
                                 d[attr.objectUri] = attr.field.options[attr.waarde].objectUri
                         else:
                             d[attr.objectUri] = attr.waarde
-                    elif issubclass(attr.field, KeuzelijstField):
+                    elif hasattr(attr.field, 'options') and attr.field.options is not None:
                         if isinstance(attr.waarde, list):
                             if attr.waarde == [None]:
                                 d[attr.objectUri] = []
