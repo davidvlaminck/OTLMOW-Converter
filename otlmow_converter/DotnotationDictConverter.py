@@ -7,7 +7,6 @@ from datetime import time, datetime, date
 from pathlib import Path
 from typing import Generator
 
-from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject, OTLAttribuut, dynamic_create_instance_from_uri, \
     get_attribute_by_name
 from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
@@ -569,7 +568,7 @@ class DotnotationDictConverter:
                 if (cast_datetime and attribute.field.is_otl_field and 
                         attribute.field.native_type in {time, datetime, date}):
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
-                elif issubclass(attribute.field, KeuzelijstField):
+                elif hasattr(attribute.field, 'options'):
                     if cardinality and value != '88888888':
                         value = [str(v) for v in value]
                     else:

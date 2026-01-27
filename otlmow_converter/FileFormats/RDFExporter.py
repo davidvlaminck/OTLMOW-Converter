@@ -1,7 +1,5 @@
 from typing import Iterable
 
-from otlmow_model.OtlmowModel.BaseClasses.FloatOrDecimalField import FloatOrDecimalField
-from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
 from otlmow_model.OtlmowModel.Classes.ImplementatieElement.RelatieObject import RelatieObject
 from rdflib import Graph, FOAF, URIRef, BNode, Literal, RDF, XSD
 
