@@ -44,6 +44,14 @@ class PandasConverter:
                                      ) -> Iterable[OTLObject]:
         df = dataframe.where(~dataframe.isna(), None)
 
+        # Replace 'nan' string with None for compatibility with different pandas versions
+        # Use map if available (pandas >= 2.1), otherwise use applymap
+        nan_replace_func = lambda x: None if isinstance(x, str) and x.lower() == 'nan' else x
+        if hasattr(df, 'map'):
+            df = df.map(nan_replace_func)
+        else:
+            df = df.applymap(nan_replace_func)
+
         for col in df.columns:
             if any(callable(getattr(x, "tolist", None)) for x in df[col]):
                 df[col] = df[col].apply(cls.tolist_if_possible)
@@ -60,6 +68,15 @@ class PandasConverter:
     async def convert_dataframe_to_objects_async(cls, dataframe: DataFrame, model_directory: Path = None, **kwargs
                                      ) -> Iterable[OTLObject]:
         dataframe = dataframe.where(~dataframe.isna(), None)
+
+        # Replace 'nan' string with None for compatibility with different pandas versions
+        # Use map if available (pandas >= 2.1), otherwise use applymap
+        nan_replace_func = lambda x: None if isinstance(x, str) and x.lower() == 'nan' else x
+        if hasattr(dataframe, 'map'):
+            dataframe = dataframe.map(nan_replace_func)
+        else:
+            dataframe = dataframe.applymap(nan_replace_func)
+
         headers = list(dataframe)
         d = {header: index for index, header in enumerate(headers)}
         dict_list = [d]
