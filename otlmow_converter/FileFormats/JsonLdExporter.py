@@ -1,5 +1,6 @@
 import json
 from asyncio import sleep
+from datetime import date, datetime, time
 from json import JSONEncoder
 from pathlib import Path
 from typing import Iterable
@@ -17,6 +18,18 @@ jsonld_settings = GlobalVariables.settings['formats']['JSON-LD']
 WAARDE_SHORTCUT = jsonld_settings['waarde_shortcut']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = jsonld_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = jsonld_settings['warn_for_non_otl_conform_attributes']
+
+
+class DateTimeEncoder(JSONEncoder):
+    """Custom JSON encoder that handles date, datetime, and time objects."""
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, date):
+            return obj.isoformat()
+        elif isinstance(obj, time):
+            return obj.isoformat()
+        return super().default(obj)
 
 
 class JsonLdExporter(AbstractExporter):
@@ -51,7 +64,7 @@ class JsonLdExporter(AbstractExporter):
 
         graph_dict = {'@graph': (list_of_objects if isinstance(list_of_objects, list) else [list_of_objects])}
 
-        encoded_json = JSONEncoder(indent=4).encode(graph_dict)
+        encoded_json = DateTimeEncoder(indent=4).encode(graph_dict)
         encoded_json = cls.modify_jsonld_for_context(encoded_json)
 
         with open(filepath, "w") as file:
@@ -93,7 +106,7 @@ class JsonLdExporter(AbstractExporter):
 
         graph_dict = {'@graph': (list_of_objects if isinstance(list_of_objects, list) else [list_of_objects])}
 
-        encoded_json = JSONEncoder(indent=4).encode(graph_dict)
+        encoded_json = DateTimeEncoder(indent=4).encode(graph_dict)
         encoded_json = cls.modify_jsonld_for_context(encoded_json)
 
         await sleep(0)
