@@ -185,11 +185,26 @@ class CsvImporter(AbstractImporter):
         )
         missing_columns = cls._compute_missing_columns(first_row['typeURI'], headers)
 
-        table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
-        table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
-        table = cls._append_missing_columns_to_table(table, missing_columns)
-
-        return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
+        try:
+            table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
+            table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
+            table = cls._append_missing_columns_to_table(table, missing_columns)
+            return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
+        except pa.lib.ArrowInvalid as e:
+            # If PyArrow fails to parse dates (e.g., DD/MM/YYYY instead of ISO format),
+            # fall back to Python CSV reader which handles all formats via OTL model conversion
+            if 'CSV conversion error' in str(e):
+                logging.debug(f'PyArrow parsing failed, falling back to Python CSV reader for {filepath.name}: {e}')
+                return cls._python_fallback_to_objects(
+                    filepath=filepath, delimiter=delimiter, quote_char=quote_char,
+                    model_directory=model_directory, separator=separator,
+                    cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                    cardinality_separator=cardinality_separator, cast_datetime=kwargs.get('cast_datetime', False),
+                    cast_list=kwargs.get('cast_list', False),
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes
+                )
+            raise
 
     @classmethod
     async def _convert_single_type_path_async(cls, filepath: Path, kwargs: dict[str, object], delimiter: str, quote_char: str,
@@ -217,11 +232,30 @@ class CsvImporter(AbstractImporter):
         )
         missing_columns = cls._compute_missing_columns(first_row['typeURI'], headers)
 
-        table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
-        table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
-        table = cls._append_missing_columns_to_table(table, missing_columns)
-
-        return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
+        try:
+            table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
+            table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
+            table = cls._append_missing_columns_to_table(table, missing_columns)
+            return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
+        except pa.lib.ArrowInvalid as e:
+            # If PyArrow fails to parse dates (e.g., DD/MM/YYYY instead of ISO format),
+            # fall back to Python CSV reader which handles all formats via OTL model conversion
+            if 'CSV conversion error' in str(e):
+                logging.debug(f'PyArrow parsing failed, falling back to Python CSV reader for {filepath.name}: {e}')
+                # Need to collect the async generator results into a list
+                results = []
+                async for obj in cls._python_fallback_to_objects_async(
+                    filepath=filepath, delimiter=delimiter, quote_char=quote_char,
+                    model_directory=model_directory, separator=separator,
+                    cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                    cardinality_separator=cardinality_separator, cast_datetime=kwargs.get('cast_datetime', False),
+                    cast_list=kwargs.get('cast_list', False),
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes
+                ):
+                    results.append(obj)
+                return results
+            raise
 
     @classmethod
     def _read_first_row_and_headers(cls, filepath: Path, delimiter: str, quote_char: str
@@ -321,6 +355,17 @@ class CsvImporter(AbstractImporter):
         cls, filepath: Path, delimiter: str, quote_char: str, schema: pa.Schema) -> pa.Table:
         include_columns = list(schema.names)  # projection pushdown
         parse_options = ParseOptions(delimiter=delimiter, quote_char=quote_char)
+
+        # Build timestamp_parsers for date/time fields to handle various formats
+        timestamp_parsers = {}
+        for field in schema:
+            if pa.types.is_string(field.type):
+                # Check if this might be a date/time field that we're reading as string
+                # We'll add common date formats for parsing
+                timestamp_parsers[field.name] = [
+                    pa.string(),  # Keep as string by default
+                ]
+
         convert_options = ConvertOptions(
             column_types=schema,
             include_columns=include_columns,
@@ -328,7 +373,7 @@ class CsvImporter(AbstractImporter):
             strings_can_be_null=True,
             # normalize boolean parsing to common variants
             true_values=["true", "True", "1", "Y", "Yes"],
-            false_values=["false", "False", "0", "N", "No"]
+            false_values=["false", "False", "0", "N", "No"],
         )
         table = read_csv(
             filepath,
@@ -381,16 +426,28 @@ class CsvImporter(AbstractImporter):
         try:
             with open(filepath, encoding='utf-8') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
-                data: list[list[object]] = [next(csv_reader)]
+                headers = next(csv_reader)
+                data: list[list[object]] = [headers]
+
+                # Identify which columns are cardinality fields (have [] in the name)
+                cardinality_columns = {i: header for i, header in enumerate(headers) if cardinality_indicator in header}
+
                 for row in csv_reader:
                     r: list[object] = []
-                    for d in row:
-                        if d is None:
+                    for col_idx, d in enumerate(row):
+                        if d is None or d == '':
                             r.append(None)
                         elif d == 'True':
                             r.append(True)
                         elif d == 'False':
                             r.append(False)
+                        elif col_idx in cardinality_columns and d:
+                            # For cardinality fields, split by separator and create a list
+                            # If there's no separator, wrap the single value in a list
+                            if cardinality_separator in str(d):
+                                r.append(str(d).split(cardinality_separator))
+                            else:
+                                r.append([d])  # Wrap single value in list
                         else:
                             r.append(d)
                     data.append(r)
@@ -402,7 +459,7 @@ class CsvImporter(AbstractImporter):
                     table_data=list_of_dicts, model_directory=model_directory,
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                    cast_datetime=cast_datetime, cast_list=cast_list,
+                    cast_datetime=cast_datetime, cast_list=True,  # Force cast_list=True since we're converting to lists
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
         except TypeUriNotInFirstRowError as e:
@@ -425,17 +482,29 @@ class CsvImporter(AbstractImporter):
         try:
             with open(filepath, encoding='utf-8') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
-                data: list[list[object]] = [next(csv_reader)]
+                headers = next(csv_reader)
+                data: list[list[object]] = [headers]
+
+                # Identify which columns are cardinality fields (have [] in the name)
+                cardinality_columns = {i: header for i, header in enumerate(headers) if cardinality_indicator in header}
+
                 for row in csv_reader:
                     await sleep(0)
                     r: list[object] = []
-                    for d in row:
-                        if d is None:
+                    for col_idx, d in enumerate(row):
+                        if d is None or d == '':
                             r.append(None)
                         elif d == 'True':
                             r.append(True)
                         elif d == 'False':
                             r.append(False)
+                        elif col_idx in cardinality_columns and d:
+                            # For cardinality fields, split by separator and create a list
+                            # If there's no separator, wrap the single value in a list
+                            if cardinality_separator in str(d):
+                                r.append(str(d).split(cardinality_separator))
+                            else:
+                                r.append([d])  # Wrap single value in list
                         else:
                             r.append(d)
                     data.append(r)
@@ -447,7 +516,7 @@ class CsvImporter(AbstractImporter):
                     table_data=list_of_dicts, model_directory=model_directory,
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                    cast_datetime=cast_datetime, cast_list=cast_list,
+                    cast_datetime=cast_datetime, cast_list=True,  # Force cast_list=True since we're converting to lists
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
