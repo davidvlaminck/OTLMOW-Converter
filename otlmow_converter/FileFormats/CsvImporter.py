@@ -1,4 +1,3 @@
-import ast
 import csv
 import logging
 from asyncio import sleep
@@ -162,6 +161,38 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def _convert_single_type_path(cls, filepath: Path, kwargs: dict[str, object], delimiter: str, quote_char: str,
+        separator: str, cardinality_indicator: str, waarde_shortcut: bool, allow_non_otl_conform_attributes: bool,
+        warn_for_non_otl_conform_attributes: bool, model_directory: Optional[Path], cardinality_separator: str
+                                  ) -> Iterable[OTLObject]:
+        # Prevent double casting downstream
+        if 'cast_list' in kwargs:
+            kwargs['cast_list'] = False
+        if 'cast_datetime' in kwargs:
+            kwargs['cast_datetime'] = False
+
+        first_row, headers = cls._read_first_row_and_headers(filepath, delimiter, quote_char)
+        instance = dynamic_create_instance_from_uri(first_row['typeURI'], model_directory=model_directory)
+
+        schema, headers_with_cardinality = cls._build_schema_for_headers(
+            instance=instance,
+            headers=headers,
+            separator=separator,
+            cardinality_indicator=cardinality_indicator,
+            waarde_shortcut=waarde_shortcut,
+            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+            filepath=filepath
+        )
+        missing_columns = cls._compute_missing_columns(first_row['typeURI'], headers)
+
+        table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
+        table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
+        table = cls._append_missing_columns_to_table(table, missing_columns)
+
+        return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
+
+    @classmethod
+    async def _convert_single_type_path_async(cls, filepath: Path, kwargs: dict[str, object], delimiter: str, quote_char: str,
         separator: str, cardinality_indicator: str, waarde_shortcut: bool, allow_non_otl_conform_attributes: bool,
         warn_for_non_otl_conform_attributes: bool, model_directory: Optional[Path], cardinality_separator: str
                                   ) -> Iterable[OTLObject]:
@@ -386,6 +417,55 @@ class CsvImporter(AbstractImporter):
             ) from e
 
     @classmethod
+    async def _python_fallback_to_objects_async(
+        cls, filepath: Path, delimiter: str, quote_char: str, model_directory: Optional[Path], separator: str,
+        cardinality_indicator: str, waarde_shortcut: bool, cardinality_separator: str, cast_datetime: bool,
+        cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool
+    ):
+        try:
+            with open(filepath, encoding='utf-8') as file:
+                csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
+                data: list[list[object]] = [next(csv_reader)]
+                for row in csv_reader:
+                    await sleep(0)
+                    r: list[object] = []
+                    for d in row:
+                        if d is None:
+                            r.append(None)
+                        elif d == 'True':
+                            r.append(True)
+                        elif d == 'False':
+                            r.append(False)
+                        else:
+                            r.append(d)
+                    data.append(r)
+
+                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts_async(
+                    two_d_sequence=data, empty_string_equals_none=True)
+
+                objects = await DotnotationTableConverter.get_data_from_table_async(
+                    table_data=list_of_dicts, model_directory=model_directory,
+                    separator=separator, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                    cast_datetime=cast_datetime, cast_list=cast_list,
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+                for obj in objects:
+                    await sleep(0)
+                    yield obj
+        except TypeUriNotInFirstRowError as e:
+            raise TypeUriNotInFirstRowError(
+                message=f'The typeURI is not in the first row in file {filepath.name}. Please remove the excess rows',
+                file_path=filepath,
+            ) from e
+        except NoTypeUriInTableError as e:
+            raise NoTypeUriInTableError(
+                message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
+                file_path=filepath,
+            ) from e
+
+    @classmethod
     def check_for_type_uri_in_first_five_rows_using_csv(cls, delimiter, e, filepath, quote_char):
         with open(filepath, encoding='utf-8') as file:
             reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
@@ -411,70 +491,82 @@ class CsvImporter(AbstractImporter):
                 file_path=filepath)
 
     @classmethod
-    async def to_objects_async(cls, filepath: Path, **kwargs) -> Iterable[OTLObject]:
-        delimiter = DELIMITER
-        quote_char = '"'
+    async def to_objects_async(cls, filepath: Path, **kwargs: dict[str, object]) -> Iterable[OTLObject]:
+        """
+        Asynchronously reads a CSV file and converts it to a list of OTLObjects.
+        Matches the implementation of to_objects with async/await support.
+        Returns a list of OTLObject instances.
+        """
+        results = []
+        async for obj in cls._to_objects_async_generator(filepath, **kwargs):
+            results.append(obj)
+        return results
+    @classmethod
+    async def _to_objects_async_generator(cls, filepath: Path, **kwargs: dict[str, object]):
+        """
+        Internal async generator that yields OTLObject instances.
+        """
+        # Settings and defaults
+        delimiter, quote_char = cls._get_delimiter_and_quote(kwargs)
+        separator, cardinality_separator, cardinality_indicator, waarde_shortcut, \
+            cast_list, cast_datetime, allow_non_otl_conform_attributes, \
+            warn_for_non_otl_conform_attributes, contains_exactly_one_type = cls._get_options(kwargs)
 
-        if kwargs is not None:
-            if 'delimiter' in kwargs:
-                delimiter = kwargs['delimiter']
-            if 'quote_char' in kwargs:
-                quote_char = kwargs['quote_char']
-        else:
-            kwargs = {}
+        # Validation and normalization
+        cls._validate_filepath(filepath)
+        delimiter = cls._normalize_delimiter(delimiter)
+        model_directory = kwargs.get('model_directory', None)
 
-        separator = kwargs.get('separator', SEPARATOR)
-        cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
-        cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
-        waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
-        cast_list = kwargs.get('cast_list', CAST_LIST)
-        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
-        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
-                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
-        warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
-                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+        # Single-type fast path
+        if contains_exactly_one_type:
+            objects = await cls._convert_single_type_path_async(
+                filepath=filepath,
+                kwargs=kwargs,
+                delimiter=delimiter,
+                quote_char=quote_char,
+                separator=separator,
+                cardinality_indicator=cardinality_indicator,
+                waarde_shortcut=waarde_shortcut,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                model_directory=model_directory,
+                cardinality_separator=cardinality_separator)
+            for obj in objects:
+                await sleep(0)
+                yield obj
+            return
 
-        if filepath is None:
-            raise ValueError(f'Can not write a file to: {filepath}')
-
-        if delimiter == '':
-            delimiter = ';'
-
-        model_directory = None
-        if kwargs is not None and 'model_directory' in kwargs:
-            model_directory = kwargs['model_directory']
-
+        # Multi-type detection
         try:
-            with open(filepath, encoding='utf-8') as file:
-                csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
-                data = [next(csv_reader)]
-                for row in csv_reader:
-                    await sleep(0)
-                    r = []
-                    for d in row:
-                        try:
-                            r.append(ast.literal_eval(d))
-                        except (SyntaxError, ValueError):
-                            r.append(str(d))
-                    data.append(r)
+            type_uris = cls._read_unique_typeuris(filepath, delimiter, quote_char)
+        except pa.lib.ArrowKeyError as e:
+            cls.check_for_type_uri_in_first_five_rows_using_csv(delimiter, e, filepath, quote_char)
+            raise
 
-                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts_async(
-                    two_d_sequence=data, empty_string_equals_none=True)
-                return await DotnotationTableConverter.get_data_from_table_async(
-                    table_data=list_of_dicts, model_directory=model_directory,
-                    separator=separator, cardinality_indicator=cardinality_indicator,
-                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
-                    cast_datetime=cast_datetime, cast_list=cast_list,
-                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
-        except TypeUriNotInFirstRowError as e:
-            raise TypeUriNotInFirstRowError(
-                message=f'The typeURI is not in the first row in file {filepath.name}.'
-                        f' Please remove the excess rows',
-                file_path=filepath,
-            ) from e
-        except NoTypeUriInTableError as e:
-            raise NoTypeUriInTableError(
-                message=f'Could not find typeURI within 5 rows in the csv file {filepath.name}',
-                file_path=filepath,
-            ) from e
+        if len(type_uris) == 1:
+            async for obj in cls._to_objects_async_generator(
+                filepath=filepath, model_directory=model_directory, delimiter=delimiter, quote_char=quote_char,
+                separator=separator, cardinality_indicator=cardinality_indicator,
+                cardinality_separator=cardinality_separator, waarde_shortcut=waarde_shortcut,
+                cast_datetime=cast_datetime, cast_list=cast_list, contains_exactly_one_type=True,
+                allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes):
+                yield obj
+            return
+
+        # Python fallback path
+        async for obj in cls._python_fallback_to_objects_async(
+            filepath=filepath,
+            delimiter=delimiter,
+            quote_char=quote_char,
+            model_directory=model_directory,  # type: ignore[arg-type]
+            separator=separator,
+            cardinality_indicator=cardinality_indicator,
+            waarde_shortcut=waarde_shortcut,
+            cardinality_separator=cardinality_separator,
+            cast_datetime=cast_datetime,
+            cast_list=cast_list,
+            allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+            warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes
+        ):
+            yield obj
