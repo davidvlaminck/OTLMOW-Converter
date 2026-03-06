@@ -209,6 +209,20 @@ def test_load_non_conform_attributes(recwarn):
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_dates_in_excel(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+
+    assert objects[0].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert objects[0].datumOprichtingObject == datetime.date(2004,1,3)
+    assert objects[1].datumOprichtingObject == datetime.date(2002,2,2)
+    assert objects[2].datumOprichtingObject == datetime.date(2004,1,4)
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_load_multiple_errors_in_different_lines(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'multiple_errors_in_different_lines.xlsx'
 
