@@ -541,8 +541,12 @@ class DotnotationDictConverter:
                 if value == '88888888':
                     attribute.clear_value()
                     return
-                value = [attribute.field.convert_to_correct_type(v, log_warnings=False)
-                         for v in str(value).split(cardinality_separator)]
+                if isinstance(value, str):
+                    value = [attribute.field.convert_to_correct_type(v, log_warnings=False)
+                             for v in str(value).split(cardinality_separator)]
+                else:
+                    value = [attribute.field.convert_to_correct_type(v, log_warnings=False)
+                             for v in value]
 
             if attribute.field.waarde_shortcut_applicable and waarde_shortcut:
                 if cardinality:
