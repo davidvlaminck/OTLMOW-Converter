@@ -260,7 +260,7 @@ class CsvImporter(AbstractImporter):
     @classmethod
     def _read_first_row_and_headers(cls, filepath: Path, delimiter: str, quote_char: str
                                     ) -> tuple[dict[str, str], list[str]]:
-        with open(filepath, encoding='utf-8') as file:
+        with open(filepath, encoding='utf-8-sig') as file:
             reader = csv.DictReader(file, delimiter=delimiter, quotechar=quote_char)
             first_row: dict[str, str] = next(reader)
 
@@ -424,7 +424,7 @@ class CsvImporter(AbstractImporter):
         cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool
     ) -> Iterable[OTLObject]:
         try:
-            with open(filepath, encoding='utf-8') as file:
+            with open(filepath, encoding='utf-8-sig') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
                 headers = next(csv_reader)
                 data: list[list[object]] = [headers]
@@ -480,7 +480,7 @@ class CsvImporter(AbstractImporter):
         cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool
     ):
         try:
-            with open(filepath, encoding='utf-8') as file:
+            with open(filepath, encoding='utf-8-sig') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
                 headers = next(csv_reader)
                 data: list[list[object]] = [headers]
@@ -536,7 +536,7 @@ class CsvImporter(AbstractImporter):
 
     @classmethod
     def check_for_type_uri_in_first_five_rows_using_csv(cls, delimiter, e, filepath, quote_char):
-        with open(filepath, encoding='utf-8') as file:
+        with open(filepath, encoding='utf-8-sig') as file:
             reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
             for _ in range(5):
                 try:
