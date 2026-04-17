@@ -16,6 +16,24 @@ def test_load_test_file_multiple_types():
     assert len(assets) == 15
 
 
+def test_load_multiple_testmodel_types_from_single_csv(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'multiple_types_empty_lines.csv'
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
+
+    assert len(recwarn.list) == 0
+    assert len(assets) == 2
+
+    assets_by_type = {asset.typeURI: asset for asset in assets}
+
+    all_cases = assets_by_type['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass']
+    another = assets_by_type['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass']
+
+    assert all_cases.assetId.identificator == 'allcases-1'
+    assert all_cases.testStringField == 'alpha'
+    assert another.assetId.identificator == 'another-1'
+    assert another.notitie == 'note-another'
+
+
 def test_load_empty_lines():
     file_location = Path(__file__).parent / 'Testfiles' / 'empty_lines.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, delimiter=','))
