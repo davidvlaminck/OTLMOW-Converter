@@ -241,7 +241,7 @@ class ExcelImporter(AbstractImporter):
 
                 # check if row_data contains all None values
                 if all_none:
-                    break
+                    continue
                 data[sheet_name].append(row_data)
 
         book.close()
@@ -271,7 +271,7 @@ class ExcelImporter(AbstractImporter):
 
                 # check if row_data contains all None values
                 if all_none:
-                    break
+                    continue
                 data[sheet_name].append(row_data)
 
         book.close()
