@@ -208,6 +208,17 @@ def test_load_non_conform_attributes(recwarn):
     assert instance.non_conform_attribute == 'value'
 
 
+def test_empty_lines_in_excel(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'empty_lines.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+
+    assert objects[0].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert len(objects) == 5
+
+
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_load_dates_in_excel(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.xlsx'
