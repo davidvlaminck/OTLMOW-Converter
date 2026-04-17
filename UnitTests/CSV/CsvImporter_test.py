@@ -16,6 +16,12 @@ def test_load_test_file_multiple_types():
     assert len(assets) == 15
 
 
+def test_load_empty_lines():
+    file_location = Path(__file__).parent / 'Testfiles' / 'empty_lines.csv'
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, delimiter=','))
+    assert len(assets) == 5
+
+
 def test_load_test_file(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))

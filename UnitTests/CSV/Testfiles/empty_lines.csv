@@ -1,0 +1,16 @@
+typeURI,assetId.identificator,assetId.toegekendDoor,geometry,testBooleanField
+https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass,0000-0000,,POINT Z (200000 200000 0),FALSE
+,,,,
+https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass,0000-0001,,POINT Z (200000 200000 0),FALSE
+https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass,0000-0002,,POINT Z (200000 200000 0),FALSE
+https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass,0000-0003,,POINT Z (200000 200000 0),FALSE
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass,0000-0004,,POINT Z (200000 200000 0),FALSE
