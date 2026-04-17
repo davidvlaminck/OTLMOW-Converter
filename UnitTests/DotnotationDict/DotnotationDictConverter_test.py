@@ -321,6 +321,25 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
     assert len(recwarn) == 0
 
 
+def test_from_dict_simple_attribute_with_cardinality_convert_lists_when_type_already_correct(recwarn):
+    expected = AllCasesTestClass()
+    expected.testIntegerFieldMetKard = [1]
+    expected._testKwantWrdMetKard.add_empty_value()
+    expected.testKwantWrdMetKard[0].waarde = 1.0
+    expected._testKwantWrdMetKard.add_empty_value()
+    expected.testKwantWrdMetKard[1].waarde = 2.0
+    expected.testStringFieldMetKard = ['a']
+    expected.testKeuzelijstMetKard = ['waarde-1', 'waarde-2']
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
+        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': 1,
+        'testStringFieldMetKard[]': 'a', 'testKeuzelijstMetKard[]': ['waarde-1','waarde-2'],
+        'testKwantWrdMetKard[]': ['1.0', '2.0']}), cast_list=True, model_directory=model_directory_path)
+
+    assert created_instance == expected
+    assert len(recwarn) == 0
+
+
 def test_from_dict_simple_attribute_with_cardinality_convert_lists_clear_values(recwarn):
     expected = AllCasesTestClass()
     expected.testIntegerFieldMetKard = '88888888'
