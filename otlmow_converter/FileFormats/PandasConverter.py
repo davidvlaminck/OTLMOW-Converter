@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Iterable
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
+import pandas as pd
 from pandas import DataFrame
 
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
@@ -42,7 +43,9 @@ class PandasConverter:
     @classmethod
     def convert_dataframe_to_objects(cls, dataframe: DataFrame, model_directory: Path = None, **kwargs
                                      ) -> Iterable[OTLObject]:
-        df = dataframe.where(~dataframe.isna(), None)
+        # Replace all NA/NaN with None for pandas 2.x and 3.0 compatibility
+        # In pandas 3, fillna(value=None) is not allowed, so we use where instead
+        df = dataframe.where(pd.notnull(dataframe), None)
 
         for col in df.columns:
             if any(callable(getattr(x, "tolist", None)) for x in df[col]):
@@ -51,20 +54,65 @@ class PandasConverter:
         headers = list(df)
         d = {header: index for index, header in enumerate(headers)}
         dict_list = [d]
-        dict_list.extend(df.to_dict('records'))
+
+        # Convert to dict and clean up any 'nan' strings (pandas 3.0 compatibility)
+        for record in df.to_dict('records'):
+            cleaned_record = {}
+            for k, v in record.items():
+                # Filter out 'nan' strings and float NaN that pandas 3.0 might create
+                if isinstance(v, str) and v == 'nan':
+                    cleaned_record[k] = None
+                elif isinstance(v, float):
+                    # Check for float NaN using the fact that NaN != NaN
+                    try:
+                        if v != v:  # NaN check
+                            cleaned_record[k] = None
+                        else:
+                            cleaned_record[k] = v
+                    except:
+                        cleaned_record[k] = v
+                else:
+                    cleaned_record[k] = v
+            dict_list.append(cleaned_record)
 
         return DotnotationTableConverter.get_data_from_table(
-            table_data=dict_list,   model_directory=model_directory, **kwargs)
+            table_data=dict_list, model_directory=model_directory, **kwargs)
 
     @classmethod
     async def convert_dataframe_to_objects_async(cls, dataframe: DataFrame, model_directory: Path = None, **kwargs
                                      ) -> Iterable[OTLObject]:
-        dataframe = dataframe.where(~dataframe.isna(), None)
-        headers = list(dataframe)
+        # Replace all NA/NaN with None for pandas 2.x and 3.0 compatibility
+        # In pandas 3, fillna(value=None) is not allowed, so we use where instead
+        df = dataframe.where(pd.notnull(dataframe), None)
+
+        for col in df.columns:
+            if any(callable(getattr(x, "tolist", None)) for x in df[col]):
+                df[col] = df[col].apply(cls.tolist_if_possible)
+
+        headers = list(df)
         d = {header: index for index, header in enumerate(headers)}
         dict_list = [d]
-        dict_list.extend(dataframe.to_dict('records'))
+
+        # Convert to dict and clean up any 'nan' strings (pandas 3.0 compatibility)
+        for record in df.to_dict('records'):
+            cleaned_record = {}
+            for k, v in record.items():
+                # Filter out 'nan' strings and float NaN that pandas 3.0 might create
+                if isinstance(v, str) and v == 'nan':
+                    cleaned_record[k] = None
+                elif isinstance(v, float):
+                    # Check for float NaN using the fact that NaN != NaN
+                    try:
+                        if v != v:  # NaN check
+                            cleaned_record[k] = None
+                        else:
+                            cleaned_record[k] = v
+                    except:
+                        cleaned_record[k] = v
+                else:
+                    cleaned_record[k] = v
+            dict_list.append(cleaned_record)
 
         return await DotnotationTableConverter.get_data_from_table_async(
-            table_data=dict_list,   model_directory=model_directory, **kwargs)
+            table_data=dict_list, model_directory=model_directory, **kwargs)
 

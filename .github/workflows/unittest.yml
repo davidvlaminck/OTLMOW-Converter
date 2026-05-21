@@ -14,9 +14,11 @@ jobs:
     timeout-minutes: 10
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        pandas-version: ['2.2.0', '3.2.0']  # Test both pandas 2.x and 3.x
     steps:
       - uses: actions/checkout@v4
       - name: Install uv with Python version ${{ matrix.python-version }}
@@ -24,7 +26,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Installing dependencies with uv for running the tests
-        run: uv pip install -r pyproject.toml --extra test
+        run: |
+          uv pip install -r pyproject.toml --extra test
+          uv pip install pandas==${{ matrix.pandas-version }}
       - name: Run unittests with pytest
         run: python -m pytest -v
         working-directory: .

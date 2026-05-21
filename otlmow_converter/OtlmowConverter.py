@@ -354,8 +354,23 @@ class OtlmowConverter:
             yield from cls.from_objects_to_dotnotation_dicts(sequence_of_objects=objects, **kwargs)
         elif isinstance(subject, DataFrame):
             subject = subject.where(~subject.isna(), None)
-            yield from [DotnotationDict({k: v for k, v in d.items() if v is not None})
-                        for d in subject.to_dict('records')]
+            result = []
+            for d in subject.to_dict('records'):
+                # Filter out None and any remaining NaN values
+                filtered = {}
+                for k, v in d.items():
+                    if v is None:
+                        continue
+                    # Check for float NaN (pandas 3.0 compatibility)
+                    if isinstance(v, float):
+                        try:
+                            if v != v:  # NaN != NaN is True
+                                continue
+                        except:
+                            pass
+                    filtered[k] = v
+                result.append(DotnotationDict(filtered))
+            yield from result
         elif isinstance(subject, Iterable):
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
@@ -391,7 +406,20 @@ class OtlmowConverter:
         elif isinstance(subject, DataFrame):
             subject = subject.where(~subject.isna(), None)
             for d in subject.to_dict('records'):
-                yield DotnotationDict({k: v for k, v in d.items() if v is not None})
+                # Filter out None and any remaining NaN values
+                filtered = {}
+                for k, v in d.items():
+                    if v is None:
+                        continue
+                    # Check for float NaN (pandas 3.0 compatibility)
+                    if isinstance(v, float):
+                        try:
+                            if v != v:  # NaN != NaN is True
+                                continue
+                        except:
+                            pass
+                    filtered[k] = v
+                yield DotnotationDict(filtered)
         elif isinstance(subject, Iterable):
             try:
                 first_element, new_generator = cls.peek_generator(iterable=iter(subject))
