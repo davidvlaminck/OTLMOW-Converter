@@ -1,5 +1,7 @@
 # coding=utf-8
 from typing import List
+
+from .KlTestKeuzelijst import KlTestKeuzelijst
 from ..BaseClasses.OTLObject import OTLAttribuut
 from ..BaseClasses.WaardenObject import WaardenObject
 from ..BaseClasses.BooleanField import BooleanField
@@ -34,6 +36,13 @@ class DtcTestComplexTypeWaarden(WaardenObject):
                                                      kardinaliteit_max='*',
                                                      definition='Test attribuut voor complexe waarde met kardinaliteit > 1 in een complex datatype.',
                                                      owner=self)
+
+        self._testKeuzelijst = OTLAttribuut(field=KlTestKeuzelijst,
+                                            naam='testKeuzelijst',
+                                            label='Test Keuzelijst',
+                                            objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijst',
+                                            definition='Test attribuut voor een keuzelijst',
+                                            owner=self)
 
         self._testKwantWrd = OTLAttribuut(field=KwantWrdTest,
                                           naam='testKwantWrd',
@@ -91,6 +100,15 @@ class DtcTestComplexTypeWaarden(WaardenObject):
     @testComplexType2MetKard.setter
     def testComplexType2MetKard(self, value):
         self._testComplexType2MetKard.set_waarde(value, owner=self._parent)
+
+    @property
+    def testKeuzelijst(self) -> str:
+        """Test attribuut voor een keuzelijst"""
+        return self._testKeuzelijst.get_waarde()
+
+    @testKeuzelijst.setter
+    def testKeuzelijst(self, value):
+        self._testKeuzelijst.set_waarde(value, owner=self)
 
     @property
     def testKwantWrd(self) -> KwantWrdTestWaarden:

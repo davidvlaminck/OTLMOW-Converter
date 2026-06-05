@@ -818,6 +818,30 @@ def test_from_dict_errors(subtests):
                 model_directory=model_directory_path)
 
 
+def test_from_dict_keuzelijst_met_kard():
+    converter = DotnotationDictConverter()
+    expected = AllCasesTestClass()
+    expected.testKeuzelijstMetKard = ['waarde-2']
+
+    created_instance = converter.from_dict_instance(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testKeuzelijstMetKard[]': ['waarde-2']}),
+        model_directory=model_directory_path, cast_list=True)
+
+    assert created_instance == expected
+
+
+def test_from_dict_keuzelijst_met_kard_in_complex():
+    converter = DotnotationDictConverter()
+    expected = AllCasesTestClass()
+    expected.testComplexTypeMetKard[0].testKeuzelijst = ['waarde-2']
+
+    created_instance = converter.from_dict_instance(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexTypeMetKard[].testKeuzelijst': ['waarde-2']}),
+        model_directory=model_directory_path, cast_list=True)
+
+    assert created_instance == expected
+
+
 def test_from_dict_instance_version():
     converter = DotnotationDictConverter(
         separator='+', waarde_shortcut=False, cardinality_indicator='()', cardinality_separator='*')
