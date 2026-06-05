@@ -830,10 +830,22 @@ def test_from_dict_keuzelijst_met_kard():
     assert created_instance == expected
 
 
+def test_from_dict_complex_kwantwrd_with_waarde_shortcut():
+    converter = DotnotationDictConverter()
+    expected = AllCasesTestClass()
+    expected.testComplexType.testKwantWrdMetKard[0].waarde = 1.1
+
+    created_instance = converter.from_dict_instance(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexType.testKwantWrdMetKard[]': [1.1]}),
+        model_directory=model_directory_path, cast_list=True, waarde_shortcut=True)
+
+    assert created_instance == expected
+
+
 def test_from_dict_keuzelijst_met_kard_in_complex():
     converter = DotnotationDictConverter()
     expected = AllCasesTestClass()
-    expected.testComplexTypeMetKard[0].testKeuzelijst = ['waarde-2']
+    expected.testComplexTypeMetKard[0].testKeuzelijst = 'waarde-2'
 
     created_instance = converter.from_dict_instance(DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI, 'testComplexTypeMetKard[].testKeuzelijst': ['waarde-2']}),

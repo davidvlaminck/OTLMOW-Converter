@@ -575,8 +575,13 @@ class DotnotationDictConverter:
                         attribute.field.native_type in {time, datetime, date}):
                     value = attribute.field.convert_to_correct_type(value, log_warnings=False)
                 elif hasattr(attribute.field, 'options'):
-                    if cardinality and value != '88888888':
-                        value = [str(v) for v in value]
+                    # Check if the field itself has cardinality
+                    field_has_cardinality = attribute.kardinaliteit_max != '1'
+                    if (cardinality or field_has_cardinality) and value != '88888888':
+                        if isinstance(value, list):
+                            value = [str(v) for v in value]
+                        else:
+                            value = [str(value)]
                     else:
                         value = str(value)
                 attribute.set_waarde(value)
@@ -596,8 +601,13 @@ class DotnotationDictConverter:
                 last_attribute = DotnotationHelper.get_attribute_by_dotnotation(
                     instance_or_attribute=object_or_attribute, dotnotation=dotnotation, separator=separator,
                     waarde_shortcut=waarde_shortcut, cardinality_indicator=cardinality_indicator)
-                value = [last_attribute.field.convert_to_correct_type(v, log_warnings=False)
-                         for v in str(value).split(cardinality_separator)]
+                # Check if the nested dotnotation also has cardinality
+                if isinstance(value, list):
+                    value = [last_attribute.field.convert_to_correct_type(v, log_warnings=False)
+                             for v in value]
+                else:
+                    value = [last_attribute.field.convert_to_correct_type(v, log_warnings=False)
+                             for v in str(value).split(cardinality_separator)]
             for index, v in enumerate(value):
                 if attribute.waarde is None or len(attribute.waarde) <= index:
                     attribute.add_empty_value()
