@@ -1,12 +1,11 @@
 # coding=utf-8
 from typing import List
-
-from .KlTestKeuzelijst import KlTestKeuzelijst
 from ..BaseClasses.OTLObject import OTLAttribuut
 from ..BaseClasses.WaardenObject import WaardenObject
 from ..BaseClasses.BooleanField import BooleanField
 from ..BaseClasses.ComplexField import ComplexField
 from ..Datatypes.DtcTestComplexType2 import DtcTestComplexType2, DtcTestComplexType2Waarden
+from ..Datatypes.KlTestKeuzelijst import KlTestKeuzelijst
 from ..Datatypes.KwantWrdTest import KwantWrdTest, KwantWrdTestWaarden
 from ..BaseClasses.StringField import StringField
 
@@ -40,8 +39,8 @@ class DtcTestComplexTypeWaarden(WaardenObject):
         self._testKeuzelijst = OTLAttribuut(field=KlTestKeuzelijst,
                                             naam='testKeuzelijst',
                                             label='Test Keuzelijst',
-                                            objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass.testKeuzelijst',
-                                            definition='Test attribuut voor een keuzelijst',
+                                            objectUri='https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#DtcTestComplexType.testKeuzelijst',
+                                            definition='Test attribuut voor een keuzelijst in een complex datatype.',
                                             owner=self)
 
         self._testKwantWrd = OTLAttribuut(field=KwantWrdTest,
@@ -103,12 +102,12 @@ class DtcTestComplexTypeWaarden(WaardenObject):
 
     @property
     def testKeuzelijst(self) -> str:
-        """Test attribuut voor een keuzelijst"""
+        """Test attribuut voor een keuzelijst in een complex datatype."""
         return self._testKeuzelijst.get_waarde()
 
     @testKeuzelijst.setter
     def testKeuzelijst(self, value):
-        self._testKeuzelijst.set_waarde(value, owner=self)
+        self._testKeuzelijst.set_waarde(value, owner=self._parent)
 
     @property
     def testKwantWrd(self) -> KwantWrdTestWaarden:

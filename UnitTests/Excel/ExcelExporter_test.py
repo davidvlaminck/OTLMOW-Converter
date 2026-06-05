@@ -33,7 +33,9 @@ def test_export_filled_dummy_data_all_testcasesclass(recwarn):
     data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
     first_row = list(data['onderdeel#AllCasesTestClass'][0])
 
-    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'bestekPostNummer[]',
+    assert first_row == [
+        'typeURI', 'assetId.identificator', 'assetId.toegekendDoor',
+        'assetVersie.context', 'assetVersie.timestamp', 'assetVersie.versienummer', 'bestekPostNummer[]',
         'datumOprichtingObject', 'geometry', 'isActief', 'notitie', 'standaardBestekPostNummer[]',
         'testBooleanField', 'testComplexType.testBooleanField',
         'testComplexType.testComplexType2.testKwantWrd', 'testComplexType.testComplexType2.testStringField',
@@ -284,7 +286,8 @@ def test_export_agent(recwarn):
     data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
     first_row = list(data['onderdeel#AllCasesTestClass'][0])
 
-    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'bestekPostNummer[]',
+    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor',
+                         'assetVersie.context', 'assetVersie.timestamp', 'assetVersie.versienummer','bestekPostNummer[]',
                          'datumOprichtingObject', 'geometry', 'isActief', 'notitie', 'standaardBestekPostNummer[]',
                          'testBooleanField', 'testComplexType.testBooleanField',
                          'testComplexType.testComplexType2.testKwantWrd',

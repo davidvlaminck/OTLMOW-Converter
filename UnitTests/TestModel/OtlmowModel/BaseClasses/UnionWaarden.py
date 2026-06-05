@@ -1,6 +1,4 @@
-﻿from typing import Generator
-
-from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
+﻿from otlmow_model.OtlmowModel.BaseClasses.WaardenObject import WaardenObject
 
 
 class UnionWaarden(WaardenObject):
@@ -10,7 +8,8 @@ class UnionWaarden(WaardenObject):
 
     def clear_other_props(self, prop_name: str):
         prop_name = prop_name[1:]
-        for attribute in self:
+        attribute_list = list(self)
+        for attribute in attribute_list:
             if attribute.naam == prop_name:
                 continue
             if attribute.field.waardeObject is not None and not attribute.field.waarde_shortcut_applicable:

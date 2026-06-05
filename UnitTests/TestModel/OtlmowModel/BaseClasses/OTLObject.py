@@ -534,7 +534,7 @@ def _recursive_create_dict_from_asset(
             if attr_key in {'_parent', '_valid_relations', '_geometry_types',
                             '_is_waarden_object', '_is_union_waarden_object'}:
                 continue
-            if hasattr(attr, '__class__') and attr.__class__.__name__ == 'OTLAttribuut':
+            if hasattr(attr, 'is_otl_attribute') and attr.is_otl_attribute:
                 if not attr.mark_to_be_cleared:
                     if attr.waarde is None:
                         continue
@@ -633,7 +633,7 @@ def _recursive_create_rdf_dict_from_asset(
             if attr_key in {'_parent', '_valid_relations', '_geometry_types',
                             '_is_union_waarden_object', '_is_waarden_object'}:
                 continue
-            if hasattr(attr, '__class__') and attr.__class__.__name__ == 'OTLAttribuut':
+            if hasattr(attr, 'is_otl_attribute') and attr.is_otl_attribute:
                 if not attr.mark_to_be_cleared:
                     if attr.waarde is None:
                         continue
@@ -673,18 +673,18 @@ def _recursive_create_rdf_dict_from_asset(
                 else:
                     if attr.mark_to_be_cleared:
                         d[attr.objectUri] = attr.field.clearing_value
-                    elif cast_datetime:
-                        if attr.field.__name__ == 'TimeField':
+                    elif cast_datetime and attr.field.is_otl_field:
+                        if attr.field.native_type == time:
                             if isinstance(attr.waarde, list):
                                 d[attr.objectUri] = [time.strftime(list_item, "%H:%M:%S") for list_item in attr.waarde]
                             else:
                                 d[attr.objectUri] = time.strftime(attr.waarde, "%H:%M:%S")
-                        elif attr.field.__name__ == 'DateField':
+                        if attr.field.native_type == date:
                             if isinstance(attr.waarde, list):
                                 d[attr.objectUri] = [date.strftime(list_item, "%Y-%m-%d") for list_item in attr.waarde]
                             else:
                                 d[attr.objectUri] = date.strftime(attr.waarde, "%Y-%m-%d")
-                        elif attr.field.__name__ == 'DateTimeField':
+                        if attr.field.native_type == datetime:
                             if isinstance(attr.waarde, list):
                                 d[attr.objectUri] = [datetime.strftime(list_item, "%Y-%m-%d %H:%M:%S")
                                                      for list_item in attr.waarde]

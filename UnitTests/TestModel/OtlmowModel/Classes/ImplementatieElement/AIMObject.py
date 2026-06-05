@@ -5,6 +5,7 @@ from ...BaseClasses.OTLObject import OTLAttribuut
 from abc import abstractmethod
 from ...Classes.ImplementatieElement.AIMDBStatus import AIMDBStatus
 from ...Classes.ImplementatieElement.AIMToestand import AIMToestand
+from ...Classes.ImplementatieElement.AIMVersie import AIMVersie
 from ...BaseClasses.OTLAsset import OTLAsset
 from ...BaseClasses.RelationInteractor import RelationInteractor
 from ...BaseClasses.DateField import DateField
@@ -14,7 +15,7 @@ from ...BaseClasses.StringField import StringField
 
 
 # Generated with OTLClassCreator. To modify: extend, do not edit
-class AIMObject(AIMDBStatus, AIMToestand, RelationInteractor, OTLAsset):
+class AIMObject(AIMDBStatus, AIMToestand, AIMVersie, RelationInteractor, OTLAsset):
     """Abstracte als de basisklasse voor alle uniek geïdentificeerde OTL objecten met de basiseigenschappen die elk OTL object minstens heeft."""
 
     typeURI = 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject'
