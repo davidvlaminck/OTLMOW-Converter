@@ -377,7 +377,7 @@ class CsvImporter(AbstractImporter):
         )
         table = read_csv(
             filepath,
-            read_options=ReadOptions(use_threads=True, block_size=(8 << 20)),  # larger blocks for throughput
+            read_options=ReadOptions(use_threads=True, encoding='utf-8-sig', block_size=(8 << 20)),  # larger blocks for throughput
             parse_options=parse_options,
             convert_options=convert_options,
         )
@@ -409,7 +409,7 @@ class CsvImporter(AbstractImporter):
     def _read_unique_typeuris(cls, filepath: Path, delimiter: str, quote_char: str) -> set[str]:
         table_typeuri = pa_csv.read_csv(
             filepath,
-            read_options=pa_csv.ReadOptions(),
+            read_options=pa_csv.ReadOptions(encoding='utf-8-sig'),
             parse_options=pa_csv.ParseOptions(delimiter=delimiter, quote_char=quote_char),
             convert_options=pa_csv.ConvertOptions(include_columns=['typeURI'])
         )
