@@ -88,6 +88,15 @@ class IFCImporter(AbstractImporter):
                 warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             asset.ifc_representation_dict = [d['representation'] for d in property_def_dict['related_objects']]
 
+            # Extract geometry from IFC representation
+            for rep in asset.ifc_representation_dict:
+                geometry = cls.extract_geometry_from_representation(rep)
+                if geometry is not None:
+                    # Only set geometry if the asset supports POLYGON Z
+                    if hasattr(asset, '_geometry_types') and 'POLYGON Z' in asset._geometry_types:
+                        asset.geometry = geometry
+                    break
+
             if asset is not None:
                 yield asset
 
@@ -136,7 +145,7 @@ class IFCImporter(AbstractImporter):
         d = {}
         for field, arg in zip(fields(_class), args):
             t = field.type
-            if arg is None:
+            if arg is None or arg == '$':
                 continue
             if arg.startswith('IFC'):
                 nested_class_name = arg.split('(')[0]
@@ -154,6 +163,8 @@ class IFCImporter(AbstractImporter):
                         ref_arg = master_dict[v[1:]]
                         ref_arg.pop('_used')
                         value_list[i] = ref_arg
+                    elif isinstance(v, str) and v != '$':
+                        value_list[i] = cls._strip_quotes(v)
                 d[field.name] = value_list
             elif arg.startswith('#'):
                 master_dict[arg[1:]]['_used'] = True
@@ -161,7 +172,7 @@ class IFCImporter(AbstractImporter):
                 ref_arg.pop('_used')
                 d[field.name] = ref_arg
             else:
-                d[field.name] = arg
+                d[field.name] = cls._strip_quotes(arg)
         return d
 
 
@@ -245,7 +256,6 @@ class IFCImporter(AbstractImporter):
     @classmethod
     def split_nested_tuples(cls, values_string: str, delimiter: str) -> List[str]:
         single_quotes, double_quotes, brackets = 0,0,0
-        remove_quotes = False
         value = ''
         for char in values_string:
             value += char
@@ -258,31 +268,29 @@ class IFCImporter(AbstractImporter):
                     single_quotes -= 1
                 else:
                     single_quotes += 1
-                    remove_quotes = True
             elif char == '"':
                 if double_quotes:
                     double_quotes -= 1
                 else:
                     double_quotes += 1
-                    remove_quotes = True
             elif char == delimiter and not single_quotes and not double_quotes and not brackets:
                 value = value[:-1]
-                yield from cls.sanitize_value(remove_quotes, value)
-                remove_quotes = False
+                yield from cls.sanitize_value(value)
                 value = ''
-        yield from cls.sanitize_value(remove_quotes, value)
+        yield from cls.sanitize_value(value)
+
+    @staticmethod
+    def _strip_quotes(value: str) -> str:
+        """Strip surrounding quotes from a value if present."""
+        if value.startswith("'") and value.endswith("'"):
+            return value[1:-1]
+        elif value.startswith('"') and value.endswith('"'):
+            return value[1:-1]
+        return value
 
     @classmethod
-    def sanitize_value(cls, remove_quotes, value):
-        if remove_quotes:
-            if value.startswith("'") and value.endswith("'"):
-                value = value[1:-1]
-            elif value.startswith('"') and value.endswith('"'):
-                value = value[1:-1]
-        if value == '$':
-            yield None
-        else:
-            yield value
+    def sanitize_value(cls, value):
+        yield value
 
     @classmethod
     def get_resolved_dict_item(cls, ifc_class: object, ifc_dict: dict, key_path: [str]) -> object:
@@ -325,3 +333,68 @@ class IFCImporter(AbstractImporter):
                 yield field.name, value
             else:
                 yield field.name, value
+
+    @classmethod
+    def extract_geometry_from_representation(cls, representation: dict) -> str:
+        """Extract geometry from IFC representation and convert to WKT string.
+
+        Parses IFCCARTESIANPOINTs, IFCPOLYLOOPs, IFCFACEOUTERBOUNDs, and IFCFACEs.
+        Determines per face the Z values and selects the bottom face (lowest max Z).
+
+        :param representation: IFC representation dictionary
+        :return: WKT string representation of the geometry
+        """
+        if not representation:
+            return None
+
+        representations = representation.get('representations', [])
+        if not representations:
+            return None
+
+        shape_rep = representations[0]
+        items = shape_rep.get('items', [])
+        if not items:
+            return None
+
+        # Get the outer shell (IfcClosedShell)
+        outer = items[0].get('outer', {})
+        cfs_faces = outer.get('cfs_faces', [])
+
+        if not cfs_faces:
+            return None
+
+        # Find the bottom face: the face with the lowest maximum Z value
+        bottom_face = None
+        bottom_face_max_z = None
+
+        for face in cfs_faces:
+            bounds = face.get('bounds', [])
+            for bound in bounds:
+                bound_data = bound.get('bound', {})
+                polygon = bound_data.get('polygon', [])
+                z_values = []
+                for point in polygon:
+                    coords = point.get('coordinates', [])
+                    if coords and len(coords) >= 3:
+                        z_values.append(float(coords[2]))
+                if z_values:
+                    max_z = max(z_values)
+                    if bottom_face_max_z is None or max_z < bottom_face_max_z:
+                        bottom_face_max_z = max_z
+                        bottom_face = polygon
+
+        if not bottom_face:
+            return None
+
+        # Build WKT string from the bottom face polygon
+        has_z = len(bottom_face[0].get('coordinates', [])) == 3
+        z_suffix = ' Z' if has_z else ''
+        wkt_points = []
+        for point in bottom_face:
+            coords = point.get('coordinates', [])
+            wkt_points.append(' '.join(str(c) for c in coords))
+
+        # Close the polygon by repeating the first point
+        wkt_points.append(wkt_points[0])
+
+        return f'POLYGON{z_suffix} (({", ".join(wkt_points)}))'
