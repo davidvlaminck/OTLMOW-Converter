@@ -76,3 +76,16 @@ def test_parse_nested_tuples():
         '$',
         ('#69', '#70', '#71', '#72'),
     )
+
+
+def test_geometry_extraction():
+    file_location = Path(__file__).parent / 'Testfiles' / 'Output-IFC-metOTLdata.ifc'
+
+    objects = list(IFCImporter.to_objects(filepath=file_location))
+    assert len(objects) == 59
+
+    # Get the first object (index 0) with assetId.identificator = 3sfJ8pCUTF8gDx7PDAn4pS
+    instance = objects[0]
+    assert instance.assetId.identificator == '3sfJ8pCUTF8gDx7PDAn4pS'
+
+    assert instance.geometry == """POLYGON Z ((134985.102499 183515.252611 56.267761, 134984.897499 183515.252611 56.267761, 134984.897499 183515.281386 56.247836, 134985.102499 183515.281386 56.247836, 134985.102499 183515.252611 56.267761))"""
