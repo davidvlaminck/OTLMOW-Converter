@@ -1,3 +1,4 @@
+import gc
 import os
 from datetime import date, datetime, time
 from pathlib import Path
@@ -32,17 +33,19 @@ def test_export_filled_dummy_data_all_testcasesclass(recwarn):
     data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
     first_row = list(data['onderdeel#AllCasesTestClass'][0])
 
-    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'bestekPostNummer[]',
+    assert first_row == [
+        'typeURI', 'assetId.identificator', 'assetId.toegekendDoor',
+        'assetVersie.context', 'assetVersie.timestamp', 'assetVersie.versienummer', 'bestekPostNummer[]',
         'datumOprichtingObject', 'geometry', 'isActief', 'notitie', 'standaardBestekPostNummer[]',
         'testBooleanField', 'testComplexType.testBooleanField',
         'testComplexType.testComplexType2.testKwantWrd', 'testComplexType.testComplexType2.testStringField',
         'testComplexType.testComplexType2MetKard[].testKwantWrd',
-        'testComplexType.testComplexType2MetKard[].testStringField', 'testComplexType.testKwantWrd',
-        'testComplexType.testKwantWrdMetKard[]', 'testComplexType.testStringField',
+        'testComplexType.testComplexType2MetKard[].testStringField', 'testComplexType.testKeuzelijst',
+        'testComplexType.testKwantWrd', 'testComplexType.testKwantWrdMetKard[]', 'testComplexType.testStringField',
         'testComplexType.testStringFieldMetKard[]', 'testComplexTypeMetKard[].testBooleanField',
         'testComplexTypeMetKard[].testComplexType2.testKwantWrd',
-        'testComplexTypeMetKard[].testComplexType2.testStringField', 'testComplexTypeMetKard[].testKwantWrd',
-        'testComplexTypeMetKard[].testStringField', 'testDateField', 'testDateTimeField',
+        'testComplexTypeMetKard[].testComplexType2.testStringField', 'testComplexTypeMetKard[].testKeuzelijst',
+        'testComplexTypeMetKard[].testKwantWrd', 'testComplexTypeMetKard[].testStringField', 'testDateField', 'testDateTimeField',
         'testDecimalField', 'testDecimalFieldMetKard[]', 'testEenvoudigType', 'testEenvoudigTypeMetKard[]',
         'testIntegerField', 'testIntegerFieldMetKard[]', 'testKeuzelijst', 'testKeuzelijstMetKard[]',
         'testKwantWrd', 'testKwantWrdMetKard[]', 'testStringField', 'testStringFieldMetKard[]',
@@ -58,7 +61,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     instance.assetId.identificator = '0000-0000'
     instance.testBooleanField = False
     instance.testDateField = date(2019, 9, 20)
-    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15)
+    instance.testDateTimeField = datetime(2001, 12, 15, 22, 22, 15, 123456)
     instance.testDecimalField = 79.07
     instance.testDecimalFieldMetKard = [10.0, 20.0]
     instance.testEenvoudigType.waarde = 'string1'
@@ -84,7 +87,7 @@ def test_export_and_then_import_unnested_attributes(recwarn):
 
     assert not instanceImported.testBooleanField
     assert instanceImported.testDateField == date(2019, 9, 20)
-    assert instanceImported.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instanceImported.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15, 123456)
     assert instanceImported.testDecimalField == 79.07
     assert instanceImported.testDecimalFieldMetKard == [10.0, 20.0]
     assert instanceImported.testEenvoudigType.waarde == 'string1'
@@ -98,6 +101,14 @@ def test_export_and_then_import_unnested_attributes(recwarn):
     assert instanceImported.testStringFieldMetKard[1] == 'string2'
     assert instanceImported.testTimeField == time(11, 5, 26)
     assert instanceImported.geometry == 'POINT Z (200000 200000 0)'
+
+    # test the datetime value in cell G2 using openpyxl directly
+    from openpyxl import load_workbook
+    wb = load_workbook(filename=file_location, read_only=True)
+    ws = wb['onderdeel#AllCasesTestClass']
+    cell_value = ws['G2'].value
+    assert cell_value == '2001-12-15T22:22:15.123456'
+    wb.close()
 
     os.unlink(file_location)
 
@@ -234,7 +245,7 @@ def test_export_and_then_import_sheetname_abbreviation(recwarn):
     assert not warns
 
     # first load the objects in the template to see it the basics are there
-    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = ExcelImporter.to_objects(filepath=file_location)
     assert len(objects) == 3
 
     instance_imported, instance_to_be_abbreviated_imported, instance_to_be_abbreviated2_imported = objects
@@ -260,7 +271,6 @@ def test_export_agent(recwarn):
 
     agent = Agent()
     agent.fill_with_dummy_data()
-    print(f'agent: {agent}')
 
     instance = AllCasesTestClass()
     instance.fill_with_dummy_data()
@@ -276,18 +286,21 @@ def test_export_agent(recwarn):
     data = ExcelImporter.get_data_dict_from_file_path(filepath=file_location)
     first_row = list(data['onderdeel#AllCasesTestClass'][0])
 
-    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor', 'bestekPostNummer[]',
+    assert first_row == ['typeURI', 'assetId.identificator', 'assetId.toegekendDoor',
+                         'assetVersie.context', 'assetVersie.timestamp', 'assetVersie.versienummer','bestekPostNummer[]',
                          'datumOprichtingObject', 'geometry', 'isActief', 'notitie', 'standaardBestekPostNummer[]',
                          'testBooleanField', 'testComplexType.testBooleanField',
                          'testComplexType.testComplexType2.testKwantWrd',
                          'testComplexType.testComplexType2.testStringField',
                          'testComplexType.testComplexType2MetKard[].testKwantWrd',
                          'testComplexType.testComplexType2MetKard[].testStringField',
+                         'testComplexType.testKeuzelijst',
                          'testComplexType.testKwantWrd',
                          'testComplexType.testKwantWrdMetKard[]', 'testComplexType.testStringField',
                          'testComplexType.testStringFieldMetKard[]', 'testComplexTypeMetKard[].testBooleanField',
                          'testComplexTypeMetKard[].testComplexType2.testKwantWrd',
                          'testComplexTypeMetKard[].testComplexType2.testStringField',
+                         'testComplexTypeMetKard[].testKeuzelijst',
                          'testComplexTypeMetKard[].testKwantWrd',
                          'testComplexTypeMetKard[].testStringField', 'testDateField', 'testDateTimeField',
                          'testDecimalField', 'testDecimalFieldMetKard[]', 'testEenvoudigType',

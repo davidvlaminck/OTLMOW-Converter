@@ -1,4 +1,6 @@
 import json
+from asyncio import sleep
+from datetime import date, datetime, time
 from json import JSONEncoder
 from pathlib import Path
 from typing import Iterable
@@ -18,9 +20,21 @@ ALLOW_NON_OTL_CONFORM_ATTRIBUTES = jsonld_settings['allow_non_otl_conform_attrib
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = jsonld_settings['warn_for_non_otl_conform_attributes']
 
 
+class DateTimeEncoder(JSONEncoder):
+    """Custom JSON encoder that handles date, datetime, and time objects."""
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, date):
+            return obj.isoformat()
+        elif isinstance(obj, time):
+            return obj.isoformat()
+        return super().default(obj)
+
+
 class JsonLdExporter(AbstractExporter):
     @classmethod
-    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> None:
+    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
@@ -38,22 +52,70 @@ class JsonLdExporter(AbstractExporter):
                                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
             d['@type'] = asset.typeURI
             d['https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI'] = asset.typeURI
+            id = asset.assetId.identificator if asset.typeURI != 'http://purl.org/dc/terms/Agent' else asset.agentId.identificator
+            if id is None:
+                raise ValueError(f'No identificator found for asset: {d}')
+            else:
+                if is_relation(asset, model_directory):
+                    d['@id'] = 'https://data.awvvlaanderen.be/id/assetrelatie/' + id
+                else:
+                    d['@id'] = 'https://data.awvvlaanderen.be/id/asset/' + id
+            list_of_objects.append(d)
+
+        graph_dict = {'@graph': (list_of_objects if isinstance(list_of_objects, list) else [list_of_objects])}
+
+        encoded_json = DateTimeEncoder(indent=4).encode(graph_dict)
+        encoded_json = cls.modify_jsonld_for_context(encoded_json)
+
+        with open(filepath, "w") as file:
+            file.write(encoded_json)
+
+        filepath.touch()
+        return (filepath,)
+
+    @classmethod
+    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
+        waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
+        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
+        warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
+                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+
+        model_directory = None
+        if 'model_directory' in kwargs:
+            model_directory = kwargs['model_directory']
+
+        list_of_objects = []
+        for asset in sequence_of_objects:
+            await sleep(0)
+            d = create_dict_from_asset(asset, rdf=True, cast_datetime=True, waarde_shortcut=waarde_shortcut,
+                                       allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                                       warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+            d['@type'] = asset.typeURI
+            d['https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#AIMObject.typeURI'] = asset.typeURI
             if asset.assetId.identificator is None:
                 raise ValueError(f'No identificator found for asset: {d}')
             else:
                 if is_relation(asset, model_directory):
-                    d['@id'] = 'https://data.awvvlaanderen.be/id/assetrelatie/' + asset.assetId.identificator
+                    d['@id'] = (
+                        f'https://data.awvvlaanderen.be/id/assetrelatie/{asset.assetId.identificator}'
+                    )
                 else:
                     d['@id'] = 'https://data.awvvlaanderen.be/id/asset/' + asset.assetId.identificator
             list_of_objects.append(d)
 
         graph_dict = {'@graph': (list_of_objects if isinstance(list_of_objects, list) else [list_of_objects])}
 
-        encoded_json = JSONEncoder(indent=4).encode(graph_dict)
+        encoded_json = DateTimeEncoder(indent=4).encode(graph_dict)
         encoded_json = cls.modify_jsonld_for_context(encoded_json)
+
+        await sleep(0)
 
         with open(filepath, "w") as file:
             file.write(encoded_json)
+
+        filepath.touch()
+        return (filepath,)
 
     @classmethod
     def modify_jsonld_for_context(cls, encoded_json: str):

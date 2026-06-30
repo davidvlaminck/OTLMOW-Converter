@@ -2,13 +2,16 @@ from datetime import date, time, datetime
 from pathlib import Path
 
 import pytest
-from otlmow_model.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
+
+from UnitTests.TestModel.OtlmowModel.BaseClasses.OTLObject import create_dict_from_asset
+from otlmow_model.OtlmowModel.Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.DotnotationDict import DotnotationDict
 from otlmow_converter.DotnotationDictConverter import DotnotationDictConverter
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+from otlmow_converter.Exceptions.OTLAttributeError import OTLAttributeError
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
@@ -91,11 +94,11 @@ def test_from_dict_datetime_convert_true(recwarn):
     expected = AllCasesTestClass()
     expected.testDateField = date(2022, 12, 12)
     expected.testTimeField = time(10, 11, 12)
-    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
+    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12, 123456)
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI, 'testDateField': '2022-12-12', 'testTimeField': '10:11:12',
-         'testDateTimeField': '2022-12-12 10:11:12'}),
+         'testDateTimeField': '2022-12-12 10:11:12.123456'}),
         model_directory=model_directory_path, cast_datetime=True)
 
     assert created_instance == expected
@@ -106,13 +109,13 @@ def test_from_dict_datetime_convert_false(recwarn):
     expected = AllCasesTestClass()
     expected.testDateField = date(2022, 12, 12)
     expected.testTimeField = time(10, 11, 12)
-    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
+    expected.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12, 123456)
 
     created_instance = DotnotationDictConverter.from_dict(DotnotationDict(
         {'typeURI': AllCasesTestClass.typeURI,
          'testDateField': date(2022, 12, 12),
          'testTimeField': time(10, 11, 12),
-         'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12)}),
+         'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12, 123456)}),
         model_directory=model_directory_path)
 
     assert created_instance == expected
@@ -123,19 +126,26 @@ def test_to_dict_datetime():
     instance = AllCasesTestClass()
     instance.testDateField = date(2022, 12, 12)
     instance.testTimeField = time(10, 11, 12)
-    instance.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12)
+    instance.testDateTimeField = datetime(2022, 12, 12, 10, 11, 12, 123456)
 
-    assert DotnotationDictConverter.to_dict(instance) == {
+    assert DotnotationDictConverter.to_dict(instance, collect_native_types=True) == {
         'testDateField': date(2022, 12, 12),
         'testTimeField': time(10, 11, 12),
-        'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12),
-        'typeURI': AllCasesTestClass.typeURI}
+        'testDateTimeField': datetime(2022, 12, 12, 10, 11, 12, 123456),
+        'typeURI': AllCasesTestClass.typeURI,
+        '_native_type_dict': {
+            'testDateField': date,
+            'testTimeField': time,
+            'testDateTimeField': datetime
+        }
+    }
 
     assert DotnotationDictConverter.to_dict(instance, cast_datetime=True) == {
         'testDateField': '2022-12-12',
         'testTimeField': '10:11:12',
-        'testDateTimeField': '2022-12-12 10:11:12',
-        'typeURI': AllCasesTestClass.typeURI}
+        'testDateTimeField': '2022-12-12T10:11:12.123456',
+        'typeURI': AllCasesTestClass.typeURI
+    }
 
 
 def test_from_dict_with_non_conform_otl_attributes(subtests, recwarn):
@@ -238,6 +248,33 @@ def test_from_dict_simple_attribute_with_cardinality_clear_values():
     assert created_instance == expected
 
 
+def test_to_dict_native_types_dict_for_cardinality_and_nested():
+    instance = AllCasesTestClass()
+    instance.testIntegerFieldMetKard = [1, 2, 3]
+    instance.testDateField = date(2022, 1, 1)
+    instance.testComplexType.testBooleanField = True
+    instance.testComplexTypeMetKard[0].testComplexType2.testKwantWrd.waarde = 20.0
+
+    result = DotnotationDictConverter.to_dict(instance, collect_native_types=True)
+    assert result['_native_type_dict']['testDateField'] == date
+    assert result['_native_type_dict']['testComplexType.testBooleanField'] == bool
+    assert result['_native_type_dict']['testComplexTypeMetKard[].testComplexType2.testKwantWrd'] == float
+    assert result['_native_type_dict']['testIntegerFieldMetKard[]'] == int
+
+
+def test_to_dict_native_types_dict_for_clear_values_and_lists():
+    instance = AllCasesTestClass()
+    instance._testDateField.clear_value()
+    instance._testIntegerFieldMetKard.clear_value()
+    instance._testComplexTypeMetKard.add_empty_value()
+    instance.testComplexTypeMetKard[0]._testStringField.clear_value()
+
+    result = DotnotationDictConverter.to_dict(instance, collect_native_types=True)
+    assert result['_native_type_dict']['testDateField'] == date
+    assert result['_native_type_dict']['testIntegerFieldMetKard[]'] == int
+    assert result['_native_type_dict']['testComplexTypeMetKard[].testStringField'] == str
+
+
 def test_to_dict_simple_attribute_with_cardinality():
     instance = AllCasesTestClass()
     instance.testIntegerFieldMetKard = [1, 2, 3]
@@ -279,6 +316,25 @@ def test_from_dict_simple_attribute_with_cardinality_convert_lists(recwarn):
         'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': '1|2',
         'testStringFieldMetKard[]': 'a|b', 'testKeuzelijstMetKard[]': 'waarde-1|waarde-2',
         'testKwantWrdMetKard[]': '1.0|2.0'}), cast_list=True, model_directory=model_directory_path)
+
+    assert created_instance == expected
+    assert len(recwarn) == 0
+
+
+def test_from_dict_simple_attribute_with_cardinality_convert_lists_when_type_already_correct(recwarn):
+    expected = AllCasesTestClass()
+    expected.testIntegerFieldMetKard = [1]
+    expected._testKwantWrdMetKard.add_empty_value()
+    expected.testKwantWrdMetKard[0].waarde = 1.0
+    expected._testKwantWrdMetKard.add_empty_value()
+    expected.testKwantWrdMetKard[1].waarde = 2.0
+    expected.testStringFieldMetKard = ['a']
+    expected.testKeuzelijstMetKard = ['waarde-1', 'waarde-2']
+
+    created_instance = DotnotationDictConverter.from_dict(DotnotationDict({
+        'typeURI': AllCasesTestClass.typeURI, 'testIntegerFieldMetKard[]': 1,
+        'testStringFieldMetKard[]': 'a', 'testKeuzelijstMetKard[]': ['waarde-1','waarde-2'],
+        'testKwantWrdMetKard[]': ['1.0', '2.0']}), cast_list=True, model_directory=model_directory_path)
 
     assert created_instance == expected
     assert len(recwarn) == 0
@@ -731,7 +787,7 @@ def test_from_dict_errors(subtests):
                 model_directory=model_directory_path)
 
     with subtests.test("error raised when using dict with invalid typeURI"):
-        with pytest.raises(ValueError):
+        with pytest.raises(CouldNotCreateInstanceError):
             DotnotationDictConverter.from_dict(DotnotationDict(
                 {'complex.attribute': 'complex attributes only valid within OTL', 'typeURI': 'not_valid_uri'}),
                 model_directory=model_directory_path)
@@ -760,6 +816,42 @@ def test_from_dict_errors(subtests):
                 {'typeURI': AllCasesTestClass.typeURI,
                  'complex.attribute': 'complex attributes only valid within OTL'}),
                 model_directory=model_directory_path)
+
+
+def test_from_dict_keuzelijst_met_kard():
+    converter = DotnotationDictConverter()
+    expected = AllCasesTestClass()
+    expected.testKeuzelijstMetKard = ['waarde-2']
+
+    created_instance = converter.from_dict_instance(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testKeuzelijstMetKard[]': ['waarde-2']}),
+        model_directory=model_directory_path, cast_list=True)
+
+    assert created_instance == expected
+
+
+def test_from_dict_complex_kwantwrd_with_waarde_shortcut():
+    converter = DotnotationDictConverter()
+    expected = AllCasesTestClass()
+    expected.testComplexType.testKwantWrdMetKard[0].waarde = 1.1
+
+    created_instance = converter.from_dict_instance(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexType.testKwantWrdMetKard[]': [1.1]}),
+        model_directory=model_directory_path, cast_list=True, waarde_shortcut=True)
+
+    assert created_instance == expected
+
+
+def test_from_dict_keuzelijst_met_kard_in_complex():
+    converter = DotnotationDictConverter()
+    expected = AllCasesTestClass()
+    expected.testComplexTypeMetKard[0].testKeuzelijst = 'waarde-2'
+
+    created_instance = converter.from_dict_instance(DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI, 'testComplexTypeMetKard[].testKeuzelijst': ['waarde-2']}),
+        model_directory=model_directory_path, cast_list=True)
+
+    assert created_instance == expected
 
 
 def test_from_dict_instance_version():
@@ -798,3 +890,50 @@ def test_to_dict_instance_version():
     created_dict = converter.to_dict_instance(instance, cast_list=True)
 
     assert created_dict == expected_dict
+
+def test_from_dict_combined_attribute_errors_not_combined():
+    input_dict = DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI,
+         'testBooleanField': 'a',
+         "testKeuzelijst": "ingebruik",
+         'testComplexType.testKwantWrdMetKard[]': 'a',
+         'testComplexTypeMetKard[].testBooleanField': [True, 'b', False]})
+
+    with pytest.raises(Exception) as excinfo:
+        DotnotationDictConverter.from_dict(input_dict,
+            model_directory=model_directory_path)
+    assert excinfo.type.__name__ == 'CouldNotConvertToCorrectTypeError'
+
+
+def test_from_dict_combined_attribute_errors_combined():
+    input_dict = DotnotationDict(
+        {'typeURI': AllCasesTestClass.typeURI,
+         'testBooleanField': 'a',
+         "testKeuzelijst": "ingebruik",
+         'testComplexType.testKwantWrdMetKard[]': 'a',
+         'testComplexTypeMetKard[].testBooleanField': [True, 'b', False]})
+
+
+    with pytest.raises(Exception) as excinfo:
+        DotnotationDictConverter.from_dict(input_dict,
+            model_directory=model_directory_path, combine_errors=True)
+    assert excinfo.type.__name__ == 'MultipleAttributeError'
+
+    print("inner exception types:", [f"{type(e).__module__}.{type(e).__name__}" for e in excinfo.value.exceptions])
+    print("orig exception types:",
+          [f"{type(e.orig_exception).__module__}.{type(e.orig_exception).__name__}" for e in excinfo.value.exceptions])
+
+
+    assert excinfo.type.__name__ == 'MultipleAttributeError'
+
+    assert excinfo.value.args[0] == ("At least one error occurred while converting from dict to an instance of "
+                                     "https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass, "
+                                     "see attribute exceptions for details.")
+    assert len(excinfo.value.exceptions) == 4
+    assert isinstance(excinfo.value.exceptions[0], OTLAttributeError)
+    assert excinfo.value.exceptions[0].orig_exception.__class__.__name__ == 'CouldNotConvertToCorrectTypeError'
+    assert excinfo.value.exceptions[1].orig_exception.__class__.__name__ == 'InvalidOptionError'
+    assert excinfo.value.exceptions[2].orig_exception.__class__.__name__ == 'CouldNotConvertToCorrectTypeError'
+    assert excinfo.value.exceptions[3].orig_exception.__class__.__name__ == 'CouldNotConvertToCorrectTypeError'
+
+

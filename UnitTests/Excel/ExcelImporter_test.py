@@ -4,10 +4,14 @@ from pathlib import Path
 
 import pytest
 
+from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
+from otlmow_converter.Exceptions.ErrorInExcelLine import ErrorInExcelLine
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
+from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
+from otlmow_converter.Exceptions.UnknownExcelError import UnknownExcelError
 from otlmow_converter.FileFormats.ExcelImporter import ExcelImporter
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -140,6 +144,42 @@ def test_get_index_of_typeURI_column_in_sheet():
     assert exception_2.tab == 'no_type_uri_in_sheet'
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_columns():
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_columns.xlsx'
+
+    with pytest.raises(ExceptionsGroup) as ex:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.exceptions) == 1
+    assert len(ex.objects) == 1
+
+    exception_1 = ex.exceptions[0]
+    assert isinstance(exception_1, MissingHeaderError)
+    assert exception_1.file_path == file_location
+    assert exception_1.tab == 'missing header'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_column_integer():
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_column_int.xlsx'
+
+    with pytest.raises(ExceptionsGroup) as ex:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                 allow_non_otl_conform_attributes=False)
+
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.exceptions) == 1
+
+    exception_1 = ex.exceptions[0]
+    assert isinstance(exception_1, UnknownExcelError)
+    assert exception_1.file_path == file_location
+    assert exception_1.tab == 'int_in_header'
+
+
 def test_check_headers():
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 
@@ -166,3 +206,62 @@ def test_load_non_conform_attributes(recwarn):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert instance.testBooleanField
     assert instance.non_conform_attribute == 'value'
+
+
+def test_empty_lines_in_excel(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'empty_lines.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+
+    assert objects[0].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert len(objects) == 5
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_dates_in_excel(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'file_with_date.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    warns = [w for w in recwarn.list if w.category is not DeprecationWarning]  # remove deprecation warnings
+    assert not warns
+
+    assert objects[0].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert objects[0].datumOprichtingObject == datetime.date(2004,1,3)
+    assert objects[1].datumOprichtingObject == datetime.date(2002,2,2)
+    assert objects[2].datumOprichtingObject == datetime.date(2004,1,4)
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_load_multiple_errors_in_different_lines(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'multiple_errors_in_different_lines.xlsx'
+
+    with pytest.raises(ExceptionsGroup) as ex:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                           warn_for_non_otl_conform_attributes=False)
+    ex = ex.value
+    assert isinstance(ex, ExceptionsGroup)
+    assert len(ex.objects) == 2
+    assert len(ex.exceptions) == 1
+
+    bad_lines_error = ex.exceptions[0]
+    # Assert that bad_lines_error is of the expected type
+    assert isinstance(bad_lines_error, BadLinesInExcelError)
+    # Assert that bad_lines_error.exceptions is a list with expected length
+    assert isinstance(bad_lines_error.exceptions, list)
+    assert len(bad_lines_error.exceptions) == 3
+
+    assert isinstance(bad_lines_error.exceptions[0], ErrorInExcelLine)
+    assert isinstance(bad_lines_error.exceptions[1], ErrorInExcelLine)
+    assert isinstance(bad_lines_error.exceptions[2], ErrorInExcelLine)
+
+    assert (str(bad_lines_error.exceptions[0]) ==
+            ('Error in line 2: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "geometry" with value "aaa": ValueError'))
+    assert (str(bad_lines_error.exceptions[1]) ==
+            ('Error in line 4: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "testDateField" with value "aaa": CouldNotConvertToCorrectTypeError'))
+    assert (str(bad_lines_error.exceptions[2]) ==
+            ('Error in line 6: MultipleAttributeError with 1 error(s):\n'
+             '- OTLAttributeError on attribute "testBooleanField" with value "aaa": CouldNotConvertToCorrectTypeError'))

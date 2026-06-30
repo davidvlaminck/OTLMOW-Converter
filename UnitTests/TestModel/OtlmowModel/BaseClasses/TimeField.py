@@ -1,11 +1,17 @@
+import sys
+import os
+
+# Voeg het projectpad toe aan sys.path zodat absolute imports werken in unittests
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../..')))
+
 import random
 import warnings
 from datetime import time, datetime, date, timezone
 from typing import Optional, Any
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
-from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
-from otlmow_model.OtlmowModel.warnings.IncorrectTypeWarning import IncorrectTypeWarning
+from .OTLField import OTLField
+from ..Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
+from ..warnings.IncorrectTypeWarning import IncorrectTypeWarning
 
 
 class TimeField(OTLField):
@@ -16,6 +22,7 @@ class TimeField(OTLField):
     label = 'Tijd'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#time'
     clearing_value = '88888888'
+    native_type = time
 
     @classmethod
     def convert_to_correct_type(cls, value: Any, log_warnings: bool = True) -> Optional[time]:

@@ -3,16 +3,16 @@ from pathlib import Path
 
 import pytest
 
-from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
 from otlmow_converter.FileFormats.GeoJSONImporter import GeoJSONImporter
 
 model_directory_path = Path(__file__).parent.parent / 'TestModel'
 
 
-def test_load_test_unnested_attributes(recwarn):
+@pytest.mark.asyncio(loop_scope="function")
+async def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.geojson'
 
-    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await GeoJSONImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -22,7 +22,7 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.assetId.identificator == '0000-0000'
     assert not instance.testBooleanField
     assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15, 123456)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'
@@ -38,11 +38,12 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-def test_load_test_nested_attributes_level_1(recwarn):
+@pytest.mark.asyncio(loop_scope="function")
+async def test_load_test_nested_attributes_level_1(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_1.geojson'
 
 
-    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await GeoJSONImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -72,11 +73,12 @@ def test_load_test_nested_attributes_level_1(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-def test_load_test_nested_attributes_level_2(recwarn):
+@pytest.mark.asyncio(loop_scope="function")
+async def test_load_test_nested_attributes_level_2(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.geojson'
 
 
-    objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+    objects = await GeoJSONImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
     assert len(recwarn.list) == 0
 
     assert len(objects) == 1
@@ -98,19 +100,21 @@ def test_load_test_nested_attributes_level_2(recwarn):
     assert instance.geometry == 'POINT Z (200000.0 200000.0 0.0)'
 
 
-def test_invalid_typeURI():
+@pytest.mark.asyncio(loop_scope="function")
+async def test_invalid_typeURI():
     with pytest.raises(ValueError):
-        GeoJSONImporter.decode_objects({"type": "FeatureCollection", "features": [{
+        await GeoJSONImporter.decode_objects_async({"type": "FeatureCollection", "features": [{
             "id": "3c221106-2dc6-4bdc-b567-3cfc964e4d64-aW1wbGVtZW50YXRpZWVsZW1lbnQjRWxlY3RyaWNpdHlDYWJsZQ",
             "properties": {}}]})
 
 
-def test_load_test_non_conform(recwarn, subtests):
+@pytest.mark.asyncio(loop_scope="function")
+async def test_load_test_non_conform(recwarn, subtests):
     file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attributes.geojson'
 
     with subtests.test(msg="default behaviour"):
         recwarn.clear()
-        objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+        objects = await GeoJSONImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
         assert len(recwarn.list) == 1
 
         assert len(objects) == 1
@@ -123,12 +127,12 @@ def test_load_test_non_conform(recwarn, subtests):
 
     with subtests.test(msg='non conform not allowed'):
         with pytest.raises(ValueError):
-            GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+            await GeoJSONImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path,
                                     allow_non_otl_conform_attributes=False)
 
     with subtests.test(msg="allowed, no warnings"):
         recwarn.clear()
-        objects = GeoJSONImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+        objects = await GeoJSONImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path,
                                           warn_for_non_otl_conform_attributes=False)
         assert len(recwarn.list) == 0
 
@@ -142,16 +146,12 @@ def test_load_test_non_conform(recwarn, subtests):
 
 
 def test_construct_wkt_string_from_geojson_point():
-
-
     point = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "Point", "coordinates": [200000.1, 200000.2, 0]})
     assert point == 'POINT Z (200000.1 200000.2 0)'
 
 
 def test_construct_wkt_string_from_geojson_line():
-
-
     line = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "LineString", "coordinates": [[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.6, 0],
                                                [200000.7, 200000.8, 0]]})
@@ -159,8 +159,6 @@ def test_construct_wkt_string_from_geojson_line():
 
 
 def test_construct_wkt_string_from_geojson_polygon():
-
-
     polygon = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "Polygon", "coordinates": [[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
                                                 [200000.1, 200000.2, 0]]]})
@@ -168,8 +166,6 @@ def test_construct_wkt_string_from_geojson_polygon():
 
 
 def test_construct_wkt_string_from_geojson_multipolygon():
-
-
     multipolygon = GeoJSONImporter.construct_wkt_string_from_geojson(
         {"type": "MultiPolygon", "coordinates": [[[[200000.1, 200000.2, 0], [200000.3, 200000.4, 0], [200000.5, 200000.8, 0],
                                                 [200000.1, 200000.2, 0]]],

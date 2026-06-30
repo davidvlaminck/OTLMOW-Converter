@@ -3,9 +3,9 @@ from datetime import date, datetime, timedelta, timezone
 from random import randrange
 from typing import Optional, Any
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
-from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
-from otlmow_model.OtlmowModel.warnings.IncorrectTypeWarning import IncorrectTypeWarning
+from .OTLField import OTLField
+from ..Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
+from ..warnings.IncorrectTypeWarning import IncorrectTypeWarning
 
 
 class DateField(OTLField):
@@ -16,6 +16,7 @@ class DateField(OTLField):
     label = 'Datum'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#date'
     clearing_value = '88888888'
+    native_type = date
 
     @classmethod
     def convert_to_correct_type(cls, value: Any, log_warnings: bool = True) -> Optional[date]:

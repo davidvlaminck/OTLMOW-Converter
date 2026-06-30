@@ -24,7 +24,7 @@ class AssetFactory:
         if fields_to_copy is None:
             fields_to_copy = []
 
-        if not isinstance(orig_otl_object, OTLObject):
+        if not orig_otl_object.return_is_otl_object():
             raise ValueError(f'{orig_otl_object} is not an OTLObject, not supported')
 
         if typeURI != '' and (typeURI != orig_otl_object.typeURI and (fields_to_copy == [] or fields_to_copy is None)):

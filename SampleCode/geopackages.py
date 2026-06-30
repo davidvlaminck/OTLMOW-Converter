@@ -3,7 +3,6 @@ from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instan
 from shapely import wkt
 
 from otlmow_converter.FileFormats.PandasConverter import PandasConverter
-from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 uris = {
     'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#Geleideconstructie',
@@ -17,11 +16,10 @@ uris = {
 }
 
 if __name__ == '__main__':
-    otlmow_converter = OtlmowConverter()
     assets = [dynamic_create_instance_from_uri(uri) for uri in uris]
     for asset in assets:
         asset.fill_with_dummy_data()
-    pandas_converter = PandasConverter(settings = otlmow_converter.settings)
+    pandas_converter = PandasConverter()
     multi_df = pandas_converter.convert_objects_to_multiple_dataframes(sequence_of_objects=assets)
 
     for uri, df in multi_df.items():  # iterate over the dataframes

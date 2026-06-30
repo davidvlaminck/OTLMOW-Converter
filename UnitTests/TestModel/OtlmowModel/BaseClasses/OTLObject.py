@@ -8,20 +8,19 @@ from datetime import datetime
 from pathlib import Path
 from typing import Union, Dict, List, Generator, TypeVar, Type
 
-from otlmow_model.OtlmowModel.BaseClasses.DateField import DateField
-from otlmow_model.OtlmowModel.BaseClasses.DateTimeField import DateTimeField
-from otlmow_model.OtlmowModel.BaseClasses.KeuzelijstField import KeuzelijstField
-from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
-from otlmow_model.OtlmowModel.BaseClasses.TimeField import TimeField
-from otlmow_model.OtlmowModel.BaseClasses.URIField import URIField
-from otlmow_model.OtlmowModel.BaseClasses.UnionTypeField import UnionTypeField
-from otlmow_model.OtlmowModel.BaseClasses.UnionWaarden import UnionWaarden
-from otlmow_model.OtlmowModel.Exceptions.AttributeDeprecationWarning import AttributeDeprecationWarning
-from otlmow_model.OtlmowModel.Exceptions.CanNotClearAttributeError import CanNotClearAttributeError
-from otlmow_model.OtlmowModel.Exceptions.ClassDeprecationWarning import ClassDeprecationWarning
-from otlmow_model.OtlmowModel.Exceptions.MethodNotApplicableError import MethodNotApplicableError
-from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
-from otlmow_model.OtlmowModel.Helpers.GenericHelper import get_titlecase_from_ns, get_ns_and_name_from_uri
+from .DateTimeField import DateTimeField
+from .OTLField import OTLField
+from .URIField import URIField
+from .UnionTypeField import UnionTypeField
+from .UnionWaarden import UnionWaarden
+from ..Exceptions.AttributeDeprecationWarning import AttributeDeprecationWarning
+from ..Exceptions.CanNotClearAttributeError import CanNotClearAttributeError
+from ..Exceptions.ClassDeprecationWarning import ClassDeprecationWarning
+from ..Exceptions.CouldNotCreateInstanceError import CouldNotCreateInstanceError
+from ..Exceptions.MethodNotApplicableError import MethodNotApplicableError
+from ..Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
+from ..Helpers.GenericHelper import get_titlecase_from_ns
+from ..Helpers.generated_lists import get_hardcoded_class_dict
 
 
 class OTLAttribuut:
@@ -45,6 +44,7 @@ class OTLAttribuut:
         self.readonlyValue = None
         self.mark_to_be_cleared: bool = False
         self.waarde = None
+        self.is_otl_attribute: bool = True
         self.field: Type[OTLField] = field
 
         if self.field.waardeObject:
@@ -165,7 +165,7 @@ class OTLAttribuut:
             converted_values = []
             for el_value in value:
                 converted_value = self.field.convert_to_correct_type(el_value)
-                if issubclass(self.field, KeuzelijstField):
+                if hasattr(self.field, 'options') and self.field.options is not None:
                     converted_value = self.field.convert_to_invulwaarde(converted_value, self.field)
 
                 field_validated = self.field.validate(converted_value, self)
@@ -180,13 +180,23 @@ class OTLAttribuut:
                 self.waarde = value
             else:
                 converted_value = self.field.convert_to_correct_type(value)
-                if issubclass(self.field, KeuzelijstField):
+                if hasattr(self.field, 'options') and self.field.options is not None:
                     converted_value = self.field.convert_to_invulwaarde(converted_value, self.field)
                 if self.field.validate(value=converted_value, attribuut=self):
                     self.waarde = converted_value
                 else:
+                    if owner is None and self.owner is not None:
+                        if hasattr(self.owner, '_parent') and self.owner._parent is not None:
+                            raise ValueError(
+                                f'Could not assign the best effort converted value to {self.owner._parent.naam}.'
+                                f'{self.naam}. Value {value} is not valid (type: {self.field.label})')
+                        else:
+                            raise ValueError(
+                                f'Could not assign the best effort converted value to {self.owner.__class__.__name__}.'
+                                f'{self.naam} Value {value} is not valid (type: {self.field.label})')
                     raise ValueError(
-                        f'Could not assign the best effort converted value to {owner.__class__.__name__}.{self.naam}')
+                        f'Could not assign the best effort converted value to {owner.__class__.__name__}.{self.naam} '
+                        f'Value {value} is not valid (type: {self.field.label})')
 
         # check if kwant Wrd inside a union type, if so, call clear_props
         if (owner is not None and value is not None and hasattr(owner, 'field') and owner.field.waardeObject is not None
@@ -240,20 +250,29 @@ class OTLAttribuut:
                 elif first_geom_type == 'POLYGON Z':
                     self.set_waarde('POLYGON Z ((200000 200000 0, 200001 200001 1, 200002 200002 2, 200000 200000 0))')
             else:
-                data = self.field.create_dummy_data()
-                if self.kardinaliteit_max != '1':
-                    self.set_waarde([data])
+                if self.objectUri == 'https://wegenenverkeer.data.vlaanderen.be/ns/implementatieelement#NaampadObject.naampad':
+                    naam_attr = get_attribute_by_name(self.owner, 'naam')
+                    if naam_attr is not None and naam_attr.waarde is not None:
+                        data = f'dummy/{naam_attr.waarde}'
+                    else:
+                        data = 'dummy/dummy'
                 else:
+                    data = self.field.create_dummy_data()
+                if data is None or self.kardinaliteit_max == '1':
                     self.set_waarde(data)
+                else:
+                    self.set_waarde([data])
             return
         new_value_object = self.field.waardeObject()
         new_value_object._parent = self
 
-        if isinstance(new_value_object, UnionWaarden):
+        if getattr(new_value_object, '_is_union_waarden_object', False):
             selected_attr = random.choice(list(new_value_object))
             selected_attr.fill_with_dummy_data()
         else:
             for a in new_value_object:
+                if a == 'is_waarden_object':
+                    continue
                 a.fill_with_dummy_data()
 
         if self.kardinaliteit_max != '1':
@@ -292,6 +311,9 @@ class OTLObject(object):
                 warnings.warn(
                     message=f'used a class ({self.__class__.__name__}) that is deprecated since version {self.deprecated_version}',
                     category=ClassDeprecationWarning)
+
+    def return_is_otl_object(self) -> bool:
+        return True
 
     def clear_value(self, attribute_name: str) -> None:
         if attribute_name is None:
@@ -338,9 +360,11 @@ class OTLObject(object):
     def __iter__(self) -> Generator[OTLAttribuut, None, None]:
         yield from sorted(filter(lambda v: isinstance(v, OTLAttribuut), (vars(self).values())), key=lambda x: x.naam)
 
-    def __eq__(self, other):
+    def __eq__(self, value) -> bool:
+        if value is None:
+            return False
         return (create_dict_from_asset(self, warn_for_non_otl_conform_attributes=False) ==
-                create_dict_from_asset(other, warn_for_non_otl_conform_attributes=False))
+                create_dict_from_asset(value, warn_for_non_otl_conform_attributes=False))
 
     def is_instance_of(self, otl_type: type, dynamic_created: bool = False, model_directory: Path = None):
         if dynamic_created:
@@ -507,9 +531,10 @@ def _recursive_create_dict_from_asset(
     else:
         d = {}
         for attr_key, attr in vars(asset).items():
-            if attr_key in {'_parent', '_valid_relations', '_geometry_types'}:
+            if attr_key in {'_parent', '_valid_relations', '_geometry_types',
+                            '_is_waarden_object', '_is_union_waarden_object'}:
                 continue
-            if isinstance(attr, OTLAttribuut):
+            if hasattr(attr, 'is_otl_attribute') and attr.is_otl_attribute:
                 if not attr.mark_to_be_cleared:
                     if attr.waarde is None:
                         continue
@@ -545,23 +570,23 @@ def _recursive_create_dict_from_asset(
                 else:
                     if attr.mark_to_be_cleared:
                         d[attr.naam] = attr.field.clearing_value
-                    elif cast_datetime:
-                        if attr.field == TimeField:
+                    elif cast_datetime and attr.field.is_otl_field:
+                        if attr.field.native_type == time:
                             if isinstance(attr.waarde, list):
                                 d[attr.naam] = [time.strftime(list_item, "%H:%M:%S") for list_item in attr.waarde]
                             else:
                                 d[attr.naam] = time.strftime(attr.waarde, "%H:%M:%S")
-                        elif attr.field == DateField:
+                        elif attr.field.native_type == date:
                             if isinstance(attr.waarde, list):
                                 d[attr.naam] = [date.strftime(list_item, "%Y-%m-%d") for list_item in attr.waarde]
                             else:
                                 d[attr.naam] = date.strftime(attr.waarde, "%Y-%m-%d")
-                        elif attr.field == DateTimeField:
+                        elif attr.field.native_type == datetime:
                             if isinstance(attr.waarde, list):
-                                d[attr.naam] = [datetime.strftime(list_item, "%Y-%m-%d %H:%M:%S")
+                                d[attr.naam] = [DateTimeField.value_default(list_item)
                                                 for list_item in attr.waarde]
                             else:
-                                d[attr.naam] = datetime.strftime(attr.waarde, "%Y-%m-%d %H:%M:%S")
+                                d[attr.naam] = DateTimeField.value_default(attr.waarde)
                         else:
                             d[attr.naam] = attr.waarde
                     else:
@@ -605,9 +630,10 @@ def _recursive_create_rdf_dict_from_asset(
     else:
         d = {}
         for attr_key, attr in vars(asset).items():
-            if attr_key in {'_parent', '_valid_relations', '_geometry_types'}:
+            if attr_key in {'_parent', '_valid_relations', '_geometry_types',
+                            '_is_union_waarden_object', '_is_waarden_object'}:
                 continue
-            if isinstance(attr, OTLAttribuut):
+            if hasattr(attr, 'is_otl_attribute') and attr.is_otl_attribute:
                 if not attr.mark_to_be_cleared:
                     if attr.waarde is None:
                         continue
@@ -647,24 +673,24 @@ def _recursive_create_rdf_dict_from_asset(
                 else:
                     if attr.mark_to_be_cleared:
                         d[attr.objectUri] = attr.field.clearing_value
-                    elif cast_datetime:
-                        if attr.field == TimeField:
+                    elif cast_datetime and attr.field.is_otl_field:
+                        if attr.field.native_type == time:
                             if isinstance(attr.waarde, list):
                                 d[attr.objectUri] = [time.strftime(list_item, "%H:%M:%S") for list_item in attr.waarde]
                             else:
                                 d[attr.objectUri] = time.strftime(attr.waarde, "%H:%M:%S")
-                        elif attr.field == DateField:
+                        if attr.field.native_type == date:
                             if isinstance(attr.waarde, list):
                                 d[attr.objectUri] = [date.strftime(list_item, "%Y-%m-%d") for list_item in attr.waarde]
                             else:
                                 d[attr.objectUri] = date.strftime(attr.waarde, "%Y-%m-%d")
-                        elif attr.field == DateTimeField:
+                        if attr.field.native_type == datetime:
                             if isinstance(attr.waarde, list):
                                 d[attr.objectUri] = [datetime.strftime(list_item, "%Y-%m-%d %H:%M:%S")
                                                      for list_item in attr.waarde]
                             else:
                                 d[attr.objectUri] = datetime.strftime(attr.waarde, "%Y-%m-%d %H:%M:%S")
-                        elif issubclass(attr.field, KeuzelijstField):
+                        elif hasattr(attr.field, 'options') and attr.field.options is not None:
                             if isinstance(attr.waarde, list):
                                 if attr.waarde == [None]:
                                     d[attr.objectUri] = []
@@ -675,7 +701,7 @@ def _recursive_create_rdf_dict_from_asset(
                                 d[attr.objectUri] = attr.field.options[attr.waarde].objectUri
                         else:
                             d[attr.objectUri] = attr.waarde
-                    elif issubclass(attr.field, KeuzelijstField):
+                    elif hasattr(attr.field, 'options') and attr.field.options is not None:
                         if isinstance(attr.waarde, list):
                             if attr.waarde == [None]:
                                 d[attr.objectUri] = []
@@ -751,7 +777,7 @@ def _make_string_version_from_dict(d, level: int = 0, indent: int = 4, list_inde
         if isinstance(value, dict):
             lines.append(f'{prefix}{key} :')
             lines.extend(_make_string_version_from_dict(value, level=level + 1, indent=indent,
-                                                        prefix=prefix + ' ' * indent * level))
+                                                        prefix=prefix + ' ' * indent))
         elif isinstance(value, list):
             lines.append(f'{prefix}{key} :')
             for index, item in enumerate(value):
@@ -855,17 +881,19 @@ def set_value_by_dictitem(instance_or_attribute: Union[OTLObject, OTLAttribuut],
             if attribute_to_set.waarde is None:
                 attribute_to_set.add_empty_value()
 
-            if cast_datetime and attribute_to_set.waarde._waarde.field in [TimeField, DateField, DateTimeField]:
+            if (cast_datetime and attribute_to_set.field.is_otl_field and
+                    attribute_to_set.field.native_type in [date, datetime, time]):
                 value = attribute_to_set.waarde._waarde.field.convert_to_correct_type(value=value, log_warnings=False)
             attribute_to_set.waarde._waarde.set_waarde(value)
     else:
-        if cast_datetime and attribute_to_set.field in [TimeField, DateField, DateTimeField]:
+        if (cast_datetime and attribute_to_set.field.is_otl_field and
+                attribute_to_set.field.native_type in [date, datetime, time]):
             value = attribute_to_set.field.convert_to_correct_type(value=value, log_warnings=False)
         attribute_to_set.set_waarde(value)
 
 
 def dynamic_create_type_from_ns_and_name(namespace: str, class_name: str, model_directory: Path = None) -> type:
-    """Loads the OTL class module and attempts to instantiate the class using the name and namespace of the class
+    """Loads the OTL class module and attempts to return the type using the name and namespace of the class
 
     :param namespace: namespace of the class
     :type: str
@@ -873,73 +901,147 @@ def dynamic_create_type_from_ns_and_name(namespace: str, class_name: str, model_
     :type: str
     :param model_directory: directory where the model is located, defaults to otlmow_model's own model
     :type: str
-    :return: returns an instance of class_name in the given namespace, located from directory, that inherits from AIMObject or RelatieObject
-    :rtype: AIMObject, RelatieObject or None
+    :return: returns an instance of class_name in the given namespace, located from directory
+    :rtype: type
     """
-    if model_directory is None:
-        current_file_path = Path(__file__)
-        model_directory = current_file_path.parent.parent.parent
-
-    namespace = '' if namespace is None else f'{get_titlecase_from_ns(namespace)}.'
-    sys.path.insert(1, str(model_directory))
     try:
-        mod = importlib.import_module(f'OtlmowModel.Classes.{namespace}{class_name}')
-        return getattr(mod, class_name)
-    except ModuleNotFoundError:
-        raise ModuleNotFoundError(f'When dynamically creating an object of class {class_name}, the import failed. '
-                                  f'Make sure you are directing to the (parent) directory where OtlmowModel is '
-                                  f'located in.')
-
-
-def dynamic_create_instance_from_ns_and_name(namespace: str, class_name: str, model_directory: Path = None
-                                             ) -> OTLObject:
-    """Loads the OTL class module and attempts to instantiate the class using the name and namespace of the class
-
-    :param namespace: namespace of the class
-    :type: str
-    :param class_name: class name to instantiate
-    :type: str
-    :param model_directory: directory where the model is located, defaults to otlmow_model's own model
-    :type: str
-    :return: returns an instance of class_name in the given namespace, located from directory, that inherits from AIMObject or RelatieObject
-    :rtype: AIMObject, RelatieObject or None
-    """
-    if model_directory is None:
-        current_file_path = Path(__file__)
-        model_directory = current_file_path.parent.parent.parent
-
-    namespace = '' if namespace is None else f'{get_titlecase_from_ns(namespace)}.'
-    sys.path.insert(1, str(model_directory))
-    try:
-        mod = importlib.import_module(f'OtlmowModel.Classes.{namespace}{class_name}')
-        class_ = getattr(mod, class_name)
-        return class_()
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundError(
-            f'When dynamically creating an object of class {class_name}, the import failed. '
-            f'Make sure you are directing to the (parent) directory where OtlmowModel is located in.'
+        class_dict = get_hardcoded_class_dict(model_directory=model_directory)
+    except FileNotFoundError as e:
+        raise CouldNotCreateInstanceError(
+            e.message + '\nMake sure you are directing to the (parent) directory '
+            'where OtlmowModel is located in.'
         ) from e
+    class_entry = next((c for c in class_dict.values() if c['ns'] == namespace and c['name'] == class_name), None)
+    if class_entry is not None:
+        return _create_type_from_class_dict_entry(class_entry, model_directory=model_directory)
+
+    error = CouldNotCreateInstanceError(
+        f'The combination of the namespace {namespace} and the class name {class_name} is not found in the hardcoded '
+        f'class dictionary.')
+
+    ns_match = next((c for c in class_dict.values() if c['ns'] == namespace), None)
+    if ns_match is None:
+        error.message += f'\nNo classes found with the namespace {namespace}.'
+        from difflib import get_close_matches
+        closest_matches = get_close_matches(namespace, {c['ns'] for c in class_dict.values()}, n=5, cutoff=0.8)
+        closest_matches_string = '", "'.join(closest_matches)
+        error.message += f'\nDid you mean one of these namespaces? "{closest_matches_string}"'
+        raise error
+
+    from difflib import get_close_matches
+    closest_matches = get_close_matches(class_name, {c['name'] for c in class_dict.values()}, n=5, cutoff=0.8)
+    closest_matches_string = '", "'.join(closest_matches)
+
+    error.message += (f'\nNo classes found with the namespace {namespace}.'
+                      f'nDid you mean one of these class names? "{closest_matches_string}"')
+    error.closest_matches = closest_matches
+    raise error
+
+
+
+
+
+def dynamic_create_instance_from_ns_and_name(namespace: str, class_name: str, model_directory: Path = None) -> OTLObject:
+    """Loads the OTL class module and attempts to instantiate the class using the name and namespace of the class.
+    Caches imported modules for performance improvement.
+
+    :param namespace: namespace of the class
+    :type: str
+    :param class_name: class name to instantiate
+    :type: str
+    :param model_directory: directory where the model is located, defaults to otlmow_model's own model
+    :type: Path
+    :return: returns an instance of class_name in the given namespace, located from directory
+    :rtype: OTLObject
+    """
+    type_ = dynamic_create_type_from_ns_and_name(namespace=namespace, class_name=class_name,
+                                                 model_directory=model_directory)
+    return type_()
 
 
 def dynamic_create_instance_from_uri(class_uri: str, model_directory: Path = None) -> OTLObject:
-    if model_directory is None:
-        current_file_path = Path(__file__)
-        model_directory = current_file_path.parent.parent.parent
+    """Loads the OTL class module and attempts to instantiate the class using the URI of the class.
 
-    if class_uri == 'http://purl.org/dc/terms/Agent':
-        ns, name = None, 'Agent'
-    else:
-        ns, name = get_ns_and_name_from_uri(class_uri)
-    return dynamic_create_instance_from_ns_and_name(ns, name, model_directory=model_directory)
+    :param class_uri: URI of the class
+    :type: str
+    :param model_directory: directory where the model is located, defaults to otlmow_model's own model
+    :type: Path
+    :return: returns an instance of the class with the given URI, located from directory
+    :rtype: OTLObject
+    """
+    type_ = dynamic_create_type_from_uri(class_uri, model_directory=model_directory)
+    return type_()
 
 
 def dynamic_create_type_from_uri(class_uri: str, model_directory: Path = None) -> type:
-    if model_directory is None:
-        current_file_path = Path(__file__)
-        model_directory = current_file_path.parent.parent.parent
+    """Loads the OTL class module and attempts to return the type using the URI of the class.
 
-    if class_uri == 'http://purl.org/dc/terms/Agent':
-        ns, name = None, 'Agent'
+    :param class_uri: URI of the class
+    :type: str
+    :param model_directory: directory where the model is located, defaults to otlmow_model's own model
+    :type: Path
+    :return: returns a type object created from the class URI
+    :rtype: type
+    """
+    try:
+        class_dict = get_hardcoded_class_dict(model_directory=model_directory)
+    except FileNotFoundError as e:
+        raise CouldNotCreateInstanceError(
+            e.message + '\nMake sure you are directing to the (parent) directory '
+            'where OtlmowModel is located in.'
+        ) from e
+    if class_uri in class_dict:
+        return _create_type_from_class_dict_entry(class_dict[class_uri], model_directory=model_directory)
+
+    from difflib import get_close_matches
+    closest_matches = get_close_matches(class_uri, class_dict.keys(), n=5, cutoff=0.8)
+    closest_matches_string = '", "'.join(closest_matches)
+
+    error = CouldNotCreateInstanceError(
+        f'Class URI {class_uri} is not found in the hardcoded class dictionary. '
+        f'Did you mean one of these? "{closest_matches_string}"')
+    error.closest_matches = closest_matches
+    raise error
+
+
+_imported_modules = {}
+
+def _create_type_from_class_dict_entry(class_dict_entry: Dict[str, str], model_directory: Path = None) -> type:
+    """Creates a type from a class dictionary entry.
+
+    :param class_dict_entry: dictionary containing the class information
+    :type class_dict_entry: dict
+    :param model_directory: directory where the model is located, defaults to otlmow_model's own model
+    :type model_directory: Path
+    :return: returns a type object created from the class dictionary entry
+    :rtype: type
+    """
+    global _imported_modules
+    namespace = class_dict_entry['ns']
+    class_name = class_dict_entry['name']
+    module_key = (namespace, class_name)
+
+    if module_key in _imported_modules:
+        mod = _imported_modules[module_key]
     else:
-        ns, name = get_ns_and_name_from_uri(class_uri)
-    return dynamic_create_type_from_ns_and_name(ns, name, model_directory=model_directory)
+        model_directory_given = model_directory is not None
+        if model_directory is None:
+            current_file_path = Path(__file__)
+            model_directory = current_file_path.parent.parent.parent
+
+        namespace_path = '' if namespace == '' else f'{get_titlecase_from_ns(namespace)}.'
+        module_path = f'OtlmowModel.Classes.{namespace_path}{class_name}'
+
+        try:
+            if str(model_directory) not in sys.path:
+                sys.path.insert(1, str(model_directory))
+            mod = importlib.import_module(module_path)
+            _imported_modules[module_key] = mod
+        except ModuleNotFoundError as e:
+            error = CouldNotCreateInstanceError(
+                f'When dynamically creating an object of class {class_name}, the import failed. ')
+            if model_directory_given:
+                error.message += 'Make sure you are directing to the (parent) directory where OtlmowModel is located in.'
+            raise error from e
+
+    return getattr(mod, class_name)

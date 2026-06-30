@@ -3,9 +3,9 @@ import random
 import warnings
 from typing import Optional, Any
 
-from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
-from otlmow_model.OtlmowModel.Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
-from otlmow_model.OtlmowModel.warnings.IncorrectTypeWarning import IncorrectTypeWarning
+from .OTLField import OTLField
+from ..Exceptions.CouldNotConvertToCorrectTypeError import CouldNotConvertToCorrectTypeError
+from ..warnings.IncorrectTypeWarning import IncorrectTypeWarning
 
 
 class FloatOrDecimalField(OTLField):
@@ -16,6 +16,7 @@ class FloatOrDecimalField(OTLField):
     label = 'Decimaal getal'
     usagenote = 'https://www.w3.org/TR/xmlschema-2/#decimal'
     clearing_value = 88888888.0
+    native_type = float
 
     @classmethod
     def convert_to_correct_type(cls, value: Any, log_warnings: bool = True) -> Optional[float]:

@@ -2,6 +2,7 @@ import os
 from datetime import date, datetime, time
 from pathlib import Path
 
+import pandas as pd
 from pandas import DataFrame, isna
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass
@@ -372,7 +373,7 @@ def test_convert_dataframe_to_objects_nan_values(caplog):
 
     instances = [instance, instance2]
 
-    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    df = DataFrame(PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances))
     assert df.shape == (2, 4)
 
     assert df['typeURI'][0] == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
@@ -395,3 +396,113 @@ def test_convert_dataframe_to_objects_nan_values(caplog):
     assert objects[1].typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
     assert objects[1].assetId.identificator == '02'
     assert objects[1].notitie == 'random note'
+
+
+def test_pandas_version_compatibility():
+    """Test that PandasConverter works correctly with both pandas 2 and pandas 3.
+    
+    This test verifies compatibility with key differences between pandas versions:
+    - NaN handling: pandas 3 may produce 'nan' strings instead of None/NaN
+    - Float NaN values: need to be properly detected and converted to None
+    - tolist() method: used for numpy arrays in dataframes
+    """
+    # Get pandas version
+    pandas_version = pd.__version__.split('.')[0]
+    
+    # Create test instances with mixed attributes
+    instance = AllCasesTestClass()
+    instance.assetId.identificator = 'test-id-001'
+    instance.testBooleanField = True
+    instance.testStringField = 'test value'
+    
+    instance2 = AnotherTestClass()
+    instance2.assetId.identificator = 'test-id-002'
+    instance2.notitie = 'a note'
+    
+    instances = [instance, instance2]
+    
+    # Test 1: Convert objects to dataframe
+    df = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=instances)
+    assert df.shape == (2, 5)  # typeURI, assetId.identificator, testBooleanField, testStringField, notitie
+    
+    # Test 2: Verify NaN values are properly represented
+    # In pandas 2, NaN is represented as pd.NA or np.nan
+    # In pandas 3, NaN might also appear as 'nan' string in some cases
+    assert isna(df['notitie'][0])  # Should be NaN/None for first instance
+    assert df['notitie'][1] == 'a note'  # Should have value for second instance
+    
+    # Test 3: Convert back to objects - this is where pandas 2/3 differences matter most
+    objects = list(PandasConverter.convert_dataframe_to_objects(
+        dataframe=df, model_directory=model_directory_path))
+    
+    assert len(objects) == 2
+    
+    # Test 4: Verify NaN values are properly converted to None
+    assert objects[0].notitie is None, f"Expected None, got {repr(objects[0].notitie)}"
+    assert objects[0].testBooleanField is True
+    assert objects[0].assetId.identificator == 'test-id-001'
+    assert objects[0].testStringField == 'test value'
+    
+    assert objects[1].notitie == 'a note'
+    assert objects[1].assetId.identificator == 'test-id-002'
+    
+    # Test 5: Test with explicit 'nan' string (pandas 3 compatibility)
+    # This simulates what might happen in pandas 3 when converting dataframes
+    df_with_nan_string = DataFrame({
+        'typeURI': ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+                    'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'],
+        'assetId.identificator': ['id-1', 'id-2'],
+        'notitie': ['nan', 'valid note'],  # 'nan' string that pandas 3 might produce
+        'testBooleanField': [True, None]
+    })
+    
+    objects_from_nan_string = list(PandasConverter.convert_dataframe_to_objects(
+        dataframe=df_with_nan_string, model_directory=model_directory_path))
+    
+    assert len(objects_from_nan_string) == 2
+    # The 'nan' string should be converted to None
+    assert objects_from_nan_string[0].notitie is None, \
+        f"Expected None for 'nan' string, got {repr(objects_from_nan_string[0].notitie)}"
+    assert objects_from_nan_string[1].notitie == 'valid note'
+    
+    # Test 6: Test with float NaN values (another pandas 3 edge case)
+    import math
+    df_with_float_nan = DataFrame({
+        'typeURI': ['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'],
+        'assetId.identificator': ['id-3'],
+        'notitie': [float('nan')],  # Explicit float NaN
+        'testBooleanField': [False]
+    })
+    
+    objects_from_float_nan = list(PandasConverter.convert_dataframe_to_objects(
+        dataframe=df_with_float_nan, model_directory=model_directory_path))
+    
+    assert len(objects_from_float_nan) == 1
+    assert objects_from_float_nan[0].notitie is None, \
+        f"Expected None for float NaN, got {repr(objects_from_float_nan[0].notitie)}"
+    
+    # Test 7: Test tolist_if_possible method with numpy arrays
+    import numpy as np
+    np_array = np.array([1.0, 2.0, 3.0])
+    result = PandasConverter.tolist_if_possible(np_array)
+    assert result == [1.0, 2.0, 3.0], "tolist_if_possible should convert numpy arrays to lists"
+    
+    # Test 8: Test tolist_if_possible with non-array values
+    assert PandasConverter.tolist_if_possible('string') == 'string'
+    assert PandasConverter.tolist_if_possible(42) == 42
+    assert PandasConverter.tolist_if_possible([1, 2, 3]) == [1, 2, 3]
+    
+    # Test 9: Round-trip conversion with multiple object types
+    instance3 = AllCasesTestClass()
+    instance3.assetId.identificator = 'round-trip-id'
+    instance3.testIntegerField = 42
+    instance3.testStringFieldMetKard = ['a', 'b', 'c']
+    
+    df_roundtrip = PandasConverter.convert_objects_to_single_dataframe(list_of_objects=[instance3])
+    objects_roundtrip = list(PandasConverter.convert_dataframe_to_objects(
+        dataframe=df_roundtrip, model_directory=model_directory_path))
+    
+    assert len(objects_roundtrip) == 1
+    assert objects_roundtrip[0].assetId.identificator == 'round-trip-id'
+    assert objects_roundtrip[0].testIntegerField == 42
+    assert objects_roundtrip[0].testStringFieldMetKard == ['a', 'b', 'c']

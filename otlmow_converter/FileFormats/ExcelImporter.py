@@ -1,16 +1,20 @@
+import logging
 import os
+import sys
+import traceback
 import warnings
+from asyncio import sleep
 from pathlib import Path
-
 import openpyxl
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import dynamic_create_instance_from_uri
 from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonStandardAttributeWarning
-
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
+from otlmow_converter.Exceptions.MissingHeaderError import MissingHeaderError
 from otlmow_converter.Exceptions.NoTypeUriInExcelTabError import NoTypeUriInExcelTabError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
@@ -65,6 +69,9 @@ class ExcelImporter(AbstractImporter):
                     raise NoTypeUriInExcelTabError(
                         message=f'Could not find typeURI within 5 rows in Excel tab {sheet} in file {filepath.name}',
                         file_path=filepath, tab=sheet)
+                if len(sheet_data) == 1:
+                    # means there is a header but no data
+                    continue
                 headers = sheet_data[0]
                 type_uri_index = cls.get_index_of_typeURI_column_in_sheet(
                     filepath=filepath, sheet=sheet, headers=headers, data=sheet_data)
@@ -83,7 +90,101 @@ class ExcelImporter(AbstractImporter):
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                     cast_datetime=cast_datetime, cast_list=cast_list,
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes))
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes, combine_errors=True,
+                    additional_header_lines=type_uri_index))
+            except TypeUriNotInFirstRowError:
+                exception_group.add_exception(TypeUriNotInFirstRowError(
+                    message=f'The typeURI is not in the first row in file {filepath.name}.'
+                            f' Please remove the excess rows',
+                    file_path=filepath, tab=sheet
+                ))
+            except NoTypeUriInTableError:
+                if sheet.title() == 'Keuzelijsten':
+                    continue
+                exception_group.add_exception(NoTypeUriInExcelTabError(
+                    message=f'Could not find typeURI within 5 rows in the file {filepath.name} in sheet {sheet}',
+                    file_path=filepath, tab=sheet
+                ))
+            except MissingHeaderError as ex:
+                exception_group.add_exception(MissingHeaderError(
+                    message=f'{ex.args[0]} in file {filepath.name}',
+                    file_path=filepath, tab=sheet
+                ))
+            except BadLinesInExcelError as ex:
+                ex.tab = sheet
+                ex.file_path = filepath
+                exception_group.add_exception(ex)
+                list_of_objects.extend(ex.objects)
+            except BaseException as ex:
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                logging.error("error caught!")
+                logging.error("error message: \n: " + tb)
+                exception_group.add_exception(UnknownExcelError(original_exception=ex, tab=sheet))
+
+        if len(exception_group.exceptions) > 0:
+            exception_group.objects = list_of_objects
+            raise exception_group
+
+        return list_of_objects
+
+    @classmethod
+    async def to_objects_async(cls, filepath: Path = None, **kwargs) -> list:
+        if not os.path.isfile(filepath):
+            raise FileNotFoundError(f'Could not load the file at: {filepath}')
+
+        separator = kwargs.get('separator', SEPARATOR)
+        cardinality_indicator = kwargs.get('cardinality_indicator', CARDINALITY_INDICATOR)
+        cardinality_separator = kwargs.get('cardinality_separator', CARDINALITY_SEPARATOR)
+        waarde_shortcut = kwargs.get('waarde_shortcut', WAARDE_SHORTCUT)
+        cast_list = kwargs.get('cast_list', CAST_LIST)
+        cast_datetime = kwargs.get('cast_datetime', CAST_DATETIME)
+        allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
+                                                      ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
+        warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
+                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+
+        model_directory = None
+        if kwargs is not None and 'model_directory' in kwargs:
+            model_directory = kwargs['model_directory']
+
+        data = await cls.get_data_dict_from_file_path_async(filepath=filepath)
+
+        list_of_objects = []
+        exception_group = ExceptionsGroup(message=f'Failed to create objects from Excel file {filepath}')
+        for sheet, sheet_data in data.items():
+            try:
+                await sleep(0)
+                if len(sheet_data) == 0:
+                    if sheet_data == []:
+                        continue
+                    raise NoTypeUriInExcelTabError(
+                        message=f'Could not find typeURI within 5 rows in Excel tab {sheet} in file {filepath.name}',
+                        file_path=filepath, tab=sheet)
+                if len(sheet_data) == 1:
+                    # means there is a header but no data
+                    continue
+                headers = sheet_data[0]
+                type_uri_index = cls.get_index_of_typeURI_column_in_sheet(
+                    filepath=filepath, sheet=sheet, headers=headers, data=sheet_data)
+                await cls.check_headers_async(
+                    headers=headers, sheet=sheet, filepath=filepath, type_uri=sheet_data[1][type_uri_index],
+                    model_directory=model_directory, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut=waarde_shortcut, separator=separator,
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+                list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts_async(
+                    two_d_sequence=sheet_data, empty_string_equals_none=True)
+                obj = await DotnotationTableConverter.get_data_from_table_async(
+                    table_data=list_of_dicts, model_directory=model_directory,
+                    separator=separator, cardinality_indicator=cardinality_indicator,
+                    waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
+                    cast_datetime=cast_datetime, cast_list=cast_list,
+                    allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes, combine_errors=True,
+                    additional_header_lines=type_uri_index)
+                list_of_objects.extend(obj)
             except TypeUriNotInFirstRowError:
                 exception_group.add_exception(TypeUriNotInFirstRowError(
                     message=f'The typeURI is not in the first row in file {filepath.name}.'
@@ -95,7 +196,21 @@ class ExcelImporter(AbstractImporter):
                     message=f'Could not find typeURI within 5 rows in the file {filepath.name}',
                     file_path=filepath, tab=sheet
                 ))
+            except MissingHeaderError as ex:
+                exception_group.add_exception(MissingHeaderError(
+                    message=f'{ex.args[0]} in file {filepath.name}',
+                    file_path=filepath, tab=sheet
+                ))
+            except BadLinesInExcelError as ex:
+                ex.tab = sheet
+                ex.file_path = filepath
+                exception_group.add_exception(ex)
+                list_of_objects.extend(ex.objects)
             except BaseException as ex:
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+                logging.error("error caught!")
+                logging.error("error message: \n: " + tb)
                 exception_group.add_exception(UnknownExcelError(original_exception=ex, tab=sheet))
 
         if len(exception_group.exceptions) > 0:
@@ -107,18 +222,56 @@ class ExcelImporter(AbstractImporter):
     @classmethod
     def get_data_dict_from_file_path(cls, filepath) -> dict[str, list[list]]:
         data = {}
-        book = openpyxl.load_workbook(filepath, data_only=True, read_only=True)
+        book = openpyxl.load_workbook(filepath, data_only=True)
 
         for sheet in book.worksheets:
             sheet_name = sheet.title
             data[sheet_name] = []
             for row in sheet.rows:
                 row_data = []
+                all_none = True
                 for cell in row:
                     if cell.value in {'True', 'TRUE', 'False', 'FALSE'}:
                         row_data.append(cell.value.lower() == 'true')
+                        all_none = False
                     else:
                         row_data.append(cell.value)
+                        if all_none and cell.value is not None:
+                            all_none = False
+
+                # check if row_data contains all None values
+                if all_none:
+                    continue
+                data[sheet_name].append(row_data)
+
+        book.close()
+        return data
+
+    @classmethod
+    async def get_data_dict_from_file_path_async(cls, filepath) -> dict[str, list[list]]:
+        data = {}
+        await sleep(0)
+        book = openpyxl.load_workbook(filepath, data_only=True)
+
+        for sheet in book.worksheets:
+            sheet_name = sheet.title
+            data[sheet_name] = []
+            for row in sheet.rows:
+                row_data = []
+                all_none = True
+                for cell in row:
+                    await sleep(0)
+                    if cell.value in {'True', 'TRUE', 'False', 'FALSE'}:
+                        row_data.append(cell.value.lower() == 'true')
+                        all_none = False
+                    else:
+                        row_data.append(cell.value)
+                        if all_none and cell.value is not None:
+                            all_none = False
+
+                # check if row_data contains all None values
+                if all_none:
+                    continue
                 data[sheet_name].append(row_data)
 
         book.close()
@@ -156,14 +309,61 @@ class ExcelImporter(AbstractImporter):
                       allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
                       warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
-        error = InvalidColumnNamesInExcelTabError(
-            message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '
-                    f'bad_columns', file_path=filepath, tab=sheet)
+        bad_columns = []
+
         for header in headers:
             if header == 'typeURI':
                 continue
             if header in ['bron.typeURI', 'doel.typeURI']:
                 continue
+            if header is None:
+                continue
+            header = str(header)
+            if header.startswith('[DEPRECATED] '):
+                bad_columns.append(header)
+                continue
+            try:
+                DotnotationHelper.get_attribute_by_dotnotation(
+                    instance_or_attribute=instance, dotnotation=header, separator=separator,
+                    cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
+            except DotnotationListOfListError:
+                bad_columns.append(header)
+            except AttributeError:
+                if not allow_non_otl_conform_attributes:
+                    bad_columns.append(header)
+                elif warn_for_non_otl_conform_attributes:
+                    warnings.warn(
+                        message=f'{header} is a non standardized attribute of {type_uri}. '
+                                f'The attribute will be added on the instance.',
+                        stacklevel=2,
+                        category=NonStandardAttributeWarning)
+
+        if len(bad_columns) > 0:
+            raise InvalidColumnNamesInExcelTabError(
+                message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
+                ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)
+
+    @staticmethod
+    async def check_headers_async(headers: list[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
+                      cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT,
+                      separator: str = SEPARATOR,
+                      allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
+                      warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
+        await sleep(0)
+        bad_columns = []
+        instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
+        error = InvalidColumnNamesInExcelTabError(
+            message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '
+                    f'bad_columns', file_path=filepath, tab=sheet)
+        for header in headers:
+            await sleep(0)
+            if header == 'typeURI':
+                continue
+            if header in ['bron.typeURI', 'doel.typeURI']:
+                continue
+            if header is None:
+                continue
+            header = str(header)
             if header.startswith('[DEPRECATED] '):
                 error.bad_columns.append(header)
                 continue
@@ -172,10 +372,10 @@ class ExcelImporter(AbstractImporter):
                     instance_or_attribute=instance, dotnotation=header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
             except DotnotationListOfListError:
-                error.bad_columns.append(header)
+                bad_columns.append(header)
             except AttributeError:
                 if not allow_non_otl_conform_attributes:
-                    error.bad_columns.append(header)
+                    bad_columns.append(header)
                 elif warn_for_non_otl_conform_attributes:
                     warnings.warn(
                         message=f'{header} is a non standardized attribute of {type_uri}. '
@@ -183,5 +383,7 @@ class ExcelImporter(AbstractImporter):
                         stacklevel=2,
                         category=NonStandardAttributeWarning)
 
-        if len(error.bad_columns) > 0:
-            raise error
+        if len(bad_columns) > 0:
+            raise InvalidColumnNamesInExcelTabError(
+                message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
+                ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)

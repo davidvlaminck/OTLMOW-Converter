@@ -1,5 +1,5 @@
 ﻿from abc import ABC
-from otlmow_model.OtlmowModel.BaseClasses.OTLField import OTLField
+from .OTLField import OTLField
 
 
 class ComplexField(OTLField, ABC):
@@ -7,3 +7,4 @@ class ComplexField(OTLField, ABC):
         return OTLField.__str__(self)
 
     waarde_shortcut_applicable = False
+    native_type = dict

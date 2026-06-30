@@ -16,17 +16,54 @@ def test_load_test_file_multiple_types():
     assert len(assets) == 15
 
 
+def test_load_multiple_testmodel_types_from_single_csv(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'multiple_types_empty_lines.csv'
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
+
+    assert len(recwarn.list) == 0
+    assert len(assets) == 2
+
+    assets_by_type = {asset.typeURI: asset for asset in assets}
+
+    all_cases = assets_by_type['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass']
+    another = assets_by_type['https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass']
+
+    assert all_cases.assetId.identificator == 'allcases-1'
+    assert all_cases.testStringField == 'alpha'
+    assert another.assetId.identificator == 'another-1'
+    assert another.notitie == 'note-another'
+
+
+def test_load_empty_lines():
+    file_location = Path(__file__).parent / 'Testfiles' / 'empty_lines.csv'
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, delimiter=','))
+    assert len(assets) == 5
+
+
 def test_load_test_file(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'import_then_export_input.csv'
     assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
     assert len(assets) == 1
     assert assets[0].assetId.identificator == 'UgVLnoH'
-    assert recwarn.list == []
+    assert len(recwarn.list) == 0
+
+
+def test_load_test_file_with_non_otl_conform_attributes(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'non_conform_attribute.csv'
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
+    assert len(assets) == 1
+    assert assets[0].assetId.identificator == 'id2'
+    assert len(recwarn.list) == 1
+    assert recwarn.list[0].message.args[0] == ('non_conform_attribute is a non standardized attribute of '
+                                               'AnotherTestClass. The attribute will be added on the instance.')
+
+    with pytest.raises(AttributeError) as exc:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, allow_non_otl_conform_attributes=False))
 
 
 def test_load_test_unnested_attributes(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'unnested_attributes.csv'
-    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
     assert len(recwarn.list) == 0
 
     assert len(assets) == 1
@@ -34,7 +71,7 @@ def test_load_test_unnested_attributes(recwarn):
     assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     assert not instance.testBooleanField
     assert instance.testDateField == date(2019, 9, 20)
-    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15)
+    assert instance.testDateTimeField == datetime(2001, 12, 15, 22, 22, 15,123456)
     assert instance.testDecimalField == 79.07
     assert instance.testDecimalFieldMetKard == [10.0, 20.0]
     assert instance.testEenvoudigType.waarde == 'string1'
@@ -86,7 +123,7 @@ def test_load_test_nested_attributes_1_level(recwarn):
 
 def test_load_test_nested_attributes_2_levels(recwarn):
     file_location = Path(__file__).parent / 'Testfiles' / 'nested_attributes_2.csv'
-    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path))
+    assets = list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
     assert len(recwarn.list) == 0
 
     assert len(assets) == 1
