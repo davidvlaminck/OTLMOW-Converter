@@ -30,6 +30,6 @@ class TtlExporter(AbstractExporter):
     @classmethod
     async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[
         Path]:
-        pass
+        raise NotImplementedError('Async export to TTL is not implemented yet. Please use the synchronous version.')
 
 
