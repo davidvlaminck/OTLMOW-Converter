@@ -1,11 +1,11 @@
 from datetime import datetime
 from pathlib import Path
 
-from otlmow_model.Classes.Onderdeel.Stroomkring import Stroomkring
-from otlmow_model.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
-from otlmow_model.Classes.Onderdeel.Voedt import Voedt
+from otlmow_model.OtlmowModel.Classes.Onderdeel.Stroomkring import Stroomkring
+from otlmow_model.OtlmowModel.Classes.Onderdeel.Verkeersregelaar import Verkeersregelaar
+from otlmow_model.OtlmowModel.Classes.Onderdeel.Voedt import Voedt
+from otlmow_model.OtlmowModel.Helpers import RelationCreator
 
-from otlmow_model import RelationCreator
 from otlmow_converter.OtlmowConverter import OtlmowConverter
 
 if __name__ == '__main__':
@@ -24,10 +24,10 @@ if __name__ == '__main__':
 
     instance.isActief = True
 
-    assets = [RelationCreator.create_relation(s, instance, relation_type=Voedt)]
+    assets = [RelationCreator.create_relation(source=s, target=instance, relation_type=Voedt)]
 
 # export
-    file_path = Path(f'Output/{datetime.now().strftime("%Y%m%d%H%M%S")}_verkeersregelaar.json')
-    otlmow_converter.create_file_from_assets(filepath=file_path, list_of_objects=assets)
+    input_file_path = Path(f'Output/20260918132734_verkeersregelaar.json')
+    assets = otlmow_converter.from_file_to_objects(file_path=input_file_path)
     file_path = Path(f'Output/{datetime.now().strftime("%Y%m%d%H%M%S")}_verkeersregelaar.ttl')
-    otlmow_converter.create_file_from_assets(filepath=file_path, list_of_objects=assets)
+    otlmow_converter.to_file(file_path=file_path, subject=assets)

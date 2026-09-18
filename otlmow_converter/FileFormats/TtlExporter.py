@@ -1,30 +1,35 @@
 from typing import Iterable
 
+from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from rdflib.paths import Path
 
+from otlmow_converter.AbstractExporter import AbstractExporter
 from otlmow_converter.FileFormats.RDFExporter import RDFExporter
+from otlmow_converter.SettingsManager import GlobalVariables, load_settings
+
+load_settings()
+
+ttl_settings = GlobalVariables.settings['formats']['ttl']
+WAARDE_SHORTCUT = ttl_settings['waarde_shortcut']
+ALLOW_NON_OTL_CONFORM_ATTRIBUTES = ttl_settings['allow_non_otl_conform_attributes']
+WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = ttl_settings['warn_for_non_otl_conform_attributes']
+RDF_EXPORTER = RDFExporter(settings=ttl_settings)
+
+class TtlExporter(AbstractExporter):
 
 
-class TtlExporter:
-    def __init__(self, settings=None):
-        if settings is None:
-            settings = {}
-        self.settings = settings
-
-        if 'file_formats' not in self.settings:
-            raise ValueError("The settings are not loaded or don't contain settings for file formats")
-        ttl_settings = next((s for s in settings['file_formats'] if 'name' in s and s['name'] == 'ttl'), None)
-        if ttl_settings is None:
-            raise ValueError("Unable to find ttl in file formats settings")
-
-        self.settings = ttl_settings
-
-        self.rdf_exporter = RDFExporter(dotnotation_settings=ttl_settings['dotnotation'])
-
-    def export_to_file(self, filepath: Path = None, list_of_objects: Iterable = None) -> None:
+    @classmethod
+    def from_objects(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[Path]:
         if filepath is None:
             raise ValueError(f'Can not write a file to: {filepath}')
 
-        graph = self.rdf_exporter.create_graph(list_of_objects)
+        graph = RDF_EXPORTER.create_graph(sequence_of_objects)
 
         graph.serialize(destination=str(filepath))
+
+    @classmethod
+    async def from_objects_async(cls, sequence_of_objects: Iterable[OTLObject], filepath: Path, **kwargs) -> tuple[
+        Path]:
+        pass
+
+

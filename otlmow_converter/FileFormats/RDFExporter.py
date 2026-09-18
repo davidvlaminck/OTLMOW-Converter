@@ -5,12 +5,8 @@ from rdflib import Graph, FOAF, URIRef, BNode, Literal, RDF, XSD
 
 
 class RDFExporter:
-    def __init__(self, dotnotation_settings: dict = None):
-
-        if dotnotation_settings is None:
-            dotnotation_settings = {}
-        self.settings = dotnotation_settings
-
+    def __init__(self, settings: dict = None):
+        self.settings = settings
         for required_attribute in ['waarde_shortcut']:
             if required_attribute not in self.settings:
                 raise ValueError("The settings are not loaded or don't contain the full dotnotation settings")
