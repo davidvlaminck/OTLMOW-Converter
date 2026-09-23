@@ -265,3 +265,40 @@ def test_load_multiple_errors_in_different_lines(recwarn):
     assert (str(bad_lines_error.exceptions[2]) ==
             ('Error in line 6: MultipleAttributeError with 1 error(s):\n'
              '- OTLAttributeError on attribute "testBooleanField" with value "aaa": CouldNotConvertToCorrectTypeError'))
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_ignore_x_columns_true(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'ignore_x_columns.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                       ignore_X_columns=True)
+
+    x_warnings = [w for w in recwarn.list if 'X_doelIsActief' in str(w.message)]
+    assert not x_warnings
+
+    assert len(objects) == 1
+
+    instance = objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.testStringField == 'test_string'
+    assert not hasattr(instance, 'X_doelIsActief')
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_ignore_x_columns_false(recwarn):
+    file_location = Path(__file__).parent / 'Testfiles' / 'ignore_x_columns.xlsx'
+
+    objects = ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path,
+                                       ignore_X_columns=False)
+
+    x_warnings = [w for w in recwarn.list if 'X_doelIsActief' in str(w.message)]
+    assert len(x_warnings) > 0
+
+    assert len(objects) == 1
+
+    instance = objects[0]
+    assert instance.typeURI == 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    assert instance.testStringField == 'test_string'
+    assert hasattr(instance, 'X_doelIsActief')
+    assert instance.X_doelIsActief == 'some_value'
