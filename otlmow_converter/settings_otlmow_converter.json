@@ -45,6 +45,7 @@
             "cast_datetime": true,
             "allow_non_otl_conform_attributes": true,
             "warn_for_non_otl_conform_attributes": true,
+            "ignore_x_columns": false,
             "dotnotation": {
                 "waarde_shortcut": true,
                 "separator": ".",

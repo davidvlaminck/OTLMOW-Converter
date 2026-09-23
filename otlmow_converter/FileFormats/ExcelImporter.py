@@ -34,6 +34,7 @@ CAST_LIST = xlsx_settings['cast_list']
 CAST_DATETIME = xlsx_settings['cast_datetime']
 ALLOW_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['allow_non_otl_conform_attributes']
 WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES = xlsx_settings['warn_for_non_otl_conform_attributes']
+IGNORE_X_COLUMNS = xlsx_settings['ignore_x_columns']
 
 
 class ExcelImporter(AbstractImporter):
@@ -51,13 +52,16 @@ class ExcelImporter(AbstractImporter):
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
-                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+        ignore_X_columns = kwargs.get('ignore_X_columns', IGNORE_X_COLUMNS)
 
         model_directory = None
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
 
         data = cls.get_data_dict_from_file_path(filepath=filepath)
+        if ignore_X_columns:
+            data = {sheet: cls._filter_x_columns(sheet_data) for sheet, sheet_data in data.items()}
 
         list_of_objects = []
         exception_group = ExceptionsGroup(message=f'Failed to create objects from Excel file {filepath}')
@@ -142,13 +146,16 @@ class ExcelImporter(AbstractImporter):
         allow_non_otl_conform_attributes = kwargs.get('allow_non_otl_conform_attributes',
                                                       ALLOW_NON_OTL_CONFORM_ATTRIBUTES)
         warn_for_non_otl_conform_attributes = kwargs.get('warn_for_non_otl_conform_attributes',
-                                                         WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+                                                          WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES)
+        ignore_X_columns = kwargs.get('ignore_X_columns', IGNORE_X_COLUMNS)
 
         model_directory = None
         if kwargs is not None and 'model_directory' in kwargs:
             model_directory = kwargs['model_directory']
 
         data = await cls.get_data_dict_from_file_path_async(filepath=filepath)
+        if ignore_X_columns:
+            data = {sheet: cls._filter_x_columns(sheet_data) for sheet, sheet_data in data.items()}
 
         list_of_objects = []
         exception_group = ExceptionsGroup(message=f'Failed to create objects from Excel file {filepath}')
@@ -276,6 +283,16 @@ class ExcelImporter(AbstractImporter):
 
         book.close()
         return data
+
+    @staticmethod
+    def _filter_x_columns(sheet_data: list[list]) -> list[list]:
+        if not sheet_data or not sheet_data[0]:
+            return sheet_data
+        headers = sheet_data[0]
+        x_indices = {i for i, h in enumerate(headers) if h is not None and str(h).startswith('X_')}
+        if not x_indices:
+            return sheet_data
+        return [[val for i, val in enumerate(row) if i not in x_indices] for row in sheet_data]
 
     @classmethod
     def get_index_of_typeURI_column_in_sheet(cls, filepath: Path, sheet: str,  headers: list[str],
