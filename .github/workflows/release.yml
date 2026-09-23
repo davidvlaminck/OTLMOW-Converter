@@ -15,9 +15,9 @@ jobs:
     concurrency: release
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install uv with Python version 3.13
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: 3.13
       - run: uv pip install --upgrade build && python3 -m build
