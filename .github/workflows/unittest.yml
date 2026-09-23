@@ -18,7 +18,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
-        pandas-version: ['2.2.0', '3.0.0']  # Test both pandas 2.x and 3.x
+        pandas-version: ['2.2.0']  # Default to pandas 2.x
+        include:
+          # Test pandas 3.0.0 only on Python 3.11+ (pandas 3.0 requires Python >= 3.11)
+          - python-version: '3.11'
+            pandas-version: '3.0.0'
+          - python-version: '3.12'
+            pandas-version: '3.0.0'
+          - python-version: '3.13'
+            pandas-version: '3.0.0'
+          - python-version: '3.14'
+            pandas-version: '3.0.0'
     steps:
       - uses: actions/checkout@v4
       - name: Install uv with Python version ${{ matrix.python-version }}
