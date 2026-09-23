@@ -12,7 +12,7 @@ from otlmow_converter.FileFormats.RDFExporter import RDFExporter
 
 
 def test_export_relation():
-    exporter = RDFExporter(dotnotation_settings={'waarde_shortcut': False})
+    exporter = RDFExporter(settings={'waarde_shortcut': False})
 
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -33,7 +33,7 @@ def test_export_relation():
 
 
 def test_export_unnested_attributes(subtests):
-    exporter = RDFExporter(dotnotation_settings={'waarde_shortcut': False})
+    exporter = RDFExporter(settings={'waarde_shortcut': False})
 
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -98,7 +98,7 @@ def test_export_unnested_attributes(subtests):
 
 
 def test_export_nested_attributes_level_1(subtests):
-    exporter = RDFExporter(dotnotation_settings={'waarde_shortcut': False})
+    exporter = RDFExporter(settings={'waarde_shortcut': False})
 
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
@@ -191,7 +191,7 @@ def test_export_nested_attributes_level_1(subtests):
 
 
 def test_export_nested_attributes_level_higher(subtests):
-    exporter = RDFExporter(dotnotation_settings={'waarde_shortcut': False})
+    exporter = RDFExporter(settings={'waarde_shortcut': False})
 
     instance = AllCasesTestClass()
     instance.assetId.identificator = '0000'
