@@ -15,9 +15,11 @@ jobs:
         with:
           python-version: 3.13
       - name: Installing dependencies with uv
-        run: uv pip install -r pyproject.toml --extra benchmark
+        run: |
+          uv venv --python 3.13
+          uv pip install -r pyproject.toml --extra benchmark
       - name: Run benchmarks
-        run: python benchmark/perform_benchmark.py
+        run: uv run python benchmark/perform_benchmark.py
       - name: Remove pyc files
         run: rm -f */*.pyc
       - name: Push to github

@@ -33,11 +33,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Installing dependencies with uv for running the tests
         run: |
+          uv venv --python ${{ matrix.python-version }}
           uv pip install -r pyproject.toml --extra test
           uv pip install pandas==${{ matrix.pandas-version }}
       - name: Run unittests with pytest
-        run: python -m pytest -v
+        run: uv run python -m pytest -v
         working-directory: .
       - name: Run the notebook with pytest
-        run: python -m pytest --nbmake Readme.ipynb
+        run: uv run python -m pytest --nbmake Readme.ipynb
         working-directory: .

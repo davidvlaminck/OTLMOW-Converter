@@ -20,6 +20,9 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           python-version: 3.13
-      - run: uv pip install --upgrade build && python3 -m build
+      - run: |
+          uv venv --python 3.13
+          uv pip install --upgrade build
+          uv run python3 -m build
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
