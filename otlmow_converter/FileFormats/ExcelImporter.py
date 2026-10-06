@@ -111,7 +111,7 @@ class ExcelImporter(AbstractImporter):
                 ))
             except MissingHeaderError as ex:
                 exception_group.add_exception(MissingHeaderError(
-                    message=f'{ex.args[0]} in file {filepath.name}',
+                    message=f'{ex.args[0]} in tab {sheet} in file {filepath.name}',
                     file_path=filepath, tab=sheet
                 ))
             except BadLinesInExcelError as ex:
@@ -205,7 +205,7 @@ class ExcelImporter(AbstractImporter):
                 ))
             except MissingHeaderError as ex:
                 exception_group.add_exception(MissingHeaderError(
-                    message=f'{ex.args[0]} in file {filepath.name}',
+                    message=f'{ex.args[0]} in tab {sheet} in file {filepath.name}',
                     file_path=filepath, tab=sheet
                 ))
             except BadLinesInExcelError as ex:
