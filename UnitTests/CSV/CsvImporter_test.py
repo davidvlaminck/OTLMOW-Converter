@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from otlmow_converter.Exceptions.DotnotationIncorrectError import DotnotationIncorrectError
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.CsvImporter import CsvImporter
@@ -163,3 +164,177 @@ def test_raise_errors():
         CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
         assert exc.value.message == 'Could not find typeURI within 5 rows in the csv file type_uri_not_in_file.csv'
         assert exc.value.file_path == file_location
+
+
+def test_bad_kard_error_missing_indicator_sync():
+    """Test that missing cardinality indicator raises DotnotationIncorrectError in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    with pytest.raises(ExceptionsGroup) as exc:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+
+    assert len(exc.value.exceptions) == 1
+    err = exc.value.exceptions[0]
+    assert err.header == 'testEenvoudigTypeMetKard'
+    assert err.expected_header == 'testEenvoudigTypeMetKard[]'
+    assert 'attribute at position 0 has cardinality' in str(err)
+
+
+@pytest.mark.asyncio
+async def test_bad_kard_error_missing_indicator_async():
+    """Test that missing cardinality indicator raises DotnotationIncorrectError in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    with pytest.raises(ExceptionsGroup) as exc:
+        await CsvImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True)
+
+    assert len(exc.value.exceptions) == 1
+    err = exc.value.exceptions[0]
+    assert err.header == 'testEenvoudigTypeMetKard'
+    assert err.expected_header == 'testEenvoudigTypeMetKard[]'
+    assert 'attribute at position 0 has cardinality' in str(err)
+
+
+def test_bad_kard_error_extra_indicator_sync():
+    """Test that extra cardinality indicator raises DotnotationIncorrectError in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_extra.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    with pytest.raises(ExceptionsGroup) as exc:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+
+    assert len(exc.value.exceptions) == 1
+    err = exc.value.exceptions[0]
+    assert err.header == 'testStringField[]'
+    assert err.expected_header == 'testStringField'
+    assert 'no attribute in path has cardinality > 1' in str(err)
+
+
+@pytest.mark.asyncio
+async def test_bad_kard_error_extra_indicator_async():
+    """Test that extra cardinality indicator raises DotnotationIncorrectError in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_extra.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    with pytest.raises(ExceptionsGroup) as exc:
+        await CsvImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True)
+
+    assert len(exc.value.exceptions) == 1
+    err = exc.value.exceptions[0]
+    assert err.header == 'testStringField[]'
+    assert err.expected_header == 'testStringField'
+    assert 'no attribute in path has cardinality > 1' in str(err)
+
+
+def test_bad_kard_error_multiple_errors_sync():
+    """Test that multiple cardinality errors are raised as ExceptionsGroup in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_multiple.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    with pytest.raises(ExceptionsGroup) as exc:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+
+    assert len(exc.value.exceptions) == 2
+    headers = {e.header for e in exc.value.exceptions}
+    assert 'testEenvoudigTypeMetKard' in headers
+    assert 'testStringField[]' in headers
+
+
+@pytest.mark.asyncio
+async def test_bad_kard_error_multiple_errors_async():
+    """Test that multiple cardinality errors are raised as ExceptionsGroup in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_multiple.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    with pytest.raises(ExceptionsGroup) as exc:
+        await CsvImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True)
+
+    assert len(exc.value.exceptions) == 2
+    headers = {e.header for e in exc.value.exceptions}
+    assert 'testEenvoudigTypeMetKard' in headers
+    assert 'testStringField[]' in headers
+
+
+def test_bad_kard_error_data_still_loaded_sync():
+    """Test that data is still loaded correctly despite cardinality error in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    try:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+    except ExceptionsGroup as exc:
+        # The error should be raised but data should still be loadable
+        assert len(exc.exceptions) == 1
+
+
+@pytest.mark.asyncio
+async def test_bad_kard_error_data_still_loaded_async():
+    """Test that data is still loaded correctly despite cardinality error in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    try:
+        await CsvImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True)
+    except ExceptionsGroup as exc:
+        # The error should be raised but data should still be loadable
+        assert len(exc.exceptions) == 1
+
+
+def test_bad_kard_error_deep_path_missing_indicator_sync():
+    """Test that missing cardinality indicator on 3-level deep path with multiple cardinalities raises DotnotationListOfListError in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+    with pytest.raises(ExceptionsGroup) as exc:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+
+    assert len(exc.value.exceptions) == 1
+    assert isinstance(exc.value.exceptions[0], DotnotationListOfListError)
+    err = exc.value.exceptions[0]
+    assert 'testComplexTypeMetKard.testComplexType2MetKard.testKwantWrd' in str(err)
+    assert 'multiple attributes with cardinality' in str(err).lower()
+
+
+@pytest.mark.asyncio
+async def test_bad_kard_error_deep_path_missing_indicator_async():
+    """Test that missing cardinality indicator on 3-level deep path with multiple cardinalities raises DotnotationListOfListError in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+    with pytest.raises(ExceptionsGroup) as exc:
+        await CsvImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True)
+
+    assert len(exc.value.exceptions) == 1
+    assert isinstance(exc.value.exceptions[0], DotnotationListOfListError)
+    err = exc.value.exceptions[0]
+    assert 'testComplexTypeMetKard.testComplexType2MetKard.testKwantWrd' in str(err)
+    assert 'multiple attributes with cardinality' in str(err).lower()
+
+
+def test_bad_kard_error_deep_path_single_cardinality_sync():
+    """Test that missing cardinality indicator on deep path with SINGLE cardinality can be fixed in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep_single.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    from otlmow_converter.Exceptions.DotnotationIncorrectError import DotnotationIncorrectError
+    with pytest.raises(ExceptionsGroup) as exc:
+        list(CsvImporter.to_objects(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True))
+
+    assert len(exc.value.exceptions) == 1
+    assert isinstance(exc.value.exceptions[0], DotnotationIncorrectError)
+    err = exc.value.exceptions[0]
+    assert err.header == 'testComplexType.testComplexType2MetKard.testKwantWrd'
+    # Single cardinality at position 1 (testComplexType2MetKard) - should add [] after it
+    assert err.expected_header == 'testComplexType.testComplexType2MetKard[].testKwantWrd'
+    assert 'attribute at position 1 has cardinality' in str(err)
+
+
+@pytest.mark.asyncio
+async def test_bad_kard_error_deep_path_single_cardinality_async():
+    """Test that missing cardinality indicator on deep path with SINGLE cardinality can be fixed in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep_single.csv'
+    from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
+    from otlmow_converter.Exceptions.DotnotationIncorrectError import DotnotationIncorrectError
+    with pytest.raises(ExceptionsGroup) as exc:
+        await CsvImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path, contains_exactly_one_type=True)
+
+    assert len(exc.value.exceptions) == 1
+    assert isinstance(exc.value.exceptions[0], DotnotationIncorrectError)
+    err = exc.value.exceptions[0]
+    assert err.header == 'testComplexType.testComplexType2MetKard.testKwantWrd'
+    # Single cardinality at position 1 (testComplexType2MetKard) - should add [] after it
+    assert err.expected_header == 'testComplexType.testComplexType2MetKard[].testKwantWrd'
+    assert 'attribute at position 1 has cardinality' in str(err)

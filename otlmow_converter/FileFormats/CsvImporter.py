@@ -13,6 +13,9 @@ from pyarrow._csv import read_csv, ParseOptions, ReadOptions, ConvertOptions
 
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
+from otlmow_converter.Exceptions.DotnotationIncorrectError import DotnotationIncorrectError
+from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.NoTypeUriInTableError import NoTypeUriInTableError
 from otlmow_converter.Exceptions.TypeUriNotInFirstRowError import TypeUriNotInFirstRowError
 from otlmow_converter.FileFormats.DotnotationTableConverter import DotnotationTableConverter
@@ -173,7 +176,7 @@ class CsvImporter(AbstractImporter):
         first_row, headers = cls._read_first_row_and_headers(filepath, delimiter, quote_char)
         instance = dynamic_create_instance_from_uri(first_row['typeURI'], model_directory=model_directory)
 
-        schema, headers_with_cardinality = cls._build_schema_for_headers(
+        schema, headers_with_cardinality, fixed_headers, cardinality_errors = cls._build_schema_for_headers(
             instance=instance,
             headers=headers,
             separator=separator,
@@ -183,28 +186,43 @@ class CsvImporter(AbstractImporter):
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
             filepath=filepath
         )
-        missing_columns = cls._compute_missing_columns(first_row['typeURI'], headers)
+
+        # Raise cardinality errors immediately if any - no point loading data with invalid headers
+        if cardinality_errors:
+            exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name}')
+            for err in cardinality_errors:
+                exception_group.add_exception(err)
+            raise exception_group
+
+        missing_columns = cls._compute_missing_columns(first_row['typeURI'], fixed_headers)
 
         try:
             table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
             table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
             table = cls._append_missing_columns_to_table(table, missing_columns)
-            return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
+            # Rename columns from original headers to fixed headers
+            table = cls._rename_columns(table, headers, fixed_headers)
+            objects = PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
         except pa.lib.ArrowInvalid as e:
             # If PyArrow fails to parse dates (e.g., DD/MM/YYYY instead of ISO format),
             # fall back to Python CSV reader which handles all formats via OTL model conversion
             if 'CSV conversion error' in str(e):
                 logging.debug(f'PyArrow parsing failed, falling back to Python CSV reader for {filepath.name}: {e}')
-                return cls._python_fallback_to_objects(
+                objects = cls._python_fallback_to_objects(
                     filepath=filepath, delimiter=delimiter, quote_char=quote_char,
                     model_directory=model_directory, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
                     cardinality_separator=cardinality_separator, cast_datetime=kwargs.get('cast_datetime', False),
                     cast_list=kwargs.get('cast_list', False),
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                    fixed_headers=fixed_headers,
+                    instance=instance
                 )
-            raise
+            else:
+                raise
+
+        return objects
 
     @classmethod
     async def _convert_single_type_path_async(cls, filepath: Path, kwargs: dict[str, object], delimiter: str, quote_char: str,
@@ -220,7 +238,7 @@ class CsvImporter(AbstractImporter):
         first_row, headers = cls._read_first_row_and_headers(filepath, delimiter, quote_char)
         instance = dynamic_create_instance_from_uri(first_row['typeURI'], model_directory=model_directory)
 
-        schema, headers_with_cardinality = cls._build_schema_for_headers(
+        schema, headers_with_cardinality, fixed_headers, cardinality_errors = cls._build_schema_for_headers(
             instance=instance,
             headers=headers,
             separator=separator,
@@ -230,20 +248,30 @@ class CsvImporter(AbstractImporter):
             warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
             filepath=filepath
         )
-        missing_columns = cls._compute_missing_columns(first_row['typeURI'], headers)
+
+        # Raise cardinality errors immediately if any - no point loading data with invalid headers
+        if cardinality_errors:
+            exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name}')
+            for err in cardinality_errors:
+                exception_group.add_exception(err)
+            raise exception_group
+
+        missing_columns = cls._compute_missing_columns(first_row['typeURI'], fixed_headers)
 
         try:
             table = cls._read_csv_table_with_schema(filepath, delimiter, quote_char, schema)
             table = cls._apply_cardinality_splitting(table, headers_with_cardinality, cardinality_separator)
             table = cls._append_missing_columns_to_table(table, missing_columns)
-            return PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
+            # Rename columns from original headers to fixed headers
+            table = cls._rename_columns(table, headers, fixed_headers)
+            objects = PyArrowConverter.convert_table_to_objects(table=table, **kwargs)
         except pa.lib.ArrowInvalid as e:
             # If PyArrow fails to parse dates (e.g., DD/MM/YYYY instead of ISO format),
             # fall back to Python CSV reader which handles all formats via OTL model conversion
             if 'CSV conversion error' in str(e):
                 logging.debug(f'PyArrow parsing failed, falling back to Python CSV reader for {filepath.name}: {e}')
                 # Need to collect the async generator results into a list
-                results = []
+                objects = []
                 async for obj in cls._python_fallback_to_objects_async(
                     filepath=filepath, delimiter=delimiter, quote_char=quote_char,
                     model_directory=model_directory, separator=separator,
@@ -251,11 +279,15 @@ class CsvImporter(AbstractImporter):
                     cardinality_separator=cardinality_separator, cast_datetime=kwargs.get('cast_datetime', False),
                     cast_list=kwargs.get('cast_list', False),
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes
+                    warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                    fixed_headers=fixed_headers,
+                    instance=instance
                 ):
-                    results.append(obj)
-                return results
-            raise
+                    objects.append(obj)
+            else:
+                raise
+
+        return objects
 
     @classmethod
     def _read_first_row_and_headers(cls, filepath: Path, delimiter: str, quote_char: str
@@ -275,32 +307,89 @@ class CsvImporter(AbstractImporter):
     def _build_schema_for_headers(
         cls, instance: OTLObject, headers: list[str], separator: str, cardinality_indicator: str,
         waarde_shortcut: bool, allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool,
-        filepath: Path) -> tuple[pa.Schema, list[tuple[str, pa.DataType]]]:
+        filepath: Path) -> tuple[pa.Schema, list[tuple[str, pa.DataType]], list[str], list[DotnotationIncorrectError]]:
         schema_list: list[tuple[str, pa.DataType]] = [('typeURI', pa.string())]
         headers_with_cardinality: list[tuple[str, pa.DataType]] = []
+        fixed_headers: list[str] = []
+        cardinality_errors: list[DotnotationIncorrectError] = []
 
         for header in headers:
+            fixed_header = header
+            # First check cardinality using the header without indicator
+            header_without_indicator = header.replace(cardinality_indicator, '')
+            cardinality_positions = DotnotationHelper.get_cardinality_positions_in_path(
+                instance, header_without_indicator, separator, cardinality_indicator)
+            has_cardinality_in_model = len(cardinality_positions) > 0
+            has_cardinality_in_header = cardinality_indicator in header
+
+            if has_cardinality_in_model and not has_cardinality_in_header:
+                # Missing cardinality indicator
+                if len(cardinality_positions) > 1:
+                    # Multiple cardinalities in path - this would require multiple [] indicators
+                    # which is not allowed (DotnotationListOfListError)
+                    error = DotnotationListOfListError(
+                        f"Header '{header}' in file '{filepath.name}' has multiple attributes with cardinality > 1 "
+                        f"at positions {cardinality_positions}. Cannot fix automatically - would require multiple "
+                        f"cardinality indicators which is not allowed."
+                    )
+                    cardinality_errors.append(error)
+                    fixed_header = header
+                else:
+                    # Single cardinality - add indicator after the specific attribute
+                    parts = header_without_indicator.split(separator)
+                    parts[cardinality_positions[0]] = parts[cardinality_positions[0]] + cardinality_indicator
+                    expected_header = separator.join(parts)
+                    error = DotnotationIncorrectError(
+                        message=f"Header '{header}' in file '{filepath.name}' has incorrect cardinality indicator. "
+                                f"Expected: '{expected_header}' (attribute at position {cardinality_positions[0]} has cardinality > 1)",
+                        file_path=filepath,
+                        header=header,
+                        expected_header=expected_header
+                    )
+                    cardinality_errors.append(error)
+                    fixed_header = expected_header
+                    has_cardinality_in_header = True
+            elif not has_cardinality_in_model and has_cardinality_in_header:
+                # Extra cardinality indicator
+                expected_header = header.replace(cardinality_indicator, '')
+                error = DotnotationIncorrectError(
+                    message=f"Header '{header}' in file '{filepath.name}' has incorrect cardinality indicator. "
+                            f"Expected: '{expected_header}' (no attribute in path has cardinality > 1)",
+                    file_path=filepath,
+                    header=header,
+                    expected_header=expected_header
+                )
+                cardinality_errors.append(error)
+                fixed_header = expected_header
+                has_cardinality_in_header = False
+            else:
+                fixed_header = header
+
+            # Get the attribute using the fixed header
             try:
                 attribute = DotnotationHelper.get_attribute_by_dotnotation(
-                    instance, dotnotation=header, separator=separator,
+                    instance, dotnotation=fixed_header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
-            except AttributeError as e:
-                if e.args and e.args[0] == "'NoneType' object has no attribute 'field'":
-                    if allow_non_otl_conform_attributes:
-                        if warn_for_non_otl_conform_attributes:
-                            logging.warning(
-                                f'Warning: {e.args[0]}: {header} in file {filepath.name}, this is not OTL conform but will be loaded as string.'
-                            )
-                        schema_list.append((header, pa.string()))
-                        if cardinality_indicator in header:
-                            headers_with_cardinality.append((header, pa.list_(pa.string())))
-                        continue
-                    raise
-                logging.error(f'Error while processing header {header} in file {filepath.name}: {e}')
+            except (AttributeError, TypeError) as e:
+                # If we can't traverse the path (e.g., waarde not instantiated for deep cardinality paths),
+                # fall back to using string type for schema - the actual conversion will handle it
+                if allow_non_otl_conform_attributes:
+                    if warn_for_non_otl_conform_attributes:
+                        logging.warning(
+                            f'Warning: Could not get attribute for header {header}: {e}, this is not OTL conform but will be loaded as string.'
+                        )
+                    # Schema uses original header name for reading
+                    schema_list.append((header, pa.string()))
+                    if cardinality_indicator in fixed_header:
+                        headers_with_cardinality.append((header, pa.list_(pa.string())))
+                    fixed_headers.append(fixed_header)
+                    continue
                 raise
 
+            fixed_headers.append(fixed_header)
             nt = attribute.field.native_type
-            if cardinality_indicator in header:
+            # Schema uses original header name for reading the CSV
+            if has_cardinality_in_header:
                 schema_list.append((header, pa.string()))
                 if nt == str:
                     headers_with_cardinality.append((header, pa.list_(pa.string())))
@@ -318,7 +407,7 @@ class CsvImporter(AbstractImporter):
                     headers_with_cardinality.append((header, pa.list_(pa.date32())))
                 else:
                     raise NotImplementedError(
-                        f'Unsupported native type for cardinality > 1: {nt} from {attribute.field.__class__.__name__} for header {header}'
+                        f'Unsupported native type for cardinality > 1: {nt} from {attribute.field.__class__.__name__} for header {fixed_header}'
                     )
             else:
                 if nt == str:
@@ -337,10 +426,10 @@ class CsvImporter(AbstractImporter):
                     schema_list.append((header, pa.date32()))
                 else:
                     raise NotImplementedError(
-                        f'Unsupported native type: {nt} from {attribute.field.__class__.__name__} for header {header}'
+                        f'Unsupported native type: {nt} from {attribute.field.__class__.__name__} for header {fixed_header}'
                     )
 
-        return pa.schema(schema_list), headers_with_cardinality
+        return pa.schema(schema_list), headers_with_cardinality, fixed_headers, cardinality_errors
 
     @classmethod
     def _compute_missing_columns(cls, type_uri: str, headers: list[str]) -> list[str]:
@@ -406,6 +495,18 @@ class CsvImporter(AbstractImporter):
         return table
 
     @classmethod
+    def _rename_columns(cls, table: pa.Table, original_headers: list[str], fixed_headers: list[str]) -> pa.Table:
+        """Rename columns in the table from original headers to fixed headers."""
+        # Create mapping from original to fixed headers
+        # typeURI is not in headers/fixed_headers, so we skip it
+        rename_map = {orig: fixed for orig, fixed in zip(original_headers, fixed_headers) if orig != fixed}
+        if not rename_map:
+            return table
+        # Rename columns
+        new_names = [rename_map.get(name, name) for name in table.schema.names]
+        return table.rename_columns(new_names)
+
+    @classmethod
     def _read_unique_typeuris(cls, filepath: Path, delimiter: str, quote_char: str) -> set[str]:
         table_typeuri = pa_csv.read_csv(
             filepath,
@@ -421,16 +522,37 @@ class CsvImporter(AbstractImporter):
     def _python_fallback_to_objects(
         cls, filepath: Path, delimiter: str, quote_char: str, model_directory: Optional[Path], separator: str,
         cardinality_indicator: str, waarde_shortcut: bool, cardinality_separator: str, cast_datetime: bool,
-        cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool
+        cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool,
+        fixed_headers: list[str] = None, instance: OTLObject = None
     ) -> Iterable[OTLObject]:
         try:
             with open(filepath, encoding='utf-8-sig') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
                 headers = next(csv_reader)
-                data: list[list[object]] = [headers]
+
+                # Validate headers if instance is provided
+                cardinality_errors = []
+                has_typeuri = 'typeURI' in headers
+                data_headers = headers[1:] if has_typeuri else headers
+                if instance is not None and fixed_headers is None:
+                    _, _, fixed_data_headers, cardinality_errors = cls._build_schema_for_headers(
+                        instance=instance,
+                        headers=data_headers,
+                        separator=separator,
+                        cardinality_indicator=cardinality_indicator,
+                        waarde_shortcut=waarde_shortcut,
+                        allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                        filepath=filepath
+                    )
+                    fixed_headers = ['typeURI'] + fixed_data_headers if has_typeuri else fixed_data_headers
+                elif fixed_headers is None:
+                    fixed_headers = headers
+
+                data: list[list[object]] = [fixed_headers]
 
                 # Identify which columns are cardinality fields (have [] in the name)
-                cardinality_columns = {i: header for i, header in enumerate(headers) if cardinality_indicator in header}
+                cardinality_columns = {i: header for i, header in enumerate(fixed_headers) if cardinality_indicator in header}
 
                 for row in csv_reader:
                     r: list[object] = []
@@ -455,13 +577,22 @@ class CsvImporter(AbstractImporter):
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=data, empty_string_equals_none=True)
 
-                return DotnotationTableConverter.get_data_from_table(
+                objects = DotnotationTableConverter.get_data_from_table(
                     table_data=list_of_dicts, model_directory=model_directory,
                     separator=separator, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, cardinality_separator=cardinality_separator,
                     cast_datetime=cast_datetime, cast_list=True,  # Force cast_list=True since we're converting to lists
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+                # Raise cardinality errors if any
+                if cardinality_errors:
+                    exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name}')
+                    for err in cardinality_errors:
+                        exception_group.add_exception(err)
+                    raise exception_group
+
+                return objects
         except TypeUriNotInFirstRowError as e:
             raise TypeUriNotInFirstRowError(
                 message=f'The typeURI is not in the first row in file {filepath.name}. Please remove the excess rows',
@@ -477,16 +608,37 @@ class CsvImporter(AbstractImporter):
     async def _python_fallback_to_objects_async(
         cls, filepath: Path, delimiter: str, quote_char: str, model_directory: Optional[Path], separator: str,
         cardinality_indicator: str, waarde_shortcut: bool, cardinality_separator: str, cast_datetime: bool,
-        cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool
+        cast_list: bool,  allow_non_otl_conform_attributes: bool, warn_for_non_otl_conform_attributes: bool,
+        fixed_headers: list[str] = None, instance: OTLObject = None
     ):
         try:
             with open(filepath, encoding='utf-8-sig') as file:
                 csv_reader = csv.reader(file, delimiter=delimiter, quotechar=quote_char)
                 headers = next(csv_reader)
-                data: list[list[object]] = [headers]
+
+                # Validate headers if instance is provided
+                cardinality_errors = []
+                has_typeuri = 'typeURI' in headers
+                data_headers = headers[1:] if has_typeuri else headers
+                if instance is not None and fixed_headers is None:
+                    _, _, fixed_data_headers, cardinality_errors = cls._build_schema_for_headers(
+                        instance=instance,
+                        headers=data_headers,
+                        separator=separator,
+                        cardinality_indicator=cardinality_indicator,
+                        waarde_shortcut=waarde_shortcut,
+                        allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                        warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes,
+                        filepath=filepath
+                    )
+                    fixed_headers = ['typeURI'] + fixed_data_headers if has_typeuri else fixed_data_headers
+                elif fixed_headers is None:
+                    fixed_headers = headers
+
+                data: list[list[object]] = [fixed_headers]
 
                 # Identify which columns are cardinality fields (have [] in the name)
-                cardinality_columns = {i: header for i, header in enumerate(headers) if cardinality_indicator in header}
+                cardinality_columns = {i: header for i, header in enumerate(fixed_headers) if cardinality_indicator in header}
 
                 for row in csv_reader:
                     await sleep(0)
@@ -519,6 +671,13 @@ class CsvImporter(AbstractImporter):
                     cast_datetime=cast_datetime, cast_list=True,  # Force cast_list=True since we're converting to lists
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+                # Raise cardinality errors if any
+                if cardinality_errors:
+                    exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name}')
+                    for err in cardinality_errors:
+                        exception_group.add_exception(err)
+                    raise exception_group
 
                 for obj in objects:
                     await sleep(0)

@@ -11,6 +11,7 @@ from otlmow_model.OtlmowModel.Exceptions.NonStandardAttributeWarning import NonS
 from otlmow_converter.AbstractImporter import AbstractImporter
 from otlmow_converter.DotnotationHelper import DotnotationHelper
 from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
+from otlmow_converter.Exceptions.DotnotationIncorrectError import DotnotationIncorrectError
 from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
@@ -79,12 +80,25 @@ class ExcelImporter(AbstractImporter):
                 headers = sheet_data[0]
                 type_uri_index = cls.get_index_of_typeURI_column_in_sheet(
                     filepath=filepath, sheet=sheet, headers=headers, data=sheet_data)
-                cls.check_headers(headers=headers, sheet=sheet, filepath=filepath,
-                                  type_uri=sheet_data[1][type_uri_index], model_directory=model_directory,
-                                  cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
-                                  separator=separator,
-                                  allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
-                                  warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+                fixed_headers, cardinality_errors = cls.check_headers(headers=headers, sheet=sheet, filepath=filepath,
+                                          type_uri=sheet_data[1][type_uri_index], model_directory=model_directory,
+                                          cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut,
+                                          separator=separator,
+                                          allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
+                                          warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+                # Raise cardinality errors immediately if any - no point loading data with invalid headers
+                if cardinality_errors:
+                    exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name} tab {sheet}')
+                    for err in cardinality_errors:
+                        exception_group.add_exception(err)
+                    raise exception_group
+
+                # Replace headers with fixed headers
+                sheet_data[0] = fixed_headers
+
+                # Split cardinality columns in data rows
+                sheet_data = cls._split_cardinality_columns(sheet_data, fixed_headers, cardinality_separator)
 
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
@@ -120,6 +134,9 @@ class ExcelImporter(AbstractImporter):
                 exception_group.add_exception(ex)
                 list_of_objects.extend(ex.objects)
             except BaseException as ex:
+                # Re-raise ExceptionsGroup directly (cardinality errors)
+                if isinstance(ex, ExceptionsGroup):
+                    raise
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
                 logging.error("error caught!")
@@ -174,12 +191,25 @@ class ExcelImporter(AbstractImporter):
                 headers = sheet_data[0]
                 type_uri_index = cls.get_index_of_typeURI_column_in_sheet(
                     filepath=filepath, sheet=sheet, headers=headers, data=sheet_data)
-                await cls.check_headers_async(
+                fixed_headers, cardinality_errors = await cls.check_headers_async(
                     headers=headers, sheet=sheet, filepath=filepath, type_uri=sheet_data[1][type_uri_index],
                     model_directory=model_directory, cardinality_indicator=cardinality_indicator,
                     waarde_shortcut=waarde_shortcut, separator=separator,
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
+
+                # Raise cardinality errors immediately if any - no point loading data with invalid headers
+                if cardinality_errors:
+                    exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name} tab {sheet}')
+                    for err in cardinality_errors:
+                        exception_group.add_exception(err)
+                    raise exception_group
+
+                # Replace headers with fixed headers
+                sheet_data[0] = fixed_headers
+
+                # Split cardinality columns in data rows
+                sheet_data = cls._split_cardinality_columns(sheet_data, fixed_headers, cardinality_separator)
 
                 list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts_async(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
@@ -214,6 +244,9 @@ class ExcelImporter(AbstractImporter):
                 exception_group.add_exception(ex)
                 list_of_objects.extend(ex.objects)
             except BaseException as ex:
+                # Re-raise ExceptionsGroup directly (cardinality errors)
+                if isinstance(ex, ExceptionsGroup):
+                    raise
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
                 logging.error("error caught!")
@@ -295,6 +328,32 @@ class ExcelImporter(AbstractImporter):
         return [[val for i, val in enumerate(row) if i not in x_indices] for row in sheet_data]
 
     @classmethod
+    def _split_cardinality_columns(cls, sheet_data: list[list], fixed_headers: list[str], cardinality_separator: str) -> list[list]:
+        """Split cardinality columns in data rows based on fixed headers with [] indicator."""
+        if len(sheet_data) <= 1:
+            return sheet_data
+        
+        headers = sheet_data[0]
+        # Find columns that have cardinality indicator
+        cardinality_indices = {i: header for i, header in enumerate(headers) if header is not None and '[]' in header}
+        
+        if not cardinality_indices:
+            return sheet_data
+        
+        result = [headers]
+        for row in sheet_data[1:]:
+            new_row = list(row)
+            for col_idx, header in cardinality_indices.items():
+                if col_idx < len(new_row) and new_row[col_idx] is not None and new_row[col_idx] != '':
+                    value = str(new_row[col_idx])
+                    if cardinality_separator in value:
+                        new_row[col_idx] = value.split(cardinality_separator)
+                    else:
+                        new_row[col_idx] = [value]
+            result.append(new_row)
+        return result
+
+    @classmethod
     def get_index_of_typeURI_column_in_sheet(cls, filepath: Path, sheet: str,  headers: list[str],
                                              data: list[list[str]]) -> int:
         try:
@@ -324,83 +383,237 @@ class ExcelImporter(AbstractImporter):
                       cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT,
                       separator: str = SEPARATOR,
                       allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
-                      warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
+                      warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES
+                      ) -> tuple[list[str], list[DotnotationIncorrectError]]:
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
         bad_columns = []
+        fixed_headers = []
+        cardinality_errors = []
 
         for header in headers:
             if header == 'typeURI':
+                fixed_headers.append(header)
                 continue
             if header in ['bron.typeURI', 'doel.typeURI']:
+                fixed_headers.append(header)
                 continue
             if header is None:
+                fixed_headers.append(header)
                 continue
             header = str(header)
             if header.startswith('[DEPRECATED] '):
                 bad_columns.append(header)
+                fixed_headers.append(header)
                 continue
+
+            # Check for list of lists (multiple cardinality indicators) before processing
+            if header.count(cardinality_indicator) > 1:
+                bad_columns.append(header)
+                fixed_headers.append(header)
+                continue
+
+            # Check cardinality correctness first
+            header_without_indicator = header.replace(cardinality_indicator, '')
+            cardinality_positions = DotnotationHelper.get_cardinality_positions_in_path(
+                instance, header_without_indicator, separator, cardinality_indicator)
+            has_cardinality_in_model = len(cardinality_positions) > 0
+            has_cardinality_in_header = cardinality_indicator in header
+
+            if has_cardinality_in_model and not has_cardinality_in_header:
+                # Missing cardinality indicator
+                if len(cardinality_positions) > 1:
+                    # Multiple cardinalities in path - this would require multiple [] indicators
+                    # which is not allowed (DotnotationListOfListError)
+                    error = DotnotationListOfListError(
+                        f"Header '{header}' in file '{filepath.name}' tab '{sheet}' has multiple attributes with cardinality > 1 "
+                        f"at positions {cardinality_positions}. Cannot fix automatically - would require multiple "
+                        f"cardinality indicators which is not allowed."
+                    )
+                    cardinality_errors.append(error)
+                    fixed_header = header
+                else:
+                    # Single cardinality - add indicator after the specific attribute
+                    parts = header_without_indicator.split(separator)
+                    parts[cardinality_positions[0]] = parts[cardinality_positions[0]] + cardinality_indicator
+                    expected_header = separator.join(parts)
+                    error = DotnotationIncorrectError(
+                        message=f"Header '{header}' in file '{filepath.name}' tab '{sheet}' has incorrect cardinality indicator. "
+                                f"Expected: '{expected_header}' (attribute at position {cardinality_positions[0]} has cardinality > 1)",
+                        file_path=filepath,
+                        tab=sheet,
+                        header=header,
+                        expected_header=expected_header
+                    )
+                    cardinality_errors.append(error)
+                    fixed_header = expected_header
+            elif not has_cardinality_in_model and has_cardinality_in_header:
+                # Extra cardinality indicator
+                expected_header = header.replace(cardinality_indicator, '')
+                error = DotnotationIncorrectError(
+                    message=f"Header '{header}' in file '{filepath.name}' tab '{sheet}' has incorrect cardinality indicator. "
+                            f"Expected: '{expected_header}' (no attribute in path has cardinality > 1)",
+                    file_path=filepath,
+                    tab=sheet,
+                    header=header,
+                    expected_header=expected_header
+                )
+                cardinality_errors.append(error)
+                fixed_header = expected_header
+            else:
+                fixed_header = header
+
+            # Now validate the fixed header
             try:
                 DotnotationHelper.get_attribute_by_dotnotation(
-                    instance_or_attribute=instance, dotnotation=header, separator=separator,
+                    instance_or_attribute=instance, dotnotation=fixed_header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
             except DotnotationListOfListError:
-                bad_columns.append(header)
+                bad_columns.append(fixed_header)
+                fixed_headers.append(fixed_header)
+                continue
             except AttributeError:
                 if not allow_non_otl_conform_attributes:
-                    bad_columns.append(header)
+                    bad_columns.append(fixed_header)
                 elif warn_for_non_otl_conform_attributes:
                     warnings.warn(
-                        message=f'{header} is a non standardized attribute of {type_uri}. '
+                        message=f'{fixed_header} is a non standardized attribute of {type_uri}. '
                                 f'The attribute will be added on the instance.',
                         stacklevel=2,
                         category=NonStandardAttributeWarning)
+                fixed_headers.append(fixed_header)
+                continue
+
+            fixed_headers.append(fixed_header)
 
         if len(bad_columns) > 0:
             raise InvalidColumnNamesInExcelTabError(
                 message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
                 ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)
+
+        return fixed_headers, cardinality_errors
+
+        if len(bad_columns) > 0:
+            raise InvalidColumnNamesInExcelTabError(
+                message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
+                ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)
+
+        return fixed_headers, cardinality_errors
 
     @staticmethod
     async def check_headers_async(headers: list[str], sheet: str, filepath: Path, type_uri: str, model_directory: Path,
                       cardinality_indicator: str = CARDINALITY_INDICATOR, waarde_shortcut: bool = WAARDE_SHORTCUT,
                       separator: str = SEPARATOR,
                       allow_non_otl_conform_attributes: bool = ALLOW_NON_OTL_CONFORM_ATTRIBUTES,
-                      warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES) -> None:
+                      warn_for_non_otl_conform_attributes: bool = WARN_FOR_NON_OTL_CONFORM_ATTRIBUTES
+                      ) -> tuple[list[str], list[DotnotationIncorrectError]]:
         await sleep(0)
         bad_columns = []
         instance = dynamic_create_instance_from_uri(type_uri, model_directory=model_directory)
         error = InvalidColumnNamesInExcelTabError(
             message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}, see attribute '
                     f'bad_columns', file_path=filepath, tab=sheet)
+        fixed_headers = []
+        cardinality_errors = []
+
         for header in headers:
             await sleep(0)
             if header == 'typeURI':
+                fixed_headers.append(header)
                 continue
             if header in ['bron.typeURI', 'doel.typeURI']:
+                fixed_headers.append(header)
                 continue
             if header is None:
+                fixed_headers.append(header)
                 continue
             header = str(header)
             if header.startswith('[DEPRECATED] '):
                 error.bad_columns.append(header)
+                fixed_headers.append(header)
                 continue
+
+            # Check for list of lists (multiple cardinality indicators) before processing
+            if header.count(cardinality_indicator) > 1:
+                bad_columns.append(header)
+                fixed_headers.append(header)
+                continue
+
+            # Check cardinality correctness first
+            header_without_indicator = header.replace(cardinality_indicator, '')
+            cardinality_positions = DotnotationHelper.get_cardinality_positions_in_path(
+                instance, header_without_indicator, separator, cardinality_indicator)
+            has_cardinality_in_model = len(cardinality_positions) > 0
+            has_cardinality_in_header = cardinality_indicator in header
+
+            if has_cardinality_in_model and not has_cardinality_in_header:
+                # Missing cardinality indicator
+                if len(cardinality_positions) > 1:
+                    # Multiple cardinalities in path - this would require multiple [] indicators
+                    # which is not allowed (DotnotationListOfListError)
+                    err = DotnotationListOfListError(
+                        f"Header '{header}' in file '{filepath.name}' tab '{sheet}' has multiple attributes with cardinality > 1 "
+                        f"at positions {cardinality_positions}. Cannot fix automatically - would require multiple "
+                        f"cardinality indicators which is not allowed."
+                    )
+                    cardinality_errors.append(err)
+                    fixed_header = header
+                else:
+                    # Single cardinality - add indicator after the specific attribute
+                    parts = header_without_indicator.split(separator)
+                    parts[cardinality_positions[0]] = parts[cardinality_positions[0]] + cardinality_indicator
+                    expected_header = separator.join(parts)
+                    err = DotnotationIncorrectError(
+                        message=f"Header '{header}' in file '{filepath.name}' tab '{sheet}' has incorrect cardinality indicator. "
+                                f"Expected: '{expected_header}' (attribute at position {cardinality_positions[0]} has cardinality > 1)",
+                        file_path=filepath,
+                        tab=sheet,
+                        header=header,
+                        expected_header=expected_header
+                    )
+                    cardinality_errors.append(err)
+                    fixed_header = expected_header
+            elif not has_cardinality_in_model and has_cardinality_in_header:
+                # Extra cardinality indicator
+                expected_header = header.replace(cardinality_indicator, '')
+                err = DotnotationIncorrectError(
+                    message=f"Header '{header}' in file '{filepath.name}' tab '{sheet}' has incorrect cardinality indicator. "
+                            f"Expected: '{expected_header}' (no attribute in path has cardinality > 1)",
+                    file_path=filepath,
+                    tab=sheet,
+                    header=header,
+                    expected_header=expected_header
+                )
+                cardinality_errors.append(err)
+                fixed_header = expected_header
+            else:
+                fixed_header = header
+
+            # Now validate the fixed header
             try:
                 DotnotationHelper.get_attribute_by_dotnotation(
-                    instance_or_attribute=instance, dotnotation=header, separator=separator,
+                    instance_or_attribute=instance, dotnotation=fixed_header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
             except DotnotationListOfListError:
-                bad_columns.append(header)
+                bad_columns.append(fixed_header)
+                fixed_headers.append(fixed_header)
+                continue
             except AttributeError:
                 if not allow_non_otl_conform_attributes:
-                    bad_columns.append(header)
+                    bad_columns.append(fixed_header)
                 elif warn_for_non_otl_conform_attributes:
                     warnings.warn(
-                        message=f'{header} is a non standardized attribute of {type_uri}. '
+                        message=f'{fixed_header} is a non standardized attribute of {type_uri}. '
                                 f'The attribute will be added on the instance.',
                         stacklevel=2,
                         category=NonStandardAttributeWarning)
+                fixed_headers.append(fixed_header)
+                continue
+
+            fixed_headers.append(fixed_header)
 
         if len(bad_columns) > 0:
             raise InvalidColumnNamesInExcelTabError(
                 message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
                 ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)
+
+        return fixed_headers, cardinality_errors
