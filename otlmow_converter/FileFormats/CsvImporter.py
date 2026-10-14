@@ -461,8 +461,8 @@ class CsvImporter(AbstractImporter):
             null_values=["", "NULL", "null"],
             strings_can_be_null=True,
             # normalize boolean parsing to common variants
-            true_values=["true", "True", "1", "Y", "Yes"],
-            false_values=["false", "False", "0", "N", "No"],
+            true_values=["true", "True", "TRUE", "1", "Y", "Yes"],
+            false_values=["false", "False", "FALSE", "0", "N", "No"],
         )
         table = read_csv(
             filepath,
