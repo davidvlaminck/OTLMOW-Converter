@@ -490,12 +490,6 @@ class ExcelImporter(AbstractImporter):
                 message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
                 ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)
 
-        return fixed_headers, cardinality_errors
-
-        if len(bad_columns) > 0:
-            raise InvalidColumnNamesInExcelTabError(
-                message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
-                ', '.join(bad_columns), tab=sheet, file_path=filepath, bad_columns=bad_columns)
 
         return fixed_headers, cardinality_errors
 
