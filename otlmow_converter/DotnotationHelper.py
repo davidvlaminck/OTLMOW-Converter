@@ -105,6 +105,87 @@ class DotnotationHelper:
                     instance_or_attribute=instance_or_attribute, dotnotation=dotnotation,
                     separator=separator, cardinality_indicator=cardinality_indicator, waarde_shortcut=True)
 
+    @classmethod
+    def has_cardinality_in_path(cls, instance_or_attribute: Union[OTLAttribuut, OTLObject], dotnotation: str,
+                                 separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR) -> bool:
+        """Check if any attribute in the dotnotation path has cardinality > 1.
+        :param instance_or_attribute: class or attribute to start the dotnotation from
+        :param dotnotation: a string representing a hierarchical structure of attributes
+        :param separator: separator used in dotnotation
+        :param cardinality_indicator: indicator used for cardinality in dotnotation
+        :return: True if any attribute in the path has cardinality > 1, False otherwise
+        """
+        if separator in dotnotation:
+            parts = dotnotation.split(separator)
+            current = instance_or_attribute
+            for part in parts:
+                has_cardinality_indicator = cardinality_indicator in part
+                attr_name = part.replace(cardinality_indicator, '') if has_cardinality_indicator else part
+                attribute = get_attribute_by_name(current, attr_name)
+                if attribute is None:
+                    return False
+                if attribute.kardinaliteit_max != '1':
+                    return True
+                # Only traverse into complex attributes (those with waardeObject)
+                if attribute.field.waardeObject is not None:
+                    # Create a temporary instance of the waardeObject for traversal
+                    # This works at class level without needing instantiated values
+                    waarde_object_class = attribute.field.waardeObject
+                    if waarde_object_class is not None:
+                        current = waarde_object_class()
+                    else:
+                        return False
+                else:
+                    # Simple attribute, no further traversal possible
+                    return False
+            return False
+        else:
+            has_cardinality_indicator = cardinality_indicator in dotnotation
+            attr_name = dotnotation.replace(cardinality_indicator, '') if has_cardinality_indicator else dotnotation
+            attribute = get_attribute_by_name(instance_or_attribute, attr_name)
+            if attribute is None:
+                return False
+            return attribute.kardinaliteit_max != '1'
+
+    @classmethod
+    def get_cardinality_positions_in_path(cls, instance_or_attribute: Union[OTLAttribuut, OTLObject], dotnotation: str,
+                                           separator: str = SEPARATOR, cardinality_indicator: str = CARDINALITY_INDICATOR) -> list[int]:
+        """Get the positions (indices) of attributes in the dotnotation path that have cardinality > 1.
+        :param instance_or_attribute: class or attribute to start the dotnotation from
+        :param dotnotation: a string representing a hierarchical structure of attributes
+        :param separator: separator used in dotnotation
+        :param cardinality_indicator: indicator used for cardinality in dotnotation
+        :return: list of indices (0-based) where attributes have cardinality > 1
+        """
+        positions = []
+        if separator in dotnotation:
+            parts = dotnotation.split(separator)
+            current = instance_or_attribute
+            for i, part in enumerate(parts):
+                has_cardinality_indicator = cardinality_indicator in part
+                attr_name = part.replace(cardinality_indicator, '') if has_cardinality_indicator else part
+                attribute = get_attribute_by_name(current, attr_name)
+                if attribute is None:
+                    break
+                if attribute.kardinaliteit_max != '1':
+                    positions.append(i)
+                # Only traverse into complex attributes (those with waardeObject)
+                if attribute.field.waardeObject is not None:
+                    waarde_object_class = attribute.field.waardeObject
+                    if waarde_object_class is not None:
+                        current = waarde_object_class()
+                    else:
+                        break
+                else:
+                    break
+        else:
+            has_cardinality_indicator = cardinality_indicator in dotnotation
+            attr_name = dotnotation.replace(cardinality_indicator, '') if has_cardinality_indicator else dotnotation
+            attribute = get_attribute_by_name(instance_or_attribute, attr_name)
+            if attribute is not None and attribute.kardinaliteit_max != '1':
+                positions.append(0)
+        return positions
+
     def get_attribute_by_dotnotation_instance(self, instance_or_attribute: Union[OTLAttribuut, OTLObject],
                                               dotnotation: str
                                               ) -> Union[OTLAttribuut, List[OTLAttribuut]]:

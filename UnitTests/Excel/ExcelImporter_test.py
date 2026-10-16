@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from otlmow_converter.Exceptions.BadLinesInExcelError import BadLinesInExcelError
+from otlmow_converter.Exceptions.DotnotationIncorrectError import DotnotationIncorrectError
 from otlmow_converter.Exceptions.ErrorInExcelLine import ErrorInExcelLine
 from otlmow_converter.Exceptions.ExceptionsGroup import ExceptionsGroup
 from otlmow_converter.Exceptions.InvalidColumnNamesInExcelTabError import InvalidColumnNamesInExcelTabError
@@ -183,14 +184,51 @@ def test_bad_column_integer():
 def test_check_headers():
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 
+    all_cases_uri = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     try:
         ExcelImporter.check_headers(
             filepath=file_location, model_directory=model_directory_path, sheet='<Worksheet "correct_sheet">',
             headers=['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
-            type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+            type_uris=[all_cases_uri],
+            sheet_data=[
+                ['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
+                [all_cases_uri, 'val', 'val2', 'val3', 'val4'],
+            ],
+            type_uri_index=0,
             allow_non_otl_conform_attributes=False)
     except InvalidColumnNamesInExcelTabError as ex:
         assert ex.bad_columns == ['bad_name_field', '[DEPRECATED] d_a', 'list[].list[]']
+
+
+def test_check_headers_multiple_types_column_data():
+    """A header unknown to one type must not fail when that type has no data in the column.
+
+    Only types that actually populate a column are validated against that column's header,
+    so a column used exclusively by one type does not fail validation for another type.
+    """
+    all_cases_uri = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    another_uri = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
+
+    # testStringField exists on AllCasesTestClass but NOT on AnotherTestClass.
+    # Only the AllCasesTestClass row populates the column, so AnotherTestClass must not be
+    # validated against it (no AttributeError / bad_columns for AnotherTestClass).
+    fixed_headers, cardinality_errors = ExcelImporter.check_headers(
+        filepath=Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx',
+        model_directory=model_directory_path,
+        sheet='<Worksheet "correct_sheet">',
+        headers=['typeURI', 'testStringField'],
+        type_uris=[all_cases_uri, another_uri],
+        sheet_data=[
+            ['typeURI', 'testStringField'],
+            [all_cases_uri, 'a value'],            # AllCasesTestClass populates the column
+            [another_uri, None],                    # AnotherTestClass has no data in the column
+        ],
+        type_uri_index=0,
+        allow_non_otl_conform_attributes=False)
+
+    assert fixed_headers == ['typeURI', 'testStringField']
+    assert cardinality_errors == []
+
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
@@ -302,3 +340,172 @@ def test_ignore_x_columns_false(recwarn):
     assert instance.testStringField == 'test_string'
     assert hasattr(instance, 'X_doelIsActief')
     assert instance.X_doelIsActief == 'some_value'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_kard_error_missing_indicator_sync():
+    """Test that missing cardinality indicator raises DotnotationIncorrectError in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationIncorrectError)
+    err = ex.exceptions[0]
+    assert err.header == 'testEenvoudigTypeMetKard'
+    assert err.expected_header == 'testEenvoudigTypeMetKard[]'
+    assert 'attribute at position 0 has cardinality' in str(err)
+    assert err.tab == 'Sheet1'
+
+
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+async def test_bad_kard_error_missing_indicator_async():
+    """Test that missing cardinality indicator raises DotnotationIncorrectError in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        await ExcelImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationIncorrectError)
+    err = ex.exceptions[0]
+    assert err.header == 'testEenvoudigTypeMetKard'
+    assert err.expected_header == 'testEenvoudigTypeMetKard[]'
+    assert 'attribute at position 0 has cardinality' in str(err)
+    assert err.tab == 'Sheet1'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_kard_error_extra_indicator_sync():
+    """Test that extra cardinality indicator raises DotnotationIncorrectError in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_extra.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationIncorrectError)
+    err = ex.exceptions[0]
+    assert err.header == 'testStringField[]'
+    assert err.expected_header == 'testStringField'
+    assert 'no attribute in path has cardinality > 1' in str(err)
+    assert err.tab == 'Sheet1'
+
+
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+async def test_bad_kard_error_extra_indicator_async():
+    """Test that extra cardinality indicator raises DotnotationIncorrectError in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_extra.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        await ExcelImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationIncorrectError)
+    err = ex.exceptions[0]
+    assert err.header == 'testStringField[]'
+    assert err.expected_header == 'testStringField'
+    assert 'no attribute in path has cardinality > 1' in str(err)
+    assert err.tab == 'Sheet1'
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_kard_error_multiple_errors_sync():
+    """Test that multiple cardinality errors are raised as ExceptionsGroup in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_multiple.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 2
+    headers = {e.header for e in ex.exceptions}
+    assert 'testEenvoudigTypeMetKard' in headers
+    assert 'testStringField[]' in headers
+
+
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+async def test_bad_kard_error_multiple_errors_async():
+    """Test that multiple cardinality errors are raised as ExceptionsGroup in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_multiple.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        await ExcelImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 2
+    headers = {e.header for e in ex.exceptions}
+    assert 'testEenvoudigTypeMetKard' in headers
+    assert 'testStringField[]' in headers
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_kard_error_deep_path_missing_indicator_sync():
+    """Test that missing cardinality indicator on 3-level deep path with multiple cardinalities raises DotnotationListOfListError in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep.xlsx'
+    from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+    with pytest.raises(ExceptionsGroup) as exc:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationListOfListError)
+    err = ex.exceptions[0]
+    assert 'testComplexTypeMetKard.testComplexType2MetKard.testKwantWrd' in str(err)
+    assert 'multiple attributes with cardinality' in str(err).lower()
+
+
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+async def test_bad_kard_error_deep_path_missing_indicator_async():
+    """Test that missing cardinality indicator on 3-level deep path with multiple cardinalities raises DotnotationListOfListError in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep.xlsx'
+    from otlmow_converter.Exceptions.DotnotationListOfListError import DotnotationListOfListError
+    with pytest.raises(ExceptionsGroup) as exc:
+        await ExcelImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationListOfListError)
+    err = ex.exceptions[0]
+    assert 'testComplexTypeMetKard.testComplexType2MetKard.testKwantWrd' in str(err)
+    assert 'multiple attributes with cardinality' in str(err).lower()
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_bad_kard_error_deep_path_single_cardinality_sync():
+    """Test that missing cardinality indicator on deep path with SINGLE cardinality can be fixed in sync mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep_single.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        ExcelImporter.to_objects(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationIncorrectError)
+    err = ex.exceptions[0]
+    assert err.header == 'testComplexType.testComplexType2MetKard.testKwantWrd'
+    # Single cardinality at position 1 (testComplexType2MetKard) - should add [] after it
+    assert err.expected_header == 'testComplexType.testComplexType2MetKard[].testKwantWrd'
+    assert 'attribute at position 1 has cardinality' in str(err)
+    assert err.tab == 'Sheet'
+
+
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+async def test_bad_kard_error_deep_path_single_cardinality_async():
+    """Test that missing cardinality indicator on deep path with SINGLE cardinality can be fixed in async mode."""
+    file_location = Path(__file__).parent / 'Testfiles' / 'bad_kard_header_deep_single.xlsx'
+    with pytest.raises(ExceptionsGroup) as exc:
+        await ExcelImporter.to_objects_async(filepath=file_location, model_directory=model_directory_path)
+
+    ex = exc.value
+    assert len(ex.exceptions) == 1
+    assert isinstance(ex.exceptions[0], DotnotationIncorrectError)
+    err = ex.exceptions[0]
+    assert err.header == 'testComplexType.testComplexType2MetKard.testKwantWrd'
+    # Single cardinality at position 1 (testComplexType2MetKard) - should add [] after it
+    assert err.expected_header == 'testComplexType.testComplexType2MetKard[].testKwantWrd'
+    assert 'attribute at position 1 has cardinality' in str(err)
+    assert err.tab == 'Sheet'
