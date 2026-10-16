@@ -371,8 +371,11 @@ class CsvImporter(AbstractImporter):
                     instance, dotnotation=fixed_header, separator=separator,
                     cardinality_indicator=cardinality_indicator, waarde_shortcut=waarde_shortcut)
             except (AttributeError, TypeError) as e:
-                # If we can't traverse the path (e.g., waarde not instantiated for deep cardinality paths),
-                # fall back to using string type for schema - the actual conversion will handle it
+                # If cardinality errors were already recorded for this header,
+                # return them instead of raising a nonconforming-column error,
+                # so callers receive the promised structured cardinality diagnostic.
+                if cardinality_errors:
+                    return pa.schema(schema_list), headers_with_cardinality, fixed_headers, cardinality_errors
                 if allow_non_otl_conform_attributes:
                     if warn_for_non_otl_conform_attributes:
                         logging.warning(

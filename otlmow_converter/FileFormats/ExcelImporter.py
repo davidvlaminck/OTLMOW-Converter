@@ -513,6 +513,12 @@ class ExcelImporter(AbstractImporter):
 
             fixed_headers.append(fixed_header)
 
+        if len(cardinality_errors) > 0:
+            # Return accumulated cardinality errors before treating lookup
+            # failures as nonconforming-column errors, so callers receive
+            # the promised structured cardinality diagnostic.
+            return fixed_headers, cardinality_errors
+
         if len(bad_columns) > 0:
             raise InvalidColumnNamesInExcelTabError(
                 message=f'There are invalid column names in Excel tab {sheet} in file {filepath.name}: ' +
@@ -653,6 +659,12 @@ class ExcelImporter(AbstractImporter):
                     break
 
             fixed_headers.append(fixed_header)
+
+        if len(cardinality_errors) > 0:
+            # Return accumulated cardinality errors before treating lookup
+            # failures as nonconforming-column errors, so callers receive
+            # the promised structured cardinality diagnostic.
+            return fixed_headers, cardinality_errors
 
         if len(bad_columns) > 0:
             raise InvalidColumnNamesInExcelTabError(
