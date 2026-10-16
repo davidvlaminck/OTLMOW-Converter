@@ -184,14 +184,51 @@ def test_bad_column_integer():
 def test_check_headers():
     file_location = Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx'
 
+    all_cases_uri = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
     try:
         ExcelImporter.check_headers(
             filepath=file_location, model_directory=model_directory_path, sheet='<Worksheet "correct_sheet">',
             headers=['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
-            type_uri='https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass',
+            type_uris=[all_cases_uri],
+            sheet_data=[
+                ['typeURI', 'testStringField', 'bad_name_field', '[DEPRECATED] d_a', 'list[].list[]'],
+                [all_cases_uri, 'val', 'val2', 'val3', 'val4'],
+            ],
+            type_uri_index=0,
             allow_non_otl_conform_attributes=False)
     except InvalidColumnNamesInExcelTabError as ex:
         assert ex.bad_columns == ['bad_name_field', '[DEPRECATED] d_a', 'list[].list[]']
+
+
+def test_check_headers_multiple_types_column_data():
+    """A header unknown to one type must not fail when that type has no data in the column.
+
+    Only types that actually populate a column are validated against that column's header,
+    so a column used exclusively by one type does not fail validation for another type.
+    """
+    all_cases_uri = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AllCasesTestClass'
+    another_uri = 'https://wegenenverkeer.data.vlaanderen.be/ns/onderdeel#AnotherTestClass'
+
+    # testStringField exists on AllCasesTestClass but NOT on AnotherTestClass.
+    # Only the AllCasesTestClass row populates the column, so AnotherTestClass must not be
+    # validated against it (no AttributeError / bad_columns for AnotherTestClass).
+    fixed_headers, cardinality_errors = ExcelImporter.check_headers(
+        filepath=Path(__file__).parent / 'Testfiles' / 'typeURITestFile.xlsx',
+        model_directory=model_directory_path,
+        sheet='<Worksheet "correct_sheet">',
+        headers=['typeURI', 'testStringField'],
+        type_uris=[all_cases_uri, another_uri],
+        sheet_data=[
+            ['typeURI', 'testStringField'],
+            [all_cases_uri, 'a value'],            # AllCasesTestClass populates the column
+            [another_uri, None],                    # AnotherTestClass has no data in the column
+        ],
+        type_uri_index=0,
+        allow_non_otl_conform_attributes=False)
+
+    assert fixed_headers == ['typeURI', 'testStringField']
+    assert cardinality_errors == []
+
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
