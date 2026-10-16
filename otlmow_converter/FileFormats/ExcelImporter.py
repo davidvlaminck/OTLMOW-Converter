@@ -87,12 +87,10 @@ class ExcelImporter(AbstractImporter):
                                           allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                                           warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
-                # Raise cardinality errors immediately if any - no point loading data with invalid headers
                 if cardinality_errors:
-                    exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name} tab {sheet}')
                     for err in cardinality_errors:
                         exception_group.add_exception(err)
-                    raise exception_group
+                    continue
 
                 # Replace headers with fixed headers
                 sheet_data[0] = fixed_headers
@@ -134,9 +132,6 @@ class ExcelImporter(AbstractImporter):
                 exception_group.add_exception(ex)
                 list_of_objects.extend(ex.objects)
             except BaseException as ex:
-                # Re-raise ExceptionsGroup directly (cardinality errors)
-                if isinstance(ex, ExceptionsGroup):
-                    raise
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
                 logging.error("error caught!")
@@ -198,12 +193,10 @@ class ExcelImporter(AbstractImporter):
                     allow_non_otl_conform_attributes=allow_non_otl_conform_attributes,
                     warn_for_non_otl_conform_attributes=warn_for_non_otl_conform_attributes)
 
-                # Raise cardinality errors immediately if any - no point loading data with invalid headers
                 if cardinality_errors:
-                    exception_group = ExceptionsGroup(message=f'Cardinality errors in file {filepath.name} tab {sheet}')
                     for err in cardinality_errors:
                         exception_group.add_exception(err)
-                    raise exception_group
+                    continue
 
                 # Replace headers with fixed headers
                 sheet_data[0] = fixed_headers
@@ -244,9 +237,6 @@ class ExcelImporter(AbstractImporter):
                 exception_group.add_exception(ex)
                 list_of_objects.extend(ex.objects)
             except BaseException as ex:
-                # Re-raise ExceptionsGroup directly (cardinality errors)
-                if isinstance(ex, ExceptionsGroup):
-                    raise
                 exc_type, exc_value, exc_tb = sys.exc_info()
                 tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
                 logging.error("error caught!")
