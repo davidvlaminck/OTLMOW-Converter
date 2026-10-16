@@ -350,7 +350,11 @@ class ExcelImporter(AbstractImporter):
             for col_idx, header in cardinality_indices.items():
                 if col_idx < len(new_row) and new_row[col_idx] is not None and new_row[col_idx] != '':
                     value = str(new_row[col_idx])
-                    if cardinality_separator in value:
+                    if value == '88888888':
+                        # List clearing marker must stay scalar so OTLAttribuut.set_waarde
+                        # recognizes it as a clear operation rather than a list value.
+                        new_row[col_idx] = value
+                    elif cardinality_separator in value:
                         new_row[col_idx] = value.split(cardinality_separator)
                     else:
                         new_row[col_idx] = [value]
