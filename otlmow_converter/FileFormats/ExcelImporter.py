@@ -96,7 +96,7 @@ class ExcelImporter(AbstractImporter):
                 sheet_data[0] = fixed_headers
 
                 # Split cardinality columns in data rows
-                sheet_data = cls._split_cardinality_columns(sheet_data, fixed_headers, cardinality_separator)
+                sheet_data = cls._split_cardinality_columns(sheet_data, fixed_headers, cardinality_separator, cardinality_indicator)
 
                 list_of_dicts = DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
@@ -202,7 +202,7 @@ class ExcelImporter(AbstractImporter):
                 sheet_data[0] = fixed_headers
 
                 # Split cardinality columns in data rows
-                sheet_data = cls._split_cardinality_columns(sheet_data, fixed_headers, cardinality_separator)
+                sheet_data = cls._split_cardinality_columns(sheet_data, fixed_headers, cardinality_separator, cardinality_indicator)
 
                 list_of_dicts = await DotnotationTableConverter.transform_2d_sequence_to_list_of_dicts_async(
                     two_d_sequence=sheet_data, empty_string_equals_none=True)
@@ -318,14 +318,14 @@ class ExcelImporter(AbstractImporter):
         return [[val for i, val in enumerate(row) if i not in x_indices] for row in sheet_data]
 
     @classmethod
-    def _split_cardinality_columns(cls, sheet_data: list[list], fixed_headers: list[str], cardinality_separator: str) -> list[list]:
-        """Split cardinality columns in data rows based on fixed headers with [] indicator."""
+    def _split_cardinality_columns(cls, sheet_data: list[list], fixed_headers: list[str], cardinality_separator: str, cardinality_indicator: str) -> list[list]:
+        """Split cardinality columns in data rows based on fixed headers with the configured cardinality indicator."""
         if len(sheet_data) <= 1:
             return sheet_data
         
         headers = sheet_data[0]
         # Find columns that have cardinality indicator
-        cardinality_indices = {i: header for i, header in enumerate(headers) if header is not None and '[]' in header}
+        cardinality_indices = {i: header for i, header in enumerate(headers) if header is not None and cardinality_indicator in header}
         
         if not cardinality_indices:
             return sheet_data
