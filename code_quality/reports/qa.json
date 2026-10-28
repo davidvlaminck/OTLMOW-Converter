@@ -1,0 +1,2424 @@
+{
+  "date": "2026-10-28",
+  "repo": "otlmow_converter",
+  "commit": "cd76693",
+  "thresholds": {
+    "ruff_issues": 0,
+    "ruff_format_files": 0,
+    "mypy_errors": 0,
+    "coverage_percent": 80.0,
+    "coverage_branch_percent": 75.0,
+    "max_crap": 6.0,
+    "max_complexity": 6,
+    "bandit_high": 0,
+    "dead_code": 0,
+    "god_classes": 0,
+    "unparsable_files": 0,
+    "manual_conventions": 0,
+    "pip_audit_vulns": 0,
+    "import_architecture_violations": 0
+  },
+  "metrics": {
+    "ruff_issues": 0,
+    "ruff_format_files": 0,
+    "mypy_errors": 63,
+    "coverage_percent": 86.0,
+    "coverage_branch_percent": 76.6,
+    "max_crap": 474.4,
+    "max_complexity": 43,
+    "bandit_high": 0,
+    "dead_code": 0,
+    "pip_audit_vulns": 0,
+    "god_classes": 4,
+    "unparsable_files": 0,
+    "manual_conventions": 1,
+    "import_architecture_violations": 0,
+    "import_architecture_status": "not enabled"
+  },
+  "enforced_gates": [],
+  "failed_gates": [],
+  "all_gates_met": false,
+  "lead_target": {
+    "file": "otlmow_converter/FileFormats/CsvImporter.py",
+    "name": "_python_fallback_to_objects_async",
+    "block_type": "method",
+    "complexity": 22,
+    "coverage": 2.2,
+    "crap": 474.4,
+    "lineno": 705
+  },
+  "hotspots": [
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "commits": 45,
+      "lines_changed": 1723,
+      "max_complexity": 43,
+      "score": 74089
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "commits": 39,
+      "lines_changed": 1807,
+      "max_complexity": 27,
+      "score": 48789
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "commits": 53,
+      "lines_changed": 1440,
+      "max_complexity": 31,
+      "score": 44640
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "commits": 45,
+      "lines_changed": 1680,
+      "max_complexity": 20,
+      "score": 33600
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "commits": 54,
+      "lines_changed": 1582,
+      "max_complexity": 16,
+      "score": 25312
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "commits": 17,
+      "lines_changed": 370,
+      "max_complexity": 33,
+      "score": 12210
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvExporter.py",
+      "commits": 32,
+      "lines_changed": 501,
+      "max_complexity": 10,
+      "score": 5010
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "commits": 21,
+      "lines_changed": 354,
+      "max_complexity": 12,
+      "score": 4248
+    },
+    {
+      "file": "otlmow_converter/HelperFunctions.py",
+      "commits": 7,
+      "lines_changed": 185,
+      "max_complexity": 19,
+      "score": 3515
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PyArrowConverter.py",
+      "commits": 10,
+      "lines_changed": 171,
+      "max_complexity": 20,
+      "score": 3420
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "commits": 18,
+      "lines_changed": 340,
+      "max_complexity": 9,
+      "score": 3060
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelExporter.py",
+      "commits": 22,
+      "lines_changed": 314,
+      "max_complexity": 5,
+      "score": 1570
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "commits": 13,
+      "lines_changed": 227,
+      "max_complexity": 6,
+      "score": 1362
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
+      "commits": 8,
+      "lines_changed": 177,
+      "max_complexity": 7,
+      "score": 1239
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdDecoder.py",
+      "commits": 8,
+      "lines_changed": 89,
+      "max_complexity": 13,
+      "score": 1157
+    },
+    {
+      "file": "otlmow_converter/AssetFactory.py",
+      "commits": 7,
+      "lines_changed": 70,
+      "max_complexity": 12,
+      "score": 840
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonImporter.py",
+      "commits": 6,
+      "lines_changed": 114,
+      "max_complexity": 6,
+      "score": 684
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdImporter.py",
+      "commits": 4,
+      "lines_changed": 96,
+      "max_complexity": 6,
+      "score": 576
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonDecoder.py",
+      "commits": 12,
+      "lines_changed": 110,
+      "max_complexity": 5,
+      "score": 550
+    },
+    {
+      "file": "otlmow_converter/FileExporter.py",
+      "commits": 10,
+      "lines_changed": 76,
+      "max_complexity": 7,
+      "score": 532
+    },
+    {
+      "file": "otlmow_converter/FileFormats/RDFExporter.py",
+      "commits": 5,
+      "lines_changed": 31,
+      "max_complexity": 14,
+      "score": 434
+    },
+    {
+      "file": "otlmow_converter/FileImporter.py",
+      "commits": 4,
+      "lines_changed": 58,
+      "max_complexity": 6,
+      "score": 348
+    },
+    {
+      "file": "otlmow_converter/SettingsManager.py",
+      "commits": 7,
+      "lines_changed": 63,
+      "max_complexity": 4,
+      "score": 252
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonExporter.py",
+      "commits": 5,
+      "lines_changed": 92,
+      "max_complexity": 2,
+      "score": 184
+    },
+    {
+      "file": "otlmow_converter/DotnotationDict.py",
+      "commits": 6,
+      "lines_changed": 57,
+      "max_complexity": 2,
+      "score": 114
+    },
+    {
+      "file": "otlmow_converter/FileFormats/TtlExporter.py",
+      "commits": 2,
+      "lines_changed": 37,
+      "max_complexity": 2,
+      "score": 74
+    },
+    {
+      "file": "otlmow_converter/Exceptions/BadLinesInExcelError.py",
+      "commits": 4,
+      "lines_changed": 28,
+      "max_complexity": 2,
+      "score": 56
+    },
+    {
+      "file": "otlmow_converter/Exceptions/MultipleAttributeError.py",
+      "commits": 3,
+      "lines_changed": 25,
+      "max_complexity": 2,
+      "score": 50
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ExceptionsGroup.py",
+      "commits": 2,
+      "lines_changed": 20,
+      "max_complexity": 2,
+      "score": 40
+    },
+    {
+      "file": "otlmow_converter/Exceptions/UnknownExcelError.py",
+      "commits": 1,
+      "lines_changed": 20,
+      "max_complexity": 2,
+      "score": 40
+    },
+    {
+      "file": "otlmow_converter/Exceptions/InvalidColumnNamesInExcelTabError.py",
+      "commits": 2,
+      "lines_changed": 16,
+      "max_complexity": 2,
+      "score": 32
+    },
+    {
+      "file": "otlmow_converter/AbstractExporter.py",
+      "commits": 5,
+      "lines_changed": 29,
+      "max_complexity": 1,
+      "score": 29
+    },
+    {
+      "file": "otlmow_converter/AbstractImporter.py",
+      "commits": 4,
+      "lines_changed": 29,
+      "max_complexity": 1,
+      "score": 29
+    },
+    {
+      "file": "otlmow_converter/Exceptions/CannotCombineDifferentAssetsError.py",
+      "commits": 2,
+      "lines_changed": 25,
+      "max_complexity": 1,
+      "score": 25
+    },
+    {
+      "file": "otlmow_converter/Exceptions/CannotCombineAssetsError.py",
+      "commits": 4,
+      "lines_changed": 21,
+      "max_complexity": 1,
+      "score": 21
+    },
+    {
+      "file": "otlmow_converter/Exceptions/NoTypeUriInExcelTabError.py",
+      "commits": 2,
+      "lines_changed": 18,
+      "max_complexity": 1,
+      "score": 18
+    },
+    {
+      "file": "otlmow_converter/Exceptions/DotnotationIncorrectError.py",
+      "commits": 1,
+      "lines_changed": 14,
+      "max_complexity": 1,
+      "score": 14
+    },
+    {
+      "file": "otlmow_converter/Exceptions/FailedToImportFileError.py",
+      "commits": 3,
+      "lines_changed": 13,
+      "max_complexity": 1,
+      "score": 13
+    },
+    {
+      "file": "otlmow_converter/Exceptions/TypeUriNotInFirstRowError.py",
+      "commits": 2,
+      "lines_changed": 13,
+      "max_complexity": 1,
+      "score": 13
+    },
+    {
+      "file": "otlmow_converter/Exceptions/OTLAttributeError.py",
+      "commits": 1,
+      "lines_changed": 10,
+      "max_complexity": 1,
+      "score": 10
+    },
+    {
+      "file": "otlmow_converter/Exceptions/MissingHeaderError.py",
+      "commits": 1,
+      "lines_changed": 9,
+      "max_complexity": 1,
+      "score": 9
+    },
+    {
+      "file": "otlmow_converter/Exceptions/NoTypeUriInTableError.py",
+      "commits": 1,
+      "lines_changed": 9,
+      "max_complexity": 1,
+      "score": 9
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ErrorInExcelLine.py",
+      "commits": 2,
+      "lines_changed": 8,
+      "max_complexity": 1,
+      "score": 8
+    },
+    {
+      "file": "otlmow_converter/Exceptions/DotnotationListOfListError.py",
+      "commits": 1,
+      "lines_changed": 4,
+      "max_complexity": 1,
+      "score": 4
+    },
+    {
+      "file": "otlmow_converter/Exceptions/NoIdentificatorError.py",
+      "commits": 1,
+      "lines_changed": 3,
+      "max_complexity": 1,
+      "score": 3
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ExceptionsDictGroup.py",
+      "commits": 0,
+      "lines_changed": 62,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/Exceptions/__init__.py",
+      "commits": 1,
+      "lines_changed": 0,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DictDecoder.py",
+      "commits": 2,
+      "lines_changed": 55,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableExporter.py",
+      "commits": 2,
+      "lines_changed": 164,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableImporter.py",
+      "commits": 3,
+      "lines_changed": 280,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/FileFormats/OtlAssetGeoJSONEncoder.py",
+      "commits": 2,
+      "lines_changed": 49,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/FileFormats/OtlAssetJSONEncoder.py",
+      "commits": 5,
+      "lines_changed": 59,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/FileFormats/OtlAssetJSONLDEncoder.py",
+      "commits": 3,
+      "lines_changed": 69,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/FileFormats/TableExporter.py",
+      "commits": 6,
+      "lines_changed": 97,
+      "max_complexity": 0,
+      "score": 0
+    },
+    {
+      "file": "otlmow_converter/SubsetTool.py",
+      "commits": 1,
+      "lines_changed": 75,
+      "max_complexity": 0,
+      "score": 0
+    }
+  ],
+  "ruff_per_rule": {},
+  "crap": [
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_python_fallback_to_objects_async",
+      "block_type": "method",
+      "complexity": 22,
+      "coverage": 2.2,
+      "crap": 474.4,
+      "lineno": 705
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "has_cardinality_in_path",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 4.0,
+      "crap": 98.5,
+      "lineno": 160
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "set_attribute_by_dotnotation",
+      "block_type": "method",
+      "complexity": 43,
+      "coverage": 97.2,
+      "crap": 43.0,
+      "lineno": 699
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "to_objects_async",
+      "block_type": "method",
+      "complexity": 22,
+      "coverage": 66.2,
+      "crap": 40.7,
+      "lineno": 185
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
+      "name": "from_objects_async",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 3.7,
+      "crap": 38.1,
+      "lineno": 89
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_python_fallback_to_objects",
+      "block_type": "method",
+      "complexity": 21,
+      "coverage": 66.7,
+      "crap": 37.3,
+      "lineno": 600
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "check_headers_async",
+      "block_type": "method",
+      "complexity": 31,
+      "coverage": 82.9,
+      "crap": 35.8,
+      "lineno": 619
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdImporter.py",
+      "name": "to_objects_async",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 7.1,
+      "crap": 34.8,
+      "lineno": 60
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "set_attribute_by_dotnotation",
+      "block_type": "method",
+      "complexity": 33,
+      "coverage": 100.0,
+      "crap": 33.0,
+      "lineno": 341
+    },
+    {
+      "file": "otlmow_converter/HelperFunctions.py",
+      "name": "wrap_in_quotes",
+      "block_type": "function",
+      "complexity": 6,
+      "coverage": 10.0,
+      "crap": 32.2,
+      "lineno": 18
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "check_headers",
+      "block_type": "method",
+      "complexity": 31,
+      "coverage": 95.0,
+      "crap": 31.1,
+      "lineno": 458
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_build_schema_for_headers",
+      "block_type": "method",
+      "complexity": 27,
+      "coverage": 90.9,
+      "crap": 27.5,
+      "lineno": 367
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "to_dict_instance_async",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 10.0,
+      "crap": 23.2,
+      "lineno": 84
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "from_dict_instance_async",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 10.0,
+      "crap": 23.2,
+      "lineno": 492
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "to_objects",
+      "block_type": "method",
+      "complexity": 23,
+      "coverage": 94.1,
+      "crap": 23.1,
+      "lineno": 43
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dataframe_async",
+      "block_type": "method",
+      "complexity": 14,
+      "coverage": 64.5,
+      "crap": 22.8,
+      "lineno": 263
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dotnotation_dicts_async",
+      "block_type": "method",
+      "complexity": 20,
+      "coverage": 82.5,
+      "crap": 22.1,
+      "lineno": 442
+    },
+    {
+      "file": "otlmow_converter/AssetFactory.py",
+      "name": "create_otl_object_using_other_otl_object_as_template",
+      "block_type": "method",
+      "complexity": 12,
+      "coverage": 59.1,
+      "crap": 21.9,
+      "lineno": 13
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "get_tables_per_type_from_data_async",
+      "block_type": "method",
+      "complexity": 16,
+      "coverage": 73.5,
+      "crap": 20.7,
+      "lineno": 276
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PyArrowConverter.py",
+      "name": "convert_objects_to_single_table",
+      "block_type": "method",
+      "complexity": 20,
+      "coverage": 88.0,
+      "crap": 20.7,
+      "lineno": 23
+    },
+    {
+      "file": "otlmow_converter/HelperFunctions.py",
+      "name": "combine_two_asset_instances",
+      "block_type": "function",
+      "complexity": 19,
+      "coverage": 97.3,
+      "crap": 19.0,
+      "lineno": 110
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "get_tables_per_type_from_data",
+      "block_type": "method",
+      "complexity": 16,
+      "coverage": 78.8,
+      "crap": 18.4,
+      "lineno": 193
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dotnotation_dicts",
+      "block_type": "method",
+      "complexity": 16,
+      "coverage": 78.9,
+      "crap": 18.4,
+      "lineno": 392
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_objects_async",
+      "block_type": "method",
+      "complexity": 15,
+      "coverage": 77.8,
+      "crap": 17.5,
+      "lineno": 87
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dicts_async",
+      "block_type": "method",
+      "complexity": 15,
+      "coverage": 82.8,
+      "crap": 16.2,
+      "lineno": 351
+    },
+    {
+      "file": "otlmow_converter/HelperFunctions.py",
+      "name": "combine_files",
+      "block_type": "function",
+      "complexity": 16,
+      "coverage": 100.0,
+      "crap": 16.0,
+      "lineno": 30
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_objects",
+      "block_type": "method",
+      "complexity": 14,
+      "coverage": 79.2,
+      "crap": 15.8,
+      "lineno": 51
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "_yield_list_field",
+      "block_type": "method",
+      "complexity": 15,
+      "coverage": 100.0,
+      "crap": 15.0,
+      "lineno": 374
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dataframe",
+      "block_type": "method",
+      "complexity": 14,
+      "coverage": 83.3,
+      "crap": 14.9,
+      "lineno": 216
+    },
+    {
+      "file": "otlmow_converter/FileFormats/RDFExporter.py",
+      "name": "_add_attributes_to_graph",
+      "block_type": "method",
+      "complexity": 14,
+      "coverage": 100.0,
+      "crap": 14.0,
+      "lineno": 65
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "_split_cardinality_columns",
+      "block_type": "method",
+      "complexity": 13,
+      "coverage": 85.0,
+      "crap": 13.6,
+      "lineno": 393
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "name": "convert_dataframe_to_objects_async",
+      "block_type": "method",
+      "complexity": 12,
+      "coverage": 78.3,
+      "crap": 13.5,
+      "lineno": 89
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "get_single_table_from_data_async",
+      "block_type": "method",
+      "complexity": 11,
+      "coverage": 73.1,
+      "crap": 13.4,
+      "lineno": 131
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "list_attributes_and_values_by_dotnotation",
+      "block_type": "method",
+      "complexity": 13,
+      "coverage": 100.0,
+      "crap": 13.0,
+      "lineno": 464
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdDecoder.py",
+      "name": "transform_dict_to_rdf_dict",
+      "block_type": "method",
+      "complexity": 13,
+      "coverage": 100.0,
+      "crap": 13.0,
+      "lineno": 46
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "name": "convert_dataframe_to_objects",
+      "block_type": "method",
+      "complexity": 12,
+      "coverage": 87.0,
+      "crap": 12.3,
+      "lineno": 49
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "_yield_simple_field",
+      "block_type": "method",
+      "complexity": 12,
+      "coverage": 88.5,
+      "crap": 12.2,
+      "lineno": 329
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "transform_2d_sequence_to_list_of_dicts_async",
+      "block_type": "method",
+      "complexity": 11,
+      "coverage": 79.2,
+      "crap": 12.1,
+      "lineno": 623
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "get_data_from_table_async",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 54.2,
+      "crap": 11.7,
+      "lineno": 422
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "_filter_x_columns",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 75.0,
+      "crap": 11.6,
+      "lineno": 383
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dicts",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 75.0,
+      "crap": 11.6,
+      "lineno": 317
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "get_single_table_from_data",
+      "block_type": "method",
+      "complexity": 11,
+      "coverage": 84.0,
+      "crap": 11.5,
+      "lineno": 70
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "transform_2d_sequence_to_list_of_dicts",
+      "block_type": "method",
+      "complexity": 11,
+      "coverage": 87.0,
+      "crap": 11.3,
+      "lineno": 592
+    },
+    {
+      "file": "otlmow_converter/FileFormats/RDFExporter.py",
+      "name": "create_graph",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 76.5,
+      "crap": 11.3,
+      "lineno": 14
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "get_cardinality_positions_in_path",
+      "block_type": "method",
+      "complexity": 11,
+      "coverage": 92.0,
+      "crap": 11.1,
+      "lineno": 207
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "get_attribute_by_dotnotation",
+      "block_type": "method",
+      "complexity": 11,
+      "coverage": 100.0,
+      "crap": 11.0,
+      "lineno": 262
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_file",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 79.2,
+      "crap": 10.9,
+      "lineno": 130
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_file_async",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 80.8,
+      "crap": 10.7,
+      "lineno": 168
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvExporter.py",
+      "name": "from_objects_async",
+      "block_type": "method",
+      "complexity": 9,
+      "coverage": 73.2,
+      "crap": 10.6,
+      "lineno": 104
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "clear_list_of_list_attributes",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 100.0,
+      "crap": 10.0,
+      "lineno": 534
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvExporter.py",
+      "name": "from_pyarrow_table_to_file",
+      "block_type": "method",
+      "complexity": 10,
+      "coverage": 96.0,
+      "crap": 10.0,
+      "lineno": 187
+    },
+    {
+      "file": "otlmow_converter/AssetFactory.py",
+      "name": "copy_fields_from_object_to_new_object",
+      "block_type": "method",
+      "complexity": 9,
+      "coverage": 78.9,
+      "crap": 9.8,
+      "lineno": 55
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "_sort_headers",
+      "block_type": "method",
+      "complexity": 9,
+      "coverage": 80.0,
+      "crap": 9.6,
+      "lineno": 35
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "name": "convert_wkt_string_to_geojson",
+      "block_type": "method",
+      "complexity": 9,
+      "coverage": 82.6,
+      "crap": 9.4,
+      "lineno": 150
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvExporter.py",
+      "name": "from_objects",
+      "block_type": "method",
+      "complexity": 9,
+      "coverage": 86.5,
+      "crap": 9.2,
+      "lineno": 31
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "flatten_dict",
+      "block_type": "method",
+      "complexity": 9,
+      "coverage": 94.1,
+      "crap": 9.0,
+      "lineno": 512
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_convert_single_type_path_async",
+      "block_type": "method",
+      "complexity": 8,
+      "coverage": 75.0,
+      "crap": 9.0,
+      "lineno": 272
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "name": "decode_objects",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 60.0,
+      "crap": 8.3,
+      "lineno": 124
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "get_dotnotation",
+      "block_type": "method",
+      "complexity": 8,
+      "coverage": 90.9,
+      "crap": 8.0,
+      "lineno": 45
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "get_data_dict_from_file_path",
+      "block_type": "method",
+      "complexity": 8,
+      "coverage": 100.0,
+      "crap": 8.0,
+      "lineno": 325
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "get_data_dict_from_file_path_async",
+      "block_type": "method",
+      "complexity": 8,
+      "coverage": 95.7,
+      "crap": 8.0,
+      "lineno": 353
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_to_objects_async_generator",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 78.3,
+      "crap": 7.5,
+      "lineno": 854
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_convert_single_type_path",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 80.8,
+      "crap": 7.3,
+      "lineno": 195
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "get_data_from_table",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 81.8,
+      "crap": 7.3,
+      "lineno": 359
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
+      "name": "from_objects",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 88.5,
+      "crap": 7.1,
+      "lineno": 38
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "to_dict",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 94.1,
+      "crap": 7.0,
+      "lineno": 118
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "_iterate_over_attributes_and_values_by_dotnotation",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 100.0,
+      "crap": 7.0,
+      "lineno": 209
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "get_attributes_per_level_by_dotnotation",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 94.4,
+      "crap": 7.0,
+      "lineno": 96
+    },
+    {
+      "file": "otlmow_converter/FileExporter.py",
+      "name": "get_exporter_from_extension",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 90.0,
+      "crap": 7.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelImporter.py",
+      "name": "get_index_of_typeURI_column_in_sheet",
+      "block_type": "method",
+      "complexity": 7,
+      "coverage": 100.0,
+      "crap": 7.0,
+      "lineno": 427
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "from_dict_async",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 73.7,
+      "crap": 6.7,
+      "lineno": 615
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "name": "get_bounding_box",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 81.8,
+      "crap": 6.2,
+      "lineno": 192
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "check_for_type_uri_in_first_five_rows_using_csv",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 86.7,
+      "crap": 6.1,
+      "lineno": 813
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonImporter.py",
+      "name": "to_objects",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 85.7,
+      "crap": 6.1,
+      "lineno": 18
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonImporter.py",
+      "name": "to_objects_async",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 85.7,
+      "crap": 6.1,
+      "lineno": 58
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdImporter.py",
+      "name": "to_objects",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 85.7,
+      "crap": 6.1,
+      "lineno": 20
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "from_dict",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 94.9,
+      "crap": 6.0,
+      "lineno": 528
+    },
+    {
+      "file": "otlmow_converter/FileImporter.py",
+      "name": "get_importer_from_extension",
+      "block_type": "method",
+      "complexity": 6,
+      "coverage": 94.1,
+      "crap": 6.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/HelperFunctions.py",
+      "name": "combine_assets",
+      "block_type": "function",
+      "complexity": 6,
+      "coverage": 100.0,
+      "crap": 6.0,
+      "lineno": 91
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_rename_columns",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 66.7,
+      "crap": 5.9,
+      "lineno": 576
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonDecoder.py",
+      "name": "decode_json_string",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 71.4,
+      "crap": 5.6,
+      "lineno": 11
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdDecoder.py",
+      "name": "decode_json_string",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 80.0,
+      "crap": 5.2,
+      "lineno": 12
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "to_dict_instance",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 100.0,
+      "crap": 5.0,
+      "lineno": 51
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "_yield_none_value",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 100.0,
+      "crap": 5.0,
+      "lineno": 312
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "handle_non_conform_attribute",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 100.0,
+      "crap": 5.0,
+      "lineno": 430
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "from_dict_instance",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 100.0,
+      "crap": 5.0,
+      "lineno": 457
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelExporter.py",
+      "name": "from_objects",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 95.2,
+      "crap": 5.0,
+      "lineno": 27
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelExporter.py",
+      "name": "from_objects_async",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 95.7,
+      "crap": 5.0,
+      "lineno": 78
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "name": "split_and_add_to_list",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 100.0,
+      "crap": 5.0,
+      "lineno": 207
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "name": "to_objects",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 94.4,
+      "crap": 5.0,
+      "lineno": 26
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "name": "to_objects_async",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 94.4,
+      "crap": 5.0,
+      "lineno": 75
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "name": "decode_objects_async",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 93.3,
+      "crap": 5.0,
+      "lineno": 169
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonDecoder.py",
+      "name": "decode_json_string_async",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 93.3,
+      "crap": 5.0,
+      "lineno": 44
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PyArrowConverter.py",
+      "name": "convert_table_to_objects",
+      "block_type": "method",
+      "complexity": 5,
+      "coverage": 100.0,
+      "crap": 5.0,
+      "lineno": 198
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelExporter.py",
+      "name": "create_sheet_by_name_async",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 62.5,
+      "crap": 4.8,
+      "lineno": 164
+    },
+    {
+      "file": "otlmow_converter/SettingsManager.py",
+      "name": "load_settings",
+      "block_type": "function",
+      "complexity": 4,
+      "coverage": 72.7,
+      "crap": 4.3,
+      "lineno": 15
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdContext.py",
+      "name": "replace_context",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 77.8,
+      "crap": 4.2,
+      "lineno": 18
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
+      "name": "default",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 75.0,
+      "crap": 4.2,
+      "lineno": 26
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_compute_missing_columns",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 80.0,
+      "crap": 4.1,
+      "lineno": 510
+    },
+    {
+      "file": "otlmow_converter/DotnotationDict.py",
+      "name": "__delattr__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 20.0,
+      "crap": 4.0,
+      "lineno": 19
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "to_objects",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 93.8,
+      "crap": 4.0,
+      "lineno": 45
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_get_delimiter_and_quote",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 100.0,
+      "crap": 4.0,
+      "lineno": 144
+    },
+    {
+      "file": "otlmow_converter/FileFormats/ExcelExporter.py",
+      "name": "create_sheet_by_name",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 93.3,
+      "crap": 4.0,
+      "lineno": 133
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "name": "from_dotnotation_dicts",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 100.0,
+      "crap": 4.0,
+      "lineno": 28
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "name": "construct_wkt_string_from_coords",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 100.0,
+      "crap": 4.0,
+      "lineno": 227
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PyArrowConverter.py",
+      "name": "convert_objects_to_multiple_tables",
+      "block_type": "method",
+      "complexity": 4,
+      "coverage": 88.9,
+      "crap": 4.0,
+      "lineno": 160
+    },
+    {
+      "file": "otlmow_converter/FileFormats/TtlExporter.py",
+      "name": "from_objects",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 20.0,
+      "crap": 4.0,
+      "lineno": 21
+    },
+    {
+      "file": "otlmow_converter/DotnotationDict.py",
+      "name": "__setattr__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 25.0,
+      "crap": 3.7,
+      "lineno": 11
+    },
+    {
+      "file": "otlmow_converter/Exceptions/UnknownExcelError.py",
+      "name": "__str__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 25.0,
+      "crap": 3.7,
+      "lineno": 14
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "name": "convert_objects_to_multiple_dataframes_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 33.3,
+      "crap": 3.2,
+      "lineno": 35
+    },
+    {
+      "file": "otlmow_converter/FileFormats/RDFExporter.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 80.0,
+      "crap": 3.1,
+      "lineno": 8
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "_yield_non_conform",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 290
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_read_csv_table_with_schema",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 518
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_apply_cardinality_splitting",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 555
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_append_missing_columns_to_table",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 567
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_read_unique_typeuris",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 588
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "transform_list_of_dicts_to_2d_sequence",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 545
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "transform_list_of_dicts_to_2d_sequence_async",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 568
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "_get_item_from_dict",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 655
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "name": "from_dotnotation_dicts_async",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 56
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "name": "construct_wkt_string_from_geojson",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 215
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
+      "name": "modify_jsonld_for_context",
+      "block_type": "method",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 140
+    },
+    {
+      "file": "otlmow_converter/SettingsManager.py",
+      "name": "_update_dict",
+      "block_type": "function",
+      "complexity": 3,
+      "coverage": 100.0,
+      "crap": 3.0,
+      "lineno": 29
+    },
+    {
+      "file": "otlmow_converter/Exceptions/BadLinesInExcelError.py",
+      "name": "__str__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 50.0,
+      "crap": 2.5,
+      "lineno": 27
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ExceptionsGroup.py",
+      "name": "__str__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 50.0,
+      "crap": 2.5,
+      "lineno": 15
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_validate_filepath",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 66.7,
+      "crap": 2.1,
+      "lineno": 186
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_dataframe_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 75.0,
+      "crap": 2.1,
+      "lineno": 626
+    },
+    {
+      "file": "otlmow_converter/DotnotationDict.py",
+      "name": "__getattr__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 5
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "to_dict_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 87.5,
+      "crap": 2.0,
+      "lineno": 175
+    },
+    {
+      "file": "otlmow_converter/Exceptions/BadLinesInExcelError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 9
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ExceptionsGroup.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 5
+    },
+    {
+      "file": "otlmow_converter/Exceptions/InvalidColumnNamesInExcelTabError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 85.7,
+      "crap": 2.0,
+      "lineno": 8
+    },
+    {
+      "file": "otlmow_converter/Exceptions/MultipleAttributeError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/Exceptions/MultipleAttributeError.py",
+      "name": "__str__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 16
+    },
+    {
+      "file": "otlmow_converter/Exceptions/UnknownExcelError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 2
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvExporter.py",
+      "name": "_write_file",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 228
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_get_options",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 92.3,
+      "crap": 2.0,
+      "lineno": 155
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_normalize_delimiter",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 191
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "_read_first_row_and_headers",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 88.9,
+      "crap": 2.0,
+      "lineno": 352
+    },
+    {
+      "file": "otlmow_converter/FileFormats/CsvImporter.py",
+      "name": "to_objects_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 842
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "name": "from_objects",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 82
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
+      "name": "from_objects_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 115
+    },
+    {
+      "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
+      "name": "construct_wkt_string_from_coord",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 239
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonExporter.py",
+      "name": "from_objects",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 19
+    },
+    {
+      "file": "otlmow_converter/FileFormats/JsonExporter.py",
+      "name": "from_objects_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 49
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "name": "convert_objects_to_multiple_dataframes",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 26
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "name": "tolist_if_possible",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 44
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_dicts",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 502
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_dicts_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 512
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_dicts_to_objects",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 521
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_dicts_to_objects_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 532
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_dotnotation_dicts",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 539
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_dotnotation_dicts_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 551
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_dotnotation_dicts_to_objects",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 560
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_dotnotation_dicts_to_objects_async",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 572
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_dataframe",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 614
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "collect_to_list",
+      "block_type": "method",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 664
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_objects_async",
+      "block_type": "function",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 678
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dicts_async",
+      "block_type": "function",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 687
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dotnotation_dicts_async",
+      "block_type": "function",
+      "complexity": 2,
+      "coverage": 100.0,
+      "crap": 2.0,
+      "lineno": 696
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "get_mapped_setting_name_from_file_path",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 33.3,
+      "crap": 1.3,
+      "lineno": 659
+    },
+    {
+      "file": "otlmow_converter/AbstractExporter.py",
+      "name": "from_objects",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 10
+    },
+    {
+      "file": "otlmow_converter/AbstractExporter.py",
+      "name": "from_objects_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 15
+    },
+    {
+      "file": "otlmow_converter/AbstractImporter.py",
+      "name": "to_objects",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 10
+    },
+    {
+      "file": "otlmow_converter/AbstractImporter.py",
+      "name": "to_objects_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 15
+    },
+    {
+      "file": "otlmow_converter/DotnotationDict.py",
+      "name": "__str__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 25
+    },
+    {
+      "file": "otlmow_converter/DotnotationDict.py",
+      "name": "__repr__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 28
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "get_dotnotation_instance",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 30
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "get_attributes_per_level_by_dotnotation_instance",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 85
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "get_attribute_by_dotnotation_instance",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 250
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "list_attributes_and_values_by_dotnotation_instance",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 453
+    },
+    {
+      "file": "otlmow_converter/Exceptions/BadTypeWarning.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 50.0,
+      "crap": 1.1,
+      "lineno": 5
+    },
+    {
+      "file": "otlmow_converter/DotnotationDict.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 2
+    },
+    {
+      "file": "otlmow_converter/DotnotationDictConverter.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 39
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 18
+    },
+    {
+      "file": "otlmow_converter/DotnotationHelper.py",
+      "name": "set_attribute_by_dotnotation_instance",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 320
+    },
+    {
+      "file": "otlmow_converter/Exceptions/BadLinesInExcelError.py",
+      "name": "add_exception",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 24
+    },
+    {
+      "file": "otlmow_converter/Exceptions/CannotCombineAssetsError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 5
+    },
+    {
+      "file": "otlmow_converter/Exceptions/CannotCombineDifferentAssetsError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 5
+    },
+    {
+      "file": "otlmow_converter/Exceptions/CannotCombineDifferentAssetsError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 15
+    },
+    {
+      "file": "otlmow_converter/Exceptions/CannotCombineDifferentAssetsError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 20
+    },
+    {
+      "file": "otlmow_converter/Exceptions/DotnotationIncorrectError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 8
+    },
+    {
+      "file": "otlmow_converter/Exceptions/DotnotationListOfListError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 2
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ErrorInExcelLine.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 2
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ErrorInExcelLine.py",
+      "name": "__str__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/Exceptions/ExceptionsGroup.py",
+      "name": "add_exception",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 12
+    },
+    {
+      "file": "otlmow_converter/Exceptions/FailedToImportFileError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 5
+    },
+    {
+      "file": "otlmow_converter/Exceptions/MissingHeaderError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/Exceptions/MultipleAttributeError.py",
+      "name": "add_exception",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 13
+    },
+    {
+      "file": "otlmow_converter/Exceptions/NoIdentificatorError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 2
+    },
+    {
+      "file": "otlmow_converter/Exceptions/NoTypeUriInExcelTabError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/Exceptions/NoTypeUriInTableError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/Exceptions/OTLAttributeError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 2
+    },
+    {
+      "file": "otlmow_converter/Exceptions/OTLAttributeError.py",
+      "name": "__str__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 10
+    },
+    {
+      "file": "otlmow_converter/Exceptions/TypeUriNotInFirstRowError.py",
+      "name": "__init__",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 7
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "create_instance_from_row",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 487
+    },
+    {
+      "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
+      "name": "create_instance_from_row_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 516
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "name": "convert_objects_to_single_dataframe",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 12
+    },
+    {
+      "file": "otlmow_converter/FileFormats/PandasConverter.py",
+      "name": "convert_objects_to_single_dataframe_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 17
+    },
+    {
+      "file": "otlmow_converter/FileFormats/TtlExporter.py",
+      "name": "from_objects_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 30
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "peek_generator",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 44
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_file_to_objects",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 580
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_file_to_objects_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 589
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_file",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 597
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_objects_to_file_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 606
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_dataframe_to_objects",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 636
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "from_dataframe_to_objects_async",
+      "block_type": "method",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 644
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_objects",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 674
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dicts",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 683
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dotnotation_dicts",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 692
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_file",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 705
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_file_async",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 709
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dataframe",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 715
+    },
+    {
+      "file": "otlmow_converter/OtlmowConverter.py",
+      "name": "to_dataframe_async",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 723
+    },
+    {
+      "file": "otlmow_converter/SettingsManager.py",
+      "name": "_load_settings_by_dict",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 11
+    },
+    {
+      "file": "otlmow_converter/SettingsManager.py",
+      "name": "update_settings_by_dict",
+      "block_type": "function",
+      "complexity": 1,
+      "coverage": 100.0,
+      "crap": 1.0,
+      "lineno": 37
+    }
+  ],
+  "god_classes_detail": {
+    "available": true,
+    "count": 4,
+    "classes": [
+      "otlmow_converter/DotnotationDictConverter.py:DotnotationDictConverter",
+      "otlmow_converter/OtlmowConverter.py:OtlmowConverter",
+      "otlmow_converter/FileFormats/ExcelImporter.py:ExcelImporter",
+      "otlmow_converter/FileFormats/CsvImporter.py:CsvImporter"
+    ]
+  },
+  "excluded": [],
+  "coverage_split": [
+    {
+      "group": "generated (excluded)",
+      "statements": 0,
+      "line_percent": 0.0,
+      "branches": 0,
+      "branch_percent": 0.0
+    },
+    {
+      "group": "hand-written",
+      "statements": 3613,
+      "line_percent": 86.0,
+      "branches": 1556,
+      "branch_percent": 76.6
+    }
+  ],
+  "coverage_package_percent": 86.0,
+  "coverage_package_branch_percent": 76.6,
+  "unparsable_detail": [],
+  "tools": {
+    "ruff": true,
+    "mypy": true,
+    "bandit": true,
+    "vulture": true,
+    "pip-audit": true,
+    "radon": true,
+    "pytest": true,
+    "lint-imports": false
+  }
+}

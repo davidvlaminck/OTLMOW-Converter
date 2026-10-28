@@ -1,0 +1,71 @@
+[
+  {
+    "date": "2026-10-28",
+    "commit": "cd76693",
+    "metrics": {
+      "ruff_issues": 0,
+      "ruff_format_files": -1,
+      "mypy_errors": 63,
+      "coverage_percent": 86.0,
+      "coverage_branch_percent": 76.6,
+      "max_crap": 474.4,
+      "max_complexity": 43,
+      "bandit_high": 0,
+      "dead_code": 0,
+      "pip_audit_vulns": 0,
+      "god_classes": 4,
+      "unparsable_files": 4,
+      "manual_conventions": 1,
+      "import_architecture_violations": 0,
+      "import_architecture_status": "not enabled"
+    },
+    "ruff_per_rule": {},
+    "result": "red"
+  },
+  {
+    "date": "2026-10-28",
+    "commit": "cd76693",
+    "metrics": {
+      "ruff_issues": 0,
+      "ruff_format_files": -1,
+      "mypy_errors": 63,
+      "coverage_percent": 86.0,
+      "coverage_branch_percent": 76.6,
+      "max_crap": 474.4,
+      "max_complexity": 43,
+      "bandit_high": 0,
+      "dead_code": 0,
+      "pip_audit_vulns": 0,
+      "god_classes": 4,
+      "unparsable_files": 0,
+      "manual_conventions": 1,
+      "import_architecture_violations": 0,
+      "import_architecture_status": "not enabled"
+    },
+    "ruff_per_rule": {},
+    "result": "red"
+  },
+  {
+    "date": "2026-10-28",
+    "commit": "cd76693",
+    "metrics": {
+      "ruff_issues": 0,
+      "ruff_format_files": 0,
+      "mypy_errors": 63,
+      "coverage_percent": 86.0,
+      "coverage_branch_percent": 76.6,
+      "max_crap": 474.4,
+      "max_complexity": 43,
+      "bandit_high": 0,
+      "dead_code": 0,
+      "pip_audit_vulns": 0,
+      "god_classes": 4,
+      "unparsable_files": 0,
+      "manual_conventions": 1,
+      "import_architecture_violations": 0,
+      "import_architecture_status": "not enabled"
+    },
+    "ruff_per_rule": {},
+    "result": "red"
+  }
+]

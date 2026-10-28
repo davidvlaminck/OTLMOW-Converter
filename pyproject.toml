@@ -52,9 +52,46 @@ benchmark = [
 dev = ["ruff>=0.9.0"]
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py39"
+src = ["otlmow_converter", "UnitTests", "code_quality/scripts"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B"]
-ignore = ["E501", "B008"]
+select = [
+    "E", "F", "I", "B", "C4", "UP", "PYI", "PT", "RUF", "S", "BLE", "TRY", "FLY",
+    "A", "C", "PL", "Q", "RET", "N", "W", "T20", "G", "LOG", "PIE", "SIM", "PERF",
+    "ARG", "TID", "PTH",
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+docstring-quotes = "double"
+
+[tool.ruff.lint.per-file-ignores]
+"otlmow_converter/**/*.py" = ["N802", "N803", "N815", "N806", "TID252"]
+"UnitTests/**" = ["S101", "N802", "N803", "N815", "PLR2004", "PT006", "PT011"]
+"code_quality/scripts/*.py" = ["T201", "S603"]
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "single"
+
+[tool.pytest.ini_options]
+testpaths = ["UnitTests"]
+
+[tool.mypy]
+python_version = "3.9"
+mypy_path = "."
+explicit_package_bases = true
+namespace_packages = true
+warn_unused_ignores = true
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+strict_equality = true
+warn_return_any = true
+
+[[tool.mypy.overrides]]
+module = ["otlmow_converter.*"]
+disallow_untyped_defs = false
