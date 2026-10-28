@@ -1,4 +1,4 @@
-﻿from asyncio import sleep
+from asyncio import sleep
 from json import JSONEncoder
 from pathlib import Path
 from typing import Iterable

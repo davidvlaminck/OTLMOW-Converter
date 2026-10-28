@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 from pathlib import Path
 
 from UnitTests.TestModel.OtlmowModel.Classes.Onderdeel.AllCasesTestClass import AllCasesTestClass

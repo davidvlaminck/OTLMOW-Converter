@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Set
 
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import set_value_by_dictitem, OTLObject, \

@@ -1,7 +1,7 @@
 {
   "date": "2026-10-28",
   "repo": "otlmow_converter",
-  "commit": "cd76693",
+  "commit": "967b6bb",
   "thresholds": {
     "ruff_issues": 0,
     "ruff_format_files": 0,
@@ -20,7 +20,7 @@
   },
   "metrics": {
     "ruff_issues": 0,
-    "ruff_format_files": 0,
+    "ruff_format_files": -1,
     "mypy_errors": 63,
     "coverage_percent": 86.0,
     "coverage_branch_percent": 76.6,
@@ -45,7 +45,7 @@
     "complexity": 22,
     "coverage": 2.2,
     "crap": 474.4,
-    "lineno": 705
+    "lineno": 611
   },
   "hotspots": [
     {
@@ -443,7 +443,7 @@
       "complexity": 22,
       "coverage": 2.2,
       "crap": 474.4,
-      "lineno": 705
+      "lineno": 611
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -452,7 +452,7 @@
       "complexity": 10,
       "coverage": 4.0,
       "crap": 98.5,
-      "lineno": 160
+      "lineno": 109
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -461,7 +461,7 @@
       "complexity": 43,
       "coverage": 97.2,
       "crap": 43.0,
-      "lineno": 699
+      "lineno": 502
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -470,7 +470,7 @@
       "complexity": 22,
       "coverage": 66.2,
       "crap": 40.7,
-      "lineno": 185
+      "lineno": 155
     },
     {
       "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
@@ -479,7 +479,7 @@
       "complexity": 6,
       "coverage": 3.7,
       "crap": 38.1,
-      "lineno": 89
+      "lineno": 77
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -488,7 +488,7 @@
       "complexity": 21,
       "coverage": 66.7,
       "crap": 37.3,
-      "lineno": 600
+      "lineno": 525
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -497,7 +497,7 @@
       "complexity": 31,
       "coverage": 82.9,
       "crap": 35.8,
-      "lineno": 619
+      "lineno": 535
     },
     {
       "file": "otlmow_converter/FileFormats/JsonLdImporter.py",
@@ -506,7 +506,7 @@
       "complexity": 6,
       "coverage": 7.1,
       "crap": 34.8,
-      "lineno": 60
+      "lineno": 55
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -515,7 +515,7 @@
       "complexity": 33,
       "coverage": 100.0,
       "crap": 33.0,
-      "lineno": 341
+      "lineno": 253
     },
     {
       "file": "otlmow_converter/HelperFunctions.py",
@@ -524,7 +524,7 @@
       "complexity": 6,
       "coverage": 10.0,
       "crap": 32.2,
-      "lineno": 18
+      "lineno": 15
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -533,7 +533,7 @@
       "complexity": 31,
       "coverage": 95.0,
       "crap": 31.1,
-      "lineno": 458
+      "lineno": 390
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -542,7 +542,7 @@
       "complexity": 27,
       "coverage": 90.9,
       "crap": 27.5,
-      "lineno": 367
+      "lineno": 307
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -551,7 +551,7 @@
       "complexity": 5,
       "coverage": 10.0,
       "crap": 23.2,
-      "lineno": 84
+      "lineno": 63
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -560,7 +560,7 @@
       "complexity": 5,
       "coverage": 10.0,
       "crap": 23.2,
-      "lineno": 492
+      "lineno": 342
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -578,7 +578,7 @@
       "complexity": 14,
       "coverage": 64.5,
       "crap": 22.8,
-      "lineno": 263
+      "lineno": 233
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -587,7 +587,7 @@
       "complexity": 20,
       "coverage": 82.5,
       "crap": 22.1,
-      "lineno": 442
+      "lineno": 397
     },
     {
       "file": "otlmow_converter/AssetFactory.py",
@@ -596,7 +596,7 @@
       "complexity": 12,
       "coverage": 59.1,
       "crap": 21.9,
-      "lineno": 13
+      "lineno": 10
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -605,7 +605,7 @@
       "complexity": 16,
       "coverage": 73.5,
       "crap": 20.7,
-      "lineno": 276
+      "lineno": 233
     },
     {
       "file": "otlmow_converter/FileFormats/PyArrowConverter.py",
@@ -614,7 +614,7 @@
       "complexity": 20,
       "coverage": 88.0,
       "crap": 20.7,
-      "lineno": 23
+      "lineno": 22
     },
     {
       "file": "otlmow_converter/HelperFunctions.py",
@@ -623,7 +623,7 @@
       "complexity": 19,
       "coverage": 97.3,
       "crap": 19.0,
-      "lineno": 110
+      "lineno": 102
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -632,7 +632,7 @@
       "complexity": 16,
       "coverage": 78.8,
       "crap": 18.4,
-      "lineno": 193
+      "lineno": 167
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -641,7 +641,7 @@
       "complexity": 16,
       "coverage": 78.9,
       "crap": 18.4,
-      "lineno": 392
+      "lineno": 349
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -650,7 +650,7 @@
       "complexity": 15,
       "coverage": 77.8,
       "crap": 17.5,
-      "lineno": 87
+      "lineno": 83
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -659,7 +659,7 @@
       "complexity": 15,
       "coverage": 82.8,
       "crap": 16.2,
-      "lineno": 351
+      "lineno": 311
     },
     {
       "file": "otlmow_converter/HelperFunctions.py",
@@ -668,7 +668,7 @@
       "complexity": 16,
       "coverage": 100.0,
       "crap": 16.0,
-      "lineno": 30
+      "lineno": 27
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -686,7 +686,7 @@
       "complexity": 15,
       "coverage": 100.0,
       "crap": 15.0,
-      "lineno": 374
+      "lineno": 257
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -695,7 +695,7 @@
       "complexity": 14,
       "coverage": 83.3,
       "crap": 14.9,
-      "lineno": 216
+      "lineno": 188
     },
     {
       "file": "otlmow_converter/FileFormats/RDFExporter.py",
@@ -704,7 +704,7 @@
       "complexity": 14,
       "coverage": 100.0,
       "crap": 14.0,
-      "lineno": 65
+      "lineno": 50
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -713,7 +713,7 @@
       "complexity": 13,
       "coverage": 85.0,
       "crap": 13.6,
-      "lineno": 393
+      "lineno": 335
     },
     {
       "file": "otlmow_converter/FileFormats/PandasConverter.py",
@@ -722,7 +722,7 @@
       "complexity": 12,
       "coverage": 78.3,
       "crap": 13.5,
-      "lineno": 89
+      "lineno": 82
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -731,7 +731,7 @@
       "complexity": 11,
       "coverage": 73.1,
       "crap": 13.4,
-      "lineno": 131
+      "lineno": 118
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -740,7 +740,7 @@
       "complexity": 13,
       "coverage": 100.0,
       "crap": 13.0,
-      "lineno": 464
+      "lineno": 351
     },
     {
       "file": "otlmow_converter/FileFormats/JsonLdDecoder.py",
@@ -749,7 +749,7 @@
       "complexity": 13,
       "coverage": 100.0,
       "crap": 13.0,
-      "lineno": 46
+      "lineno": 37
     },
     {
       "file": "otlmow_converter/FileFormats/PandasConverter.py",
@@ -758,7 +758,7 @@
       "complexity": 12,
       "coverage": 87.0,
       "crap": 12.3,
-      "lineno": 49
+      "lineno": 44
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -767,7 +767,7 @@
       "complexity": 12,
       "coverage": 88.5,
       "crap": 12.2,
-      "lineno": 329
+      "lineno": 220
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -776,7 +776,7 @@
       "complexity": 11,
       "coverage": 79.2,
       "crap": 12.1,
-      "lineno": 623
+      "lineno": 499
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -785,7 +785,7 @@
       "complexity": 7,
       "coverage": 54.2,
       "crap": 11.7,
-      "lineno": 422
+      "lineno": 345
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -794,7 +794,7 @@
       "complexity": 10,
       "coverage": 75.0,
       "crap": 11.6,
-      "lineno": 383
+      "lineno": 325
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -803,7 +803,7 @@
       "complexity": 10,
       "coverage": 75.0,
       "crap": 11.6,
-      "lineno": 317
+      "lineno": 280
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -821,7 +821,7 @@
       "complexity": 11,
       "coverage": 87.0,
       "crap": 11.3,
-      "lineno": 592
+      "lineno": 469
     },
     {
       "file": "otlmow_converter/FileFormats/RDFExporter.py",
@@ -839,7 +839,7 @@
       "complexity": 11,
       "coverage": 92.0,
       "crap": 11.1,
-      "lineno": 207
+      "lineno": 151
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -848,7 +848,7 @@
       "complexity": 11,
       "coverage": 100.0,
       "crap": 11.0,
-      "lineno": 262
+      "lineno": 197
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -857,7 +857,7 @@
       "complexity": 10,
       "coverage": 79.2,
       "crap": 10.9,
-      "lineno": 130
+      "lineno": 121
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -866,7 +866,7 @@
       "complexity": 10,
       "coverage": 80.8,
       "crap": 10.7,
-      "lineno": 168
+      "lineno": 153
     },
     {
       "file": "otlmow_converter/FileFormats/CsvExporter.py",
@@ -875,7 +875,7 @@
       "complexity": 9,
       "coverage": 73.2,
       "crap": 10.6,
-      "lineno": 104
+      "lineno": 96
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -884,7 +884,7 @@
       "complexity": 10,
       "coverage": 100.0,
       "crap": 10.0,
-      "lineno": 534
+      "lineno": 411
     },
     {
       "file": "otlmow_converter/FileFormats/CsvExporter.py",
@@ -893,7 +893,7 @@
       "complexity": 10,
       "coverage": 96.0,
       "crap": 10.0,
-      "lineno": 187
+      "lineno": 166
     },
     {
       "file": "otlmow_converter/AssetFactory.py",
@@ -902,7 +902,7 @@
       "complexity": 9,
       "coverage": 78.9,
       "crap": 9.8,
-      "lineno": 55
+      "lineno": 50
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -920,7 +920,7 @@
       "complexity": 9,
       "coverage": 82.6,
       "crap": 9.4,
-      "lineno": 150
+      "lineno": 130
     },
     {
       "file": "otlmow_converter/FileFormats/CsvExporter.py",
@@ -929,7 +929,7 @@
       "complexity": 9,
       "coverage": 86.5,
       "crap": 9.2,
-      "lineno": 31
+      "lineno": 32
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -938,7 +938,7 @@
       "complexity": 9,
       "coverage": 94.1,
       "crap": 9.0,
-      "lineno": 512
+      "lineno": 389
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -947,7 +947,7 @@
       "complexity": 8,
       "coverage": 75.0,
       "crap": 9.0,
-      "lineno": 272
+      "lineno": 228
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
@@ -956,7 +956,7 @@
       "complexity": 6,
       "coverage": 60.0,
       "crap": 8.3,
-      "lineno": 124
+      "lineno": 107
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -965,7 +965,7 @@
       "complexity": 8,
       "coverage": 90.9,
       "crap": 8.0,
-      "lineno": 45
+      "lineno": 33
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -974,7 +974,7 @@
       "complexity": 8,
       "coverage": 100.0,
       "crap": 8.0,
-      "lineno": 325
+      "lineno": 267
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelImporter.py",
@@ -983,7 +983,7 @@
       "complexity": 8,
       "coverage": 95.7,
       "crap": 8.0,
-      "lineno": 353
+      "lineno": 295
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -992,7 +992,7 @@
       "complexity": 7,
       "coverage": 78.3,
       "crap": 7.5,
-      "lineno": 854
+      "lineno": 736
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1001,7 +1001,7 @@
       "complexity": 7,
       "coverage": 80.8,
       "crap": 7.3,
-      "lineno": 195
+      "lineno": 166
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -1010,7 +1010,7 @@
       "complexity": 7,
       "coverage": 81.8,
       "crap": 7.3,
-      "lineno": 359
+      "lineno": 299
     },
     {
       "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
@@ -1019,7 +1019,7 @@
       "complexity": 7,
       "coverage": 88.5,
       "crap": 7.1,
-      "lineno": 38
+      "lineno": 37
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -1028,7 +1028,7 @@
       "complexity": 7,
       "coverage": 94.1,
       "crap": 7.0,
-      "lineno": 118
+      "lineno": 85
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -1037,7 +1037,7 @@
       "complexity": 7,
       "coverage": 100.0,
       "crap": 7.0,
-      "lineno": 209
+      "lineno": 144
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -1046,7 +1046,7 @@
       "complexity": 7,
       "coverage": 94.4,
       "crap": 7.0,
-      "lineno": 96
+      "lineno": 64
     },
     {
       "file": "otlmow_converter/FileExporter.py",
@@ -1064,7 +1064,7 @@
       "complexity": 7,
       "coverage": 100.0,
       "crap": 7.0,
-      "lineno": 427
+      "lineno": 365
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -1073,7 +1073,7 @@
       "complexity": 6,
       "coverage": 73.7,
       "crap": 6.7,
-      "lineno": 615
+      "lineno": 439
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
@@ -1082,7 +1082,7 @@
       "complexity": 6,
       "coverage": 81.8,
       "crap": 6.2,
-      "lineno": 192
+      "lineno": 170
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1091,7 +1091,7 @@
       "complexity": 6,
       "coverage": 86.7,
       "crap": 6.1,
-      "lineno": 813
+      "lineno": 700
     },
     {
       "file": "otlmow_converter/FileFormats/JsonImporter.py",
@@ -1109,7 +1109,7 @@
       "complexity": 6,
       "coverage": 85.7,
       "crap": 6.1,
-      "lineno": 58
+      "lineno": 52
     },
     {
       "file": "otlmow_converter/FileFormats/JsonLdImporter.py",
@@ -1127,7 +1127,7 @@
       "complexity": 6,
       "coverage": 94.9,
       "crap": 6.0,
-      "lineno": 528
+      "lineno": 366
     },
     {
       "file": "otlmow_converter/FileImporter.py",
@@ -1145,7 +1145,7 @@
       "complexity": 6,
       "coverage": 100.0,
       "crap": 6.0,
-      "lineno": 91
+      "lineno": 83
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1154,7 +1154,7 @@
       "complexity": 5,
       "coverage": 66.7,
       "crap": 5.9,
-      "lineno": 576
+      "lineno": 501
     },
     {
       "file": "otlmow_converter/FileFormats/JsonDecoder.py",
@@ -1181,7 +1181,7 @@
       "complexity": 5,
       "coverage": 100.0,
       "crap": 5.0,
-      "lineno": 51
+      "lineno": 42
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -1190,7 +1190,7 @@
       "complexity": 5,
       "coverage": 100.0,
       "crap": 5.0,
-      "lineno": 312
+      "lineno": 203
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -1199,7 +1199,7 @@
       "complexity": 5,
       "coverage": 100.0,
       "crap": 5.0,
-      "lineno": 430
+      "lineno": 299
     },
     {
       "file": "otlmow_converter/DotnotationDictConverter.py",
@@ -1208,7 +1208,7 @@
       "complexity": 5,
       "coverage": 100.0,
       "crap": 5.0,
-      "lineno": 457
+      "lineno": 319
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelExporter.py",
@@ -1217,7 +1217,7 @@
       "complexity": 5,
       "coverage": 95.2,
       "crap": 5.0,
-      "lineno": 27
+      "lineno": 26
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelExporter.py",
@@ -1226,7 +1226,7 @@
       "complexity": 5,
       "coverage": 95.7,
       "crap": 5.0,
-      "lineno": 78
+      "lineno": 65
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
@@ -1235,7 +1235,7 @@
       "complexity": 5,
       "coverage": 100.0,
       "crap": 5.0,
-      "lineno": 207
+      "lineno": 185
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
@@ -1253,7 +1253,7 @@
       "complexity": 5,
       "coverage": 94.4,
       "crap": 5.0,
-      "lineno": 75
+      "lineno": 66
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
@@ -1262,7 +1262,7 @@
       "complexity": 5,
       "coverage": 93.3,
       "crap": 5.0,
-      "lineno": 169
+      "lineno": 140
     },
     {
       "file": "otlmow_converter/FileFormats/JsonDecoder.py",
@@ -1271,7 +1271,7 @@
       "complexity": 5,
       "coverage": 93.3,
       "crap": 5.0,
-      "lineno": 44
+      "lineno": 34
     },
     {
       "file": "otlmow_converter/FileFormats/PyArrowConverter.py",
@@ -1280,7 +1280,7 @@
       "complexity": 5,
       "coverage": 100.0,
       "crap": 5.0,
-      "lineno": 198
+      "lineno": 93
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelExporter.py",
@@ -1289,7 +1289,7 @@
       "complexity": 4,
       "coverage": 62.5,
       "crap": 4.8,
-      "lineno": 164
+      "lineno": 130
     },
     {
       "file": "otlmow_converter/SettingsManager.py",
@@ -1316,7 +1316,7 @@
       "complexity": 4,
       "coverage": 75.0,
       "crap": 4.2,
-      "lineno": 26
+      "lineno": 25
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1325,7 +1325,7 @@
       "complexity": 4,
       "coverage": 80.0,
       "crap": 4.1,
-      "lineno": 510
+      "lineno": 438
     },
     {
       "file": "otlmow_converter/DotnotationDict.py",
@@ -1334,7 +1334,7 @@
       "complexity": 2,
       "coverage": 20.0,
       "crap": 4.0,
-      "lineno": 19
+      "lineno": 17
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1352,7 +1352,7 @@
       "complexity": 4,
       "coverage": 100.0,
       "crap": 4.0,
-      "lineno": 144
+      "lineno": 127
     },
     {
       "file": "otlmow_converter/FileFormats/ExcelExporter.py",
@@ -1361,7 +1361,7 @@
       "complexity": 4,
       "coverage": 93.3,
       "crap": 4.0,
-      "lineno": 133
+      "lineno": 106
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
@@ -1379,7 +1379,7 @@
       "complexity": 4,
       "coverage": 100.0,
       "crap": 4.0,
-      "lineno": 227
+      "lineno": 186
     },
     {
       "file": "otlmow_converter/FileFormats/PyArrowConverter.py",
@@ -1388,7 +1388,7 @@
       "complexity": 4,
       "coverage": 88.9,
       "crap": 4.0,
-      "lineno": 160
+      "lineno": 72
     },
     {
       "file": "otlmow_converter/FileFormats/TtlExporter.py",
@@ -1397,7 +1397,7 @@
       "complexity": 2,
       "coverage": 20.0,
       "crap": 4.0,
-      "lineno": 21
+      "lineno": 22
     },
     {
       "file": "otlmow_converter/DotnotationDict.py",
@@ -1415,7 +1415,7 @@
       "complexity": 2,
       "coverage": 25.0,
       "crap": 3.7,
-      "lineno": 14
+      "lineno": 16
     },
     {
       "file": "otlmow_converter/FileFormats/PandasConverter.py",
@@ -1424,7 +1424,7 @@
       "complexity": 2,
       "coverage": 33.3,
       "crap": 3.2,
-      "lineno": 35
+      "lineno": 32
     },
     {
       "file": "otlmow_converter/FileFormats/RDFExporter.py",
@@ -1442,7 +1442,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 290
+      "lineno": 192
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1451,7 +1451,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 518
+      "lineno": 446
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1460,7 +1460,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 555
+      "lineno": 480
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1469,7 +1469,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 567
+      "lineno": 492
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1478,7 +1478,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 588
+      "lineno": 513
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -1487,7 +1487,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 545
+      "lineno": 428
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -1496,7 +1496,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 568
+      "lineno": 450
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -1505,7 +1505,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 655
+      "lineno": 530
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
@@ -1523,7 +1523,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 215
+      "lineno": 174
     },
     {
       "file": "otlmow_converter/FileFormats/JsonLdExporter.py",
@@ -1532,7 +1532,7 @@
       "complexity": 3,
       "coverage": 100.0,
       "crap": 3.0,
-      "lineno": 140
+      "lineno": 121
     },
     {
       "file": "otlmow_converter/SettingsManager.py",
@@ -1550,7 +1550,7 @@
       "complexity": 2,
       "coverage": 50.0,
       "crap": 2.5,
-      "lineno": 27
+      "lineno": 20
     },
     {
       "file": "otlmow_converter/Exceptions/ExceptionsGroup.py",
@@ -1568,7 +1568,7 @@
       "complexity": 2,
       "coverage": 66.7,
       "crap": 2.1,
-      "lineno": 186
+      "lineno": 157
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1577,7 +1577,7 @@
       "complexity": 2,
       "coverage": 75.0,
       "crap": 2.1,
-      "lineno": 626
+      "lineno": 568
     },
     {
       "file": "otlmow_converter/DotnotationDict.py",
@@ -1595,7 +1595,7 @@
       "complexity": 2,
       "coverage": 87.5,
       "crap": 2.0,
-      "lineno": 175
+      "lineno": 123
     },
     {
       "file": "otlmow_converter/Exceptions/BadLinesInExcelError.py",
@@ -1649,7 +1649,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 2
+      "lineno": 3
     },
     {
       "file": "otlmow_converter/FileFormats/CsvExporter.py",
@@ -1658,7 +1658,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 228
+      "lineno": 207
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1667,7 +1667,7 @@
       "complexity": 2,
       "coverage": 92.3,
       "crap": 2.0,
-      "lineno": 155
+      "lineno": 138
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1676,7 +1676,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 191
+      "lineno": 162
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1685,7 +1685,7 @@
       "complexity": 2,
       "coverage": 88.9,
       "crap": 2.0,
-      "lineno": 352
+      "lineno": 293
     },
     {
       "file": "otlmow_converter/FileFormats/CsvImporter.py",
@@ -1694,7 +1694,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 842
+      "lineno": 725
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
@@ -1703,7 +1703,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 82
+      "lineno": 86
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONExporter.py",
@@ -1712,7 +1712,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 115
+      "lineno": 108
     },
     {
       "file": "otlmow_converter/FileFormats/GeoJSONImporter.py",
@@ -1721,7 +1721,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 239
+      "lineno": 198
     },
     {
       "file": "otlmow_converter/FileFormats/JsonExporter.py",
@@ -1730,7 +1730,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 19
+      "lineno": 18
     },
     {
       "file": "otlmow_converter/FileFormats/JsonExporter.py",
@@ -1739,7 +1739,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 49
+      "lineno": 42
     },
     {
       "file": "otlmow_converter/FileFormats/PandasConverter.py",
@@ -1748,7 +1748,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 26
+      "lineno": 25
     },
     {
       "file": "otlmow_converter/FileFormats/PandasConverter.py",
@@ -1757,7 +1757,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 44
+      "lineno": 39
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1766,7 +1766,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 502
+      "lineno": 451
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1775,7 +1775,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 512
+      "lineno": 461
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1784,7 +1784,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 521
+      "lineno": 468
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1793,7 +1793,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 532
+      "lineno": 479
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1802,7 +1802,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 539
+      "lineno": 486
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1811,7 +1811,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 551
+      "lineno": 498
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1820,7 +1820,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 560
+      "lineno": 506
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1829,7 +1829,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 572
+      "lineno": 517
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1838,7 +1838,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 614
+      "lineno": 556
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1847,7 +1847,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 664
+      "lineno": 606
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1856,7 +1856,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 678
+      "lineno": 620
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1865,7 +1865,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 687
+      "lineno": 629
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1874,7 +1874,7 @@
       "complexity": 2,
       "coverage": 100.0,
       "crap": 2.0,
-      "lineno": 696
+      "lineno": 638
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -1883,7 +1883,7 @@
       "complexity": 1,
       "coverage": 33.3,
       "crap": 1.3,
-      "lineno": 659
+      "lineno": 601
     },
     {
       "file": "otlmow_converter/AbstractExporter.py",
@@ -1928,7 +1928,7 @@
       "complexity": 1,
       "coverage": 50.0,
       "crap": 1.1,
-      "lineno": 25
+      "lineno": 23
     },
     {
       "file": "otlmow_converter/DotnotationDict.py",
@@ -1937,7 +1937,7 @@
       "complexity": 1,
       "coverage": 50.0,
       "crap": 1.1,
-      "lineno": 28
+      "lineno": 26
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -1946,7 +1946,7 @@
       "complexity": 1,
       "coverage": 50.0,
       "crap": 1.1,
-      "lineno": 30
+      "lineno": 25
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -1955,7 +1955,7 @@
       "complexity": 1,
       "coverage": 50.0,
       "crap": 1.1,
-      "lineno": 85
+      "lineno": 57
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -1964,7 +1964,7 @@
       "complexity": 1,
       "coverage": 50.0,
       "crap": 1.1,
-      "lineno": 250
+      "lineno": 189
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -1973,7 +1973,7 @@
       "complexity": 1,
       "coverage": 50.0,
       "crap": 1.1,
-      "lineno": 453
+      "lineno": 344
     },
     {
       "file": "otlmow_converter/Exceptions/BadTypeWarning.py",
@@ -2000,7 +2000,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 39
+      "lineno": 35
     },
     {
       "file": "otlmow_converter/DotnotationHelper.py",
@@ -2018,7 +2018,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 320
+      "lineno": 243
     },
     {
       "file": "otlmow_converter/Exceptions/BadLinesInExcelError.py",
@@ -2027,7 +2027,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 24
+      "lineno": 17
     },
     {
       "file": "otlmow_converter/Exceptions/CannotCombineAssetsError.py",
@@ -2180,7 +2180,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 10
+      "lineno": 9
     },
     {
       "file": "otlmow_converter/Exceptions/TypeUriNotInFirstRowError.py",
@@ -2198,7 +2198,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 487
+      "lineno": 393
     },
     {
       "file": "otlmow_converter/FileFormats/DotnotationTableConverter.py",
@@ -2207,7 +2207,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 516
+      "lineno": 411
     },
     {
       "file": "otlmow_converter/FileFormats/PandasConverter.py",
@@ -2225,7 +2225,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 17
+      "lineno": 18
     },
     {
       "file": "otlmow_converter/FileFormats/TtlExporter.py",
@@ -2234,7 +2234,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 30
+      "lineno": 31
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2252,7 +2252,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 580
+      "lineno": 524
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2261,7 +2261,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 589
+      "lineno": 533
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2270,7 +2270,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 597
+      "lineno": 540
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2279,7 +2279,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 606
+      "lineno": 549
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2288,7 +2288,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 636
+      "lineno": 578
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2297,7 +2297,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 644
+      "lineno": 586
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2306,7 +2306,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 674
+      "lineno": 616
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2315,7 +2315,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 683
+      "lineno": 625
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2324,7 +2324,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 692
+      "lineno": 634
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2333,7 +2333,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 705
+      "lineno": 645
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2342,7 +2342,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 709
+      "lineno": 649
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2351,7 +2351,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 715
+      "lineno": 654
     },
     {
       "file": "otlmow_converter/OtlmowConverter.py",
@@ -2360,7 +2360,7 @@
       "complexity": 1,
       "coverage": 100.0,
       "crap": 1.0,
-      "lineno": 723
+      "lineno": 660
     },
     {
       "file": "otlmow_converter/SettingsManager.py",

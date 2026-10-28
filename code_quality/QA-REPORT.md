@@ -3,14 +3,14 @@
 > GENERATED FILE — produced by `code_quality/scripts/qa_report.py`.
 > Do not edit by hand; edit the thresholds in the script instead.
 
-Generated: 2026-10-28 · commit `cd76693`
+Generated: 2026-10-28 · commit `967b6bb`
 
 ## Thresholds (gate)
 
 | Metric | Threshold | Current | Status |
 |---|---|---|---|
 | ruff issues | ≤ 0 | 0 | 🟢 |
-| files needing `ruff format` | ≤ 0 | 0 | 🟢 |
+| files needing `ruff format` | ≤ 0 | crashed | 🔴 |
 | mypy errors | ≤ 0 | 63 | 🔴 |
 | test coverage (lines, owned code) | ≥ 80.0 | 86.0 % | 🟢 |
 | test coverage (branches, owned code) | ≥ 75.0 | 76.6 % | 🟢 |
@@ -41,7 +41,7 @@ The gate above measures the **hand-written** code: that is the code a refactor t
 
 ## Lead refactor target (highest CRAP)
 
-`otlmow_converter/FileFormats/CsvImporter.py:705` → `_python_fallback_to_objects_async` — CRAP **474.4** — complexity **22** — coverage **2.2 %**
+`otlmow_converter/FileFormats/CsvImporter.py:611` → `_python_fallback_to_objects_async` — CRAP **474.4** — complexity **22** — coverage **2.2 %**
 
 Verify with `code_quality/README.md` §7 before touching it: the behaviour must be pinned by a golden-file test first.
 
@@ -59,6 +59,9 @@ Verify with `code_quality/README.md` §7 before touching it: the behaviour must 
 
 | Date | Coverage % | Branch % | Ruff | MyPy | Max CRAP | Max complexity | Result |
 |---|---:|---:|---:|---:|---:|---:|---|
+| 2026-10-28 | 86.0 | 76.6 | 0 | 63 | 474.4 | 43 | red |
+| 2026-10-28 | 86.0 | 76.6 | 0 | 63 | 474.4 | 43 | red |
+| 2026-10-28 | 86.0 | 76.6 | 0 | 63 | 474.4 | 43 | red |
 | 2026-10-28 | 86.0 | 76.6 | 0 | 63 | 474.4 | 43 | red |
 | 2026-10-28 | 86.0 | 76.6 | 0 | 63 | 474.4 | 43 | red |
 | 2026-10-28 | 86.0 | 76.6 | 0 | 63 | 474.4 | 43 | red |

@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Iterable
 from otlmow_model.OtlmowModel.BaseClasses.OTLObject import OTLObject
 from otlmow_converter.AbstractImporter import AbstractImporter
